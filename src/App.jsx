@@ -626,8 +626,9 @@ export default function App() {
         });
 
         // Comprobar si TODOS los jugadores humanos de la partida están preparados
+        // (Los bots nunca bloquean el inicio porque siempre se consideran preparados)
         const currentList = stateRef.current.players || players;
-        const humanPlayers = currentList.filter(p => p.isHuman);
+        const humanPlayers = currentList.filter(p => Boolean(p.isHuman && !p.isBot));
         const allReady = humanPlayers.length > 0 && humanPlayers.every(p => next.includes(p.id));
         if (allReady) {
           setTimeout(() => {
@@ -713,7 +714,9 @@ export default function App() {
     setPlanningTimer(30);
     setTurnTimer(cfg.turnTimeLimit || 15);
     setPhase('planning');
-    setReadyPlayers([]);
+    // Los bots siempre se inicializan como preparados automáticamente
+    const initialBotReadyIds = playerList.filter(p => p.isBot || !p.isHuman).map(p => p.id);
+    setReadyPlayers(initialBotReadyIds);
 
     const isMultiplayerActive = isMultiplayer || forceMultiplayerHost || stateRef.current.isMultiplayer;
     const isHostActive = isHost || forceMultiplayerHost || stateRef.current.isHost;
@@ -731,7 +734,7 @@ export default function App() {
       phase: 'planning',
       planningTimer: 30,
       turnTimer: cfg.turnTimeLimit || 15,
-      readyPlayers: [],
+      readyPlayers: initialBotReadyIds,
       isMultiplayer: isMultiplayerActive,
       isHost: isHostActive,
     };
@@ -1141,7 +1144,11 @@ export default function App() {
               >
                 <Check className={`w-3.5 h-3.5 ${readyPlayers.includes(mySlotId) ? 'stroke-[3]' : ''}`} />
                 <span>
-                  {readyPlayers.includes(mySlotId) ? '¡Listo!' : '¡Preparado!'} ({readyPlayers.length}/{players.filter(p => p.isHuman).length})
+                  {readyPlayers.includes(mySlotId) ? '¡Listo!' : '¡Preparado!'} (
+                  {readyPlayers.filter(id => {
+                    const p = players.find(player => player.id === id);
+                    return p && p.isHuman && !p.isBot;
+                  }).length}/{players.filter(p => Boolean(p.isHuman && !p.isBot)).length})
                 </span>
               </button>
             )}
