@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import {
   TUTORIAL_TRUMP_CARD,
@@ -44,6 +44,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
 
   const currentStep = TUTORIAL_STEPS[stepIndex] || TUTORIAL_STEPS[0];
   const trumpSuit = SUITS[TUTORIAL_TRUMP_CARD.suit];
+  const processedBotStepsRef = useRef(new Set());
 
   // Lanzar confeti al llegar a la graduación
   useEffect(() => {
@@ -56,6 +57,73 @@ export function InteractiveTutorial({ onBackToMenu }) {
       });
     }
   }, [currentStep.type]);
+
+  // Despliegue automático de la carta del bot nada más comenzar su turno para que el jugador
+  // vea la carta sobre la mesa MIENTRAS lee la explicación táctica
+  useEffect(() => {
+    if (currentStep.type !== 'bot_turn') return;
+    if (processedBotStepsRef.current.has(currentStep.stepId)) return;
+
+    processedBotStepsRef.current.add(currentStep.stepId);
+
+    const timer = setTimeout(() => {
+      if (currentStep.stepId === 20) {
+        // Conclusión del despliegue: colocar las últimas cartas de los bots en la mesa
+        sound.playCard();
+        setFronts(prev => ({
+          ...prev,
+          right: {
+            ...prev.right,
+            teamB: [
+              ...prev.right.teamB,
+              { id: 'card-9s', suit: 'spades', rank: '9', base: 9, playedBy: 'Rival B1', isShadow: false },
+            ],
+          },
+          left: {
+            ...prev.left,
+            teamA: [
+              ...prev.left.teamA,
+              { id: 'card-3d', suit: 'diamonds', rank: '3', base: 3, playedBy: 'Aliado A2', isShadow: false },
+            ],
+          },
+          center: {
+            ...prev.center,
+            teamB: [
+              ...prev.center.teamB,
+              { id: 'card-5h', suit: 'hearts', rank: '5', base: 5, playedBy: 'Rival B2', isShadow: false },
+            ],
+          },
+        }));
+        return;
+      }
+
+      const { card, frontKey, asShadow, botName, botTeam } = currentStep;
+
+      if (asShadow) {
+        sound.playShadow();
+      } else {
+        sound.playCard();
+      }
+
+      setFronts(prev => ({
+        ...prev,
+        [frontKey]: {
+          ...prev[frontKey],
+          [botTeam]: [
+            ...prev[frontKey][botTeam],
+            {
+              ...card,
+              isShadow: asShadow,
+              playedBy: botName,
+              isOwner: false,
+            },
+          ],
+        },
+      }));
+    }, 120);
+
+    return () => clearTimeout(timer);
+  }, [currentStep]);
 
   // Alerta temporal ante un clic no permitido
   function triggerWarning(msg) {
@@ -77,68 +145,9 @@ export function InteractiveTutorial({ onBackToMenu }) {
     setStepIndex(prev => prev + 1);
   }
 
-  // Ejecución de jugada del bot al pulsar "Continuar"
+  // Avanzar al siguiente paso tras leer la explicación de la jugada del bot
   function handleAdvanceBotTurn() {
-    if (currentStep.type !== 'bot_turn') return;
-
-    if (currentStep.stepId === 20) {
-      // Conclusión del despliegue: colocar las últimas cartas de los bots
-      // B1: 9♠ en right
-      // A2: 3♦ en left
-      // B2: 5♥ en center
-      setFronts(prev => ({
-        ...prev,
-        right: {
-          ...prev.right,
-          teamB: [
-            ...prev.right.teamB,
-            { id: 'card-9s', suit: 'spades', rank: '9', base: 9, playedBy: 'Rival B1', isShadow: false },
-          ],
-        },
-        left: {
-          ...prev.left,
-          teamA: [
-            ...prev.left.teamA,
-            { id: 'card-3d', suit: 'diamonds', rank: '3', base: 3, playedBy: 'Aliado A2', isShadow: false },
-          ],
-        },
-        center: {
-          ...prev.center,
-          teamB: [
-            ...prev.center.teamB,
-            { id: 'card-5h', suit: 'hearts', rank: '5', base: 5, playedBy: 'Rival B2', isShadow: false },
-          ],
-        },
-      }));
-      sound.playCard();
-      setStepIndex(prev => prev + 1);
-      return;
-    }
-
-    const { card, frontKey, asShadow, botName, botTeam } = currentStep;
-
-    if (asShadow) {
-      sound.playShadow();
-    } else {
-      sound.playCard();
-    }
-
-    setFronts(prev => ({
-      ...prev,
-      [frontKey]: {
-        ...prev[frontKey],
-        [botTeam]: [
-          ...prev[frontKey][botTeam],
-          {
-            ...card,
-            isShadow: asShadow,
-            playedBy: botName,
-            isOwner: false,
-          },
-        ],
-      },
-    }));
-
+    sound.playCard();
     setStepIndex(prev => prev + 1);
   }
 
@@ -498,23 +507,38 @@ export function InteractiveTutorial({ onBackToMenu }) {
                     {teamBCards.length === 0 ? (
                       <span className="text-[11px] text-slate-600 italic m-auto">Sin tropas enemigas</span>
                     ) : (
-                      teamBCards.map((c, i) => (
-                        <div key={`b-${i}-${c.id}`} className="relative group">
-                          <Card
-                            card={c}
-                            isShadow={c.isShadow}
-                            isRevealed={isResolutionPhase}
-                            isOwner={false}
-                            isTrump={c.suit === TUTORIAL_TRUMP_CARD.suit}
-                            compact
-                          />
-                          {c.playedBy && (
-                            <span className="absolute -bottom-1 -right-1 bg-slate-900 text-[8px] font-bold px-1 rounded border border-rose-900/50 text-rose-400">
-                              {c.playedBy}
-                            </span>
-                          )}
-                        </div>
-                      ))
+                      teamBCards.map((c, i) => {
+                        const isJustPlayed = currentStep.type === 'bot_turn' && (
+                          currentStep.card?.id === c.id ||
+                          (currentStep.stepId === 20 && ['card-9s', 'card-5h'].includes(c.id))
+                        );
+
+                        return (
+                          <div key={`b-${i}-${c.id}`} className="relative group">
+                            {isJustPlayed && (
+                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-black text-[8px] px-1.5 py-0.5 rounded shadow-lg z-20 whitespace-nowrap animate-bounce flex items-center gap-0.5">
+                                <Sparkles className="w-2.5 h-2.5" />
+                                <span>JUGADA AHORA</span>
+                              </div>
+                            )}
+                            <div className={isJustPlayed ? 'ring-2 ring-amber-400 rounded-lg scale-105 transition-all shadow-lg shadow-amber-500/20' : ''}>
+                              <Card
+                                card={c}
+                                isShadow={c.isShadow}
+                                isRevealed={isResolutionPhase}
+                                isOwner={false}
+                                isTrump={c.suit === TUTORIAL_TRUMP_CARD.suit}
+                                compact
+                              />
+                            </div>
+                            {c.playedBy && (
+                              <span className="absolute -bottom-1 -right-1 bg-slate-900 text-[8px] font-bold px-1 rounded border border-rose-900/50 text-rose-400">
+                                {c.playedBy}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })
                     )}
                   </div>
                 </div>
@@ -552,23 +576,38 @@ export function InteractiveTutorial({ onBackToMenu }) {
                     {teamACards.length === 0 ? (
                       <span className="text-[11px] text-slate-600 italic m-auto">Despliega tus tropas aquí</span>
                     ) : (
-                      teamACards.map((c, i) => (
-                        <div key={`a-${i}-${c.id}`} className="relative group">
-                          <Card
-                            card={c}
-                            isShadow={c.isShadow}
-                            isRevealed={isResolutionPhase}
-                            isOwner={c.isOwner}
-                            isTrump={c.suit === TUTORIAL_TRUMP_CARD.suit}
-                            compact
-                          />
-                          {c.playedBy && (
-                            <span className="absolute -bottom-1 -right-1 bg-slate-900 text-[8px] font-bold px-1 rounded border border-emerald-900/50 text-emerald-400">
-                              {c.playedBy}
-                            </span>
-                          )}
-                        </div>
-                      ))
+                      teamACards.map((c, i) => {
+                        const isJustPlayed = currentStep.type === 'bot_turn' && (
+                          currentStep.card?.id === c.id ||
+                          (currentStep.stepId === 20 && c.id === 'card-3d')
+                        );
+
+                        return (
+                          <div key={`a-${i}-${c.id}`} className="relative group">
+                            {isJustPlayed && (
+                              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-black text-[8px] px-1.5 py-0.5 rounded shadow-lg z-20 whitespace-nowrap animate-bounce flex items-center gap-0.5">
+                                <Sparkles className="w-2.5 h-2.5" />
+                                <span>JUGADA AHORA</span>
+                              </div>
+                            )}
+                            <div className={isJustPlayed ? 'ring-2 ring-amber-400 rounded-lg scale-105 transition-all shadow-lg shadow-amber-500/20' : ''}>
+                              <Card
+                                card={c}
+                                isShadow={c.isShadow}
+                                isRevealed={isResolutionPhase}
+                                isOwner={c.isOwner}
+                                isTrump={c.suit === TUTORIAL_TRUMP_CARD.suit}
+                                compact
+                              />
+                            </div>
+                            {c.playedBy && (
+                              <span className="absolute -bottom-1 -right-1 bg-slate-900 text-[8px] font-bold px-1 rounded border border-emerald-900/50 text-emerald-400">
+                                {c.playedBy}
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })
                     )}
                   </div>
 
