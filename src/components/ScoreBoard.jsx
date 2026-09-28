@@ -121,10 +121,10 @@ export function ScoreBoard({
             <span>Descarte: <strong className="text-slate-200 font-mono">{discardDeckCount}</strong></span>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1">
+          <div className="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1" title="Equipo que empieza atacando en esta ronda (Iniciativa)">
             <span>Iniciativa: </span>
             <strong className={initiativeTeam === 'teamA' ? 'text-emerald-400' : 'text-rose-400'}>
-              {initiativeTeam === 'teamA' ? (is1v1 ? 'Tuya' : 'Equipo A') : (is1v1 ? 'Rival' : 'Equipo B')}
+              {initiativeTeam === 'teamA' ? (is1v1 ? 'Tuya (1er Ataque)' : 'Equipo A (1er Ataque)') : (is1v1 ? 'Rival (1er Ataque)' : 'Equipo B (1er Ataque)')}
             </strong>
           </div>
         </div>

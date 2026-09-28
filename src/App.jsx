@@ -29,6 +29,7 @@ import {
   Check,
   AlertTriangle,
   Sparkles,
+  Dices,
 } from 'lucide-react';
 
 export default function App() {
@@ -158,6 +159,7 @@ export default function App() {
       drawDeckLength: base.drawDeck ? base.drawDeck.length : 0,
       discardDeckLength: base.discardDeck ? base.discardDeck.length : 0,
       initiativeTeam: base.initiativeTeam,
+      initiativeNotice: base.initiativeNotice,
       modeId: base.selectedMode,
     };
 
@@ -191,6 +193,9 @@ export default function App() {
     setTeamACumulativePoints(syncData.teamACumulativePoints);
     setTeamBCumulativePoints(syncData.teamBCumulativePoints);
     setInitiativeTeam(syncData.initiativeTeam);
+    if (syncData.initiativeNotice !== undefined) {
+      setInitiativeNotice(syncData.initiativeNotice);
+    }
 
     stateRef.current = {
       ...stateRef.current,
@@ -207,6 +212,7 @@ export default function App() {
       teamACumulativePoints: syncData.teamACumulativePoints,
       teamBCumulativePoints: syncData.teamBCumulativePoints,
       initiativeTeam: syncData.initiativeTeam,
+      initiativeNotice: syncData.initiativeNotice,
     };
   }
 
@@ -341,27 +347,9 @@ export default function App() {
     return list;
   }
 
-  // Corte de baraja oficial para definir iniciativa en la Ronda 1 (Capítulo 3)
-  function cutDeckForInitialInitiative(deck) {
-    let cardA, cardB;
-    let attempts = 0;
-    do {
-      const idxA = Math.floor(Math.random() * deck.length);
-      let idxB = Math.floor(Math.random() * deck.length);
-      while (idxB === idxA) {
-        idxB = Math.floor(Math.random() * deck.length);
-      }
-      cardA = deck[idxA];
-      cardB = deck[idxB];
-      attempts++;
-    } while (cardA.base === cardB.base && attempts < 10);
-
-    const winnerTeam = cardA.base >= cardB.base ? 'teamA' : 'teamB';
-    return {
-      winnerTeam,
-      cardA,
-      cardB,
-    };
+  // Selección aleatoria oficial para definir quién empieza atacando (Iniciativa en Ronda 1)
+  function determineInitialInitiative() {
+    return Math.random() < 0.5 ? 'teamA' : 'teamB';
   }
 
   // Fin del despliegue de la ronda
@@ -709,6 +697,32 @@ export default function App() {
     const initialBotReadyIds = playerList.filter(p => p.isBot || !p.isHuman).map(p => p.id);
     setReadyPlayers(initialBotReadyIds);
 
+    // Mensaje descriptivo de quién empieza atacando (sorteo en Ronda 1, rotación en rondas posteriores)
+    const isTeamA = newInitiativeTeam === 'teamA';
+    const activeModeId = cfg.id || selectedMode || stateRef.current.selectedMode;
+    const is1v1 = activeModeId === '1v1';
+    const isMp = isMultiplayer || forceMultiplayerHost || stateRef.current.isMultiplayer;
+
+    let noticeText = '';
+    if (roundNumber === 1) {
+      if (isMp) {
+        noticeText = `🎲 Sorteo de Iniciativa (Ronda 1): ¡Le ha tocado empezar atacando al ${isTeamA ? 'Equipo A' : 'Equipo B'}!`;
+      } else if (is1v1) {
+        noticeText = `🎲 Sorteo de Iniciativa (Ronda 1): ¡${isTeamA ? 'Te ha tocado a TI empezar atacando' : 'Le ha tocado al RIVAL empezar atacando'}!`;
+      } else {
+        noticeText = `🎲 Sorteo de Iniciativa (Ronda 1): ¡${isTeamA ? 'Le ha tocado a TU EQUIPO (A) empezar atacando' : 'Le ha tocado al EQUIPO RIVAL (B) empezar atacando'}!`;
+      }
+    } else {
+      if (isMp) {
+        noticeText = `🔄 Rotación de Iniciativa (Ronda ${roundNumber}): Por reglamento alterna la iniciativa. Empieza atacando el ${isTeamA ? 'Equipo A' : 'Equipo B'}.`;
+      } else if (is1v1) {
+        noticeText = `🔄 Rotación de Iniciativa (Ronda ${roundNumber}): Por reglamento alterna la iniciativa. Ahora ${isTeamA ? 'te toca a TI empezar atacando' : 'le toca al RIVAL empezar atacando'}.`;
+      } else {
+        noticeText = `🔄 Rotación de Iniciativa (Ronda ${roundNumber}): Por reglamento alterna la iniciativa. Ahora ${isTeamA ? 'le toca a TU EQUIPO (A) empezar atacando' : 'le toca al EQUIPO RIVAL (B) empezar atacando'}.`;
+      }
+    }
+    setInitiativeNotice(noticeText);
+
     const isMultiplayerActive = isMultiplayer || forceMultiplayerHost || stateRef.current.isMultiplayer;
     const isHostActive = isHost || forceMultiplayerHost || stateRef.current.isHost;
 
@@ -716,6 +730,7 @@ export default function App() {
       ...stateRef.current,
       round: roundNumber,
       initiativeTeam: newInitiativeTeam,
+      initiativeNotice: noticeText,
       drawDeck: pool,
       discardDeck: discards,
       trumpCard: trump,
@@ -747,13 +762,7 @@ export default function App() {
     setTotalMatchRounds(rhythmConfig.rounds);
 
     const initialDeck = createDeck(modeConfig.decks);
-    const cut = cutDeckForInitialInitiative(initialDeck);
-    const initialInitiative = cut.winnerTeam;
-
-    const noticeText = `Corte de Baraja (Ronda 1): Equipo A sacó [${cut.cardA.rank}] vs Equipo B [${cut.cardB.rank}] ➔ ¡Iniciativa inicial para ${
-      initialInitiative === 'teamA' ? (selectedMode === '1v1' ? 'Ti' : 'Equipo A') : (selectedMode === '1v1' ? 'el Rival' : 'Equipo B')
-    }!`;
-    setInitiativeNotice(noticeText);
+    const initialInitiative = determineInitialInitiative();
 
     startNewRound(1, initialInitiative, initialDeck, [], modeConfig);
     setScreen('game');
@@ -786,13 +795,7 @@ export default function App() {
 
     if (isHostUser) {
       const initialDeck = createDeck(activeConfig.decks);
-      const cut = cutDeckForInitialInitiative(initialDeck);
-      const initialInitiative = cut.winnerTeam;
-
-      const noticeText = `Corte de Baraja Multijugador: Equipo A [${cut.cardA.rank}] vs Equipo B [${cut.cardB.rank}] ➔ Iniciativa para ${
-        initialInitiative === 'teamA' ? 'Equipo A' : 'Equipo B'
-      }.`;
-      setInitiativeNotice(noticeText);
+      const initialInitiative = determineInitialInitiative();
 
       // Notificar a todos los clientes que la partida arranca
       mp.broadcast({
@@ -853,13 +856,7 @@ export default function App() {
     setTotalMatchRounds(rhythmConfig.rounds);
 
     const newDeck = createDeck(modeConfig.decks);
-    const cut = cutDeckForInitialInitiative(newDeck);
-    const initialInitiative = cut.winnerTeam;
-
-    const noticeText = `Corte de Baraja: Equipo A [${cut.cardA.rank}] vs Equipo B [${cut.cardB.rank}] ➔ ¡Iniciativa para ${
-      initialInitiative === 'teamA' ? (selectedMode === '1v1' ? 'Ti' : 'Equipo A') : (selectedMode === '1v1' ? 'el Rival' : 'Equipo B')
-    }!`;
-    setInitiativeNotice(noticeText);
+    const initialInitiative = determineInitialInitiative();
 
     startNewRound(1, initialInitiative, newDeck, [], modeConfig);
   }
@@ -1070,18 +1067,18 @@ export default function App() {
         />
       )}
 
-      {/* Aviso de Corte de Baraja / Iniciativa */}
+      {/* Aviso de Sorteo / Iniciativa (Quién empieza atacando) */}
       {initiativeNotice && (
-        <div className="bg-indigo-950/90 border-b border-indigo-700/60 text-indigo-200 px-4 py-1.5 text-xs flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>{initiativeNotice}</span>
+        <div className="bg-gradient-to-r from-amber-950/95 via-indigo-950/95 to-slate-900 border-b border-amber-500/50 text-amber-200 px-4 py-2 text-xs flex items-center justify-between shadow-lg animate-fadeIn">
+          <div className="flex items-center gap-2.5">
+            <Dices className="w-4 h-4 text-amber-400 shrink-0 animate-bounce" />
+            <span className="font-semibold text-slate-100">{initiativeNotice}</span>
           </div>
           <button
             onClick={() => setInitiativeNotice(null)}
-            className="text-[10px] uppercase font-bold text-indigo-400 hover:text-white"
+            className="text-[10px] uppercase font-bold text-amber-400 hover:text-white px-2.5 py-0.5 rounded bg-slate-900/60 border border-amber-500/30 hover:border-amber-400 transition"
           >
-            Cerrar
+            Entendido
           </button>
         </div>
       )}

@@ -231,9 +231,9 @@ export function FullManualModal({ isOpen, onClose }) {
                 </div>
 
                 <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
-                  <h4 className="font-bold text-slate-100">Determinación de la Iniciativa Inicial (Corte de Baraja)</h4>
+                  <h4 className="font-bold text-slate-100">Determinación de la Iniciativa Inicial</h4>
                   <p>
-                    Antes de iniciar la Ronda 1, un representante de cada equipo roba una carta del mazo. El equipo que obtenga la carta de mayor valor base recibe la <strong className="text-amber-400">Ficha de Iniciativa</strong>. A continuación, las cartas utilizadas se devuelven al mazo y este se vuelve a barajar completamente.
+                    Antes de iniciar la Ronda 1, se determina qué equipo empieza atacando mediante un <strong className="text-amber-400">sorteo 100% aleatorio</strong> (en el juego presencial de mesa se realiza un corte de baraja robando la carta más alta; en la versión digital el sistema ejecuta este sorteo automáticamente por código). El equipo beneficiado recibe la <strong className="text-amber-400">Ficha de Iniciativa</strong> y abre el primer turno de despliegue.
                   </p>
                 </div>
 
@@ -535,7 +535,7 @@ export function FullManualModal({ isOpen, onClose }) {
                         <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded uppercase">Setup</span>
                       </div>
                       <p className="text-slate-400">
-                        Se revela la carta superior del Mazo Principal para fijar el Palo Triunfo (+2 pts por carta de ese palo) y cada duelista coloca sus 2 Marcadores de Sombra activos. La Iniciativa rota automáticamente al rival respecto a la ronda previa (o se determina por corte de baraja en Ronda 1).
+                        Se revela la carta superior del Mazo Principal para fijar el Palo Triunfo (+2 pts por carta de ese palo) y cada duelista coloca sus 2 Marcadores de Sombra activos. La Iniciativa rota automáticamente al rival respecto a la ronda previa (o se determina por sorteo aleatorio en Ronda 1).
                       </p>
                     </div>
 

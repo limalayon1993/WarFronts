@@ -309,6 +309,11 @@ export function InteractiveTutorial({ onBackToMenu }) {
               <span className="text-rose-400 font-bold">Equipo B (B1 y B2)</span>
             </div>
 
+            <div className="hidden sm:flex items-center gap-1.5 text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1" title="Tu equipo ganó el sorteo de iniciativa para empezar atacando">
+              <span className="text-slate-400">Iniciativa:</span>
+              <span className="text-emerald-400 font-bold">Tu Equipo (1er Ataque)</span>
+            </div>
+
             <button
               onClick={() => setIsMuted(sound.toggleMute())}
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition"

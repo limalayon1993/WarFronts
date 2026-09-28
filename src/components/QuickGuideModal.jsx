@@ -125,7 +125,7 @@ export function QuickGuideModal({ isOpen, onClose }) {
                   <div className="flex items-start gap-2 bg-slate-950/60 p-2 rounded border border-slate-800/80">
                     <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                     <span>
-                      <strong className="text-amber-300">Rotación de Iniciativa:</strong> Ronda 1 por corte de baraja (carta más alta). Desde Ronda 2 rota automáticamente al rival.
+                      <strong className="text-amber-300">Rotación de Iniciativa:</strong> Ronda 1 por sorteo aleatorio (corte de baraja en presencial). Desde Ronda 2 rota automáticamente al rival.
                     </span>
                   </div>
                 </div>

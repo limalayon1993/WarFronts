@@ -78,6 +78,14 @@ export function TurnStrip({
                   <Bot className={`w-3 h-3 ${isTeamA ? 'text-emerald-400' : 'text-rose-400'}`} />
                 )}
                 <span>{player.name}</span>
+                {idx === 0 && (
+                  <span
+                    className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 shrink-0"
+                    title="Abre la ronda atacando (Equipo con Iniciativa)"
+                  >
+                    1º Ataque
+                  </span>
+                )}
                 <span className="font-mono text-[10px] text-slate-500">
                   ({player.hand.length})
                 </span>

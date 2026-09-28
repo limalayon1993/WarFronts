@@ -93,19 +93,19 @@ export const TUTORIAL_STEPS = [
     buttonText: 'Comenzar Instrucción',
   },
 
-  // PASO 1: LECTURA DEL PALO DE TRIUNFO
+  // PASO 1: LECTURA DEL PALO DE TRIUNFO E INICIATIVA (QUIÉN EMPIEZA ATACANDO)
   {
     stepId: 1,
     type: 'dialog',
     stage: 'trump_reveal',
-    title: 'Fase 1: Palo de Triunfo Revelado',
-    subtitle: 'El factor determinante de puntuación',
+    title: 'Fase 1: Palo de Triunfo e Iniciativa Inicial',
+    subtitle: 'Triunfo de Ronda y Sorteo de Quién Empieza Atacando',
     instructor: 'Comandante Instructor',
     content: [
-      'Observa la parte superior: la carta de triunfo revelada es el 7 de Corazones (♥).',
-      '¡El palo de triunfo de esta ronda es CORAZONES (♥)!',
-      '¿Qué significa esto? Toda carta de Corazones que se juegue en cualquier frente sumará automáticamente +2 PUNTOS EXTRA además de su valor numérico base.',
-      'En WarFronts los valores van del 2 al 10, y las figuras valen: Jota (J) = 11, Reina (Q) = 12, Rey (K) = 13 y As (A) = 14.',
+      'Observa la parte superior: la carta de triunfo revelada es el 7 de Corazones (♥). Toda carta de Corazones que se juegue en cualquier frente sumará automáticamente +2 PUNTOS EXTRA además de su valor numérico base (del 2 al 10, J=11, Q=12, K=13, A=14).',
+      '¿Quién empieza atacando? La selección de qué equipo abre el juego es 100% ALEATORIA en la Ronda 1. En el juego presencial de mesa se realiza un corte de baraja (robando una carta cada equipo y ganando la más alta), mientras que en esta versión digital el sistema realiza el sorteo aleatorio automáticamente por código sin necesidad de cortar cartas.',
+      'Rotación de iniciativa: A partir de la Ronda 2, la iniciativa rota automáticamente al equipo rival al comenzar cada ronda, alternando quién abre las hostilidades.',
+      'Para esta instrucción guiada, ¡el sorteo ha otorgado la iniciativa a tu equipo (Equipo A) y serás tú (A1) quien realice el primer ataque!',
     ],
     buttonText: 'Ver Fase de Planificación',
   },
@@ -142,7 +142,7 @@ export const TUTORIAL_STEPS = [
     title: 'Tu Turno 1: Despliegue Inicial',
     actionPrompt: 'Selecciona tu Rey de Corazones (K♥) y despliégalo en el Frente Central.',
     whyThisCard:
-      'El Rey de Corazones tiene valor base 13 + 2 puntos por ser palo de triunfo = ¡15 puntos totales! Abrir con un golpe de autoridad en el Centro establece control territorial inmediato y le indica a tu aliado A2 que tenemos cartas de Corazones para cooperar.',
+      'Al haber ganado la iniciativa de la ronda, tu equipo empieza atacando y abres la partida. El Rey de Corazones tiene valor base 13 + 2 puntos por ser palo de triunfo = ¡15 puntos totales! Abrir con un golpe de autoridad en el Centro establece control territorial inmediato y le indica a tu aliado A2 que tenemos cartas de Corazones para cooperar.',
     whyNotOthers: [
       {
         cardLabel: '4 de Tréboles (4♣)',
