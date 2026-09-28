@@ -5,8 +5,8 @@ import { Lock, Zap, Swords } from 'lucide-react';
 export function FrontZone({
   frontKey,
   frontInfo,
-  teamACards = [], // Aliados (incluye al jugador humano)
-  teamBCards = [], // Rivales
+  teamACards = [], // Tropas del Equipo A
+  teamBCards = [], // Tropas del Equipo B
   trumpSuit,
   isRoundOver = false,
   selectedCard = null,
@@ -14,6 +14,7 @@ export function FrontZone({
   maxFrontCards = 8,
   modeId = '1v1',
   viewerPlayerId = null,
+  viewerTeam = 'teamA',
   onDeploy,
 }) {
   const totalCards = teamACards.length + teamBCards.length;
@@ -21,6 +22,22 @@ export function FrontZone({
   const canDeploy = isPlayerTurn && !isSaturated && selectedCard;
 
   const isTeamMode = modeId !== '1v1';
+  const isViewerTeamB = viewerTeam === 'teamB';
+
+  const allyCards = isViewerTeamB ? teamBCards : teamACards;
+  const enemyCards = isViewerTeamB ? teamACards : teamBCards;
+
+  const allyLabel = isTeamMode 
+    ? (isViewerTeamB ? 'Tu Equipo (B)' : 'Tu Equipo (A)') 
+    : 'Tus Fuerzas';
+  const allyColor = isViewerTeamB ? 'text-rose-400' : 'text-emerald-400';
+  const allyBorder = isViewerTeamB ? 'border-rose-900/50 text-rose-400' : 'border-emerald-900/50 text-emerald-400';
+
+  const enemyLabel = isTeamMode 
+    ? (isViewerTeamB ? 'Equipo Rival (A)' : 'Equipo Rival (B)') 
+    : 'Rival';
+  const enemyColor = isViewerTeamB ? 'text-emerald-400' : 'text-rose-400';
+  const enemyBorder = isViewerTeamB ? 'border-emerald-900/50 text-emerald-400' : 'border-rose-900/50 text-rose-400';
 
   return (
     <div
@@ -57,27 +74,26 @@ export function FrontZone({
         </div>
       </div>
 
-      {/* Lado de Rivales (Equipo B) */}
+      {/* Lado de Rivales (Arriba) */}
       <div className="my-2 min-h-[90px] flex flex-col justify-start">
         <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
-          <span className="font-semibold text-rose-400">
-            {isTeamMode ? 'Equipo Rival (B)' : 'Rival'}
+          <span className={`font-semibold ${enemyColor}`}>
+            {enemyLabel}
           </span>
-          {/* Conteo de cartas desplegadas (sin contador de puntos numéricos) */}
           <span className="font-mono text-xs text-slate-400">
-            {teamBCards.length} {teamBCards.length === 1 ? 'carta' : 'cartas'}
+            {enemyCards.length} {enemyCards.length === 1 ? 'carta' : 'cartas'}
           </span>
         </div>
 
-        {/* Cartas del Equipo Rival */}
+        {/* Cartas del Rival */}
         <div className="flex flex-wrap gap-1 items-center min-h-[64px] bg-slate-950/40 rounded-lg p-1.5 border border-slate-800/80">
-          {teamBCards.length === 0 ? (
+          {enemyCards.length === 0 ? (
             <span className="text-[11px] text-slate-600 italic m-auto">Sin tropas enemigas</span>
           ) : (
-            teamBCards.map((card, idx) => {
-              const isOwner = card.playedById === viewerPlayerId;
+            enemyCards.map((card, idx) => {
+              const isOwner = Boolean(card.isOwner || (card.playedById && card.playedById === viewerPlayerId));
               return (
-                <div key={`b-${idx}-${card.id}`} className="relative group">
+                <div key={`enemy-${idx}-${card.id}`} className="relative group">
                   <Card
                     card={card}
                     isShadow={card.isShadow}
@@ -87,7 +103,7 @@ export function FrontZone({
                     compact
                   />
                   {card.playedBy && (
-                    <span className="absolute -bottom-1 -right-1 bg-slate-900 text-rose-400 text-[8px] font-bold px-1 rounded border border-rose-900/50">
+                    <span className={`absolute -bottom-1 -right-1 bg-slate-900 text-[8px] font-bold px-1 rounded border ${enemyBorder}`}>
                       {card.playedBy}
                     </span>
                   )}
@@ -98,7 +114,7 @@ export function FrontZone({
         </div>
       </div>
 
-      {/* Divisor Central / Balanza de Batalla táctica sin revelar puntuación mental */}
+      {/* Divisor Central / Balanza de Batalla táctica */}
       <div className="py-2 my-1 border-y border-slate-800/80 flex items-center justify-between bg-slate-950/60 px-3 rounded-lg">
         <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
           <Swords className="w-3.5 h-3.5 text-amber-500/80" />
@@ -124,18 +140,17 @@ export function FrontZone({
         )}
       </div>
 
-      {/* Lado de Aliados (Equipo A) */}
+      {/* Lado de Aliados / Propias Tropas (Abajo) */}
       <div className="my-2 min-h-[90px] flex flex-col justify-end">
-        {/* Cartas del Equipo Aliado */}
+        {/* Cartas de las Fuerzas Propias / Aliadas */}
         <div className="flex flex-wrap gap-1 items-center min-h-[64px] bg-slate-950/40 rounded-lg p-1.5 border border-slate-800/80 mb-1.5">
-          {teamACards.length === 0 ? (
+          {allyCards.length === 0 ? (
             <span className="text-[11px] text-slate-600 italic m-auto">Despliega tus tropas aquí</span>
           ) : (
-            teamACards.map((card, idx) => {
-              // Solo la persona que lanzó la carta sombra puede verla; los compañeros de equipo NO pueden verla
-              const isOwner = card.playedById ? card.playedById === viewerPlayerId : card.isHuman;
+            allyCards.map((card, idx) => {
+              const isOwner = Boolean(card.isOwner || (card.playedById && card.playedById === viewerPlayerId));
               return (
-                <div key={`a-${idx}-${card.id}`} className="relative group">
+                <div key={`ally-${idx}-${card.id}`} className="relative group">
                   <Card
                     card={card}
                     isShadow={card.isShadow}
@@ -145,7 +160,7 @@ export function FrontZone({
                     compact
                   />
                   {card.playedBy && (
-                    <span className="absolute -bottom-1 -right-1 bg-slate-900 text-emerald-400 text-[8px] font-bold px-1 rounded border border-emerald-900/50">
+                    <span className={`absolute -bottom-1 -right-1 bg-slate-900 text-[8px] font-bold px-1 rounded border ${allyBorder}`}>
                       {card.playedBy}
                     </span>
                   )}
@@ -155,13 +170,13 @@ export function FrontZone({
           )}
         </div>
 
-        {/* Pie del equipo aliado (sin desgloses automáticos ni sumadores de puntos) */}
+        {/* Pie de tropas propias */}
         <div className="flex items-center justify-between text-[11px] text-slate-400">
-          <span className="font-semibold text-emerald-400">
-            {isTeamMode ? 'Equipo Aliado (A)' : 'Tus Fuerzas'}
+          <span className={`font-semibold ${allyColor}`}>
+            {allyLabel}
           </span>
           <span className="font-mono text-xs text-slate-400">
-            {teamACards.length} {teamACards.length === 1 ? 'carta' : 'cartas'}
+            {allyCards.length} {allyCards.length === 1 ? 'carta' : 'cartas'}
           </span>
         </div>
       </div>

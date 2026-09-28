@@ -39,6 +39,7 @@ export default function App() {
   const [isHost, setIsHost] = useState(false);
   const [mySlotId, setMySlotId] = useState('A1');
   const [multiplayerRoomCode, setMultiplayerRoomCode] = useState('');
+  const [multiplayerSlots, setMultiplayerSlots] = useState(null);
 
   // Selección del Menú
   const [selectedMode, setSelectedMode] = useState('1v1');
@@ -130,9 +131,13 @@ export default function App() {
 
   // Difundir estado a todos los clientes multijugador con sanitización estricta anti-trampas
   function broadcastStateToClients(customState = null) {
-    if (!mp.isHost || !stateRef.current.isMultiplayer) return;
+    if (!mp.isHost) return;
+    const isMp = customState?.isMultiplayer ?? stateRef.current.isMultiplayer;
+    if (!isMp) return;
 
     const base = customState || stateRef.current;
+    if (!base.fronts || !base.players) return;
+
     const fullState = {
       fronts: base.fronts,
       players: base.players,
@@ -168,6 +173,7 @@ export default function App() {
 
   // Aplicar sincronización recibida del Host (en modo Cliente)
   function applySynchronizedState(syncData) {
+    if (!syncData) return;
     setFronts(syncData.fronts);
     setPlayers(syncData.players);
     setCurrentTurnPlayerId(syncData.currentTurnPlayerId);
@@ -181,6 +187,23 @@ export default function App() {
     setTeamACumulativePoints(syncData.teamACumulativePoints);
     setTeamBCumulativePoints(syncData.teamBCumulativePoints);
     setInitiativeTeam(syncData.initiativeTeam);
+
+    stateRef.current = {
+      ...stateRef.current,
+      fronts: syncData.fronts,
+      players: syncData.players,
+      currentTurnPlayerId: syncData.currentTurnPlayerId,
+      turnTimer: syncData.turnTimer,
+      phase: syncData.phase,
+      round: syncData.round,
+      totalMatchRounds: syncData.totalMatchRounds,
+      trumpCard: syncData.trumpCard,
+      teamARoundPoints: syncData.teamARoundPoints,
+      teamBRoundPoints: syncData.teamBRoundPoints,
+      teamACumulativePoints: syncData.teamACumulativePoints,
+      teamBCumulativePoints: syncData.teamBCumulativePoints,
+      initiativeTeam: syncData.initiativeTeam,
+    };
   }
 
   // Escuchar eventos de red en multijugador
@@ -222,8 +245,21 @@ export default function App() {
   // Generar lista de jugadores según el modo e iniciativa
   function createPlayerList(mode, initTeam, customSlots = null) {
     if (customSlots && customSlots.length > 0) {
-      // Usar los slots configurados en el lobby multijugador
-      return customSlots.map(s => ({
+      // Usar los slots configurados en el lobby multijugador, ordenados intercalando turnos
+      const teamAPlayers = customSlots.filter(s => s.team === 'teamA');
+      const teamBPlayers = customSlots.filter(s => s.team === 'teamB');
+      const maxLen = Math.max(teamAPlayers.length, teamBPlayers.length);
+      const ordered = [];
+      for (let i = 0; i < maxLen; i++) {
+        if (initTeam === 'teamA') {
+          if (teamAPlayers[i]) ordered.push(teamAPlayers[i]);
+          if (teamBPlayers[i]) ordered.push(teamBPlayers[i]);
+        } else {
+          if (teamBPlayers[i]) ordered.push(teamBPlayers[i]);
+          if (teamAPlayers[i]) ordered.push(teamAPlayers[i]);
+        }
+      }
+      return ordered.map(s => ({
         id: s.slotId,
         name: s.playerName || (s.isBot ? `Bot ${s.slotId}` : `Jugador ${s.slotId}`),
         team: s.team,
@@ -312,7 +348,7 @@ export default function App() {
   }
 
   // Fin del despliegue de la ronda
-  function handleDeploymentEnd() {
+  function handleDeploymentEnd(currentFronts = fronts, currentPlayersList = players) {
     sound.playReveal();
 
     let teamARoundScoreSum = 0;
@@ -321,8 +357,8 @@ export default function App() {
     let teamBFrontWins = 0;
 
     FRONTS.forEach(front => {
-      const teamACards = fronts[front.id].teamA;
-      const teamBCards = fronts[front.id].teamB;
+      const teamACards = currentFronts[front.id].teamA;
+      const teamBCards = currentFronts[front.id].teamB;
       const teamAScore = calculateFrontScore(teamACards, trumpCard?.suit, true);
       const teamBScore = calculateFrontScore(teamBCards, trumpCard?.suit, true);
 
@@ -352,20 +388,24 @@ export default function App() {
     setTeamBCumulativePoints(newTeamBCumulative);
     setPhase('roundOver');
 
+    stateRef.current = {
+      ...stateRef.current,
+      fronts: currentFronts,
+      players: currentPlayersList,
+      phase: 'roundOver',
+      teamARoundPoints: newTeamARoundPts,
+      teamBRoundPoints: newTeamBRoundPts,
+      teamACumulativePoints: newTeamACumulative,
+      teamBCumulativePoints: newTeamBCumulative,
+    };
+
     if (isMultiplayer && isHost) {
-      broadcastStateToClients({
-        ...stateRef.current,
-        phase: 'roundOver',
-        teamARoundPoints: newTeamARoundPts,
-        teamBRoundPoints: newTeamBRoundPts,
-        teamACumulativePoints: newTeamACumulative,
-        teamBCumulativePoints: newTeamBCumulative,
-      });
+      broadcastStateToClients(stateRef.current);
     }
   }
 
   // Pasar al siguiente jugador con cartas en mano en orden intercalado estricto
-  function advanceToNextTurn(currentPlayerId, currentPlayersList = players) {
+  function advanceToNextTurn(currentPlayerId, currentPlayersList = players, currentFronts = fronts) {
     const currentIndex = currentPlayersList.findIndex(p => p.id === currentPlayerId);
     const n = currentPlayersList.length;
 
@@ -373,28 +413,34 @@ export default function App() {
       const nextIndex = (currentIndex + step) % n;
       if (currentPlayersList[nextIndex].hand.length > 0) {
         const nextPlayerId = currentPlayersList[nextIndex].id;
+        const limitTimer = modeConfig.turnTimeLimit || 15;
         setCurrentTurnPlayerId(nextPlayerId);
-        setTurnTimer(modeConfig.turnTimeLimit || 15);
+        setTurnTimer(limitTimer);
+
+        stateRef.current = {
+          ...stateRef.current,
+          fronts: currentFronts,
+          players: currentPlayersList,
+          currentTurnPlayerId: nextPlayerId,
+          turnTimer: limitTimer,
+        };
 
         if (isMultiplayer && isHost) {
-          broadcastStateToClients({
-            ...stateRef.current,
-            players: currentPlayersList,
-            currentTurnPlayerId: nextPlayerId,
-            turnTimer: modeConfig.turnTimeLimit || 15,
-          });
+          broadcastStateToClients(stateRef.current);
         }
         return;
       }
     }
 
     // Si nadie tiene cartas, fin del despliegue
-    handleDeploymentEnd();
+    handleDeploymentEnd(currentFronts, currentPlayersList);
   }
 
   // Ejecución del despliegue de una carta (humano o bot)
   function executePlayerMove(playerId, card, frontKey, asShadow) {
-    const player = players.find(p => p.id === playerId);
+    const currentList = stateRef.current.players || players;
+    const currentActiveFronts = stateRef.current.fronts || fronts;
+    const player = currentList.find(p => p.id === playerId);
     if (!player) return;
 
     const deployedCard = {
@@ -408,16 +454,16 @@ export default function App() {
 
     // Actualizar frentes
     const updatedFronts = {
-      ...fronts,
+      ...currentActiveFronts,
       [frontKey]: {
-        ...fronts[frontKey],
-        [player.team]: [...fronts[frontKey][player.team], deployedCard],
+        ...currentActiveFronts[frontKey],
+        [player.team]: [...currentActiveFronts[frontKey][player.team], deployedCard],
       },
     };
     setFronts(updatedFronts);
 
     // Actualizar jugador (remover carta de mano y restar ficha de sombra)
-    const updatedPlayers = players.map(p => {
+    const updatedPlayers = currentList.map(p => {
       if (p.id === playerId) {
         return {
           ...p,
@@ -428,6 +474,12 @@ export default function App() {
       return p;
     });
     setPlayers(updatedPlayers);
+
+    stateRef.current = {
+      ...stateRef.current,
+      fronts: updatedFronts,
+      players: updatedPlayers,
+    };
 
     if (asShadow) {
       sound.playShadow();
@@ -445,9 +497,9 @@ export default function App() {
     // Comprobar si todos los jugadores terminaron sus cartas
     const anyCardsLeft = updatedPlayers.some(p => p.hand.length > 0);
     if (!anyCardsLeft) {
-      handleDeploymentEnd();
+      handleDeploymentEnd(updatedFronts, updatedPlayers);
     } else {
-      advanceToNextTurn(playerId, updatedPlayers);
+      advanceToNextTurn(playerId, updatedPlayers, updatedFronts);
     }
   }
 
@@ -476,6 +528,12 @@ export default function App() {
     });
     setPlayers(updatedPlayers);
 
+    stateRef.current = {
+      ...stateRef.current,
+      players: updatedPlayers,
+      discardDeck: updatedDiscard,
+    };
+
     const notice = `¡Tiempo agotado para ${activePlayer.name}! Penalización oficial: Carta descartada al pozo sin puntuar.`;
     setPenaltyNotice(notice);
     setTimeout(() => setPenaltyNotice(null), 4000);
@@ -494,9 +552,9 @@ export default function App() {
 
     const anyCardsLeft = updatedPlayers.some(p => p.hand.length > 0);
     if (!anyCardsLeft) {
-      handleDeploymentEnd();
+      handleDeploymentEnd(fronts, updatedPlayers);
     } else {
-      advanceToNextTurn(activePlayer.id, updatedPlayers);
+      advanceToNextTurn(activePlayer.id, updatedPlayers, fronts);
     }
   }
 
@@ -516,17 +574,20 @@ export default function App() {
       setDrawDeck(pool);
     }
 
-    setTurnTimer(modeConfig.turnTimeLimit || (is1v1 ? 20 : 15));
+    const initialTurnTimer = modeConfig.turnTimeLimit || (is1v1 ? 20 : 15);
+    setTurnTimer(initialTurnTimer);
     setPhase('deployment');
 
+    stateRef.current = {
+      ...stateRef.current,
+      players: updatedPlayers,
+      drawDeck: pool,
+      phase: 'deployment',
+      turnTimer: initialTurnTimer,
+    };
+
     if (isMultiplayer && isHost) {
-      broadcastStateToClients({
-        ...stateRef.current,
-        players: updatedPlayers,
-        drawDeck: pool,
-        phase: 'deployment',
-        turnTimer: modeConfig.turnTimeLimit || (is1v1 ? 20 : 15),
-      });
+      broadcastStateToClients(stateRef.current);
     }
   }
 
@@ -537,7 +598,8 @@ export default function App() {
     currentDrawPool,
     currentDiscardPool,
     cfg = modeConfig,
-    customSlots = null
+    customSlots = null,
+    forceMultiplayerHost = false
   ) {
     let pool = [...currentDrawPool];
     let discards = [...currentDiscardPool];
@@ -551,8 +613,9 @@ export default function App() {
     // 1. Palo de triunfo
     const trump = pool.pop();
 
-    // 2. Jugadores
-    const playerList = createPlayerList(cfg, newInitiativeTeam, customSlots);
+    // 2. Jugadores (usar customSlots o los guardados en multiplayerSlots)
+    const effectiveSlots = customSlots || multiplayerSlots;
+    const playerList = createPlayerList(cfg, newInitiativeTeam, effectiveSlots);
 
     const is1v1 = cfg.id === '1v1';
     if (is1v1) {
@@ -585,21 +648,28 @@ export default function App() {
     setTurnTimer(cfg.turnTimeLimit || 15);
     setPhase('planning');
 
-    if (isMultiplayer && isHost) {
-      broadcastStateToClients({
-        ...stateRef.current,
-        round: roundNumber,
-        initiativeTeam: newInitiativeTeam,
-        drawDeck: pool,
-        discardDeck: discards,
-        trumpCard: trump,
-        players: playerList,
-        currentTurnPlayerId: playerList[0].id,
-        fronts: initialFronts,
-        phase: 'planning',
-        planningTimer: 30,
-        turnTimer: cfg.turnTimeLimit || 15,
-      });
+    const isMultiplayerActive = isMultiplayer || forceMultiplayerHost || stateRef.current.isMultiplayer;
+    const isHostActive = isHost || forceMultiplayerHost || stateRef.current.isHost;
+
+    stateRef.current = {
+      ...stateRef.current,
+      round: roundNumber,
+      initiativeTeam: newInitiativeTeam,
+      drawDeck: pool,
+      discardDeck: discards,
+      trumpCard: trump,
+      players: playerList,
+      currentTurnPlayerId: playerList[0].id,
+      fronts: initialFronts,
+      phase: 'planning',
+      planningTimer: 30,
+      turnTimer: cfg.turnTimeLimit || 15,
+      isMultiplayer: isMultiplayerActive,
+      isHost: isHostActive,
+    };
+
+    if (isMultiplayerActive && isHostActive) {
+      broadcastStateToClients(stateRef.current);
     }
   }
 
@@ -627,14 +697,23 @@ export default function App() {
     setScreen('game');
   }
 
-  // Iniciar partida multijugador desde la sala (Host)
+  // Iniciar partida multijugador desde la sala (Host o Cliente)
   function handleStartMultiplayerMatch(lobbyData) {
+    const isHostUser = Boolean(lobbyData.isHost);
+    const assignedSlot = lobbyData.mySlotId || mp.myPlayerId || (isHostUser ? 'A1' : null);
+
     setIsMultiplayer(true);
-    setIsHost(lobbyData.isHost);
-    setMySlotId(lobbyData.mySlotId || 'A1');
+    setIsHost(isHostUser);
+    setMySlotId(assignedSlot);
+    setMultiplayerSlots(lobbyData.slots || null);
     setSelectedMode(lobbyData.modeId);
     setSelectedRhythm(lobbyData.rhythmRounds);
     setMultiplayerRoomCode(mp.roomCode);
+
+    stateRef.current.isMultiplayer = true;
+    stateRef.current.isHost = isHostUser;
+    stateRef.current.mySlotId = assignedSlot;
+    stateRef.current.selectedMode = lobbyData.modeId;
 
     const activeConfig = GAME_MODES[lobbyData.modeId] || GAME_MODES['2v2'];
     setTotalMatchRounds(lobbyData.rhythmRounds);
@@ -643,7 +722,7 @@ export default function App() {
     setTeamACumulativePoints(0);
     setTeamBCumulativePoints(0);
 
-    if (lobbyData.isHost) {
+    if (isHostUser) {
       const initialDeck = createDeck(activeConfig.decks);
       const cut = cutDeckForInitialInitiative(initialDeck);
       const initialInitiative = cut.winnerTeam;
@@ -652,8 +731,6 @@ export default function App() {
         initialInitiative === 'teamA' ? 'Equipo A' : 'Equipo B'
       }.`;
       setInitiativeNotice(noticeText);
-
-      startNewRound(1, initialInitiative, initialDeck, [], activeConfig, lobbyData.slots);
 
       // Notificar a todos los clientes que la partida arranca
       mp.broadcast({
@@ -665,6 +742,8 @@ export default function App() {
           isHost: false,
         },
       });
+
+      startNewRound(1, initialInitiative, initialDeck, [], activeConfig, lobbyData.slots, true);
     }
 
     setScreen('game');
@@ -693,7 +772,7 @@ export default function App() {
     const newDiscardDeck = [...discardDeck, ...cardsToDiscard];
     const nextInitiativeTeam = initiativeTeam === 'teamA' ? 'teamB' : 'teamA';
 
-    startNewRound(round + 1, nextInitiativeTeam, drawDeck, newDiscardDeck, modeConfig);
+    startNewRound(round + 1, nextInitiativeTeam, drawDeck, newDiscardDeck, modeConfig, multiplayerSlots);
   }
 
   // Disputar Prórroga oficial de 2 rondas por empate exacto en acumulados (Capítulo 7)
@@ -837,10 +916,11 @@ export default function App() {
     }
   }, [screen, phase, currentTurnPlayerId, players, fronts, isMultiplayer, isHost]);
 
-  // Obtener al jugador local
-  const localPlayer = players.find(p => p.id === mySlotId) || players.find(p => p.isHuman);
+  // Obtener al jugador local y perspectiva de equipo
+  const localPlayer = players.find(p => p.id === mySlotId) || (!isMultiplayer ? players.find(p => p.isHuman) : null);
+  const viewerTeam = localPlayer?.team || (mySlotId?.startsWith('B') ? 'teamB' : 'teamA');
   const isMyTurn = currentTurnPlayerId === mySlotId && phase === 'deployment';
-  const selectedCard = localPlayer?.hand.find(c => c.id === selectedCardId);
+  const selectedCard = localPlayer?.hand?.find(c => c.id === selectedCardId);
 
   // PANTALLA 1: MENÚ PRINCIPAL
   if (screen === 'menu') {
@@ -994,6 +1074,7 @@ export default function App() {
               maxFrontCards={modeConfig.maxFrontCards}
               modeId={selectedMode}
               viewerPlayerId={mySlotId}
+              viewerTeam={viewerTeam}
               onDeploy={handleDeployPlayerCard}
             />
           ))}

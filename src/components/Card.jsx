@@ -95,17 +95,17 @@ export function Card({
     );
   }
 
-  // Carta boca abajo genérica (ej. mano oculta del bot)
-  if (!card) {
+  // Carta boca abajo genérica (ej. mano oculta de rival/bot o no revelada)
+  if (!card || card.isHidden || !card.rank || card.rank === '?') {
     return (
       <div
         className={`
           relative rounded-lg bg-gradient-to-br from-slate-800 to-slate-950
-          border border-slate-700 shadow-md flex items-center justify-center
-          ${compact ? 'w-12 h-16 sm:w-14 sm:h-20' : 'w-16 h-24 sm:w-20 sm:h-28'}
+          border border-slate-700 shadow-md flex items-center justify-center select-none
+          ${compact ? 'w-12 h-16 sm:w-14 sm:h-20' : 'w-16 h-24 sm:w-20 sm:h-28 md:w-24 md:h-34'}
         `}
       >
-        <Shield className="w-4 h-4 text-slate-600" />
+        <Shield className="w-5 h-5 text-slate-600" />
       </div>
     );
   }

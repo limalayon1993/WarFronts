@@ -78,10 +78,17 @@ export function MultiplayerLobby({
 
     const unsubSlotAssigned = mp.on('slotAssigned', (slotId) => {
       setMySlotId(slotId);
+      mp.myPlayerId = slotId;
     });
 
-    const unsubGameStart = mp.on('gameStart', (gameData) => {
-      onStartMultiplayerGame(gameData);
+    const unsubGameStart = mp.on('gameStart', (data) => {
+      const payload = data?.gameData || data;
+      const assignedSlot = mySlotId || mp.myPlayerId;
+      onStartMultiplayerGame({
+        ...payload,
+        isHost: false,
+        mySlotId: assignedSlot,
+      });
     });
 
     const unsubChat = mp.on('chatMessage', (msg) => {
@@ -182,6 +189,7 @@ export function MultiplayerLobby({
       setRoomCode(res.roomCode);
       setIsHost(true);
       setMySlotId('A1');
+      mp.myPlayerId = 'A1';
 
       const initialSlots = buildInitialSlots(selectedMode, playerName, false);
       setLobbySlots(initialSlots);

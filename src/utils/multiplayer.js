@@ -243,7 +243,7 @@ class MultiplayerManager {
         break;
 
       case 'GAME_START':
-        this.emit('gameStart', data);
+        this.emit('gameStart', data.gameData || data);
         break;
 
       case 'GAME_SYNC':
