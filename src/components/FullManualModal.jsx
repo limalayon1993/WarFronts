@@ -519,26 +519,54 @@ export function FullManualModal({ isOpen, onClose }) {
                 </div>
 
                 <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
-                  <h4 className="font-bold text-amber-400">2. Adaptación de las 4 Fases de la Ronda</h4>
-                  <p className="text-xs text-slate-400">
-                    El principal desafío del 1v1 es que la "Fase de Táctica (30s)" pierde su sentido original de comunicación. Así es como se estructura la ronda:
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <h4 className="font-bold text-amber-400">2. Las 4 Fases de la Ronda</h4>
+                    <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded font-mono font-bold">
+                      Fases Idénticas al Modo Equipos
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-slate-300 bg-amber-950/20 border border-amber-800/40 p-3 rounded-lg leading-relaxed">
+                    Las fases se desarrollan completamente igual que en los otros modos, pero usando la <strong>fase de táctica (30s)</strong> para planear cómo vas a atacar en la siguiente ronda (en vez de para comunicarse).
                   </p>
                   <div className="space-y-2 text-xs sm:text-sm text-slate-300">
                     <div className="bg-slate-950 p-3 rounded border border-slate-800">
-                      <strong className="text-slate-100 block mb-0.5">FASE 1: Preparación y Triunfo (Sin Cambios)</strong>
-                      Se revela la carta superior del mazo para definir el Palo Triunfo (+2 pts). El jugador con la Ficha de Iniciativa se prepara para abrir.
+                      <div className="flex items-center justify-between mb-1">
+                        <strong className="text-slate-100 font-bold">FASE 1: Palo Triunfo e Iniciativa</strong>
+                        <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded uppercase">Setup</span>
+                      </div>
+                      <p className="text-slate-400">
+                        Se revela la carta superior del Mazo Principal para fijar el Palo Triunfo (+2 pts por carta de ese palo) y cada duelista coloca sus 2 Marcadores de Sombra activos. La Iniciativa rota automáticamente al rival respecto a la ronda previa (o se determina por corte de baraja en Ronda 1).
+                      </p>
                     </div>
+
                     <div className="bg-slate-950 p-3 rounded border border-slate-800">
-                      <strong className="text-slate-100 block mb-0.5">FASE 2: Reparto Inmediato</strong>
-                      Se reparten las 10 cartas a cada jugador.
+                      <div className="flex items-center justify-between mb-1">
+                        <strong className="text-slate-100 font-bold">FASE 2: Fase Táctica (Reloj: 30s Estrictos — SIN CARTAS EN MANO)</strong>
+                        <span className="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono">30s</span>
+                      </div>
+                      <p className="text-slate-400">
+                        <strong className="text-amber-300">Planificación Táctica Individual:</strong> En lugar de comunicación entre compañeros, cada jugador dispone de 30 segundos sin cartas en mano para reflexionar, planificar mentalmente el enfoque de los 3 frentes y anticipar los contrataques del oponente.
+                      </p>
                     </div>
+
                     <div className="bg-slate-950 p-3 rounded border border-slate-800">
-                      <strong className="text-slate-100 block mb-0.5">FASE 3: Planificación Estratégica (Reemplaza la Táctica)</strong>
-                      Reloj de 30 Segundos: Ambos jugadores tienen medio minuto de silencio absoluto para analizar su mano de 10 cartas, planificar sus Sinergias y decidir qué frentes atacarán o abandonarán.
+                      <div className="flex items-center justify-between mb-1">
+                        <strong className="text-slate-100 font-bold">FASE 3: Reparto de Cartas (Silencio Absoluto)</strong>
+                        <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded uppercase">Reparto</span>
+                      </div>
+                      <p className="text-slate-400">
+                        Inmediatamente al terminar los 30 segundos de la Fase Táctica, el repartidor entrega 10 cartas boca abajo a cada duelista. Silencio absoluto y concentración estricta desde este instante.
+                      </p>
                     </div>
+
                     <div className="bg-slate-950 p-3 rounded border border-slate-800">
-                      <strong className="text-slate-100 block mb-0.5">FASE 4: Despliegue (El Duelo)</strong>
-                      Turnos 1 a 1: Inicia el jugador con Iniciativa. Juegan de forma alternada (Jugador A - Jugador B - Jugador A...). Reloj de 20s: Se agregan 5 segundos ya que hay más cartas que revisar. Deben colocar 1 carta por turno.
+                      <div className="flex items-center justify-between mb-1">
+                        <strong className="text-slate-100 font-bold">FASE 4: Despliegue Táctico (Silencio Absoluto — Reloj: 15s / Turno)</strong>
+                        <span className="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-mono">15s / Turno</span>
+                      </div>
+                      <p className="text-slate-400">
+                        Turnos 1 a 1 alternados (Jugador A ➔ Jugador B ➔ Jugador A...) comenzando por quien tenga la Iniciativa. Se coloca exactamente una carta por turno en un frente no saturado (máximo 8 cartas sumando ambos duelistas). Cada jugador puede jugar hasta 2 Cartas de Sombra durante la ronda volteando sus marcadores. Exceder los 15s conlleva la penalización oficial de descartar una carta al azar al pozo sin puntuar. Concluye al jugar las 10 cartas.
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -74,8 +74,8 @@ export default function App() {
   const [planningTimer, setPlanningTimer] = useState(30);
   const [isBotThinking, setIsBotThinking] = useState(false);
 
-  // Reloj oficial de turno (15s en 2v2/3v3/4v4, 20s en 1v1)
-  const [turnTimer, setTurnTimer] = useState(20);
+  // Reloj oficial de turno (15s por turno con penalización de descarte)
+  const [turnTimer, setTurnTimer] = useState(15);
   const [penaltyNotice, setPenaltyNotice] = useState(null);
   const [initiativeNotice, setInitiativeNotice] = useState(null);
 
@@ -574,24 +574,20 @@ export default function App() {
     }
   }
 
-  // Transición a la fase de despliegue (repartiendo cartas si es modo por equipos)
+  // Transición a la fase de despliegue (Fase 3: Reparto y Fase 4: Despliegue)
   function beginDeploymentPhase() {
     setReadyPlayers([]);
-    const is1v1 = modeConfig.id === '1v1';
     let pool = [...drawDeck];
-    let updatedPlayers = players;
 
-    // En modos por equipos (2v2, 3v3, 4v4), repartir ahora 5 cartas por jugador (Fase 3: Reparto)
-    if (!is1v1) {
-      updatedPlayers = players.map(player => ({
-        ...player,
-        hand: pool.splice(0, modeConfig.handSize),
-      }));
-      setPlayers(updatedPlayers);
-      setDrawDeck(pool);
-    }
+    // En todos los modos (1v1 y equipos), se reparten las cartas al terminar la fase táctica (Fase 3)
+    const updatedPlayers = players.map(player => ({
+      ...player,
+      hand: pool.splice(0, modeConfig.handSize),
+    }));
+    setPlayers(updatedPlayers);
+    setDrawDeck(pool);
 
-    const initialTurnTimer = modeConfig.turnTimeLimit || (is1v1 ? 20 : 15);
+    const initialTurnTimer = modeConfig.turnTimeLimit || 15;
     setTurnTimer(initialTurnTimer);
     setPhase('deployment');
 
@@ -684,16 +680,10 @@ export default function App() {
     const effectiveSlots = customSlots || multiplayerSlots;
     const playerList = createPlayerList(cfg, newInitiativeTeam, effectiveSlots);
 
-    const is1v1 = cfg.id === '1v1';
-    if (is1v1) {
-      playerList.forEach(player => {
-        player.hand = pool.splice(0, cfg.handSize);
-      });
-    } else {
-      playerList.forEach(player => {
-        player.hand = [];
-      });
-    }
+    // En todos los modos (1v1 y equipos), la Fase 2 es sin cartas en mano (se reparten en Fase 3)
+    playerList.forEach(player => {
+      player.hand = [];
+    });
 
     const initialFronts = {
       left: { teamA: [], teamB: [] },
@@ -938,7 +928,7 @@ export default function App() {
     return () => clearInterval(timer);
   }, [screen, phase, planningTimer, isMultiplayer, isHost]);
 
-  // Temporizador oficial por turno durante el despliegue (15s en equipos / 20s en 1v1)
+  // Temporizador oficial por turno durante el despliegue (15s oficiales con penalización de descarte)
   useEffect(() => {
     if (screen !== 'game' || phase !== 'deployment') return;
     if (isMultiplayer && !isHost) return; // Solo el Host o en juego local aplica penalizaciones de tiempo
@@ -1101,7 +1091,7 @@ export default function App() {
             <span>
               {selectedMode === '1v1' ? (
                 <>
-                  <strong>FASE 3: Planificación Estratégica (30s).</strong> Estudia tu mano de 10 cartas, planifica sinergias (+5) y triunfos (+2) mentalmente.
+                  <strong>FASE 2: Fase Táctica (30s) — SIN CARTAS EN MANO.</strong> Planificación táctica individual: prepara mentalmente tu táctica y contrataque antes del reparto.
                 </>
               ) : (
                 <>
@@ -1222,7 +1212,7 @@ export default function App() {
                 </span>
               ) : phase === 'planning' ? (
                 <span className="text-xs text-amber-300">
-                  {selectedMode === '1v1' ? 'Analiza tu mano...' : 'Planificad táctica macro (sin cartas)...'}
+                  {selectedMode === '1v1' ? 'Fase táctica: prepara tu estrategia mentalmente...' : 'Planificad táctica macro (sin cartas)...'}
                 </span>
               ) : (
                 <span className="text-xs text-slate-500">
@@ -1236,8 +1226,8 @@ export default function App() {
           <div className="flex items-center justify-center gap-1.5 sm:gap-3 flex-wrap min-h-[110px] sm:min-h-[140px] py-1">
             {!localPlayer || !localPlayer.hand || localPlayer.hand.length === 0 ? (
               <span className="text-sm text-slate-500 italic">
-                {phase === 'planning' && selectedMode !== '1v1'
-                  ? 'Fase de Táctica: Recibirás tus 5 cartas al comenzar el despliegue.'
+                {phase === 'planning'
+                  ? `Fase de Táctica: Recibirás tus ${modeConfig.handSize} cartas al comenzar el despliegue.`
                   : 'Has desplegado todas tus tropas de esta ronda.'}
               </span>
             ) : (

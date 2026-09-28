@@ -37,7 +37,7 @@ export function TurnStrip({
           )}
         </span>
 
-        {/* Reloj oficial por turno (15s en 2v2/3v3/4v4, 20s en 1v1 con penalización de descarte) */}
+        {/* Reloj oficial por turno (15s con penalización de descarte) */}
         {typeof turnTimer === 'number' && (
           <div
             className={`flex items-center gap-1 font-mono font-black text-xs px-2 py-0.5 rounded border transition ${

@@ -374,17 +374,28 @@ export function QuickGuideModal({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 space-y-1">
-                  <div className="font-semibold text-slate-200 mb-0.5">2. Adaptación de las 4 Fases:</div>
-                  <div>• <strong>Fase 1:</strong> Revelar Palo Triunfo (+2 pts). Preparar 2 Marcadores Sombra.</div>
-                  <div>• <strong>Fase 2:</strong> Reparto directo de 10 cartas a cada jugador.</div>
-                  <div>• <strong>Fase 3 Planificación:</strong> Reloj de 30s de silencio para estudiar mano de 10 cartas.</div>
-                  <div>• <strong>Fase 4 Despliegue:</strong> Turnos 1 a 1 (<span className="font-mono">A➔B➔A</span>). Reloj de 20s/turno. 1 carta por turno.</div>
+                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 space-y-1.5">
+                  <div className="font-semibold text-slate-200 mb-0.5 flex items-center justify-between">
+                    <span>2. Las 4 Fases (Idénticas al Modo Equipos):</span>
+                    <span className="text-[10px] text-amber-400 font-mono font-bold">Táctica: 30s | Turno: 15s</span>
+                  </div>
+                  <div>
+                    • <strong className="text-amber-300">FASE 1: Preparación & Triunfo:</strong> Revelar Palo Triunfo (+2 pts). Activar los 2 Marcadores Sombra por jugador y rotar iniciativa.
+                  </div>
+                  <div>
+                    • <strong className="text-amber-300">FASE 2: Fase Táctica (30s):</strong> <strong className="text-amber-200">Planificación Táctica Individual:</strong> En vez de comunicarse, cada jugador dispone de 30s <span className="text-rose-300 font-semibold">sin cartas en mano</span> para preparar mentalmente la táctica y contrataque que ejecutará contra su oponente.
+                  </div>
+                  <div>
+                    • <strong className="text-amber-300">FASE 3: Reparto de Cartas (Silencio):</strong> Se reparten boca abajo 10 cartas a cada duelista. Silencio absoluto y concentración.
+                  </div>
+                  <div>
+                    • <strong className="text-amber-300">FASE 4: Despliegue Táctico (15s / Turno):</strong> Turnos 1 a 1 alternados (1 carta/turno en frente no saturado). Hasta 2 Cartas Sombra. Cierre al jugar las 10 cartas.
+                  </div>
                 </div>
               </div>
 
               <div className="mt-3 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-                <span>⚡ Mazo Continuo: Sin rebarajar salvo agotamiento</span>
+                <span>⚡ Mazo Continuo: Sin rebarajar entre rondas salvo agotamiento</span>
                 <span className="text-amber-400 font-bold">Modalidad Duelo 1v1 Oficial</span>
               </div>
             </div>

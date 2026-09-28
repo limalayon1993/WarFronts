@@ -39,8 +39,8 @@ export const GAME_MODES = {
     maxFrontCards: 8,
     shadowsPerPlayer: 2,
     totalPlayers: 2,
-    turnTimeLimit: 20, // 20s en 1v1 según Capítulo 8
-    description: '1 baraja (52 cartas). 10 cartas en mano, 2 sombras, límite de 8 cartas por frente.',
+    turnTimeLimit: 15, // 15s en 1v1 según Capítulo 5 y Anexo 8
+    description: '1 baraja (52 cartas). 10 cartas por jugador, 2 sombras, límite de 8 cartas por frente.',
   },
   '2v2': {
     id: '2v2',
