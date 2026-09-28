@@ -26,13 +26,10 @@ export function TurnStrip({
             <span className="text-amber-400 font-bold ml-1">
               — ¡Selecciona tu carta y el frente a disputar!
             </span>
-          ) : isBotThinking ? (
-            <span className="text-slate-400 italic ml-1">
-              pensando táctica de equipo...
-            </span>
           ) : (
-            <span className="text-slate-400 italic ml-1">
-              desplegando...
+            <span className="text-amber-400/90 italic ml-1 inline-flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              analizando jugada táctica (5s)...
             </span>
           )}
         </span>

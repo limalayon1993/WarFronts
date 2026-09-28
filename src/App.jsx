@@ -1126,12 +1126,17 @@ export default function App() {
     if (activePlayer.isBot && activePlayer.hand.length > 0) {
       setIsBotThinking(true);
       const delay = setTimeout(() => {
+        const currentList = stateRef.current.players || players;
+        const currentFronts = stateRef.current.fronts || fronts;
+        const currentTrump = stateRef.current.trumpCard || trumpCard;
+        const currentBot = currentList.find(p => p.id === activePlayer.id) || activePlayer;
+
         const move = chooseBotMove({
-          botHand: activePlayer.hand,
-          botTeam: activePlayer.team,
-          fronts,
-          trumpSuit: trumpCard?.suit,
-          botShadowsLeft: activePlayer.shadowsLeft,
+          botHand: currentBot.hand,
+          botTeam: currentBot.team,
+          fronts: currentFronts,
+          trumpSuit: currentTrump?.suit,
+          botShadowsLeft: currentBot.shadowsLeft,
           maxFrontCards: modeConfig.maxFrontCards,
         });
 
@@ -1141,9 +1146,14 @@ export default function App() {
           advanceToNextTurn(activePlayer.id);
         }
         setIsBotThinking(false);
-      }, 750);
+      }, 5000); // 5 segundos de pensamiento reglamentario
 
-      return () => clearTimeout(delay);
+      return () => {
+        clearTimeout(delay);
+        setIsBotThinking(false);
+      };
+    } else {
+      setIsBotThinking(false);
     }
   }, [screen, phase, currentTurnPlayerId, players, fronts, isMultiplayer, isHost]);
 
