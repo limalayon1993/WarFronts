@@ -1,7 +1,7 @@
 import React from 'react';
 import { FRONTS, resolveFrontWinner, calculateFrontScore } from '../constants/rules';
 import { Card } from './Card';
-import { ArrowRight, Award } from 'lucide-react';
+import { ArrowRight, Award, Clock, CheckCircle2, Users } from 'lucide-react';
 
 export function RoundSummaryModal({
   isOpen,
@@ -11,10 +11,20 @@ export function RoundSummaryModal({
   trumpSuit,
   modeId = '1v1',
   onNextRound,
+  isMultiplayer = false,
+  readyPlayers = [],
+  mySlotId = 'A1',
+  players = [],
+  countdown = 60,
+  onToggleReady,
 }) {
-  if (!isOpen) return null;
+  if (!isOpen || !fronts || !fronts.left || !fronts.center || !fronts.right) return null;
 
   const is1v1 = modeId === '1v1';
+  const humanPlayers = players.filter(p => Boolean(p.isHuman && !p.isBot));
+  const isMeReady = readyPlayers.includes(mySlotId);
+  const readyHumansCount = humanPlayers.filter(p => readyPlayers.includes(p.id)).length;
+  const totalHumansCount = humanPlayers.length > 0 ? humanPlayers.length : 1;
 
   // Resolver cada frente
   const frontResults = FRONTS.map(front => {
@@ -83,6 +93,25 @@ export function RoundSummaryModal({
             {roundOutcome === 'teamA' && ' (+1 Punto de Ronda)'}
             {roundOutcome === 'teamB' && ' (+1 Punto de Ronda)'}
           </p>
+
+          {/* Temporizador de 1 minuto e información de preparación */}
+          <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-800/90 border border-slate-700 text-slate-300 shadow-sm">
+              <Clock className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+              <span>Siguiente ronda en:</span>
+              <span className="font-mono font-bold text-amber-400">{countdown}s</span>
+            </div>
+            {isMultiplayer && (
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+                readyHumansCount >= totalHumansCount
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                  : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
+              }`}>
+                <Users className="w-3.5 h-3.5" />
+                <span>Comandantes listos: <strong>{readyHumansCount}/{totalHumansCount}</strong></span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Desglose de los 3 Frentes con sombras reveladas */}
@@ -176,15 +205,78 @@ export function RoundSummaryModal({
           </div>
         </div>
 
-        {/* Botón de acción */}
-        <div className="px-6 py-4 border-t border-slate-800 bg-slate-950 flex justify-end">
-          <button
-            onClick={onNextRound}
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm flex items-center gap-2 shadow-lg transition"
-          >
-            <span>{isFinalRound ? 'Ver Resultados Finales' : `Comenzar Ronda ${round + 1}`}</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+        {/* Barra inferior de estado y acción */}
+        <div className="px-6 py-4 border-t border-slate-800 bg-slate-950 flex flex-col sm:flex-row items-center justify-between gap-3">
+          {/* Estado de preparación de los jugadores */}
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            {isMultiplayer ? (
+              <>
+                <span className="text-slate-400 font-medium">Comandantes:</span>
+                {humanPlayers.map(p => {
+                  const ready = readyPlayers.includes(p.id);
+                  const isMe = p.id === mySlotId;
+                  return (
+                    <div
+                      key={p.id}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-semibold transition ${
+                        ready
+                          ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300'
+                          : 'bg-slate-900 border-slate-700/80 text-slate-400'
+                      }`}
+                    >
+                      {ready ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                      ) : (
+                        <Clock className="w-3.5 h-3.5 text-amber-400/70" />
+                      )}
+                      <span>{p.name} {isMe && '(Tú)'}</span>
+                      <span className={`text-[10px] font-bold uppercase ${ready ? 'text-emerald-400' : 'text-slate-500'}`}>
+                        {ready ? 'Listo' : 'Esperando'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </>
+            ) : (
+              <span className="text-slate-400 text-xs">
+                Pulsa para continuar o espera {countdown}s para avance automático.
+              </span>
+            )}
+          </div>
+
+          {/* Botón de acción */}
+          <div>
+            {isMultiplayer ? (
+              <button
+                onClick={onToggleReady}
+                className={`px-6 py-2.5 rounded-xl font-black text-sm flex items-center gap-2 shadow-lg transition active:scale-95 ${
+                  isMeReady
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/50 shadow-emerald-900/30'
+                    : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-amber-900/30 ring-2 ring-amber-400/30'
+                }`}
+              >
+                {isMeReady ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>{isFinalRound ? '¡Listo! Esperando Resultados...' : '¡Listo! Esperando a los demás...'}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{isFinalRound ? 'Listo para Resultados Finales' : `Siguiente Ronda (Ronda ${round + 1})`}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={onNextRound}
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm flex items-center gap-2 shadow-lg transition"
+              >
+                <span>{isFinalRound ? 'Ver Resultados Finales' : `Comenzar Ronda ${round + 1}`}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

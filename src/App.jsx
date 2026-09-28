@@ -75,6 +75,8 @@ export default function App() {
   const [phase, setPhase] = useState('planning');
   const [planningTimer, setPlanningTimer] = useState(30);
   const [isBotThinking, setIsBotThinking] = useState(false);
+  const [roundOverTimer, setRoundOverTimer] = useState(60);
+  const [roundOverReadyPlayers, setRoundOverReadyPlayers] = useState([]);
 
   // Reloj oficial de turno (15s por turno con penalización de descarte)
   const [turnTimer, setTurnTimer] = useState(15);
@@ -120,6 +122,8 @@ export default function App() {
     isHost,
     mySlotId,
     readyPlayers,
+    roundOverTimer,
+    roundOverReadyPlayers,
   };
 
   // Detectar parámetro ?room=WF-XXXX en la URL
@@ -134,11 +138,14 @@ export default function App() {
     } catch (_) {}
   }, []);
 
+  // Handlers ref para evitar closures obsoletos en listeners de red
+  const handlersRef = useRef({});
+
   // Difundir estado a todos los clientes multijugador con sanitización estricta anti-trampas
   function broadcastStateToClients(customState = null) {
     if (!mp.isHost) return;
     const isMp = customState?.isMultiplayer ?? stateRef.current.isMultiplayer;
-    if (!isMp) return;
+    if (!isMp && !mp.isHost) return;
 
     const base = customState || stateRef.current;
     if (!base.fronts || !base.players) return;
@@ -161,6 +168,8 @@ export default function App() {
       initiativeTeam: base.initiativeTeam,
       initiativeNotice: base.initiativeNotice,
       modeId: base.selectedMode,
+      roundOverReadyPlayers: base.roundOverReadyPlayers || [],
+      roundOverTimer: base.roundOverTimer ?? 60,
     };
 
     mp.connections.forEach((conn, peerId) => {
@@ -180,6 +189,8 @@ export default function App() {
   // Aplicar sincronización recibida del Host (en modo Cliente)
   function applySynchronizedState(syncData) {
     if (!syncData) return;
+    const prevPhase = stateRef.current.phase;
+
     setFronts(syncData.fronts);
     setPlayers(syncData.players);
     setCurrentTurnPlayerId(syncData.currentTurnPlayerId);
@@ -195,6 +206,16 @@ export default function App() {
     setInitiativeTeam(syncData.initiativeTeam);
     if (syncData.initiativeNotice !== undefined) {
       setInitiativeNotice(syncData.initiativeNotice);
+    }
+    if (syncData.roundOverReadyPlayers !== undefined) {
+      setRoundOverReadyPlayers(syncData.roundOverReadyPlayers);
+    }
+    if (syncData.roundOverTimer !== undefined) {
+      setRoundOverTimer(syncData.roundOverTimer);
+    }
+
+    if (syncData.phase === 'roundOver' && prevPhase !== 'roundOver') {
+      sound.playReveal();
     }
 
     stateRef.current = {
@@ -213,14 +234,25 @@ export default function App() {
       teamBCumulativePoints: syncData.teamBCumulativePoints,
       initiativeTeam: syncData.initiativeTeam,
       initiativeNotice: syncData.initiativeNotice,
+      roundOverReadyPlayers: syncData.roundOverReadyPlayers ?? stateRef.current.roundOverReadyPlayers ?? [],
+      roundOverTimer: syncData.roundOverTimer ?? stateRef.current.roundOverTimer ?? 60,
     };
   }
+
+  // Actualizar handlersRef en cada render con las funciones más recientes
+  handlersRef.current = {
+    executePlayerMove,
+    handleSetPlayerReady,
+    handleSetRoundReady,
+    applySynchronizedState,
+    handleNextRound,
+  };
 
   // Escuchar eventos de red en multijugador
   useEffect(() => {
     // Cliente recibe sincronización del Host
     const unsubSync = mp.on('gameSync', (gameState) => {
-      applySynchronizedState(gameState);
+      handlersRef.current.applySynchronizedState?.(gameState);
     });
 
     // Cliente recibe aviso de penalización
@@ -236,24 +268,36 @@ export default function App() {
       const curr = stateRef.current;
       if (curr.currentTurnPlayerId !== slotId || curr.phase !== 'deployment') return;
 
-      const player = curr.players.find(p => p.id === slotId);
+      const player = curr.players?.find(p => p.id === slotId);
       if (!player) return;
 
-      const card = player.hand.find(c => c.id === cardId);
+      const card = player.hand?.find(c => c.id === cardId);
       if (!card) return;
 
-      executePlayerMove(slotId, card, frontKey, asShadow);
+      handlersRef.current.executePlayerMove?.(slotId, card, frontKey, asShadow);
     });
 
-    // Host recibe confirmación de preparación de un cliente
+    // Host recibe confirmación de preparación de un cliente (fase táctica)
     const unsubPlayerReady = mp.on('clientPlayerReady', ({ slotId, isReady }) => {
       if (!mp.isHost) return;
-      handleSetPlayerReady(slotId, isReady);
+      handlersRef.current.handleSetPlayerReady?.(slotId, isReady);
     });
 
-    // Cliente recibe lista actualizada de jugadores preparados
+    // Cliente recibe lista actualizada de jugadores preparados (fase táctica)
     const unsubReadyUpdate = mp.on('readyUpdate', (readySlotIds) => {
       setReadyPlayers(readySlotIds || []);
+    });
+
+    // Host recibe confirmación de preparación para siguiente ronda de un cliente
+    const unsubRoundReady = mp.on('clientRoundReady', ({ slotId, isReady }) => {
+      if (!mp.isHost) return;
+      handlersRef.current.handleSetRoundReady?.(slotId, isReady);
+    });
+
+    // Cliente recibe actualización de jugadores preparados y cronómetro en roundOver
+    const unsubRoundReadyUpdate = mp.on('roundReadyUpdate', ({ readySlotIds, timer }) => {
+      if (readySlotIds !== undefined) setRoundOverReadyPlayers(readySlotIds);
+      if (timer !== undefined) setRoundOverTimer(timer);
     });
 
     return () => {
@@ -262,6 +306,8 @@ export default function App() {
       unsubPlayCard();
       unsubPlayerReady();
       unsubReadyUpdate();
+      unsubRoundReady();
+      unsubRoundReadyUpdate();
     };
   }, []);
 
@@ -353,8 +399,12 @@ export default function App() {
   }
 
   // Fin del despliegue de la ronda
-  function handleDeploymentEnd(currentFronts = fronts, currentPlayersList = players) {
+  function handleDeploymentEnd(currentFronts = null, currentPlayersList = null) {
     sound.playReveal();
+
+    const activeFronts = currentFronts || stateRef.current.fronts || fronts;
+    const activePlayersList = currentPlayersList || stateRef.current.players || players;
+    const activeTrumpSuit = stateRef.current.trumpCard?.suit || trumpCard?.suit;
 
     let teamARoundScoreSum = 0;
     let teamBRoundScoreSum = 0;
@@ -362,75 +412,89 @@ export default function App() {
     let teamBFrontWins = 0;
 
     FRONTS.forEach(front => {
-      const teamACards = currentFronts[front.id].teamA;
-      const teamBCards = currentFronts[front.id].teamB;
-      const teamAScore = calculateFrontScore(teamACards, trumpCard?.suit, true);
-      const teamBScore = calculateFrontScore(teamBCards, trumpCard?.suit, true);
+      const teamACards = activeFronts[front.id].teamA;
+      const teamBCards = activeFronts[front.id].teamB;
+      const teamAScore = calculateFrontScore(teamACards, activeTrumpSuit, true);
+      const teamBScore = calculateFrontScore(teamBCards, activeTrumpSuit, true);
 
       teamARoundScoreSum += teamAScore.total;
       teamBRoundScoreSum += teamBScore.total;
 
-      const resolution = resolveFrontWinner(teamACards, teamBCards, trumpCard?.suit);
+      const resolution = resolveFrontWinner(teamACards, teamBCards, activeTrumpSuit);
       if (resolution.winner === 'teamA') teamAFrontWins++;
       if (resolution.winner === 'teamB') teamBFrontWins++;
     });
 
-    const newTeamACumulative = teamACumulativePoints + teamARoundScoreSum;
-    const newTeamBCumulative = teamBCumulativePoints + teamBRoundScoreSum;
-    let newTeamARoundPts = teamARoundPoints;
-    let newTeamBRoundPts = teamBRoundPoints;
+    const prevTeamACumulative = stateRef.current.teamACumulativePoints ?? teamACumulativePoints;
+    const prevTeamBCumulative = stateRef.current.teamBCumulativePoints ?? teamBCumulativePoints;
+    let prevTeamARoundPts = stateRef.current.teamARoundPoints ?? teamARoundPoints;
+    let prevTeamBRoundPts = stateRef.current.teamBRoundPoints ?? teamBRoundPoints;
+
+    const newTeamACumulative = prevTeamACumulative + teamARoundScoreSum;
+    const newTeamBCumulative = prevTeamBCumulative + teamBRoundScoreSum;
 
     // Sumar puntos de ronda si gana al menos 2 frentes
     if (teamAFrontWins >= 2) {
-      newTeamARoundPts += 1;
-      setTeamARoundPoints(newTeamARoundPts);
+      prevTeamARoundPts += 1;
     } else if (teamBFrontWins >= 2) {
-      newTeamBRoundPts += 1;
-      setTeamBRoundPoints(newTeamBRoundPts);
+      prevTeamBRoundPts += 1;
     }
 
+    setTeamARoundPoints(prevTeamARoundPts);
+    setTeamBRoundPoints(prevTeamBRoundPts);
     setTeamACumulativePoints(newTeamACumulative);
     setTeamBCumulativePoints(newTeamBCumulative);
     setPhase('roundOver');
+    setRoundOverTimer(60);
+    setRoundOverReadyPlayers([]);
 
     stateRef.current = {
       ...stateRef.current,
-      fronts: currentFronts,
-      players: currentPlayersList,
+      fronts: activeFronts,
+      players: activePlayersList,
       phase: 'roundOver',
-      teamARoundPoints: newTeamARoundPts,
-      teamBRoundPoints: newTeamBRoundPts,
+      teamARoundPoints: prevTeamARoundPts,
+      teamBRoundPoints: prevTeamBRoundPts,
       teamACumulativePoints: newTeamACumulative,
       teamBCumulativePoints: newTeamBCumulative,
+      roundOverTimer: 60,
+      roundOverReadyPlayers: [],
     };
 
-    if (isMultiplayer && isHost) {
+    const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
+    const isHst = Boolean(stateRef.current.isHost || isHost || mp.isHost);
+
+    if (isMp && isHst) {
       broadcastStateToClients(stateRef.current);
     }
   }
 
   // Pasar al siguiente jugador con cartas en mano en orden intercalado estricto
-  function advanceToNextTurn(currentPlayerId, currentPlayersList = players, currentFronts = fronts) {
-    const currentIndex = currentPlayersList.findIndex(p => p.id === currentPlayerId);
-    const n = currentPlayersList.length;
+  function advanceToNextTurn(currentPlayerId, currentPlayersList = null, currentFronts = null) {
+    const activeFronts = currentFronts || stateRef.current.fronts || fronts;
+    const activePlayersList = currentPlayersList || stateRef.current.players || players;
+    const currentIndex = activePlayersList.findIndex(p => p.id === currentPlayerId);
+    const n = activePlayersList.length;
 
     for (let step = 1; step <= n; step++) {
       const nextIndex = (currentIndex + step) % n;
-      if (currentPlayersList[nextIndex].hand.length > 0) {
-        const nextPlayerId = currentPlayersList[nextIndex].id;
+      if (activePlayersList[nextIndex].hand.length > 0) {
+        const nextPlayerId = activePlayersList[nextIndex].id;
         const limitTimer = modeConfig.turnTimeLimit || 15;
         setCurrentTurnPlayerId(nextPlayerId);
         setTurnTimer(limitTimer);
 
         stateRef.current = {
           ...stateRef.current,
-          fronts: currentFronts,
-          players: currentPlayersList,
+          fronts: activeFronts,
+          players: activePlayersList,
           currentTurnPlayerId: nextPlayerId,
           turnTimer: limitTimer,
         };
 
-        if (isMultiplayer && isHost) {
+        const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
+        const isHst = Boolean(stateRef.current.isHost || isHost || mp.isHost);
+        if (isMp && isHst) {
           broadcastStateToClients(stateRef.current);
         }
         return;
@@ -438,7 +502,7 @@ export default function App() {
     }
 
     // Si nadie tiene cartas, fin del despliegue
-    handleDeploymentEnd(currentFronts, currentPlayersList);
+    handleDeploymentEnd(activeFronts, activePlayersList);
   }
 
   // Ejecución del despliegue de una carta (humano o bot)
@@ -603,8 +667,11 @@ export default function App() {
         ? Array.from(new Set([...prev, slotId]))
         : prev.filter(id => id !== slotId);
 
+      const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
+      const isHst = Boolean(stateRef.current.isHost || isHost || mp.isHost);
+
       // Si somos Host, difundir la lista a todos los clientes
-      if (isMultiplayer && isHost) {
+      if (isMp && isHst) {
         mp.broadcast({
           type: 'READY_UPDATE',
           readySlotIds: next,
@@ -641,6 +708,69 @@ export default function App() {
       slotId: mySlotId,
       isReady: nextReady,
     });
+  }
+
+  // Manejo de preparación para la siguiente ronda durante roundOver
+  function handleSetRoundReady(slotId, isReady) {
+    if (stateRef.current.phase !== 'roundOver' && phase !== 'roundOver') return;
+
+    setRoundOverReadyPlayers(prev => {
+      const next = isReady
+        ? Array.from(new Set([...prev, slotId]))
+        : prev.filter(id => id !== slotId);
+
+      stateRef.current = {
+        ...stateRef.current,
+        roundOverReadyPlayers: next,
+      };
+
+      const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
+      const isHst = Boolean(stateRef.current.isHost || isHost || mp.isHost);
+
+      if (isMp && isHst) {
+        mp.broadcast({
+          type: 'ROUND_READY_UPDATE',
+          readySlotIds: next,
+          timer: stateRef.current.roundOverTimer ?? 60,
+        });
+
+        // Comprobar si TODOS los humanos de la partida están preparados
+        const currentList = stateRef.current.players || players;
+        const humanPlayers = currentList.filter(p => Boolean(p.isHuman && !p.isBot));
+        const allReady = humanPlayers.length > 0 && humanPlayers.every(p => next.includes(p.id));
+
+        if (allReady) {
+          setTimeout(() => {
+            handleNextRound();
+          }, 350);
+        }
+      }
+
+      return next;
+    });
+  }
+
+  function handleToggleRoundReady() {
+    const isReadyNow = roundOverReadyPlayers.includes(mySlotId);
+    const nextReady = !isReadyNow;
+
+    if (isMultiplayer && !isHost) {
+      // Cliente: actualiza localmente y envía al Host
+      setRoundOverReadyPlayers(prev =>
+        nextReady ? Array.from(new Set([...prev, mySlotId])) : prev.filter(id => id !== mySlotId)
+      );
+      sound.playCard();
+      mp.sendToHost({
+        type: 'ROUND_READY',
+        slotId: mySlotId,
+        isReady: nextReady,
+      });
+      return;
+    }
+
+    // Host o Local: ejecutar directamente
+    sound.playCard();
+    handleSetRoundReady(mySlotId, nextReady);
   }
 
   // Iniciar una ronda concreta
@@ -693,6 +823,8 @@ export default function App() {
     setPlanningTimer(30);
     setTurnTimer(cfg.turnTimeLimit || 15);
     setPhase('planning');
+    setRoundOverTimer(60);
+    setRoundOverReadyPlayers([]);
     // Los bots siempre se inicializan como preparados automáticamente
     const initialBotReadyIds = playerList.filter(p => p.isBot || !p.isHuman).map(p => p.id);
     setReadyPlayers(initialBotReadyIds);
@@ -741,6 +873,8 @@ export default function App() {
       planningTimer: 30,
       turnTimer: cfg.turnTimeLimit || 15,
       readyPlayers: initialBotReadyIds,
+      roundOverTimer: 60,
+      roundOverReadyPlayers: [],
       isMultiplayer: isMultiplayerActive,
       isHost: isHostActive,
     };
@@ -760,6 +894,8 @@ export default function App() {
     setTeamACumulativePoints(0);
     setTeamBCumulativePoints(0);
     setTotalMatchRounds(rhythmConfig.rounds);
+    setRoundOverTimer(60);
+    setRoundOverReadyPlayers([]);
 
     const initialDeck = createDeck(modeConfig.decks);
     const initialInitiative = determineInitialInitiative();
@@ -780,6 +916,8 @@ export default function App() {
     setSelectedMode(lobbyData.modeId);
     setSelectedRhythm(lobbyData.rhythmRounds);
     setMultiplayerRoomCode(mp.roomCode);
+    setRoundOverTimer(60);
+    setRoundOverReadyPlayers([]);
 
     stateRef.current.isMultiplayer = true;
     stateRef.current.isHost = isHostUser;
@@ -816,34 +954,67 @@ export default function App() {
 
   // Siguiente ronda
   function handleNextRound() {
-    if (round >= totalMatchRounds) {
+    // Si ya no estamos en roundOver (por ejemplo, ya se avanzó por timeout u otro evento), evitar duplicación
+    if (stateRef.current.phase !== 'roundOver' && phase !== 'roundOver') return;
+
+    const currentRound = stateRef.current.round ?? round;
+    const totalRounds = stateRef.current.totalMatchRounds ?? totalMatchRounds;
+    const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
+    const isHst = Boolean(stateRef.current.isHost || isHost || mp.isHost);
+
+    if (currentRound >= totalRounds) {
       setPhase('gameOver');
-      if (isMultiplayer && isHost) {
-        broadcastStateToClients({ ...stateRef.current, phase: 'gameOver' });
+      stateRef.current = {
+        ...stateRef.current,
+        phase: 'gameOver',
+      };
+      if (isMp && isHst) {
+        broadcastStateToClients(stateRef.current);
       }
       return;
     }
 
+    const currentFronts = stateRef.current.fronts || fronts;
+    const currentTrumpCard = stateRef.current.trumpCard || trumpCard;
+    const currentDiscardDeck = stateRef.current.discardDeck || discardDeck;
+    const currentDrawDeck = stateRef.current.drawDeck || drawDeck;
+    const currentInitiative = stateRef.current.initiativeTeam || initiativeTeam;
+
     const cardsToDiscard = [
-      trumpCard,
-      ...fronts.left.teamA,
-      ...fronts.left.teamB,
-      ...fronts.center.teamA,
-      ...fronts.center.teamB,
-      ...fronts.right.teamA,
-      ...fronts.right.teamB,
-    ];
+      currentTrumpCard,
+      ...currentFronts.left.teamA,
+      ...currentFronts.left.teamB,
+      ...currentFronts.center.teamA,
+      ...currentFronts.center.teamB,
+      ...currentFronts.right.teamA,
+      ...currentFronts.right.teamB,
+    ].filter(Boolean);
 
-    const newDiscardDeck = [...discardDeck, ...cardsToDiscard];
-    const nextInitiativeTeam = initiativeTeam === 'teamA' ? 'teamB' : 'teamA';
+    const newDiscardDeck = [...currentDiscardDeck, ...cardsToDiscard];
+    const nextInitiativeTeam = currentInitiative === 'teamA' ? 'teamB' : 'teamA';
 
-    startNewRound(round + 1, nextInitiativeTeam, drawDeck, newDiscardDeck, modeConfig, multiplayerSlots);
+    setRoundOverReadyPlayers([]);
+    setRoundOverTimer(60);
+
+    startNewRound(
+      currentRound + 1,
+      nextInitiativeTeam,
+      currentDrawDeck,
+      newDiscardDeck,
+      modeConfig,
+      multiplayerSlots
+    );
   }
 
   // Disputar Prórroga oficial de 2 rondas por empate exacto en acumulados (Capítulo 7)
   function handlePlayOvertime() {
     setTotalMatchRounds(prev => prev + 2);
     setPhase('roundOver');
+    stateRef.current = {
+      ...stateRef.current,
+      totalMatchRounds: (stateRef.current.totalMatchRounds || totalMatchRounds) + 2,
+      phase: 'roundOver',
+    };
     handleNextRound();
   }
 
@@ -975,6 +1146,47 @@ export default function App() {
       return () => clearTimeout(delay);
     }
   }, [screen, phase, currentTurnPlayerId, players, fronts, isMultiplayer, isHost]);
+
+  // Temporizador oficial de resumen de ronda (60 segundos con avance automático)
+  useEffect(() => {
+    if (screen !== 'game' || phase !== 'roundOver') return;
+
+    // En multijugador los clientes decrementan visualmente para mantener fluidez
+    if (isMultiplayer && !isHost) {
+      const visualTimer = setInterval(() => {
+        setRoundOverTimer(prev => Math.max(0, prev - 1));
+      }, 1000);
+      return () => clearInterval(visualTimer);
+    }
+
+    // Host o Local: controla el tiempo oficial y fuerza el avance al expirar
+    const timer = setInterval(() => {
+      setRoundOverTimer(prev => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          handlersRef.current.handleNextRound?.();
+          return 0;
+        }
+        const next = prev - 1;
+        stateRef.current = {
+          ...stateRef.current,
+          roundOverTimer: next,
+        };
+
+        // Si es Host en multijugador, sincronizar periódicamente con los clientes
+        if (isMultiplayer && isHost && (next % 5 === 0 || next <= 10)) {
+          mp.broadcast({
+            type: 'ROUND_READY_UPDATE',
+            readySlotIds: stateRef.current.roundOverReadyPlayers || [],
+            timer: next,
+          });
+        }
+        return next;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [screen, phase, isMultiplayer, isHost]);
 
   // Obtener al jugador local y perspectiva de equipo
   const localPlayer = players.find(p => p.id === mySlotId) || (!isMultiplayer ? players.find(p => p.isHuman) : null);
@@ -1273,6 +1485,12 @@ export default function App() {
         trumpSuit={trumpCard?.suit}
         modeId={selectedMode}
         onNextRound={handleNextRound}
+        isMultiplayer={isMultiplayer}
+        readyPlayers={roundOverReadyPlayers}
+        mySlotId={mySlotId}
+        players={players}
+        countdown={roundOverTimer}
+        onToggleReady={handleToggleRoundReady}
       />
 
       {/* MODAL DE FIN DE PARTIDA CON PRÓRROGA REGLAMENTARIA */}

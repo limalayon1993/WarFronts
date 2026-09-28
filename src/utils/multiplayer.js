@@ -216,6 +216,14 @@ class MultiplayerManager {
         });
         break;
 
+      case 'ROUND_READY':
+        this.emit('clientRoundReady', {
+          peerId: conn.peer,
+          slotId: data.slotId,
+          isReady: data.isReady,
+        });
+        break;
+
       case 'CHAT':
         this.emit('chatMessage', {
           senderName: data.senderName,
@@ -260,6 +268,13 @@ class MultiplayerManager {
 
       case 'READY_UPDATE':
         this.emit('readyUpdate', data.readySlotIds);
+        break;
+
+      case 'ROUND_READY_UPDATE':
+        this.emit('roundReadyUpdate', {
+          readySlotIds: data.readySlotIds,
+          timer: data.timer,
+        });
         break;
 
       case 'ROUND_OVER':
