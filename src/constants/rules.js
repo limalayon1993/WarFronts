@@ -86,7 +86,7 @@ export const GAME_MODES = {
 // Ritmos de juego oficiales según el reglamento v1.6
 export const GAME_RHYTHMS = [
   { id: 4, name: 'Rápido', rounds: 4, desc: '4 Rondas', timeEst: '~10 min' },
-  { id: 6, name: 'Medio', rounds: 6, desc: '6 Rondas', isDefault: true, timeEst: '~18 min' },
+  { id: 6, name: 'Medio', rounds: 6, desc: '6 Rondas', timeEst: '~18 min' },
   { id: 8, name: 'Lento', rounds: 8, desc: '8 Rondas', timeEst: '~25 min' },
 ];
 

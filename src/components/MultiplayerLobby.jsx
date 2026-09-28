@@ -556,7 +556,7 @@ export function MultiplayerLobby({
 
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                  Ritmo Oficial (Rondas)
+                  Ritmo de Juego (Rondas)
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {GAME_RHYTHMS.map((r) => (
