@@ -208,6 +208,14 @@ class MultiplayerManager {
         });
         break;
 
+      case 'PLAYER_READY':
+        this.emit('clientPlayerReady', {
+          peerId: conn.peer,
+          slotId: data.slotId,
+          isReady: data.isReady,
+        });
+        break;
+
       case 'CHAT':
         this.emit('chatMessage', {
           senderName: data.senderName,
@@ -248,6 +256,10 @@ class MultiplayerManager {
 
       case 'GAME_SYNC':
         this.emit('gameSync', data.gameState);
+        break;
+
+      case 'READY_UPDATE':
+        this.emit('readyUpdate', data.readySlotIds);
         break;
 
       case 'ROUND_OVER':

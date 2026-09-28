@@ -25,6 +25,7 @@ import {
   EyeOff,
   Clock,
   Play,
+  Check,
   AlertTriangle,
   Sparkles,
 } from 'lucide-react';
@@ -40,6 +41,7 @@ export default function App() {
   const [mySlotId, setMySlotId] = useState('A1');
   const [multiplayerRoomCode, setMultiplayerRoomCode] = useState('');
   const [multiplayerSlots, setMultiplayerSlots] = useState(null);
+  const [readyPlayers, setReadyPlayers] = useState([]);
 
   // Selección del Menú
   const [selectedMode, setSelectedMode] = useState('1v1');
@@ -115,6 +117,7 @@ export default function App() {
     isMultiplayer,
     isHost,
     mySlotId,
+    readyPlayers,
   };
 
   // Detectar parámetro ?room=WF-XXXX en la URL
@@ -235,10 +238,23 @@ export default function App() {
       executePlayerMove(slotId, card, frontKey, asShadow);
     });
 
+    // Host recibe confirmación de preparación de un cliente
+    const unsubPlayerReady = mp.on('clientPlayerReady', ({ slotId, isReady }) => {
+      if (!mp.isHost) return;
+      handleSetPlayerReady(slotId, isReady);
+    });
+
+    // Cliente recibe lista actualizada de jugadores preparados
+    const unsubReadyUpdate = mp.on('readyUpdate', (readySlotIds) => {
+      setReadyPlayers(readySlotIds || []);
+    });
+
     return () => {
       unsubSync();
       unsubPenalty();
       unsubPlayCard();
+      unsubPlayerReady();
+      unsubReadyUpdate();
     };
   }, []);
 
@@ -560,6 +576,7 @@ export default function App() {
 
   // Transición a la fase de despliegue (repartiendo cartas si es modo por equipos)
   function beginDeploymentPhase() {
+    setReadyPlayers([]);
     const is1v1 = modeConfig.id === '1v1';
     let pool = [...drawDeck];
     let updatedPlayers = players;
@@ -584,11 +601,60 @@ export default function App() {
       drawDeck: pool,
       phase: 'deployment',
       turnTimer: initialTurnTimer,
+      readyPlayers: [],
     };
 
     if (isMultiplayer && isHost) {
       broadcastStateToClients(stateRef.current);
     }
+  }
+
+  // Manejo de preparación (Listo / Preparado) durante la fase de táctica
+  function handleSetPlayerReady(slotId, isReady) {
+    if (stateRef.current.phase !== 'planning' && phase !== 'planning') return;
+
+    setReadyPlayers(prev => {
+      const next = isReady
+        ? Array.from(new Set([...prev, slotId]))
+        : prev.filter(id => id !== slotId);
+
+      // Si somos Host, difundir la lista a todos los clientes
+      if (isMultiplayer && isHost) {
+        mp.broadcast({
+          type: 'READY_UPDATE',
+          readySlotIds: next,
+        });
+
+        // Comprobar si TODOS los jugadores humanos de la partida están preparados
+        const currentList = stateRef.current.players || players;
+        const humanPlayers = currentList.filter(p => p.isHuman);
+        const allReady = humanPlayers.length > 0 && humanPlayers.every(p => next.includes(p.id));
+        if (allReady) {
+          setTimeout(() => {
+            beginDeploymentPhase();
+          }, 250);
+        }
+      }
+
+      return next;
+    });
+  }
+
+  function handleClientToggleReady() {
+    const isCurrentlyReady = readyPlayers.includes(mySlotId);
+    const nextReady = !isCurrentlyReady;
+
+    setReadyPlayers(prev =>
+      nextReady ? Array.from(new Set([...prev, mySlotId])) : prev.filter(id => id !== mySlotId)
+    );
+
+    sound.playCard();
+
+    mp.sendToHost({
+      type: 'PLAYER_READY',
+      slotId: mySlotId,
+      isReady: nextReady,
+    });
   }
 
   // Iniciar una ronda concreta
@@ -647,6 +713,7 @@ export default function App() {
     setPlanningTimer(30);
     setTurnTimer(cfg.turnTimeLimit || 15);
     setPhase('planning');
+    setReadyPlayers([]);
 
     const isMultiplayerActive = isMultiplayer || forceMultiplayerHost || stateRef.current.isMultiplayer;
     const isHostActive = isHost || forceMultiplayerHost || stateRef.current.isHost;
@@ -664,6 +731,7 @@ export default function App() {
       phase: 'planning',
       planningTimer: 30,
       turnTimer: cfg.turnTimeLimit || 15,
+      readyPlayers: [],
       isMultiplayer: isMultiplayerActive,
       isHost: isHostActive,
     };
@@ -852,10 +920,11 @@ export default function App() {
   // Temporizador de fase de planificación (30 segundos oficiales)
   useEffect(() => {
     if (screen !== 'game' || phase !== 'planning') return;
-    if (isMultiplayer && !isHost) return; // Solo el Host o en juego local corre el reloj maestro
 
     if (planningTimer <= 0) {
-      beginDeploymentPhase();
+      if (!isMultiplayer || isHost) {
+        beginDeploymentPhase();
+      }
       return;
     }
 
@@ -1040,16 +1109,40 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="font-mono bg-amber-950/20 px-2 py-1 rounded text-slate-950 font-black">
-              {planningTimer}s
+            <span className="font-mono bg-amber-950/20 px-2.5 py-1 rounded text-slate-950 font-black flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" />
+              <span>{planningTimer}s</span>
             </span>
-            {(!isMultiplayer || isHost) && (
+
+            {!isMultiplayer ? (
               <button
+                type="button"
                 onClick={beginDeploymentPhase}
-                className="bg-slate-950 hover:bg-slate-900 text-amber-400 px-3 py-1 rounded-lg text-xs font-black flex items-center gap-1 shadow transition"
+                className="bg-slate-950 hover:bg-slate-900 text-amber-400 px-3.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 shadow transition cursor-pointer"
               >
                 <Play className="w-3 h-3 fill-current" />
-                <span>{selectedMode === '1v1' ? '¡Iniciar Duelo!' : '¡Repartir y Comenzar!'}</span>
+                <span>{selectedMode === '1v1' ? '¡Iniciar Duelo!' : '¡Empezar Ya!'}</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  if (isHost) {
+                    handleSetPlayerReady(mySlotId, !readyPlayers.includes(mySlotId));
+                  } else {
+                    handleClientToggleReady();
+                  }
+                }}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 shadow transition cursor-pointer ${
+                  readyPlayers.includes(mySlotId)
+                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white ring-2 ring-emerald-300 shadow-emerald-900/40'
+                    : 'bg-slate-950 hover:bg-slate-900 text-amber-400 border border-amber-500/40 hover:border-amber-400'
+                }`}
+              >
+                <Check className={`w-3.5 h-3.5 ${readyPlayers.includes(mySlotId) ? 'stroke-[3]' : ''}`} />
+                <span>
+                  {readyPlayers.includes(mySlotId) ? '¡Listo!' : '¡Preparado!'} ({readyPlayers.length}/{players.filter(p => p.isHuman).length})
+                </span>
               </button>
             )}
           </div>
