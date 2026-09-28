@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Bot,
   Sparkles,
+  GraduationCap,
 } from 'lucide-react';
 
 export function MainMenu({
@@ -24,6 +25,7 @@ export function MainMenu({
   setSelectedRhythm,
   onStartGame,
   onOpenMultiplayer,
+  onOpenTutorial,
   onOpenQuickGuide,
   onOpenFullManual,
   isMuted,
@@ -73,6 +75,16 @@ export function MainMenu({
             {isMuted ? <VolumeX className="w-4 h-4 text-slate-500" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
           </button>
 
+          {/* Botón de Tutorial Guiado */}
+          <button
+            onClick={onOpenTutorial}
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 hover:from-emerald-500/30 hover:to-emerald-600/30 border border-emerald-500/40 text-emerald-300 hover:text-emerald-200 transition flex items-center gap-1.5 text-xs font-bold shadow"
+            title="Iniciar Tutorial Interactivo Guiado 2v2"
+          >
+            <GraduationCap className="w-4 h-4 text-emerald-400" />
+            <span>Tutorial</span>
+          </button>
+
           {/* Botón de Guía Rápida de Mesa */}
           <button
             onClick={onOpenQuickGuide}
@@ -117,13 +129,62 @@ export function MainMenu({
             </div>
           </div>
 
-          {/* Los 2 Botones Principales */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 max-w-4xl w-full">
-            {/* 1. Jugar con bots */}
+          {/* Los 3 Botones Principales: Tutorial, Bots, Multijugador */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6 max-w-6xl w-full">
+            {/* 1. Tutorial Guiado (2v2) */}
+            <button
+              type="button"
+              onClick={onOpenTutorial}
+              className="group relative flex flex-col justify-between text-left p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-emerald-950/30 border border-slate-800 hover:border-emerald-500/70 hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none overflow-hidden"
+            >
+              <div className="absolute top-0 right-0 w-44 h-44 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-emerald-500/20 transition-all" />
+
+              <div>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/10 group-hover:scale-110 transition-transform duration-300">
+                    <GraduationCap className="w-7 h-7" />
+                  </div>
+                  <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                    Paso a Paso
+                  </span>
+                </div>
+
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-100 group-hover:text-emerald-300 transition-colors uppercase tracking-wide">
+                  Tutorial
+                </h2>
+
+                <p className="text-xs sm:text-sm text-slate-400 mt-2.5 leading-relaxed">
+                  Partida interactiva 2v2 con bots donde te llevamos de la mano de principio a fin. Aprende qué cartas usar, por qué usarlas y las tácticas del rival.
+                </p>
+
+                <div className="flex flex-wrap gap-2 mt-5">
+                  <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
+                    🎓 100% Guiado
+                  </span>
+                  <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
+                    👥 Partida 2v2
+                  </span>
+                  <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
+                    💡 Sin azar
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                <span className="text-xs font-black uppercase tracking-wider text-emerald-400 group-hover:text-emerald-300 transition-colors flex items-center gap-1.5">
+                  Iniciar Tutorial
+                </span>
+                <div className="w-9 h-9 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-bold shadow-md shadow-emerald-500/20 group-hover:translate-x-1 transition-transform">
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+              </div>
+            </button>
+
+            {/* 2. Jugar con bots */}
             <button
               type="button"
               onClick={() => setView('bots')}
-              className="group relative flex flex-col justify-between text-left p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-amber-950/25 border border-slate-800 hover:border-amber-500/70 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none overflow-hidden"
+              className="group relative flex flex-col justify-between text-left p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-amber-950/25 border border-slate-800 hover:border-amber-500/70 hover:shadow-2xl hover:shadow-amber-500/10 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-44 h-44 bg-amber-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-amber-500/20 transition-all" />
 
@@ -147,10 +208,10 @@ export function MainMenu({
 
                 <div className="flex flex-wrap gap-2 mt-5">
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    ⚡ 1v1, 2v2, 3v3 y 4v4
+                    ⚡ 1v1 a 4v4
                   </span>
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    🤖 IA Adaptativa
+                    🤖 IA Táctica
                   </span>
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
                     ⏱ Sin esperas
@@ -168,11 +229,11 @@ export function MainMenu({
               </div>
             </button>
 
-            {/* 2. Multijugador */}
+            {/* 3. Multijugador */}
             <button
               type="button"
               onClick={onOpenMultiplayer}
-              className="group relative flex flex-col justify-between text-left p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-indigo-950/25 border border-slate-800 hover:border-indigo-500/70 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none overflow-hidden"
+              className="group relative flex flex-col justify-between text-left p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900/95 to-indigo-950/25 border border-slate-800 hover:border-indigo-500/70 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all duration-300 hover:-translate-y-1.5 focus:outline-none overflow-hidden"
             >
               <div className="absolute top-0 right-0 w-44 h-44 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none group-hover:bg-indigo-500/20 transition-all" />
 
@@ -196,7 +257,7 @@ export function MainMenu({
 
                 <div className="flex flex-wrap gap-2 mt-5">
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    🌐 Código de Sala
+                    🌐 Código Sala
                   </span>
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
                     👥 Hasta 8 Jugadores

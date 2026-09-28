@@ -15,6 +15,7 @@ import { Card } from './components/Card';
 import { FrontZone } from './components/FrontZone';
 import { ScoreBoard } from './components/ScoreBoard';
 import { MainMenu } from './components/MainMenu';
+import { InteractiveTutorial } from './components/InteractiveTutorial';
 import { MultiplayerLobby } from './components/MultiplayerLobby';
 import { TurnStrip } from './components/TurnStrip';
 import { QuickGuideModal } from './components/QuickGuideModal';
@@ -995,6 +996,7 @@ export default function App() {
           setSelectedRhythm={setSelectedRhythm}
           onStartGame={handleStartGame}
           onOpenMultiplayer={() => setScreen('multiplayer_lobby')}
+          onOpenTutorial={() => setScreen('tutorial')}
           onOpenQuickGuide={() => setIsQuickGuideOpen(true)}
           onOpenFullManual={() => setIsFullManualOpen(true)}
           isMuted={isMuted}
@@ -1003,6 +1005,15 @@ export default function App() {
         <QuickGuideModal isOpen={isQuickGuideOpen} onClose={() => setIsQuickGuideOpen(false)} />
         <FullManualModal isOpen={isFullManualOpen} onClose={() => setIsFullManualOpen(false)} />
       </>
+    );
+  }
+
+  // PANTALLA: TUTORIAL INTERACTIVO 2v2 GUIADO
+  if (screen === 'tutorial') {
+    return (
+      <InteractiveTutorial
+        onBackToMenu={() => setScreen('menu')}
+      />
     );
   }
 
