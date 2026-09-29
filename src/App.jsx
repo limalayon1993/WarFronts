@@ -109,6 +109,12 @@ export default function App() {
   const [draggingCardId, setDraggingCardId] = useState(null);
   const [isShadowMode, setIsShadowMode] = useState(false);
 
+  // Jugador local y perspectiva de equipo
+  const localPlayer = players.find(p => p.id === mySlotId) || (!isMultiplayer ? players.find(p => p.isHuman) : null);
+  const viewerTeam = localPlayer?.team || (mySlotId?.startsWith('B') ? 'teamB' : 'teamA');
+  const isMyTurn = currentTurnPlayerId === mySlotId && phase === 'deployment';
+  const selectedCard = localPlayer?.hand?.find(c => c.id === selectedCardId);
+
   // Modales y Sonido
   const [isQuickGuideOpen, setIsQuickGuideOpen] = useState(false);
   const [isFullManualOpen, setIsFullManualOpen] = useState(false);
@@ -1419,12 +1425,6 @@ export default function App() {
 
     return () => clearInterval(timer);
   }, [screen, phase, isMultiplayer, isHost]);
-
-  // Obtener al jugador local y perspectiva de equipo
-  const localPlayer = players.find(p => p.id === mySlotId) || (!isMultiplayer ? players.find(p => p.isHuman) : null);
-  const viewerTeam = localPlayer?.team || (mySlotId?.startsWith('B') ? 'teamB' : 'teamA');
-  const isMyTurn = currentTurnPlayerId === mySlotId && phase === 'deployment';
-  const selectedCard = localPlayer?.hand?.find(c => c.id === selectedCardId);
 
   // PANTALLA 1: MENÚ PRINCIPAL
   if (screen === 'menu') {
