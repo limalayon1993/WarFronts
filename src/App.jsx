@@ -1331,40 +1331,41 @@ export default function App() {
     if (screen !== 'game' || phase !== 'deployment') return;
     if (isMultiplayer && !isHost) return; // Clientes no calculan IA
 
-    const activePlayer = players.find(p => p.id === currentTurnPlayerId);
+    const currentList = stateRef.current.players || players;
+    const activePlayer = currentList.find(p => p.id === currentTurnPlayerId);
     if (!activePlayer) return;
 
     if (activePlayer.isBot && activePlayer.hand.length > 0) {
       setIsBotThinking(true);
 
-      const botClock = activePlayer.team === 'teamA'
-        ? (stateRef.current.teamAClock ?? teamAClock)
-        : (stateRef.current.teamBClock ?? teamBClock);
+      const currentTeamClock = activePlayer.team === 'teamA'
+        ? (stateRef.current.teamAClock ?? 100)
+        : (stateRef.current.teamBClock ?? 100);
 
       // Tiempo de cálculo adaptativo al ritmo de tiempo y jugada de emergencia si el reloj está bajo
-      let botDelay = 2200;
-      if (botClock <= 8) {
-        botDelay = 700; // Despliegue de emergencia para evitar caída de bandera
+      let botDelay = 2000;
+      if (currentTeamClock <= 8) {
+        botDelay = 600; // Despliegue de emergencia para evitar caída de bandera
       } else if (selectedTimeSpeed === 'rapido') {
-        botDelay = 1500;
+        botDelay = 1200;
       } else if (selectedTimeSpeed === 'lento') {
-        botDelay = 3200;
+        botDelay = 2800;
       } else {
-        botDelay = 2200; // medio
+        botDelay = 2000; // medio
       }
 
       const delay = setTimeout(() => {
-        const currentList = stateRef.current.players || players;
-        const currentFronts = stateRef.current.fronts || fronts;
-        const currentTrump = stateRef.current.trumpCard || trumpCard;
-        const currentBot = currentList.find(p => p.id === activePlayer.id) || activePlayer;
+        const freshList = stateRef.current.players || players;
+        const freshFronts = stateRef.current.fronts || fronts;
+        const freshTrump = stateRef.current.trumpCard || trumpCard;
+        const freshBot = freshList.find(p => p.id === activePlayer.id) || activePlayer;
 
         const move = chooseBotMove({
-          botHand: currentBot.hand,
-          botTeam: currentBot.team,
-          fronts: currentFronts,
-          trumpSuit: currentTrump?.suit,
-          botShadowsLeft: currentBot.shadowsLeft,
+          botHand: freshBot.hand,
+          botTeam: freshBot.team,
+          fronts: freshFronts,
+          trumpSuit: freshTrump?.suit,
+          botShadowsLeft: freshBot.shadowsLeft,
           maxFrontCards: modeConfig.maxFrontCards,
         });
 
@@ -1383,7 +1384,7 @@ export default function App() {
     } else {
       setIsBotThinking(false);
     }
-  }, [screen, phase, currentTurnPlayerId, players, fronts, isMultiplayer, isHost, selectedTimeSpeed, teamAClock, teamBClock]);
+  }, [screen, phase, currentTurnPlayerId, isMultiplayer, isHost, selectedTimeSpeed]);
 
   // Temporizador oficial de resumen de ronda (60 segundos con avance automático)
   useEffect(() => {
