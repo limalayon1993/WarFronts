@@ -124,7 +124,7 @@ export function Card({
         ${compact ? 'w-12 h-16 sm:w-14 sm:h-20' : 'w-16 h-24 sm:w-20 sm:h-28 md:w-24 md:h-34'}
         ${isSelected ? 'ring-4 ring-amber-400 scale-105 shadow-xl -translate-y-2' : ''}
         ${isPlayable ? 'cursor-pointer hover:-translate-y-1.5 hover:shadow-lg' : ''}
-        ${isRevealed && isShadow ? 'ring-2 ring-purple-500 animate-bounce' : ''}
+        ${isRevealed && isShadow ? 'ring-2 ring-purple-500' : ''}
       `}
     >
       {/* Insignia de Palo Triunfo */}
