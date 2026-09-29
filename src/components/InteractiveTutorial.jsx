@@ -58,6 +58,15 @@ export function InteractiveTutorial({ onBackToMenu }) {
     }
   }, [currentStep.type]);
 
+  // Reproducir sonido táctico de turno cuando le toque tirar al jugador en el tutorial
+  const prevStepTypeRef = useRef(null);
+  useEffect(() => {
+    if (currentStep.type === 'player_turn' && prevStepTypeRef.current !== 'player_turn') {
+      sound.playYourTurn();
+    }
+    prevStepTypeRef.current = currentStep.type;
+  }, [currentStep.type]);
+
   // Despliegue automático de la carta del bot nada más comenzar su turno para que el jugador
   // vea la carta sobre la mesa MIENTRAS lee la explicación táctica
   useEffect(() => {
@@ -631,12 +640,25 @@ export function InteractiveTutorial({ onBackToMenu }) {
         </div>
 
         {/* CONTROLES Y MANO DEL JUGADOR */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2">
+        <div
+          className={`rounded-2xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2 transition-all duration-300 ${
+            currentStep.type === 'player_turn'
+              ? 'glowing-green-hand bg-gradient-to-b from-emerald-950/40 via-slate-900/90 to-slate-900 border-2 border-emerald-400'
+              : 'bg-slate-900/90 border border-slate-800'
+          }`}
+        >
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
             <div className="flex items-center gap-3">
               <span className="text-xs font-bold text-slate-200">
                 Tu Mano de Comandante ({playerHand.length} cartas)
               </span>
+
+              {currentStep.type === 'player_turn' && (
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[10px] uppercase font-black px-2 py-0.5 rounded-full flex items-center gap-1.5 animate-pulse shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  ¡Te toca tirar!
+                </span>
+              )}
 
               {/* Botón de Modo Sombra */}
               <button

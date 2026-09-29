@@ -190,6 +190,44 @@ export default function App() {
   function applySynchronizedState(syncData) {
     if (!syncData) return;
     const prevPhase = stateRef.current.phase;
+    const prevFronts = stateRef.current.fronts;
+
+    // Detectar si alguien (bot, host u otro jugador) colocó una carta en un frente
+    if (syncData.fronts && prevFronts && syncData.phase === 'deployment') {
+      const prevTotal = Object.values(prevFronts).reduce(
+        (acc, f) => acc + (f?.teamA?.length || 0) + (f?.teamB?.length || 0), 0
+      );
+      const newTotal = Object.values(syncData.fronts).reduce(
+        (acc, f) => acc + (f?.teamA?.length || 0) + (f?.teamB?.length || 0), 0
+      );
+
+      if (newTotal > prevTotal) {
+        let addedCard = null;
+        for (const fKey of ['left', 'center', 'right']) {
+          const prevA = prevFronts[fKey]?.teamA?.length || 0;
+          const newA = syncData.fronts[fKey]?.teamA || [];
+          if (newA.length > prevA) {
+            addedCard = newA[newA.length - 1];
+            break;
+          }
+          const prevB = prevFronts[fKey]?.teamB?.length || 0;
+          const newB = syncData.fronts[fKey]?.teamB || [];
+          if (newB.length > prevB) {
+            addedCard = newB[newB.length - 1];
+            break;
+          }
+        }
+
+        // Si la carta fue colocada por otro jugador/bot, reproducir el efecto de sonido
+        if (addedCard && addedCard.playedById !== stateRef.current.mySlotId) {
+          if (addedCard.isShadow) {
+            sound.playShadow();
+          } else {
+            sound.playCard();
+          }
+        }
+      }
+    }
 
     setFronts(syncData.fronts);
     setPlayers(syncData.players);
@@ -1052,6 +1090,11 @@ export default function App() {
     const useShadow = isShadowMode && me.shadowsLeft > 0;
 
     if (isMultiplayer && !isHost) {
+      if (useShadow) {
+        sound.playShadow();
+      } else {
+        sound.playCard();
+      }
       // Cliente: enviar acción al Host
       mp.sendToHost({
         type: 'PLAY_CARD',
@@ -1100,20 +1143,66 @@ export default function App() {
   // Temporizador oficial por turno durante el despliegue (15s oficiales con penalización de descarte)
   useEffect(() => {
     if (screen !== 'game' || phase !== 'deployment') return;
-    if (isMultiplayer && !isHost) return; // Solo el Host o en juego local aplica penalizaciones de tiempo
 
     const timer = setInterval(() => {
       setTurnTimer(prev => {
         if (prev <= 1) {
-          handleTurnTimeoutPenalty();
-          return modeConfig.turnTimeLimit || 15;
+          if (!isMultiplayer || isHost) {
+            handleTurnTimeoutPenalty();
+            return modeConfig.turnTimeLimit || 15;
+          }
+          return 0; // Cliente espera resolución oficial del Host
         }
         return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [screen, phase, currentTurnPlayerId, players, isMultiplayer, isHost]);
+  }, [screen, phase, currentTurnPlayerId, players, isMultiplayer, isHost, modeConfig.turnTimeLimit]);
+
+  // Alerta sonora para cuando te queden 5 segundos o menos para jugar tu carta (pitidos tácticos)
+  const lastBeepSecondRef = useRef(null);
+  useEffect(() => {
+    if (screen !== 'game' || phase !== 'deployment') {
+      lastBeepSecondRef.current = null;
+      return;
+    }
+    // Solo emitir la alerta sonora si es el turno del jugador humano local
+    if (currentTurnPlayerId !== mySlotId) {
+      lastBeepSecondRef.current = null;
+      return;
+    }
+
+    if (turnTimer <= 5 && turnTimer > 0) {
+      if (lastBeepSecondRef.current !== turnTimer) {
+        lastBeepSecondRef.current = turnTimer;
+        sound.playWarningCountdown(turnTimer);
+      }
+    } else {
+      lastBeepSecondRef.current = null;
+    }
+  }, [turnTimer, currentTurnPlayerId, mySlotId, phase, screen]);
+
+  // Sonido de aviso cuando te toca tirar
+  const prevTurnPlayerRef = useRef(null);
+  const prevPhaseRef = useRef(null);
+  useEffect(() => {
+    if (screen !== 'game') {
+      prevTurnPlayerRef.current = currentTurnPlayerId;
+      prevPhaseRef.current = phase;
+      return;
+    }
+
+    const isMyTurnNow = currentTurnPlayerId === mySlotId && phase === 'deployment';
+    const wasMyTurnBefore = prevTurnPlayerRef.current === mySlotId && prevPhaseRef.current === 'deployment';
+
+    if (isMyTurnNow && !wasMyTurnBefore) {
+      sound.playYourTurn();
+    }
+
+    prevTurnPlayerRef.current = currentTurnPlayerId;
+    prevPhaseRef.current = phase;
+  }, [currentTurnPlayerId, mySlotId, phase, screen]);
 
   // Turno de Bots (Solo corre en Local o en el Host multijugador para puestos con Bot)
   useEffect(() => {
@@ -1401,13 +1490,26 @@ export default function App() {
         </div>
 
         {/* CONTROLES Y MANO DEL JUGADOR LOCAL */}
-        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2">
+        <div
+          className={`rounded-2xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2 transition-all duration-300 ${
+            isMyTurn
+              ? 'glowing-green-hand bg-gradient-to-b from-emerald-950/40 via-slate-900/90 to-slate-900 border-2 border-emerald-400'
+              : 'bg-slate-900/80 border border-slate-800'
+          }`}
+        >
           {/* Barra superior de la mano */}
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-200">
                 Tu Mano: {localPlayer?.name || 'Comandante'} ({localPlayer?.hand?.length || 0} cartas)
               </span>
+
+              {isMyTurn && (
+                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[10px] uppercase font-black px-2 py-0.5 rounded-full flex items-center gap-1.5 animate-pulse shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                  ¡Te toca tirar!
+                </span>
+              )}
 
               {/* Botón de Modo Sombra */}
               <button
