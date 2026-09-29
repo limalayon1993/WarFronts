@@ -121,9 +121,27 @@ export const TUTORIAL_STEPS = [
     content: [
       'En el reglamento oficial, antes de recibir cartas hay una fase táctica de 30 segundos donde los jugadores planifican SIN CARTAS en mano.',
       '¿Por qué sin cartas? Porque en los juegos cooperativos a menudo un jugador dominante le dice a los demás qué hacer. Al no tener cartas aún, el equipo debe acordar la macro-estrategia: por ejemplo, "aseguremos con fuerza el Centro y un Flanco, y si presionan mucho el otro, no malgastemos tropas".',
-      'Haz clic en "Iniciar Despliegue" para recibir tus 5 cartas reglamentarias.',
+      'Además, en esta fase los equipos pactan la gestión del reloj de equipo para no quedarse sin tiempo en el cierre de la ronda.',
     ],
-    buttonText: 'Iniciar Despliegue de Cartas',
+    buttonText: 'Ver Reloj de Equipo Compartido',
+  },
+
+  // PASO 2.5: NUEVA REGLA - EL RELOJ DE EQUIPO COMPARTIDO
+  {
+    stepId: 'team_clock',
+    type: 'dialog',
+    stage: 'team_clock',
+    title: 'Nueva Regla Oficial: El Reloj de Equipo Compartido',
+    subtitle: 'Gestión del Tiempo por Equipos (Dual Chess Clock)',
+    instructor: 'Comandante Instructor',
+    content: [
+      'En Frentes de Guerra el tiempo NO es individual por turno (no dispones de 15 segundos aislados por jugada). Ahora el reloj es COMPARTIDO para todo el equipo.',
+      'Bolsa de tiempo conjunta: Cada equipo dispone de un tiempo total por ronda (ejemplo en 2v2: Rápido = 1m 40s, Medio = 3m 20s, Lento = 5m 00s). Los segundos que consuma cada jugador durante su turno se restan al reloj global de su equipo.',
+      'Conmutación del reloj: El reloj de tu equipo corre mientras tú o tu aliado pensáis y realizáis la jugada. En el instante exacto en que colocáis la carta en el frente, vuestro reloj se detiene y se activa de inmediato el reloj del equipo rival.',
+      'Reseteo por ronda: El reloj de equipo se reinicia al valor completo al inicio de cada nueva ronda. El tiempo sobrante de una ronda no se acumula para las siguientes.',
+      '⚠️ Regla de Caída de Bandera (00:00): Si el reloj de un equipo llega a 00:00 antes de completar sus turnos, ¡pierde automáticamente la ronda (+1 Punto al rival)! Sin embargo, las cartas ya colocadas en la mesa se revelan y sus puntos se conservan para el cómputo de desempate final.',
+    ],
+    buttonText: '¡Entendido! Iniciar Despliegue de Cartas',
   },
 
   // =========================================================================

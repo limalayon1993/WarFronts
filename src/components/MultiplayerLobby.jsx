@@ -16,8 +16,14 @@ import {
   Sparkles,
   Wifi,
   WifiOff,
+  Timer,
 } from 'lucide-react';
-import { GAME_MODES, GAME_RHYTHMS } from '../constants/rules';
+import {
+  GAME_MODES,
+  GAME_DURATIONS,
+  TEAM_TIMES,
+  TEAM_TIME_OPTIONS,
+} from '../constants/rules';
 import { mp, formatRoomCode, generateRoomCode } from '../utils/multiplayer';
 
 export function MultiplayerLobby({
@@ -35,6 +41,7 @@ export function MultiplayerLobby({
   const [inputRoomCode, setInputRoomCode] = useState(initialRoomCode || '');
   const [selectedMode, setSelectedMode] = useState('2v2');
   const [selectedRhythm, setSelectedRhythm] = useState(6);
+  const [selectedTimeSpeed, setSelectedTimeSpeed] = useState('medio');
 
   // Estado de la sala activa
   const [roomCode, setRoomCode] = useState('');
@@ -73,6 +80,7 @@ export function MultiplayerLobby({
       setLobbySlots(lobby.slots);
       setSelectedMode(lobby.modeId);
       setSelectedRhythm(lobby.rhythmRounds);
+      if (lobby.timeSpeed) setSelectedTimeSpeed(lobby.timeSpeed);
       setAutoFillBots(lobby.autoFillBots);
     });
 
@@ -139,7 +147,7 @@ export function MultiplayerLobby({
       unsubDisconnect();
       unsubClientDisc();
     };
-  }, [onStartMultiplayerGame, lobbySlots, selectedMode, selectedRhythm, autoFillBots]);
+  }, [onStartMultiplayerGame, lobbySlots, selectedMode, selectedRhythm, selectedTimeSpeed, autoFillBots]);
 
   // Inicializar slots de la sala (todos los puestos no-host empiezan vacíos)
   const buildInitialSlots = (modeId, hostName, fillWithBots = false) => {
@@ -370,24 +378,32 @@ export function MultiplayerLobby({
     const newSlots = buildInitialSlots(newModeId, playerName, false);
     setLobbySlots(newSlots);
     setMySlotId('A1');
-    broadcastLobbyState(newSlots, newModeId, selectedRhythm, false);
+    broadcastLobbyState(newSlots, newModeId, selectedRhythm, false, selectedTimeSpeed);
   };
 
-  // Host: Cambiar ritmo de juego en la sala
+  // Host: Cambiar tiempo de equipo en la sala
+  const handleChangeTimeSpeed = (newSpeed) => {
+    if (!isHost) return;
+    setSelectedTimeSpeed(newSpeed);
+    broadcastLobbyState(lobbySlots, selectedMode, selectedRhythm, autoFillBots, newSpeed);
+  };
+
+  // Host: Cambiar duración de juego en la sala
   const handleChangeRhythm = (newRhythm) => {
     if (!isHost) return;
     setSelectedRhythm(newRhythm);
-    broadcastLobbyState(lobbySlots, selectedMode, newRhythm, autoFillBots);
+    broadcastLobbyState(lobbySlots, selectedMode, newRhythm, autoFillBots, selectedTimeSpeed);
   };
 
   // Host: Difundir estado del lobby a todos los peers
-  const broadcastLobbyState = (slots, modeId, rhythmRounds, fillBots) => {
+  const broadcastLobbyState = (slots, modeId, rhythmRounds, fillBots, timeSpeed = null) => {
     mp.broadcast({
       type: 'LOBBY_STATE',
       lobby: {
         slots,
         modeId,
         rhythmRounds,
+        timeSpeed: timeSpeed || selectedTimeSpeed,
         autoFillBots: fillBots,
       },
     });
@@ -409,6 +425,7 @@ export function MultiplayerLobby({
     onStartMultiplayerGame({
       modeId: selectedMode,
       rhythmRounds: selectedRhythm,
+      timeSpeed: selectedTimeSpeed,
       slots: lobbySlots,
       mySlotId,
       isHost: true,
@@ -449,6 +466,9 @@ export function MultiplayerLobby({
   };
 
   const modeConfig = GAME_MODES[selectedMode] || GAME_MODES['2v2'];
+  const modeTimes = TEAM_TIMES[selectedMode] || TEAM_TIMES['2v2'];
+  const currentTimeConfig = modeTimes[selectedTimeSpeed] || modeTimes['medio'];
+  const currentDuration = GAME_DURATIONS.find(d => d.rounds === selectedRhythm) || GAME_DURATIONS[1];
 
   // PANTALLA 1: CONEXIÓN O CREACIÓN (Si aún no está en sala)
   if (connectionStatus !== 'inLobby') {
@@ -562,24 +582,56 @@ export function MultiplayerLobby({
                 </div>
               </div>
 
+              {/* Selección de Tiempo de Equipo */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <Timer className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Tiempo de Equipo (Reloj Compartido)</span>
+                  </label>
+                  <span className="text-[10px] text-slate-500">Por ronda</span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {TEAM_TIME_OPTIONS.map((t) => {
+                    const speedCfg = modeTimes[t.id];
+                    return (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setSelectedTimeSpeed(t.id)}
+                        className={`p-2 rounded-lg border text-center transition ${
+                          selectedTimeSpeed === t.id
+                            ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 ring-1 ring-amber-400/40'
+                            : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
+                        }`}
+                      >
+                        <div className="text-xs font-bold">{t.name}</div>
+                        <div className="text-[10px] text-amber-400/90 font-mono mt-0.5">{speedCfg?.text || speedCfg?.label}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Selección de Duración de la Partida */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                  Ritmo de Juego (Rondas)
+                  Duración de la Partida (Rondas)
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {GAME_RHYTHMS.map((r) => (
+                  {GAME_DURATIONS.map((dur) => (
                     <button
-                      key={r.rounds}
+                      key={dur.rounds}
                       type="button"
-                      onClick={() => setSelectedRhythm(r.rounds)}
+                      onClick={() => setSelectedRhythm(dur.rounds)}
                       className={`p-2 rounded-lg border text-center text-xs font-bold transition ${
-                        selectedRhythm === r.rounds
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/60'
+                        selectedRhythm === dur.rounds
+                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 ring-1 ring-amber-400/40'
                           : 'bg-slate-950 text-slate-400 border-slate-800 hover:border-slate-700'
                       }`}
                     >
-                      <div>{r.name}</div>
-                      <div className="text-[10px] text-slate-500 font-normal">{r.rounds} rondas</div>
+                      <div>{dur.name}</div>
+                      <div className="text-[10px] text-slate-500 font-normal">{dur.rounds} rondas</div>
                     </button>
                   ))}
                 </div>
@@ -654,8 +706,8 @@ export function MultiplayerLobby({
               <span className="text-xs uppercase font-black text-amber-400 tracking-wider">
                 Sala Multijugador
               </span>
-              <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-1.5 py-0.2 rounded font-mono font-bold">
-                {modeConfig.name} • {selectedRhythm} Rondas
+              <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded font-mono font-bold">
+                {modeConfig.name} • {currentTimeConfig?.text || currentTimeConfig?.label} • Duración {currentDuration?.name} ({selectedRhythm} Rondas)
               </span>
             </div>
             <div className="flex items-center gap-2 mt-0.5">

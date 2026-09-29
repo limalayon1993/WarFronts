@@ -39,8 +39,7 @@ export const GAME_MODES = {
     maxFrontCards: 8,
     shadowsPerPlayer: 2,
     totalPlayers: 2,
-    turnTimeLimit: 15, // 15s en 1v1 según Capítulo 5 y Anexo 8
-    description: '1 baraja (52 cartas). 10 cartas por jugador, 2 sombras, límite de 8 cartas por frente.',
+    description: '1 baraja (52 cartas). 10 cartas por duelista, 2 sombras, límite de 8 cartas por frente.',
   },
   '2v2': {
     id: '2v2',
@@ -52,7 +51,6 @@ export const GAME_MODES = {
     maxFrontCards: 8,
     shadowsPerPlayer: 1,
     totalPlayers: 4,
-    turnTimeLimit: 15, // 15s en 2v2 según Capítulo 5
     description: '1 baraja (52 cartas). 4 jugadores, 5 cartas c/u, 1 sombra, límite de 8 cartas por frente.',
   },
   '3v3': {
@@ -65,7 +63,6 @@ export const GAME_MODES = {
     maxFrontCards: 12,
     shadowsPerPlayer: 1,
     totalPlayers: 6,
-    turnTimeLimit: 15, // 15s en 3v3 según Capítulo 5
     description: '2 barajas combinadas (104 cartas). 6 jugadores, 5 cartas c/u, límite de 12 cartas por frente.',
   },
   '4v4': {
@@ -78,17 +75,76 @@ export const GAME_MODES = {
     maxFrontCards: 16,
     shadowsPerPlayer: 1,
     totalPlayers: 8,
-    turnTimeLimit: 15, // 15s en 4v4 según Capítulo 5
     description: '2 barajas combinadas (104 cartas). 8 jugadores, 5 cartas c/u, límite de 16 cartas por frente.',
   },
 };
 
-// Ritmos de juego oficiales según el reglamento v1.6
-export const GAME_RHYTHMS = [
-  { id: 4, name: 'Rápido', rounds: 4, desc: '4 Rondas', timeEst: '~10 min' },
-  { id: 6, name: 'Medio', rounds: 6, desc: '6 Rondas', timeEst: '~18 min' },
-  { id: 8, name: 'Lento', rounds: 8, desc: '8 Rondas', timeEst: '~25 min' },
+// Duraciones oficiales de la partida según el reglamento v1.6
+export const GAME_DURATIONS = [
+  { id: 'corta', name: 'Corta', rounds: 4, desc: '4 Rondas', timeEst: '~10 min' },
+  { id: 'mediana', name: 'Mediana', rounds: 6, desc: '6 Rondas', timeEst: '~18 min' },
+  { id: 'larga', name: 'Larga', rounds: 8, desc: '8 Rondas', timeEst: '~25 min' },
 ];
+
+// Alias para compatibilidad hacia atrás
+export const GAME_RHYTHMS = GAME_DURATIONS;
+
+// Opciones de velocidad de tiempo por equipo
+export const TEAM_TIME_OPTIONS = [
+  { id: 'rapido', name: 'Rápido', desc: 'Ritmo ágil y dinámico' },
+  { id: 'medio', name: 'Medio', desc: 'Equilibrio táctico estándar' },
+  { id: 'lento', name: 'Lento', desc: 'Máxima profundidad y cálculo' },
+];
+
+// Tiempos oficiales por formato (Reloj de Equipo compartido por ronda) según Capítulo 3 del reglamento v1.6
+export const TEAM_TIMES = {
+  '1v1': {
+    rapido: { seconds: 100, label: '1m 40s (100s)', text: '1m 40s' },
+    medio: { seconds: 200, label: '3m 20s (200s)', text: '3m 20s' },
+    lento: { seconds: 300, label: '5m 00s (300s)', text: '5m 00s' },
+  },
+  '2v2': {
+    rapido: { seconds: 100, label: '1m 40s (100s)', text: '1m 40s' },
+    medio: { seconds: 200, label: '3m 20s (200s)', text: '3m 20s' },
+    lento: { seconds: 300, label: '5m 00s (300s)', text: '5m 00s' },
+  },
+  '3v3': {
+    rapido: { seconds: 150, label: '2m 30s (150s)', text: '2m 30s' },
+    medio: { seconds: 300, label: '5m 00s (300s)', text: '5m 00s' },
+    lento: { seconds: 450, label: '7m 30s (450s)', text: '7m 30s' },
+  },
+  '4v4': {
+    rapido: { seconds: 200, label: '3m 20s (200s)', text: '3m 20s' },
+    medio: { seconds: 400, label: '6m 40s (400s)', text: '6m 40s' },
+    lento: { seconds: 600, label: '10m 00s (600s)', text: '10m 00s' },
+  },
+};
+
+/**
+ * Obtiene los segundos del reloj de equipo para un modo y velocidad de tiempo elegidos
+ */
+export function getTeamTimeSeconds(modeId = '2v2', timeSpeed = 'medio') {
+  const modeTimes = TEAM_TIMES[modeId] || TEAM_TIMES['2v2'];
+  return modeTimes[timeSpeed]?.seconds ?? 200;
+}
+
+/**
+ * Obtiene la configuración de tiempo para un modo y velocidad
+ */
+export function getTeamTimeConfig(modeId = '2v2', timeSpeed = 'medio') {
+  const modeTimes = TEAM_TIMES[modeId] || TEAM_TIMES['2v2'];
+  return modeTimes[timeSpeed] || modeTimes['medio'];
+}
+
+/**
+ * Formatea segundos a mm:ss (o m:ss)
+ */
+export function formatClockTime(totalSeconds) {
+  if (totalSeconds == null || totalSeconds < 0) totalSeconds = 0;
+  const m = Math.floor(totalSeconds / 60);
+  const s = Math.floor(totalSeconds % 60);
+  return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
 
 /**
  * Crea la baraja con 1 o 2 mazos combinados según el modo

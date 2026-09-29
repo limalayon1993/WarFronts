@@ -15,7 +15,9 @@ export function ScoreBoard({
   drawDeckCount,
   discardDeckCount,
   modeConfig,
+  durationConfig,
   rhythmConfig,
+  timeConfig,
   isMuted,
   onToggleMute,
   onOpenQuickGuide,
@@ -28,6 +30,7 @@ export function ScoreBoard({
 }) {
   const trumpSuit = trumpCard ? SUITS[trumpCard.suit] : null;
   const is1v1 = modeConfig?.id === '1v1';
+  const effectiveDuration = durationConfig || rhythmConfig;
 
   return (
     <header className="bg-slate-950/90 border-b border-slate-800 px-4 py-2.5 backdrop-blur shadow-md">
@@ -60,7 +63,13 @@ export function ScoreBoard({
                 )}
               </h1>
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                <span className="text-amber-400">Ronda {round}</span> de {totalRounds} ({rhythmConfig?.name})
+                <span className="text-amber-400">Ronda {round}</span> de {totalRounds} (Duración {effectiveDuration?.name})
+                {timeConfig && (
+                  <>
+                    <span className="text-slate-600">•</span>
+                    <span className="text-slate-300">{timeConfig.label}</span>
+                  </>
+                )}
               </div>
             </div>
           </div>

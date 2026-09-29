@@ -26,6 +26,7 @@ import {
   Check,
   Trophy,
   Zap,
+  Clock,
 } from 'lucide-react';
 
 export function InteractiveTutorial({ onBackToMenu }) {
@@ -148,8 +149,8 @@ export function InteractiveTutorial({ onBackToMenu }) {
   function handleNextDialog() {
     sound.playCard();
 
-    // Si pasamos del paso 2 al 3 (inicio del despliegue), se reparten las 5 cartas
-    if (currentStep.stage === 'planning') {
+    // Si pasamos al inicio del despliegue (tras planning y team_clock), se reparten las 5 cartas
+    if (currentStep.stage === 'team_clock' || currentStep.stage === 'planning') {
       setPlayerHand([...TUTORIAL_INITIAL_HANDS.A1]);
     }
 
@@ -315,9 +316,48 @@ export function InteractiveTutorial({ onBackToMenu }) {
             </div>
           </div>
 
+          {/* Reloj Dual de Equipo en la cabecera del tutorial */}
+          <div className="hidden md:flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 shadow-inner">
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono transition-all ${
+                currentStep.type === 'player_turn' || currentStep.botTeam === 'teamA'
+                  ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300 ring-2 ring-emerald-500/40 shadow-emerald-500/20 shadow-sm'
+                  : 'bg-slate-900/60 border-slate-800 text-slate-500 opacity-60'
+              }`}
+              title="Reloj de tu equipo (Equipo A)"
+            >
+              <div className="flex flex-col text-left">
+                <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">Equipo A</span>
+                <span className="text-xs font-black leading-tight">03:20</span>
+              </div>
+              {(currentStep.type === 'player_turn' || currentStep.botTeam === 'teamA') && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              )}
+            </div>
+
+            <span className="text-slate-600 text-[10px] font-bold px-0.5">VS</span>
+
+            <div
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono transition-all ${
+                currentStep.botTeam === 'teamB'
+                  ? 'bg-rose-950/90 border-rose-400 text-rose-300 ring-2 ring-rose-500/40 shadow-rose-500/20 shadow-sm'
+                  : 'bg-slate-900/60 border-slate-800 text-slate-500 opacity-60'
+              }`}
+              title="Reloj del equipo rival (Equipo B)"
+            >
+              <div className="flex flex-col text-left">
+                <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">Equipo B</span>
+                <span className="text-xs font-black leading-tight">03:20</span>
+              </div>
+              {currentStep.botTeam === 'teamB' && (
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+              )}
+            </div>
+          </div>
+
           {/* Estado de Equipos & Sonido */}
           <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-2 text-xs font-mono bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
+            <div className="hidden lg:flex items-center gap-2 text-xs font-mono bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
               <span className="text-emerald-400 font-bold">Equipo A (Tú y A2)</span>
               <span className="text-slate-600">vs</span>
               <span className="text-rose-400 font-bold">Equipo B (B1 y B2)</span>
@@ -749,7 +789,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
           <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap min-h-[120px] py-1">
             {playerHand.length === 0 ? (
               <span className="text-sm text-slate-500 italic">
-                {stepIndex < 3
+                {currentStep.type === 'dialog'
                   ? 'Recibirás tus 5 cartas reglamentarias al iniciar el despliegue.'
                   : 'Has desplegado todas tus cartas de la ronda.'}
               </span>
@@ -831,6 +871,65 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 </p>
               ))}
             </div>
+
+            {/* Simulación visual del Reloj Dual de Equipo */}
+            {currentStep.stage === 'team_clock' && (
+              <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 mb-4 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-amber-400" /> Reloj Dual de Equipo (Simulación 2v2)
+                  </span>
+                  <span className="text-[10px] bg-slate-800 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">
+                    Ritmo Medio (3m 20s)
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-center gap-2.5 sm:gap-3">
+                  {/* Reloj Equipo A */}
+                  <div className="flex-1 bg-emerald-950/80 border-2 border-emerald-400 p-2.5 rounded-xl text-center shadow-lg shadow-emerald-500/20 ring-2 ring-emerald-500/30">
+                    <span className="text-[9px] sm:text-[10px] uppercase font-bold text-emerald-300 block">
+                      Tu Equipo (Tú y A2) • ACTIVO
+                    </span>
+                    <span className="text-xl sm:text-2xl font-black font-mono text-emerald-300">
+                      03:20
+                    </span>
+                    <div className="text-[9px] text-emerald-400/90 mt-0.5 animate-pulse font-medium">
+                      ⏱️ Descuenta en tu turno
+                    </div>
+                  </div>
+
+                  <span className="text-slate-500 font-black text-xs sm:text-sm">VS</span>
+
+                  {/* Reloj Equipo B */}
+                  <div className="flex-1 bg-slate-900/60 border border-slate-800 p-2.5 rounded-xl text-center opacity-70">
+                    <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 block">
+                      Equipo Rival (B1 y B2) • PAUSADO
+                    </span>
+                    <span className="text-xl sm:text-2xl font-black font-mono text-slate-400">
+                      03:20
+                    </span>
+                    <div className="text-[9px] text-slate-500 mt-0.5">
+                      Se activa al colocar tu carta
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+                  <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
+                    <strong className="text-emerald-400 block font-bold">Rápido</strong>
+                    <span className="font-mono">1m 40s (100s)</span>
+                  </div>
+                  <div className="bg-slate-900 p-1.5 rounded border border-amber-500/40">
+                    <strong className="text-amber-400 block font-bold">Medio</strong>
+                    <span className="font-mono">3m 20s (200s)</span>
+                  </div>
+                  <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
+                    <strong className="text-indigo-400 block font-bold">Lento</strong>
+                    <span className="font-mono">5m 00s (300s)</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
               <button

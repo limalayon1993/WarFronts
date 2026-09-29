@@ -135,16 +135,16 @@ export function FullManualModal({ isOpen, onClose }) {
                   </p>
 
                   <div className="pt-2">
-                    <span className="text-xs font-bold text-slate-400 block mb-1">Los ritmos oficiales son los siguientes:</span>
+                    <span className="text-xs font-bold text-slate-400 block mb-1">Las duraciones oficiales de partida son las siguientes:</span>
                     <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                       <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-amber-400 block">Rápido:</strong> 4 rondas.
+                        <strong className="text-amber-400 block">Corta:</strong> 4 rondas.
                       </li>
                       <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-amber-400 block">Medio:</strong> 6 rondas.
+                        <strong className="text-amber-400 block">Mediana:</strong> 6 rondas.
                       </li>
                       <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-amber-400 block">Lento:</strong> 8 rondas.
+                        <strong className="text-amber-400 block">Larga:</strong> 8 rondas.
                       </li>
                     </ul>
                   </div>
@@ -187,6 +187,7 @@ export function FullManualModal({ isOpen, onClose }) {
                       <div className="mt-1 text-slate-400 space-y-0.5">
                         <div>• <strong>1 Ficha de Iniciativa.</strong></div>
                         <div>• <strong>1 Marcador de Sombra por jugador</strong> (puede ser una moneda, piedra, dado, ficha o papel).</div>
+                        <div>• <strong>1 Cronómetro / Reloj de Ajedrez Dual:</strong> Reloj conmutado para medir el tiempo global compartido de cada equipo en la ronda.</div>
                         <div>• <strong>Hoja de Anotación / Marcador:</strong> 1 bloc de papel o marcador digital para registrar tanto los puntos de ronda como la suma de puntos numéricos de cada frente por ronda.</div>
                       </div>
                     </li>
@@ -220,13 +221,13 @@ export function FullManualModal({ isOpen, onClose }) {
               <div className="space-y-4 animate-fadeIn">
                 <div className="border-b border-slate-800 pb-3">
                   <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">Capítulo 3</span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">3. Disposición y Determinación de Iniciativa</h3>
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">3. Disposición, Iniciativa y Tiempos de Equipo</h3>
                 </div>
 
                 <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
                   <h4 className="font-bold text-slate-100">Disposición de la Mesa</h4>
                   <p>
-                    Se delimitan 3 zonas en el centro de la mesa: <strong className="text-slate-100">Frente Izquierdo, Frente Central y Frente Derecho</strong>. El Mazo Principal y el Pozo de Descartes se ubican a un costado.
+                    Se delimitan 3 zonas en el centro de la mesa: <strong className="text-slate-100">Frente Izquierdo, Frente Central y Frente Derecho</strong>. El Mazo Principal y el Pozo de Descartes se ubican a un costado junto con el reloj dual de equipo.
                   </p>
                 </div>
 
@@ -242,6 +243,58 @@ export function FullManualModal({ isOpen, onClose }) {
                   <p>
                     A partir de la Ronda 2, la Ficha de Iniciativa <strong className="text-emerald-400">rota automáticamente al equipo contrario</strong> al inicio de cada ronda, independientemente de quién haya ganado la ronda anterior.
                   </p>
+                </div>
+
+                {/* TABLA OFICIAL DE TIEMPOS DE EQUIPO */}
+                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
+                  <h4 className="font-bold text-amber-400 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-amber-400" /> Reloj de Equipo Compartido (Tiempos Oficiales por Modalidad)
+                  </h4>
+                  <p className="text-xs sm:text-sm text-slate-300">
+                    El tiempo ya no es individual por turno; es una <strong>bolsa de tiempo compartida para el equipo entero</strong> que se consume únicamente mientras cualquiera de sus miembros piensa o despliega una carta. Al colocar la carta, el reloj se detiene y se activa de inmediato el reloj del equipo contrario.
+                  </p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-slate-700 bg-slate-950 text-slate-300">
+                          <th className="p-2 font-bold">Modalidad</th>
+                          <th className="p-2 font-bold text-emerald-400">Rápido</th>
+                          <th className="p-2 font-bold text-amber-400">Medio</th>
+                          <th className="p-2 font-bold text-indigo-400">Lento</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800 font-mono text-slate-300">
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-sans font-semibold text-slate-100">1v1 (10 cartas/jugador)</td>
+                          <td className="p-2 text-emerald-300">1m 40s (100 seg)</td>
+                          <td className="p-2 text-amber-300">3m 20s (200 seg)</td>
+                          <td className="p-2 text-indigo-300">5m 00s (300 seg)</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-sans font-semibold text-slate-100">2v2 (10 cartas/equipo)</td>
+                          <td className="p-2 text-emerald-300">1m 40s (100 seg)</td>
+                          <td className="p-2 text-amber-300">3m 20s (200 seg)</td>
+                          <td className="p-2 text-indigo-300">5m 00s (300 seg)</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-sans font-semibold text-slate-100">3v3 (15 cartas/equipo)</td>
+                          <td className="p-2 text-emerald-300">2m 30s (150 seg)</td>
+                          <td className="p-2 text-amber-300">5m 00s (300 seg)</td>
+                          <td className="p-2 text-indigo-300">7m 30s (450 seg)</td>
+                        </tr>
+                        <tr className="hover:bg-slate-800/40">
+                          <td className="p-2 font-sans font-semibold text-slate-100">4v4 (20 cartas/equipo)</td>
+                          <td className="p-2 text-emerald-300">3m 20s (200 seg)</td>
+                          <td className="p-2 text-amber-300">6m 40s (400 seg)</td>
+                          <td className="p-2 text-indigo-300">10m 00s (600 seg)</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                    <div>• <strong>Reseteo por Ronda:</strong> Al inicio de cada nueva ronda, el reloj de ambos equipos se restablece íntegramente al 100% del tiempo estipulado. El tiempo no consumido en rondas anteriores se pierde y nunca se acumula.</div>
+                    <div>• <strong>Promedio de Tiempo por Jugada:</strong> Rápido permite una media de 10 seg por carta; Medio 20 seg por carta; Lento 30 seg por carta. La distribución entre jugadores del equipo es libre y estratégica.</div>
+                  </div>
                 </div>
               </div>
             )}
@@ -364,6 +417,7 @@ export function FullManualModal({ isOpen, onClose }) {
                     <ul className="text-xs sm:text-sm space-y-1.5 text-slate-300">
                       <li>• <strong>Comunicación Total Libre:</strong> Los equipos disponen de un tiempo de 30 segundos para hablar y coordinar su estrategia general antes de recibir sus cartas.</li>
                       <li>• <strong>Estrategia Macro:</strong> Se planifica la distribución de las zonas ("Ataquemos fuerte Centro e Izquierda", "Si alguien recibe triunfos que refuerce el flanco"), roles o señas.</li>
+                      <li>• <strong>Presupuesto Temporal:</strong> Los equipos pueden pactar la distribución de su reloj compartido (ejemplo: acordar que los jugadores iniciales jueguen en 3–5 segundos para reservar tiempo de cálculo al cierre de la ronda).</li>
                       <li className="text-emerald-300 font-semibold">• <strong>Garantía Anti-Jugador Alfa:</strong> Al no tener aún las cartas en mano, es imposible que un jugador ordene las jugadas exactas a sus compañeros.</li>
                     </ul>
                   </div>
@@ -383,17 +437,25 @@ export function FullManualModal({ isOpen, onClose }) {
                   {/* FASE 4 */}
                   <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-bold text-amber-400">FASE 4: Despliegue (Silencio Absoluto)</h4>
-                      <span className="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-mono">15s / Turno</span>
+                      <h4 className="font-bold text-amber-400">FASE 4: Despliegue (Silencio Absoluto y Reloj de Equipo Compartido)</h4>
+                      <span className="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-mono">Reloj de Equipo</span>
                     </div>
                     <ul className="text-xs sm:text-sm space-y-1.5 text-slate-300">
                       <li>• <strong>Prohibición de Comunicación:</strong> Queda prohibida toda comunicación hablada, escrita o mediante señas durante el despliegue.</li>
-                      <li>• <strong>Orden de Turnos e Intercalado:</strong> Inicia un jugador del equipo con la Ficha de Iniciativa. Los turnos se alternan estrictamente 1 a 1 entre jugadores de ambos equipos de forma fija (ej: A1 ➔ B1 ➔ A2 ➔ B2) hasta que todos los jugadores hayan colocado sus 5 cartas.</li>
-                      <li>• <strong>Acción Única del Turno (Reloj: 15s):</strong> En su turno, el jugador DEBE colocar exactamente UNA (1) carta en cualquiera de los 3 Frentes que no haya alcanzado el Límite Territorial Compartido. No se permite jugar 2 cartas en un mismo turno ni pasar el turno.</li>
+                      <li>• <strong>Inicio del Reloj:</strong> El reloj del equipo con la Ficha de Iniciativa se activa en el instante en que comienza la fase.</li>
+                      <li>• <strong>Orden de Turnos e Intercalado:</strong> Inicia un jugador del equipo con la Ficha de Iniciativa. Los turnos se alternan estrictamente 1 a 1 entre jugadores de ambos equipos de forma fija (ej: A1 ➔ B1 ➔ A2 ➔ B2) hasta que todos los jugadores hayan colocado todas sus cartas.</li>
+                      <li>• <strong>Acción Única del Turno:</strong> En su turno, el jugador DEBE colocar exactamente UNA (1) carta en cualquiera de los 3 Frentes que no haya alcanzado el Límite Territorial Compartido. No se permite jugar 2 cartas en un mismo turno ni pasar el turno. Cuando se coloca la carta el cronómetro empieza a contar para el otro equipo. Hasta que el cronómetro no empiece a contar para el otro equipo estos no pueden actuar.</li>
                       <li>• Si decide jugarla boca abajo (Carta de Sombra), debe voltear/entregar su Marcador de Sombra.</li>
                       <li>• <strong>Restricción del Límite Territorial Compartido:</strong> No se puede colocar una carta en un Frente donde la suma total de cartas de ambos equipos ya haya alcanzado el límite permitido (8 cartas en 1v1 y 2v2; 12 cartas en 3v3; 16 cartas en 4v4).</li>
-                      <li className="text-rose-300 font-semibold">• <strong>Penalización por Tiempo:</strong> Si un jugador supera los 15s, pierde su turno y descarta una carta al azar de su mano directamente al pozo de descarte (esa carta no puntúa ni va a ningún frente).</li>
-                      <li>• <strong>Cierre Automático de la Fase de Despliegue:</strong> Concluye de manera instantánea y automática en el segundo exacto en que todos los jugadores de ambos equipos hayan colocado las 5 cartas de su mano en la mesa (o hayan descartado por penalización). No es posible "pasar", guardar cartas ni prolongar la fase.</li>
+                      <li className="text-rose-300 font-semibold bg-rose-950/30 p-2.5 rounded border border-rose-900/60">
+                        ⏱️ <strong>Derrota por Tiempo (Caída de Bandera):</strong> Si el reloj de un equipo llega a 00:00 antes de completar sus turnos:
+                        <div className="mt-1 pl-2 space-y-0.5 font-normal text-slate-300 text-xs">
+                          <div>- La ronda finaliza de manera instantánea.</div>
+                          <div>- El equipo infractor pierde la ronda automáticamente y el equipo rival suma el <strong className="text-emerald-400">+1 Punto de Ronda</strong> de forma directa.</div>
+                          <div>- <strong>Conservación de Puntos Acumulados:</strong> Se voltean las cartas jugadas hasta ese instante en la mesa y se suman los valores base, sinergias y triunfos ya colocados por ambos bandos. Esos puntos se registran obligatoriamente en la Hoja de Anotación para el criterio de desempate final de la partida.</div>
+                        </div>
+                      </li>
+                      <li>• <strong>Cierre Automático de la Fase de Despliegue:</strong> La Fase de Despliegue concluye de manera instantánea y automática en el segundo exacto en que todos los jugadores de ambos equipos hayan colocado las 5 cartas de su mano en la mesa. No es posible "pasar", guardar cartas ni prolongar la fase. Si ambos equipos completan el despliegue de sus 5 cartas antes de que se agote el tiempo de cualquiera de los dos, se detiene el reloj y se procede al conteo habitual de puntos en los 3 Frentes.</li>
                     </ul>
                   </div>
                 </div>
@@ -440,6 +502,15 @@ export function FullManualModal({ isOpen, onClose }) {
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-300">
                       Si un jugador intenta jugar una segunda carta boca abajo tras haber consumido su Marcador de Sombra, la carta debe voltearse inmediatamente y quedar expuesta boca arriba en la mesa.
+                    </p>
+                  </div>
+
+                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-1.5">
+                    <h4 className="font-bold text-amber-400 flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-amber-400" /> Pulsación Irregular del Reloj
+                    </h4>
+                    <p className="text-xs sm:text-sm text-slate-300">
+                      Un jugador no puede pulsar el cronómetro antes de haber soltado la carta de forma definitiva en el frente elegido. Si lo hace, el rival o el árbitro pueden exigir que retire la mano del reloj; el tiempo seguirá corriendo para su equipo hasta que la carta esté correctamente depositada en la mesa.
                     </p>
                   </div>
                 </div>
@@ -515,6 +586,9 @@ export function FullManualModal({ isOpen, onClose }) {
                     <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
                       <strong>Cartas Sombra:</strong> Cada jugador recibe <strong className="text-purple-400">2 Marcadores de Sombra</strong> (puede jugar hasta 2 cartas boca abajo durante la ronda).
                     </li>
+                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800 sm:col-span-2">
+                      <strong>Gestión del Reloj en 1v1:</strong> El jugador individual asume los 10 turnos de su equipo, disponiendo de la bolsa de tiempo completa de 10 turnos (ej. 3 min 20 s en Ritmo Medio) para alternar sus jugadas frente al rival, pulsando el reloj tras cada una de sus 10 cartas colocadas.
+                    </li>
                   </ul>
                 </div>
 
@@ -561,11 +635,11 @@ export function FullManualModal({ isOpen, onClose }) {
 
                     <div className="bg-slate-950 p-3 rounded border border-slate-800">
                       <div className="flex items-center justify-between mb-1">
-                        <strong className="text-slate-100 font-bold">FASE 4: Despliegue Táctico (Silencio Absoluto — Reloj: 15s / Turno)</strong>
-                        <span className="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-mono">15s / Turno</span>
+                        <strong className="text-slate-100 font-bold">FASE 4: Despliegue Táctico (Silencio Absoluto — Reloj de Jugador Compartido)</strong>
+                        <span className="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-mono">Reloj Dual</span>
                       </div>
                       <p className="text-slate-400">
-                        Turnos 1 a 1 alternados (Jugador A ➔ Jugador B ➔ Jugador A...) comenzando por quien tenga la Iniciativa. Se coloca exactamente una carta por turno en un frente no saturado (máximo 8 cartas sumando ambos duelistas). Cada jugador puede jugar hasta 2 Cartas de Sombra durante la ronda volteando sus marcadores. Exceder los 15s conlleva la penalización oficial de descartar una carta al azar al pozo sin puntuar. Concluye al jugar las 10 cartas.
+                        Turnos 1 a 1 alternados (Jugador A ➔ Jugador B ➔ Jugador A...) comenzando por quien tenga la Iniciativa. Se coloca exactamente una carta por turno en un frente no saturado (máximo 8 cartas sumando ambos duelistas). Cada jugador puede jugar hasta 2 Cartas de Sombra durante la ronda volteando sus marcadores. En 1v1 el reloj de equipo equivale al reloj de cada duelista (Rápido: 1m 40s, Medio: 3m 20s, Lento: 5m 00s). La Caída de Bandera a 00:00 otorga automáticamente la ronda (+1 Punto) al contrincante conservando los puntos acumulados en mesa. Concluye al jugar las 10 cartas.
                       </p>
                     </div>
                   </div>

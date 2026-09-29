@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
-import { GAME_MODES, GAME_RHYTHMS } from '../constants/rules';
+import {
+  GAME_MODES,
+  GAME_DURATIONS,
+  TEAM_TIMES,
+  TEAM_TIME_OPTIONS,
+} from '../constants/rules';
 import {
   Swords,
   Users,
@@ -16,6 +21,7 @@ import {
   Bot,
   Sparkles,
   GraduationCap,
+  Timer,
 } from 'lucide-react';
 
 export function MainMenu({
@@ -23,6 +29,8 @@ export function MainMenu({
   setSelectedMode,
   selectedRhythm,
   setSelectedRhythm,
+  selectedTimeSpeed = 'medio',
+  setSelectedTimeSpeed,
   onStartGame,
   onOpenMultiplayer,
   onOpenTutorial,
@@ -35,8 +43,11 @@ export function MainMenu({
   // 'landing' (2 botones principales) | 'bots' (configurar y crear partida contra bots)
   const [view, setView] = useState(initialView);
 
-  const currentMode = GAME_MODES[selectedMode];
-  const currentRhythm = GAME_RHYTHMS.find(r => r.rounds === selectedRhythm);
+  const currentMode = GAME_MODES[selectedMode] || GAME_MODES['1v1'];
+  const currentDuration = GAME_DURATIONS.find(d => d.rounds === selectedRhythm) || GAME_DURATIONS[1];
+  const modeTimes = TEAM_TIMES[selectedMode] || TEAM_TIMES['2v2'];
+  const currentTimeConfig = modeTimes[selectedTimeSpeed] || modeTimes['medio'];
+  const currentTimeOption = TEAM_TIME_OPTIONS.find(t => t.id === selectedTimeSpeed) || TEAM_TIME_OPTIONS[1];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between p-4 sm:p-6 lg:p-8 relative overflow-hidden select-none">
@@ -203,7 +214,7 @@ export function MainMenu({
                 </h2>
 
                 <p className="text-xs sm:text-sm text-slate-400 mt-2.5 leading-relaxed">
-                  Enfréntate a la IA táctica en partidas individuales o por equipos. Selecciona el formato (1v1, 2v2, 3v3 o 4v4) y ritmo de rondas antes del despliegue.
+                  Enfréntate a la IA táctica en partidas individuales o por equipos. Selecciona el formato (1v1 a 4v4), tiempo de equipo y duración en rondas antes del despliegue.
                 </p>
 
                 <div className="flex flex-wrap gap-2 mt-5">
@@ -295,7 +306,7 @@ export function MainMenu({
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl mx-auto">
-              Configura el formato táctico de combate y el ritmo de rondas antes del despliegue en el frente.
+              Configura el formato táctico de combate, el tiempo de equipo por ronda y la duración de la partida.
             </p>
           </div>
 
@@ -358,23 +369,24 @@ export function MainMenu({
             </div>
           </div>
 
-          {/* 2. SELECCIÓN DE RITMO DE PARTIDA */}
+          {/* 2. SELECCIÓN DE TIEMPO DE EQUIPO (RELOJ COMPARTIDO) */}
           <div className="w-full mb-7">
             <div className="flex items-center justify-between mb-3 px-1">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-amber-400" /> 2. Elige el Ritmo de la Partida
+                <Timer className="w-4 h-4 text-amber-400" /> 2. Elige el Tiempo de Equipo (Reloj Compartido)
               </span>
-              <span className="text-xs text-slate-500">Determina el total de rondas a disputar</span>
+              <span className="text-xs text-slate-500">Bolsa de tiempo conjunta por equipo para cada ronda</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              {GAME_RHYTHMS.map((rhythm) => {
-                const isSelected = selectedRhythm === rhythm.rounds;
+              {TEAM_TIME_OPTIONS.map((timeOpt) => {
+                const isSelected = selectedTimeSpeed === timeOpt.id;
+                const speedConfig = modeTimes[timeOpt.id];
                 return (
                   <button
-                    key={rhythm.rounds}
+                    key={timeOpt.id}
                     type="button"
-                    onClick={() => setSelectedRhythm(rhythm.rounds)}
+                    onClick={() => setSelectedTimeSpeed && setSelectedTimeSpeed(timeOpt.id)}
                     className={`
                       p-4 rounded-xl border transition-all text-left flex items-center justify-between
                       ${isSelected
@@ -385,13 +397,57 @@ export function MainMenu({
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-base">{rhythm.name}</span>
+                        <span className="font-bold text-base">{timeOpt.name}</span>
                       </div>
-                      <span className="text-xs text-slate-400">{rhythm.desc}</span>
+                      <span className="text-xs text-slate-400">{timeOpt.desc}</span>
+                    </div>
+
+                    <span className="text-xs font-mono font-bold text-amber-400 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800 shadow-inner">
+                      {speedConfig?.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[11px] text-slate-500 mt-2 px-1">
+              ⏱️ El tiempo es compartido para todo el equipo y se consume durante los turnos de sus componentes. Se reinicia al valor completo en cada nueva ronda.
+            </p>
+          </div>
+
+          {/* 3. SELECCIÓN DE DURACIÓN DE LA PARTIDA */}
+          <div className="w-full mb-7">
+            <div className="flex items-center justify-between mb-3 px-1">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-amber-400" /> 3. Elige la Duración de la Partida
+              </span>
+              <span className="text-xs text-slate-500">Determina el total de rondas reglamentarias a disputar</span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              {GAME_DURATIONS.map((dur) => {
+                const isSelected = selectedRhythm === dur.rounds;
+                return (
+                  <button
+                    key={dur.rounds}
+                    type="button"
+                    onClick={() => setSelectedRhythm(dur.rounds)}
+                    className={`
+                      p-4 rounded-xl border transition-all text-left flex items-center justify-between
+                      ${isSelected
+                        ? 'bg-amber-950/30 border-amber-500 ring-2 ring-amber-400/40 text-slate-100 shadow-md'
+                        : 'bg-slate-900/80 hover:bg-slate-900 border-slate-800 text-slate-300 hover:border-slate-700'
+                      }
+                    `}
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-base">{dur.name}</span>
+                      </div>
+                      <span className="text-xs text-slate-400">{dur.desc}</span>
                     </div>
 
                     <span className="text-xs font-mono font-bold text-slate-400 bg-slate-950 px-2 py-1 rounded border border-slate-800">
-                      {rhythm.timeEst}
+                      {dur.timeEst}
                     </span>
                   </button>
                 );
@@ -399,17 +455,17 @@ export function MainMenu({
             </div>
           </div>
 
-          {/* 3. RESUMEN DE LA CONFIGURACIÓN Y BOTÓN DE INICIAR */}
+          {/* 4. RESUMEN DE LA CONFIGURACIÓN Y BOTÓN DE INICIAR */}
           <div className="w-full max-w-4xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
               <span className="text-[11px] uppercase font-bold text-amber-400 tracking-wider block">
                 Configuración Seleccionada
               </span>
               <div className="text-base font-black text-slate-100">
-                Modo {currentMode.name} • Ritmo {currentRhythm.name} ({currentRhythm.rounds} Rondas)
+                Modo {currentMode.name} • Tiempo {currentTimeConfig.label} ({currentTimeOption.name}) • Duración {currentDuration.name} ({currentDuration.rounds} Rondas)
               </div>
               <div className="text-xs text-slate-400 mt-0.5">
-                Jugarás como comandante en el equipo aliado contra la IA.
+                Jugarás como comandante en el equipo aliado contra la IA. Reloj de equipo reiniciado cada ronda.
               </div>
             </div>
 

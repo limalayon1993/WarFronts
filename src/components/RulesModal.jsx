@@ -73,20 +73,23 @@ export function RulesModal({ isOpen, onClose }) {
             <div className="space-y-4">
               <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
                 <h3 className="font-bold text-slate-100 flex items-center gap-2 mb-2">
-                  <Trophy className="w-4 h-4 text-amber-400" /> Objetivo de la Partida
+                  <Trophy className="w-4 h-4 text-amber-400" /> Objetivo y Duraciones de Partida
                 </h3>
                 <p>
-                  La partida se juega a un número fijo de rondas (ej: 4, 6 u 8 rondas). 
-                  El jugador que gane la mayoría de puntos de ronda se declara vencedor.
+                  La partida se disputa a un número fijo de rondas según la duración elegida: <strong className="text-amber-400">Corta (4 rondas)</strong>, <strong className="text-amber-400">Mediana (6 rondas)</strong> o <strong className="text-amber-400">Larga (8 rondas)</strong>. 
+                  El bando que gane la mayoría de puntos de ronda se declara vencedor. En caso de empate, decide la puntuación acumulada.
                 </p>
               </div>
 
               <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
                 <h3 className="font-bold text-slate-100 flex items-center gap-2 mb-2">
-                  <Swords className="w-4 h-4 text-emerald-400" /> Objetivo de la Ronda
+                  <Swords className="w-4 h-4 text-emerald-400" /> Objetivo de la Ronda y Reloj de Equipo
                 </h3>
                 <p>
-                  Obtener el mayor valor numérico total en al menos <strong className="text-emerald-400">2 de los 3 Frentes de Guerra</strong> (Izquierdo, Central y Derecho) al terminar el despliegue de las cartas.
+                  Obtener el mayor valor numérico total en al menos <strong className="text-emerald-400">2 de los 3 Frentes de Guerra</strong> (Izquierdo, Central y Derecho) al terminar el despliegue.
+                </p>
+                <p className="mt-2 text-xs text-slate-400">
+                  El tiempo de juego es un <strong className="text-slate-200">Reloj Compartido de Equipo</strong> (Rápido, Medio o Lento) que se consume durante los turnos de sus integrantes y conmuta al rival tras cada carta jugada. Si un reloj llega a 00:00 (Caída de Bandera), el rival gana de inmediato la ronda (+1 Punto) y se contabilizan los puntos en mesa.
                 </p>
               </div>
 

@@ -4,7 +4,13 @@ import {
   shuffleDeck,
   FRONTS,
   GAME_MODES,
+  GAME_DURATIONS,
   GAME_RHYTHMS,
+  TEAM_TIMES,
+  TEAM_TIME_OPTIONS,
+  getTeamTimeSeconds,
+  getTeamTimeConfig,
+  formatClockTime,
   calculateFrontScore,
   resolveFrontWinner,
 } from './constants/rules';
@@ -30,6 +36,7 @@ import {
   AlertTriangle,
   Sparkles,
   Dices,
+  Timer,
 } from 'lucide-react';
 
 export default function App() {
@@ -45,13 +52,21 @@ export default function App() {
   const [multiplayerSlots, setMultiplayerSlots] = useState(null);
   const [readyPlayers, setReadyPlayers] = useState([]);
 
-  // Selección del Menú
+  // Selección del Menú: Formato, Duración (rondas) y Tiempo de Equipo
   const [selectedMode, setSelectedMode] = useState('1v1');
   const [selectedRhythm, setSelectedRhythm] = useState(6);
+  const [selectedTimeSpeed, setSelectedTimeSpeed] = useState('medio');
 
   // Configuración activa de la partida
   const modeConfig = GAME_MODES[selectedMode] || GAME_MODES['1v1'];
-  const rhythmConfig = GAME_RHYTHMS.find(r => r.rounds === selectedRhythm) || GAME_RHYTHMS[1];
+  const durationConfig = GAME_DURATIONS.find(d => d.rounds === selectedRhythm) || GAME_DURATIONS[1];
+  const rhythmConfig = durationConfig;
+  const timeConfig = getTeamTimeConfig(selectedMode, selectedTimeSpeed);
+
+  // Reloj de equipo compartido (segundos restantes por ronda para cada bando)
+  const defaultInitialClock = getTeamTimeSeconds(selectedMode, selectedTimeSpeed);
+  const [teamAClock, setTeamAClock] = useState(defaultInitialClock);
+  const [teamBClock, setTeamBClock] = useState(defaultInitialClock);
 
   // Estado de la partida
   const [round, setRound] = useState(1);
@@ -78,8 +93,7 @@ export default function App() {
   const [roundOverTimer, setRoundOverTimer] = useState(60);
   const [roundOverReadyPlayers, setRoundOverReadyPlayers] = useState([]);
 
-  // Reloj oficial de turno (15s por turno con penalización de descarte)
-  const [turnTimer, setTurnTimer] = useState(15);
+  // Avisos oficiales
   const [penaltyNotice, setPenaltyNotice] = useState(null);
   const [initiativeNotice, setInitiativeNotice] = useState(null);
 
@@ -106,7 +120,9 @@ export default function App() {
     fronts,
     players,
     currentTurnPlayerId,
-    turnTimer,
+    teamAClock,
+    teamBClock,
+    selectedTimeSpeed,
     phase,
     round,
     totalMatchRounds,
@@ -125,6 +141,7 @@ export default function App() {
     readyPlayers,
     roundOverTimer,
     roundOverReadyPlayers,
+    penaltyNotice,
   };
 
   // Detectar parámetro ?room=WF-XXXX en la URL
@@ -155,7 +172,9 @@ export default function App() {
       fronts: base.fronts,
       players: base.players,
       currentTurnPlayerId: base.currentTurnPlayerId,
-      turnTimer: base.turnTimer,
+      teamAClock: base.teamAClock,
+      teamBClock: base.teamBClock,
+      selectedTimeSpeed: base.selectedTimeSpeed,
       phase: base.phase,
       round: base.round,
       totalMatchRounds: base.totalMatchRounds,
@@ -168,6 +187,7 @@ export default function App() {
       discardDeckLength: base.discardDeck ? base.discardDeck.length : 0,
       initiativeTeam: base.initiativeTeam,
       initiativeNotice: base.initiativeNotice,
+      penaltyNotice: base.penaltyNotice,
       modeId: base.selectedMode,
       roundOverReadyPlayers: base.roundOverReadyPlayers || [],
       roundOverTimer: base.roundOverTimer ?? 60,
@@ -233,7 +253,10 @@ export default function App() {
     setFronts(syncData.fronts);
     setPlayers(syncData.players);
     setCurrentTurnPlayerId(syncData.currentTurnPlayerId);
-    setTurnTimer(syncData.turnTimer);
+    if (syncData.teamAClock !== undefined) setTeamAClock(syncData.teamAClock);
+    if (syncData.teamBClock !== undefined) setTeamBClock(syncData.teamBClock);
+    if (syncData.selectedTimeSpeed !== undefined) setSelectedTimeSpeed(syncData.selectedTimeSpeed);
+    if (syncData.penaltyNotice !== undefined) setPenaltyNotice(syncData.penaltyNotice);
     setPhase(syncData.phase);
     setRound(syncData.round);
     setTotalMatchRounds(syncData.totalMatchRounds);
@@ -262,7 +285,9 @@ export default function App() {
       fronts: syncData.fronts,
       players: syncData.players,
       currentTurnPlayerId: syncData.currentTurnPlayerId,
-      turnTimer: syncData.turnTimer,
+      teamAClock: syncData.teamAClock ?? stateRef.current.teamAClock,
+      teamBClock: syncData.teamBClock ?? stateRef.current.teamBClock,
+      selectedTimeSpeed: syncData.selectedTimeSpeed ?? stateRef.current.selectedTimeSpeed,
       phase: syncData.phase,
       round: syncData.round,
       totalMatchRounds: syncData.totalMatchRounds,
@@ -519,16 +544,13 @@ export default function App() {
       const nextIndex = (currentIndex + step) % n;
       if (activePlayersList[nextIndex].hand.length > 0) {
         const nextPlayerId = activePlayersList[nextIndex].id;
-        const limitTimer = modeConfig.turnTimeLimit || 15;
         setCurrentTurnPlayerId(nextPlayerId);
-        setTurnTimer(limitTimer);
 
         stateRef.current = {
           ...stateRef.current,
           fronts: activeFronts,
           players: activePlayersList,
           currentTurnPlayerId: nextPlayerId,
-          turnTimer: limitTimer,
         };
 
         const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
@@ -600,8 +622,6 @@ export default function App() {
       setIsShadowMode(false);
     }
 
-    setTurnTimer(modeConfig.turnTimeLimit || 15);
-
     // Comprobar si todos los jugadores terminaron sus cartas
     const anyCardsLeft = updatedPlayers.some(p => p.hand.length > 0);
     if (!anyCardsLeft) {
@@ -611,58 +631,89 @@ export default function App() {
     }
   }
 
-  // Manejo de penalización oficial cuando se agotan los 15s/20s de turno
-  function handleTurnTimeoutPenalty() {
-    const activePlayer = players.find(p => p.id === currentTurnPlayerId);
-    if (!activePlayer || activePlayer.hand.length === 0) return;
+  // Manejo oficial de Caída de Bandera (Derrota por Tiempo al llegar a 00:00 el reloj de equipo)
+  function handleFlagFallTimeout(infringingTeam) {
+    if (stateRef.current.phase !== 'deployment' && phase !== 'deployment') return;
 
     sound.playTimeout();
 
-    // Descartar una carta al azar directamente al pozo de descarte
-    const randomCardIndex = Math.floor(Math.random() * activePlayer.hand.length);
-    const penalizedCard = activePlayer.hand[randomCardIndex];
+    const winnerTeam = infringingTeam === 'teamA' ? 'teamB' : 'teamA';
+    const activeFronts = stateRef.current.fronts || fronts;
+    const activeTrumpSuit = stateRef.current.trumpCard?.suit || trumpCard?.suit;
 
-    const updatedDiscard = [...discardDeck, penalizedCard];
-    setDiscardDeck(updatedDiscard);
+    // 1. Conservación de Puntos Acumulados: Se voltean las cartas jugadas hasta ese instante en la mesa
+    // y se suman los valores base, sinergias y triunfos ya colocados por ambos bandos.
+    let teamARoundScoreSum = 0;
+    let teamBRoundScoreSum = 0;
 
-    const updatedPlayers = players.map(p => {
-      if (p.id === activePlayer.id) {
-        return {
-          ...p,
-          hand: p.hand.filter((_, idx) => idx !== randomCardIndex),
-        };
-      }
-      return p;
+    FRONTS.forEach(front => {
+      const teamACards = activeFronts[front.id].teamA;
+      const teamBCards = activeFronts[front.id].teamB;
+      const teamAScore = calculateFrontScore(teamACards, activeTrumpSuit, true);
+      const teamBScore = calculateFrontScore(teamBCards, activeTrumpSuit, true);
+
+      teamARoundScoreSum += teamAScore.total;
+      teamBRoundScoreSum += teamBScore.total;
     });
-    setPlayers(updatedPlayers);
+
+    const prevTeamACumulative = stateRef.current.teamACumulativePoints ?? teamACumulativePoints;
+    const prevTeamBCumulative = stateRef.current.teamBCumulativePoints ?? teamBCumulativePoints;
+    let prevTeamARoundPts = stateRef.current.teamARoundPoints ?? teamARoundPoints;
+    let prevTeamBRoundPts = stateRef.current.teamBRoundPoints ?? teamBRoundPoints;
+
+    const newTeamACumulative = prevTeamACumulative + teamARoundScoreSum;
+    const newTeamBCumulative = prevTeamBCumulative + teamBRoundScoreSum;
+
+    // 2. El equipo rival suma el +1 Punto de Ronda de forma directa
+    if (winnerTeam === 'teamA') {
+      prevTeamARoundPts += 1;
+    } else {
+      prevTeamBRoundPts += 1;
+    }
+
+    setTeamARoundPoints(prevTeamARoundPts);
+    setTeamBRoundPoints(prevTeamBRoundPts);
+    setTeamACumulativePoints(newTeamACumulative);
+    setTeamBCumulativePoints(newTeamBCumulative);
+    setPhase('roundOver');
+    setRoundOverTimer(60);
+    setRoundOverReadyPlayers([]);
+
+    const is1v1 = (selectedMode || stateRef.current.selectedMode) === '1v1';
+    let noticeText = '';
+    if (is1v1) {
+      noticeText = infringingTeam === 'teamA'
+        ? '⏱️ ¡Caída de Bandera! Se agotó tu reloj de equipo (00:00). El rival gana la ronda (+1 Punto de Ronda).'
+        : '⏱️ ¡Caída de Bandera! Se agotó el reloj de equipo del rival (00:00). ¡Ganas la ronda (+1 Punto de Ronda)!';
+    } else {
+      noticeText = infringingTeam === 'teamA'
+        ? '⏱️ ¡Caída de Bandera! Se agotó el reloj del Equipo Aliado (A) a 00:00. El Equipo B suma +1 Punto de Ronda.'
+        : '⏱️ ¡Caída de Bandera! Se agotó el reloj del Equipo Rival (B) a 00:00. El Equipo Aliado (A) suma +1 Punto de Ronda.';
+    }
+
+    setPenaltyNotice(noticeText);
+    setTimeout(() => setPenaltyNotice(null), 6000);
 
     stateRef.current = {
       ...stateRef.current,
-      players: updatedPlayers,
-      discardDeck: updatedDiscard,
+      phase: 'roundOver',
+      teamARoundPoints: prevTeamARoundPts,
+      teamBRoundPoints: prevTeamBRoundPts,
+      teamACumulativePoints: newTeamACumulative,
+      teamBCumulativePoints: newTeamBCumulative,
+      roundOverTimer: 60,
+      roundOverReadyPlayers: [],
+      penaltyNotice: noticeText,
     };
 
-    const notice = `¡Tiempo agotado para ${activePlayer.name}! Penalización oficial: Carta descartada al pozo sin puntuar.`;
-    setPenaltyNotice(notice);
-    setTimeout(() => setPenaltyNotice(null), 4000);
-
-    if (activePlayer.id === mySlotId) {
-      setSelectedCardId(null);
-      setIsShadowMode(false);
-    }
-
-    if (isMultiplayer && isHost) {
+    const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
+    const isHst = Boolean(stateRef.current.isHost || isHost || mp.isHost);
+    if (isMp && isHst) {
       mp.broadcast({
         type: 'PENALTY_NOTICE',
-        notice,
+        notice: noticeText,
       });
-    }
-
-    const anyCardsLeft = updatedPlayers.some(p => p.hand.length > 0);
-    if (!anyCardsLeft) {
-      handleDeploymentEnd(fronts, updatedPlayers);
-    } else {
-      advanceToNextTurn(activePlayer.id, updatedPlayers, fronts);
+      broadcastStateToClients(stateRef.current);
     }
   }
 
@@ -679,8 +730,9 @@ export default function App() {
     setPlayers(updatedPlayers);
     setDrawDeck(pool);
 
-    const initialTurnTimer = modeConfig.turnTimeLimit || 15;
-    setTurnTimer(initialTurnTimer);
+    const initialClock = getTeamTimeSeconds(modeConfig.id, selectedTimeSpeed);
+    setTeamAClock(initialClock);
+    setTeamBClock(initialClock);
     setPhase('deployment');
 
     stateRef.current = {
@@ -688,7 +740,8 @@ export default function App() {
       players: updatedPlayers,
       drawDeck: pool,
       phase: 'deployment',
-      turnTimer: initialTurnTimer,
+      teamAClock: initialClock,
+      teamBClock: initialClock,
       readyPlayers: [],
     };
 
@@ -812,7 +865,7 @@ export default function App() {
     handleSetRoundReady(mySlotId, nextReady);
   }
 
-  // Iniciar una ronda concreta
+  // Iniciar una ronda concreta con reseteo reglamentario de Reloj de Equipo
   function startNewRound(
     roundNumber,
     newInitiativeTeam,
@@ -820,7 +873,8 @@ export default function App() {
     currentDiscardPool,
     cfg = modeConfig,
     customSlots = null,
-    forceMultiplayerHost = false
+    forceMultiplayerHost = false,
+    speed = null
   ) {
     let pool = [...currentDrawPool];
     let discards = [...currentDiscardPool];
@@ -849,6 +903,9 @@ export default function App() {
       right: { teamA: [], teamB: [] },
     };
 
+    const activeSpeed = speed || stateRef.current.selectedTimeSpeed || selectedTimeSpeed;
+    const initialClock = getTeamTimeSeconds(cfg.id || selectedMode, activeSpeed);
+
     setDrawDeck(pool);
     setDiscardDeck(discards);
     setTrumpCard(trump);
@@ -860,7 +917,8 @@ export default function App() {
     setSelectedCardId(null);
     setIsShadowMode(false);
     setPlanningTimer(30);
-    setTurnTimer(cfg.turnTimeLimit || 15);
+    setTeamAClock(initialClock);
+    setTeamBClock(initialClock);
     setPhase('planning');
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -910,7 +968,9 @@ export default function App() {
       fronts: initialFronts,
       phase: 'planning',
       planningTimer: 30,
-      turnTimer: cfg.turnTimeLimit || 15,
+      teamAClock: initialClock,
+      teamBClock: initialClock,
+      selectedTimeSpeed: activeSpeed,
       readyPlayers: initialBotReadyIds,
       roundOverTimer: 60,
       roundOverReadyPlayers: [],
@@ -932,14 +992,14 @@ export default function App() {
     setTeamBRoundPoints(0);
     setTeamACumulativePoints(0);
     setTeamBCumulativePoints(0);
-    setTotalMatchRounds(rhythmConfig.rounds);
+    setTotalMatchRounds(durationConfig.rounds);
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
 
     const initialDeck = createDeck(modeConfig.decks);
     const initialInitiative = determineInitialInitiative();
 
-    startNewRound(1, initialInitiative, initialDeck, [], modeConfig);
+    startNewRound(1, initialInitiative, initialDeck, [], modeConfig, null, false, selectedTimeSpeed);
     setScreen('game');
   }
 
@@ -947,6 +1007,7 @@ export default function App() {
   function handleStartMultiplayerMatch(lobbyData) {
     const isHostUser = Boolean(lobbyData.isHost);
     const assignedSlot = lobbyData.mySlotId || mp.myPlayerId || (isHostUser ? 'A1' : null);
+    const activeSpeed = lobbyData.timeSpeed || selectedTimeSpeed;
 
     setIsMultiplayer(true);
     setIsHost(isHostUser);
@@ -954,6 +1015,7 @@ export default function App() {
     setMultiplayerSlots(lobbyData.slots || null);
     setSelectedMode(lobbyData.modeId);
     setSelectedRhythm(lobbyData.rhythmRounds);
+    setSelectedTimeSpeed(activeSpeed);
     setMultiplayerRoomCode(mp.roomCode);
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -962,6 +1024,7 @@ export default function App() {
     stateRef.current.isHost = isHostUser;
     stateRef.current.mySlotId = assignedSlot;
     stateRef.current.selectedMode = lobbyData.modeId;
+    stateRef.current.selectedTimeSpeed = activeSpeed;
 
     const activeConfig = GAME_MODES[lobbyData.modeId] || GAME_MODES['2v2'];
     setTotalMatchRounds(lobbyData.rhythmRounds);
@@ -980,12 +1043,13 @@ export default function App() {
         gameData: {
           modeId: lobbyData.modeId,
           rhythmRounds: lobbyData.rhythmRounds,
+          timeSpeed: activeSpeed,
           slots: lobbyData.slots,
           isHost: false,
         },
       });
 
-      startNewRound(1, initialInitiative, initialDeck, [], activeConfig, lobbyData.slots, true);
+      startNewRound(1, initialInitiative, initialDeck, [], activeConfig, lobbyData.slots, true, activeSpeed);
     }
 
     setScreen('game');
@@ -1041,7 +1105,9 @@ export default function App() {
       currentDrawDeck,
       newDiscardDeck,
       modeConfig,
-      multiplayerSlots
+      multiplayerSlots,
+      false,
+      stateRef.current.selectedTimeSpeed || selectedTimeSpeed
     );
   }
 
@@ -1063,12 +1129,12 @@ export default function App() {
     setTeamBRoundPoints(0);
     setTeamACumulativePoints(0);
     setTeamBCumulativePoints(0);
-    setTotalMatchRounds(rhythmConfig.rounds);
+    setTotalMatchRounds(durationConfig.rounds);
 
     const newDeck = createDeck(modeConfig.decks);
     const initialInitiative = determineInitialInitiative();
 
-    startNewRound(1, initialInitiative, newDeck, [], modeConfig);
+    startNewRound(1, initialInitiative, newDeck, [], modeConfig, null, false, selectedTimeSpeed);
   }
 
   // Despliegue del jugador humano al hacer clic o soltar una carta en un frente
@@ -1145,48 +1211,93 @@ export default function App() {
     return () => clearInterval(timer);
   }, [screen, phase, planningTimer, isMultiplayer, isHost]);
 
-  // Temporizador oficial por turno durante el despliegue (15s oficiales con penalización de descarte)
+  // Temporizador oficial del Reloj Compartido de Equipo durante el despliegue
   useEffect(() => {
     if (screen !== 'game' || phase !== 'deployment') return;
 
-    const timer = setInterval(() => {
-      setTurnTimer(prev => {
-        if (prev <= 1) {
-          if (!isMultiplayer || isHost) {
-            handleTurnTimeoutPenalty();
-            return modeConfig.turnTimeLimit || 15;
-          }
-          return 0; // Cliente espera resolución oficial del Host
+    // Cliente en multijugador: decrementa visualmente el reloj del equipo del jugador activo para máxima fluidez
+    if (isMultiplayer && !isHost) {
+      const timer = setInterval(() => {
+        const currList = stateRef.current.players || players;
+        const active = currList.find(p => p.id === currentTurnPlayerId);
+        const activeTeam = active?.team || 'teamA';
+        if (activeTeam === 'teamA') {
+          setTeamAClock(prev => Math.max(0, prev - 1));
+        } else {
+          setTeamBClock(prev => Math.max(0, prev - 1));
         }
-        return prev - 1;
-      });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+
+    // Host o Local: control oficial y sanción por Caída de Bandera a 00:00
+    const timer = setInterval(() => {
+      const curr = stateRef.current;
+      if (curr.phase !== 'deployment') return;
+
+      const currList = curr.players || players;
+      const active = currList.find(p => p.id === curr.currentTurnPlayerId);
+      const activeTeam = active?.team || 'teamA';
+
+      if (activeTeam === 'teamA') {
+        setTeamAClock(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            handleFlagFallTimeout('teamA');
+            return 0;
+          }
+          const next = prev - 1;
+          stateRef.current.teamAClock = next;
+          return next;
+        });
+      } else {
+        setTeamBClock(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            handleFlagFallTimeout('teamB');
+            return 0;
+          }
+          const next = prev - 1;
+          stateRef.current.teamBClock = next;
+          return next;
+        });
+      }
+
+      if (isMultiplayer && isHost) {
+        broadcastStateToClients(stateRef.current);
+      }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [screen, phase, currentTurnPlayerId, players, isMultiplayer, isHost, modeConfig.turnTimeLimit]);
+  }, [screen, phase, currentTurnPlayerId, isMultiplayer, isHost, players]);
 
-  // Alerta sonora para cuando te queden 5 segundos o menos para jugar tu carta (pitidos tácticos)
+  // Alerta sonora para cuando al equipo del jugador humano le queden 10 segundos o menos en el reloj
   const lastBeepSecondRef = useRef(null);
   useEffect(() => {
     if (screen !== 'game' || phase !== 'deployment') {
       lastBeepSecondRef.current = null;
       return;
     }
-    // Solo emitir la alerta sonora si es el turno del jugador humano local
-    if (currentTurnPlayerId !== mySlotId) {
+
+    const activePlayer = players.find(p => p.id === currentTurnPlayerId);
+    const isMyTeamTurn = activePlayer?.team === viewerTeam;
+
+    // Solo emitir la alerta si es el turno de un miembro de nuestro equipo (consume nuestro reloj)
+    if (!isMyTeamTurn) {
       lastBeepSecondRef.current = null;
       return;
     }
 
-    if (turnTimer <= 5 && turnTimer > 0) {
-      if (lastBeepSecondRef.current !== turnTimer) {
-        lastBeepSecondRef.current = turnTimer;
-        sound.playWarningCountdown(turnTimer);
+    const teamRemainingClock = viewerTeam === 'teamA' ? teamAClock : teamBClock;
+    if (teamRemainingClock <= 10 && teamRemainingClock > 0) {
+      if (lastBeepSecondRef.current !== teamRemainingClock) {
+        lastBeepSecondRef.current = teamRemainingClock;
+        sound.playWarningCountdown(teamRemainingClock);
       }
     } else {
       lastBeepSecondRef.current = null;
     }
-  }, [turnTimer, currentTurnPlayerId, mySlotId, phase, screen]);
+  }, [teamAClock, teamBClock, currentTurnPlayerId, viewerTeam, phase, screen, players]);
 
   // Sonido de aviso cuando te toca tirar
   const prevTurnPlayerRef = useRef(null);
@@ -1219,6 +1330,23 @@ export default function App() {
 
     if (activePlayer.isBot && activePlayer.hand.length > 0) {
       setIsBotThinking(true);
+
+      const botClock = activePlayer.team === 'teamA'
+        ? (stateRef.current.teamAClock ?? teamAClock)
+        : (stateRef.current.teamBClock ?? teamBClock);
+
+      // Tiempo de cálculo adaptativo al ritmo de tiempo y jugada de emergencia si el reloj está bajo
+      let botDelay = 2200;
+      if (botClock <= 8) {
+        botDelay = 700; // Despliegue de emergencia para evitar caída de bandera
+      } else if (selectedTimeSpeed === 'rapido') {
+        botDelay = 1500;
+      } else if (selectedTimeSpeed === 'lento') {
+        botDelay = 3200;
+      } else {
+        botDelay = 2200; // medio
+      }
+
       const delay = setTimeout(() => {
         const currentList = stateRef.current.players || players;
         const currentFronts = stateRef.current.fronts || fronts;
@@ -1240,7 +1368,7 @@ export default function App() {
           advanceToNextTurn(activePlayer.id);
         }
         setIsBotThinking(false);
-      }, 5000); // 5 segundos de pensamiento reglamentario
+      }, botDelay);
 
       return () => {
         clearTimeout(delay);
@@ -1249,7 +1377,7 @@ export default function App() {
     } else {
       setIsBotThinking(false);
     }
-  }, [screen, phase, currentTurnPlayerId, players, fronts, isMultiplayer, isHost]);
+  }, [screen, phase, currentTurnPlayerId, players, fronts, isMultiplayer, isHost, selectedTimeSpeed, teamAClock, teamBClock]);
 
   // Temporizador oficial de resumen de ronda (60 segundos con avance automático)
   useEffect(() => {
@@ -1307,6 +1435,8 @@ export default function App() {
           setSelectedMode={setSelectedMode}
           selectedRhythm={selectedRhythm}
           setSelectedRhythm={setSelectedRhythm}
+          selectedTimeSpeed={selectedTimeSpeed}
+          setSelectedTimeSpeed={setSelectedTimeSpeed}
           onStartGame={handleStartGame}
           onOpenMultiplayer={() => setScreen('multiplayer_lobby')}
           onOpenTutorial={() => setScreen('tutorial')}
@@ -1361,7 +1491,9 @@ export default function App() {
         drawDeckCount={drawDeck.length}
         discardDeckCount={discardDeck.length}
         modeConfig={modeConfig}
+        durationConfig={durationConfig}
         rhythmConfig={rhythmConfig}
+        timeConfig={timeConfig}
         isMuted={isMuted}
         onToggleMute={() => setIsMuted(sound.toggleMute())}
         onOpenQuickGuide={() => setIsQuickGuideOpen(true)}
@@ -1373,13 +1505,15 @@ export default function App() {
         mySlotId={mySlotId}
       />
 
-      {/* Tira Secuencial de Turnos para 1v1, 2v2, 3v3 y 4v4 con Reloj Oficial */}
+      {/* Tira Secuencial de Turnos para 1v1, 2v2, 3v3 y 4v4 con Reloj Oficial de Equipo */}
       {phase === 'deployment' && (
         <TurnStrip
           players={players}
           currentTurnPlayerId={currentTurnPlayerId}
           isBotThinking={isBotThinking}
-          turnTimer={turnTimer}
+          teamAClock={teamAClock}
+          teamBClock={teamBClock}
+          modeId={selectedMode}
         />
       )}
 
@@ -1545,8 +1679,8 @@ export default function App() {
               {isMyTurn ? (
                 <span className="text-xs text-amber-400 font-bold animate-pulse">
                   {selectedCardId
-                    ? `Haz clic o arrastra al frente para desplegar (${turnTimer}s)`
-                    : `Es tu turno: arrastra o elige una carta (${turnTimer}s)`}
+                    ? `Haz clic o arrastra al frente para desplegar (Reloj: ${formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock)})`
+                    : `Es tu turno: arrastra o elige una carta (Reloj: ${formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock)})`}
                 </span>
               ) : phase === 'planning' ? (
                 <span className="text-xs text-amber-300">

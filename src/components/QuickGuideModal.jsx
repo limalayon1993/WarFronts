@@ -47,7 +47,11 @@ export function QuickGuideModal({ isOpen, onClose }) {
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 text-slate-300">
-                <Trophy className="w-3.5 h-3.5 text-amber-400" /> Ritmos: Rápido (4), Medio (6), Lento (8)
+                <Trophy className="w-3.5 h-3.5 text-amber-400" /> Rondas: Corta: 4 • Mediana: 6 • Larga: 8
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1 text-slate-300">
+                <Clock className="w-3.5 h-3.5 text-amber-400" /> Reloj Equipo: R (10s/t) • M (20s/t) • L (30s/t)
               </span>
             </div>
             <button
@@ -84,7 +88,10 @@ export function QuickGuideModal({ isOpen, onClose }) {
                     <div className="text-lg font-black text-slate-100 my-0.5">8 Cartas</div>
                     <div className="text-[10px] text-rose-400 font-semibold">Límite TOTAL / frente</div>
                     <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
-                      🎴 1 Baraja • 5 cart./jug.
+                      🎴 1 Baraja • 5 c/jug (10 turnos)
+                    </div>
+                    <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-slate-900 py-0.5 px-1 rounded">
+                      R: 1:40 | M: 3:20 | L: 5:00
                     </div>
                   </div>
 
@@ -97,7 +104,10 @@ export function QuickGuideModal({ isOpen, onClose }) {
                     <div className="text-lg font-black text-slate-100 my-0.5">12 Cartas</div>
                     <div className="text-[10px] text-rose-400 font-semibold">Límite TOTAL / frente</div>
                     <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
-                      🎴 2 Barajas • 5 cart./jug.
+                      🎴 2 Barajas • 5 c/jug (15 turnos)
+                    </div>
+                    <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-slate-900 py-0.5 px-1 rounded">
+                      R: 2:30 | M: 5:00 | L: 7:30
                     </div>
                   </div>
 
@@ -110,7 +120,10 @@ export function QuickGuideModal({ isOpen, onClose }) {
                     <div className="text-lg font-black text-slate-100 my-0.5">16 Cartas</div>
                     <div className="text-[10px] text-rose-400 font-semibold">Límite TOTAL / frente</div>
                     <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
-                      🎴 2 Barajas • 5 cart./jug.
+                      🎴 2 Barajas • 5 c/jug (20 turnos)
+                    </div>
+                    <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-slate-900 py-0.5 px-1 rounded">
+                      R: 3:20 | M: 6:40 | L: 10:00
                     </div>
                   </div>
                 </div>
@@ -132,7 +145,7 @@ export function QuickGuideModal({ isOpen, onClose }) {
               </div>
 
               <div className="mt-3 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] font-semibold text-slate-400">
-                <span>Partida Oficial: Según el ritmo elegido</span>
+                <span>Partida Oficial: Según la duración elegida</span>
                 <span className="text-emerald-400 font-bold">Gana quien sume más Puntos de Ronda</span>
               </div>
             </div>
@@ -205,7 +218,7 @@ export function QuickGuideModal({ isOpen, onClose }) {
                 <Clock className="w-4 h-4" /> 3. Las 4 Fases de la Ronda (Secuencia de Turno Inflexible)
               </h3>
               <span className="text-[10px] bg-slate-800 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">
-                Táctica: 30s | Turno: 15s • 4 Pasos Estrictos
+                Táctica: 30s | Reloj de Equipo Compartido • 4 Pasos Estrictos
               </span>
             </div>
 
@@ -257,14 +270,14 @@ export function QuickGuideModal({ isOpen, onClose }) {
               <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs font-black text-amber-400">FASE 4</span>
-                  <span className="text-[9px] bg-rose-500/20 text-rose-300 px-1 rounded font-mono">15s / Turno</span>
+                  <span className="text-[9px] bg-rose-500/20 text-rose-300 px-1 rounded font-mono">Reloj de Equipo</span>
                 </div>
                 <h4 className="text-xs font-bold text-slate-200 mb-1">Despliegue Táctico</h4>
                 <ul className="text-[11px] text-slate-400 space-y-1">
                   <li>• <strong>Turnos 1 a 1:</strong> Alternado (<span className="font-mono">1A➔1B➔2A➔2B</span>).</li>
-                  <li>• <strong>Acción:</strong> Jugar 1 carta en un frente NO saturado.</li>
+                  <li>• <strong>Acción:</strong> Jugar 1 carta en frente no saturado y conmutar reloj.</li>
                   <li>• <strong>Carta Sombra:</strong> Máx 1 boca abajo por jugador volteando marcador.</li>
-                  <li className="text-amber-400">• <strong>Exceder 15s:</strong> Descarta al azar al pozo.</li>
+                  <li className="text-rose-400 font-semibold">• <strong>Caída de Bandera (00:00):</strong> El rival gana la ronda (+1 Pt) y se conservan acumulados en mesa.</li>
                 </ul>
                 <div className="text-[9px] text-slate-500 mt-2 italic">Cierre al colocar las 5 cartas.</div>
               </div>
@@ -348,7 +361,7 @@ export function QuickGuideModal({ isOpen, onClose }) {
                   <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
                     <Swords className="w-4 h-4" /> Anexo: Modo Duelo 1v1 (El Espejo del 2v2)
                   </h3>
-                  <span className="text-[10px] text-slate-400 font-mono">2 Jugadores • Rondas según Ritmo</span>
+                  <span className="text-[10px] text-slate-400 font-mono">2 Jugadores • Rondas según Duración</span>
                 </div>
 
                 <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 mb-3">
@@ -372,12 +385,15 @@ export function QuickGuideModal({ isOpen, onClose }) {
                       <strong className="text-purple-400 text-[11px]">2 por jugador</strong>
                     </div>
                   </div>
+                  <div className="text-[10px] font-mono text-emerald-400 font-bold bg-slate-900 py-1 px-2 rounded text-center border border-slate-800">
+                    ⏱️ Reloj Dual 1v1: R: 1:40 | M: 3:20 | L: 5:00
+                  </div>
                 </div>
 
                 <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 space-y-1.5">
                   <div className="font-semibold text-slate-200 mb-0.5 flex items-center justify-between">
                     <span>2. Las 4 Fases (Idénticas al Modo Equipos):</span>
-                    <span className="text-[10px] text-amber-400 font-mono font-bold">Táctica: 30s | Turno: 15s</span>
+                    <span className="text-[10px] text-amber-400 font-mono font-bold">Táctica: 30s | Reloj Dual</span>
                   </div>
                   <div>
                     • <strong className="text-amber-300">FASE 1: Preparación & Triunfo:</strong> Revelar Palo Triunfo (+2 pts). Activar los 2 Marcadores Sombra por jugador y rotar iniciativa.
@@ -389,7 +405,7 @@ export function QuickGuideModal({ isOpen, onClose }) {
                     • <strong className="text-amber-300">FASE 3: Reparto de Cartas (Silencio):</strong> Se reparten boca abajo 10 cartas a cada duelista. Silencio absoluto y concentración.
                   </div>
                   <div>
-                    • <strong className="text-amber-300">FASE 4: Despliegue Táctico (15s / Turno):</strong> Turnos 1 a 1 alternados (1 carta/turno en frente no saturado). Hasta 2 Cartas Sombra. Cierre al jugar las 10 cartas.
+                    • <strong className="text-amber-300">FASE 4: Despliegue Táctico (Reloj de Jugador):</strong> Turnos 1 a 1 alternados (1 carta/turno en frente no saturado). Hasta 2 Cartas Sombra. Caída de Bandera a 00:00 da la ronda al rival conservando puntos de mesa. Cierre al jugar las 10 cartas.
                   </div>
                 </div>
               </div>
