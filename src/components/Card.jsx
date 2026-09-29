@@ -12,6 +12,8 @@ export function Card({
   isPlayable = false,
   compact = false,
   onClick,
+  onDragStart,
+  onDragEnd,
 }) {
   const suitInfo = card ? SUITS[card.suit] : null;
   const isRed = card?.suit === 'hearts' || card?.suit === 'diamonds';
@@ -115,6 +117,9 @@ export function Card({
 
   return (
     <div
+      draggable={isPlayable}
+      onDragStart={isPlayable ? onDragStart : undefined}
+      onDragEnd={isPlayable ? onDragEnd : undefined}
       onClick={isPlayable ? onClick : undefined}
       className={`
         relative rounded-lg transition-all duration-150 select-none
@@ -123,7 +128,7 @@ export function Card({
           : 'bg-zinc-100 border border-zinc-300 shadow-md'}
         ${compact ? 'w-12 h-16 sm:w-14 sm:h-20' : 'w-16 h-24 sm:w-20 sm:h-28 md:w-24 md:h-34'}
         ${isSelected ? 'ring-4 ring-amber-400 scale-105 shadow-xl -translate-y-2' : ''}
-        ${isPlayable ? 'cursor-pointer hover:-translate-y-1.5 hover:shadow-lg' : ''}
+        ${isPlayable ? 'cursor-grab active:cursor-grabbing hover:-translate-y-1.5 hover:shadow-lg' : ''}
         ${isRevealed && isShadow ? 'ring-2 ring-purple-500' : ''}
       `}
     >

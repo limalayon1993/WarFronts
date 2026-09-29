@@ -37,6 +37,8 @@ export function InteractiveTutorial({ onBackToMenu }) {
   });
   const [playerHand, setPlayerHand] = useState([]);
   const [selectedCardId, setSelectedCardId] = useState(null);
+  const [draggingCardId, setDraggingCardId] = useState(null);
+  const [dragOverFrontKey, setDragOverFrontKey] = useState(null);
   const [isShadowActive, setIsShadowActive] = useState(false);
   const [shadowsLeft, setShadowsLeft] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
@@ -185,12 +187,13 @@ export function InteractiveTutorial({ onBackToMenu }) {
     setSelectedCardId(card.id);
   }
 
-  // Manejo de despliegue en un frente
-  function handleDeployToFront(frontKey) {
+  // Manejo de despliegue en un frente (clic o arrastrar y soltar)
+  function handleDeployToFront(frontKey, targetCardId = null) {
     if (currentStep.type !== 'player_turn') return;
 
-    if (!selectedCardId) {
-      triggerWarning('Primero selecciona la carta recomendada en tu mano inferior.');
+    const cardIdToPlay = targetCardId || selectedCardId;
+    if (!cardIdToPlay) {
+      triggerWarning('Primero selecciona o arrastra la carta recomendada en tu mano inferior.');
       return;
     }
 
@@ -205,7 +208,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
       return;
     }
 
-    const cardToDeploy = playerHand.find(c => c.id === selectedCardId);
+    const cardToDeploy = playerHand.find(c => c.id === cardIdToPlay);
     if (!cardToDeploy) return;
 
     const useShadow = Boolean(currentStep.requireShadow && isShadowActive);
@@ -237,6 +240,8 @@ export function InteractiveTutorial({ onBackToMenu }) {
     // Retirar carta de mano
     setPlayerHand(prev => prev.filter(c => c.id !== cardToDeploy.id));
     setSelectedCardId(null);
+    setDraggingCardId(null);
+    setDragOverFrontKey(null);
     setIsShadowActive(false);
 
     // Avanzar al siguiente paso del guion
@@ -467,10 +472,39 @@ export function InteractiveTutorial({ onBackToMenu }) {
               <div
                 key={front.id}
                 onClick={() => handleDeployToFront(front.id)}
+                onDragOver={(e) => {
+                  if (currentStep.type === 'player_turn' && !isLocked) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    if (dragOverFrontKey !== front.id) setDragOverFrontKey(front.id);
+                  }
+                }}
+                onDragEnter={(e) => {
+                  if (currentStep.type === 'player_turn' && !isLocked) {
+                    e.preventDefault();
+                    setDragOverFrontKey(front.id);
+                  }
+                }}
+                onDragLeave={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget)) {
+                    setDragOverFrontKey(null);
+                  }
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragOverFrontKey(null);
+                  if (currentStep.type !== 'player_turn') return;
+                  const droppedId = e.dataTransfer.getData('text/plain') || draggingCardId || selectedCardId;
+                  if (droppedId) {
+                    handleDeployToFront(front.id, droppedId);
+                  }
+                }}
                 className={`
                   flex-1 flex flex-col justify-between rounded-xl p-3 sm:p-4 border transition-all duration-300 relative
                   ${
-                    isTarget
+                    dragOverFrontKey === front.id
+                      ? 'bg-amber-950/40 border-amber-400 shadow-2xl ring-4 ring-amber-400 scale-[1.02]'
+                      : isTarget
                       ? 'bg-slate-900 border-amber-500 shadow-2xl shadow-amber-500/20 ring-4 ring-amber-400/50 cursor-pointer animate-pulse'
                       : isLocked
                       ? 'bg-slate-950/70 border-slate-800 opacity-60'
@@ -748,6 +782,17 @@ export function InteractiveTutorial({ onBackToMenu }) {
                         isTrump={isTrump}
                         isPlayable={isRequired}
                         onClick={() => handleSelectPlayerCard(card)}
+                        onDragStart={(e) => {
+                          if (isRequired) {
+                            setDraggingCardId(card.id);
+                            handleSelectPlayerCard(card);
+                            e.dataTransfer.setData('text/plain', card.id);
+                            e.dataTransfer.effectAllowed = 'move';
+                          }
+                        }}
+                        onDragEnd={() => {
+                          setDraggingCardId(null);
+                        }}
                       />
                     </div>
                   </div>

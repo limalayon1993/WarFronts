@@ -92,6 +92,7 @@ export default function App() {
 
   // Interacción del jugador humano
   const [selectedCardId, setSelectedCardId] = useState(null);
+  const [draggingCardId, setDraggingCardId] = useState(null);
   const [isShadowMode, setIsShadowMode] = useState(false);
 
   // Modales y Sonido
@@ -1070,18 +1071,19 @@ export default function App() {
     startNewRound(1, initialInitiative, newDeck, [], modeConfig);
   }
 
-  // Despliegue del jugador humano al hacer clic en un frente
-  function handleDeployPlayerCard(frontKey) {
+  // Despliegue del jugador humano al hacer clic o soltar una carta en un frente
+  function handleDeployPlayerCard(frontKey, targetCardId = null) {
     if (phase !== 'deployment') return;
 
     // Comprobar si es el turno del jugador local
     if (currentTurnPlayerId !== mySlotId) return;
-    if (!selectedCardId) return;
+    const cardIdToPlay = targetCardId || selectedCardId;
+    if (!cardIdToPlay) return;
 
     const me = players.find(p => p.id === mySlotId);
     if (!me) return;
 
-    const card = me.hand.find(c => c.id === selectedCardId);
+    const card = me.hand.find(c => c.id === cardIdToPlay);
     if (!card) return;
 
     const totalInFront = fronts[frontKey].teamA.length + fronts[frontKey].teamB.length;
@@ -1104,12 +1106,15 @@ export default function App() {
         asShadow: useShadow,
       });
       setSelectedCardId(null);
+      setDraggingCardId(null);
       setIsShadowMode(false);
       return;
     }
 
     // Host o Local: ejecutar directamente
     executePlayerMove(mySlotId, card, frontKey, useShadow);
+    setSelectedCardId(null);
+    setDraggingCardId(null);
   }
 
   // Volver al Menú Principal
@@ -1479,6 +1484,7 @@ export default function App() {
               trumpSuit={trumpCard?.suit}
               isRoundOver={phase === 'roundOver'}
               selectedCard={selectedCard}
+              draggingCard={localPlayer?.hand?.find(c => c.id === draggingCardId) || null}
               isPlayerTurn={isMyTurn}
               maxFrontCards={modeConfig.maxFrontCards}
               modeId={selectedMode}
@@ -1539,8 +1545,8 @@ export default function App() {
               {isMyTurn ? (
                 <span className="text-xs text-amber-400 font-bold animate-pulse">
                   {selectedCardId
-                    ? `Haz clic en un frente para desplegar (Te quedan ${turnTimer}s)`
-                    : `Es tu turno: elige una carta para jugar (${turnTimer}s)`}
+                    ? `Haz clic o arrastra al frente para desplegar (${turnTimer}s)`
+                    : `Es tu turno: arrastra o elige una carta (${turnTimer}s)`}
                 </span>
               ) : phase === 'planning' ? (
                 <span className="text-xs text-amber-300">
@@ -1578,6 +1584,17 @@ export default function App() {
                         if (isMyTurn) {
                           setSelectedCardId(prev => (prev === card.id ? null : card.id));
                         }
+                      }}
+                      onDragStart={(e) => {
+                        if (isMyTurn) {
+                          setDraggingCardId(card.id);
+                          setSelectedCardId(card.id);
+                          e.dataTransfer.setData('text/plain', card.id);
+                          e.dataTransfer.effectAllowed = 'move';
+                        }
+                      }}
+                      onDragEnd={() => {
+                        setDraggingCardId(null);
                       }}
                     />
                   </div>

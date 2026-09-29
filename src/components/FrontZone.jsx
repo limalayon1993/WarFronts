@@ -10,6 +10,7 @@ export function FrontZone({
   trumpSuit,
   isRoundOver = false,
   selectedCard = null,
+  draggingCard = null,
   isPlayerTurn = false,
   maxFrontCards = 8,
   modeId = '1v1',
@@ -17,9 +18,11 @@ export function FrontZone({
   viewerTeam = 'teamA',
   onDeploy,
 }) {
+  const [isDragOver, setIsDragOver] = React.useState(false);
   const totalCards = teamACards.length + teamBCards.length;
   const isSaturated = totalCards >= maxFrontCards;
-  const canDeploy = isPlayerTurn && !isSaturated && selectedCard;
+  const activeCard = selectedCard || draggingCard;
+  const canDeploy = isPlayerTurn && !isSaturated && Boolean(activeCard);
 
   const isTeamMode = modeId !== '1v1';
   const isViewerTeamB = viewerTeam === 'teamB';
@@ -44,9 +47,40 @@ export function FrontZone({
       onClick={() => {
         if (canDeploy) onDeploy(frontKey);
       }}
+      onDragOver={(e) => {
+        if (isPlayerTurn && !isSaturated) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          if (!isDragOver) setIsDragOver(true);
+        }
+      }}
+      onDragEnter={(e) => {
+        if (isPlayerTurn && !isSaturated) {
+          e.preventDefault();
+          setIsDragOver(true);
+        }
+      }}
+      onDragLeave={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          setIsDragOver(false);
+        }
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+        if (!isPlayerTurn || isSaturated) return;
+        const droppedCardId = e.dataTransfer.getData('text/plain') || draggingCard?.id || selectedCard?.id;
+        if (droppedCardId) {
+          onDeploy(frontKey, droppedCardId);
+        }
+      }}
       className={`
         flex-1 flex flex-col justify-between rounded-xl p-3 sm:p-4 border transition-all duration-200 relative
-        ${canDeploy ? 'cursor-pointer hover:border-amber-400 hover:bg-slate-800/80 ring-2 ring-amber-400/40' : ''}
+        ${isDragOver 
+          ? 'border-amber-400 bg-amber-950/40 ring-4 ring-amber-400 scale-[1.02] shadow-[0_0_35px_rgba(245,158,11,0.5)]' 
+          : canDeploy 
+          ? 'cursor-pointer hover:border-amber-400 hover:bg-slate-800/80 ring-2 ring-amber-400/40' 
+          : ''}
         ${isSaturated ? 'bg-slate-900/60 border-slate-700/60' : 'bg-slate-900/90 border-slate-700 shadow-xl'}
       `}
     >
@@ -127,11 +161,16 @@ export function FrontZone({
           </span>
         </div>
 
-        {/* Indicador de Acción al pasar el cursor */}
-        {canDeploy ? (
+        {/* Indicador de Acción al pasar el cursor o arrastrar */}
+        {isDragOver ? (
+          <div className="text-xs font-black text-amber-300 flex items-center gap-1.5 animate-bounce">
+            <Zap className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <span>¡Suelta aquí para desplegar!</span>
+          </div>
+        ) : canDeploy ? (
           <div className="text-xs font-bold text-amber-400 flex items-center gap-1 animate-pulse">
             <Zap className="w-3 h-3" />
-            <span>Desplegar tropa aquí</span>
+            <span>Clic o arrastra para desplegar</span>
           </div>
         ) : (
           <span className="text-[10px] text-slate-500 font-mono italic">
