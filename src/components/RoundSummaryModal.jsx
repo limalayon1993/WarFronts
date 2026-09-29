@@ -1,7 +1,7 @@
 import React from 'react';
 import { FRONTS, resolveFrontWinner, calculateFrontScore } from '../constants/rules';
 import { Card } from './Card';
-import { ArrowRight, Award, Clock, CheckCircle2, Users } from 'lucide-react';
+import { ArrowRight, Award, Clock, CheckCircle2, Users, AlertTriangle } from 'lucide-react';
 
 export function RoundSummaryModal({
   isOpen,
@@ -17,6 +17,7 @@ export function RoundSummaryModal({
   players = [],
   countdown = 60,
   onToggleReady,
+  flagFallTeam = null,
 }) {
   if (!isOpen || !fronts || !fronts.left || !fronts.center || !fronts.right) return null;
 
@@ -49,7 +50,10 @@ export function RoundSummaryModal({
   const teamBFrontWins = frontResults.filter(r => r.winner === 'teamB').length;
 
   let roundOutcome = 'tie';
-  if (teamAFrontWins >= 2) {
+  if (flagFallTeam) {
+    // Si la ronda acabó por Caída de Bandera (00:00), el ganador es DIRECTAMENTE el rival del equipo infractor
+    roundOutcome = flagFallTeam === 'teamA' ? 'teamB' : 'teamA';
+  } else if (teamAFrontWins >= 2) {
     roundOutcome = 'teamA';
   } else if (teamBFrontWins >= 2) {
     roundOutcome = 'teamB';
@@ -72,27 +76,72 @@ export function RoundSummaryModal({
             : 'bg-gradient-to-r from-amber-950/80 via-slate-900 to-amber-950/80'
         }`}>
           <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border ${
-            roundOutcome === 'teamA'
-              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-              : roundOutcome === 'teamB'
-              ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
-              : 'bg-amber-500/20 text-amber-400 border-amber-500/40'
+            flagFallTeam
+              ? (roundOutcome === 'teamA'
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                  : 'bg-rose-500/20 text-rose-400 border-rose-500/40')
+              : (roundOutcome === 'teamA'
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                  : roundOutcome === 'teamB'
+                  ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
+                  : 'bg-amber-500/20 text-amber-400 border-amber-500/40')
           }`}>
-            <Award className="w-4 h-4" />
-            Resolución de la Ronda {round}
+            {flagFallTeam ? (
+              <>
+                <Clock className="w-4 h-4 text-amber-400 animate-pulse" />
+                Caída de Bandera • Derrota por Tiempo (00:00)
+              </>
+            ) : (
+              <>
+                <Award className="w-4 h-4" />
+                Resolución de la Ronda {round}
+              </>
+            )}
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-slate-100 uppercase tracking-wide">
-            {roundOutcome === 'teamA' && (is1v1 ? '¡Has Conquistado la Ronda!' : '¡Victoria de Ronda para el Equipo Aliado (A)!')}
-            {roundOutcome === 'teamB' && (is1v1 ? 'El Rival ha Ganado la Ronda' : 'Victoria de Ronda para el Equipo Rival (B)')}
-            {roundOutcome === 'tie' && 'Ronda Nula (Empate en Frentes)'}
+            {flagFallTeam ? (
+              roundOutcome === 'teamA'
+                ? (is1v1 ? '¡Has Ganado la Ronda por Tiempo!' : '¡Victoria de Ronda para el Equipo Aliado (A)!')
+                : (is1v1 ? 'Derrota por Tiempo: Se Agotó tu Reloj' : 'Victoria de Ronda para el Equipo Rival (B)')
+            ) : (
+              <>
+                {roundOutcome === 'teamA' && (is1v1 ? '¡Has Conquistado la Ronda!' : '¡Victoria de Ronda para el Equipo Aliado (A)!')}
+                {roundOutcome === 'teamB' && (is1v1 ? 'El Rival ha Ganado la Ronda' : 'Victoria de Ronda para el Equipo Rival (B)')}
+                {roundOutcome === 'tie' && 'Ronda Nula (Empate en Frentes)'}
+              </>
+            )}
           </h2>
 
-          <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Frentes Ganados: <strong className="text-emerald-400">{teamAFrontWins}</strong> {is1v1 ? 'Tú' : 'Equipo A'} — <strong className="text-rose-400">{teamBFrontWins}</strong> {is1v1 ? 'Rival' : 'Equipo B'}
-            {roundOutcome === 'teamA' && ' (+1 Punto de Ronda)'}
-            {roundOutcome === 'teamB' && ' (+1 Punto de Ronda)'}
-          </p>
+          {flagFallTeam ? (
+            <div className="mt-2 text-xs sm:text-sm text-slate-300">
+              <p>
+                {flagFallTeam === 'teamA' ? (
+                  <span>
+                    El reloj de equipo del <strong className="text-rose-400">{is1v1 ? 'Tú' : 'Equipo Aliado (A)'}</strong> se agotó a <strong>00:00</strong>.
+                    El rival suma automáticamente <strong className="text-amber-400 font-bold">+1 Punto de Ronda</strong>.
+                  </span>
+                ) : (
+                  <span>
+                    El reloj de equipo del <strong className="text-rose-400">{is1v1 ? 'Rival' : 'Equipo Rival (B)'}</strong> se agotó a <strong>00:00</strong>.
+                    ¡{is1v1 ? 'Ganas' : 'Tu equipo gana'} automáticamente <strong className="text-amber-400 font-bold">+1 Punto de Ronda</strong>!
+                  </span>
+                )}
+              </p>
+              <div className="mt-2.5 mx-auto max-w-xl px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] sm:text-xs text-amber-200 flex items-center justify-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>
+                  <strong>Conservación de Puntos (Capítulo 5):</strong> Se computan y conservan al acumulado los puntos numéricos de todas las tropas colocadas en los frentes hasta el instante de la caída.
+                </span>
+              </div>
+            </div>
+          ) : (
+            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+              Frentes Ganados: <strong className="text-emerald-400">{teamAFrontWins}</strong> {is1v1 ? 'Tú' : 'Equipo A'} — <strong className="text-rose-400">{teamBFrontWins}</strong> {is1v1 ? 'Rival' : 'Equipo B'}
+              {roundOutcome === 'teamA' && ' (+1 Punto de Ronda)'}
+              {roundOutcome === 'teamB' && ' (+1 Punto de Ronda)'}
+            </p>
+          )}
 
           {/* Temporizador de 1 minuto e información de preparación */}
           <div className="flex flex-wrap items-center justify-center gap-2 mt-3">
@@ -121,7 +170,9 @@ export function RoundSummaryModal({
               <div
                 key={front.id}
                 className={`p-3 rounded-xl border flex flex-col justify-between ${
-                  winner === 'teamA'
+                  flagFallTeam
+                    ? 'bg-slate-950/60 border-slate-700/80'
+                    : winner === 'teamA'
                     ? 'bg-emerald-950/30 border-emerald-500/40'
                     : winner === 'teamB'
                     ? 'bg-rose-950/30 border-rose-500/40'
@@ -132,10 +183,14 @@ export function RoundSummaryModal({
                   <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
                     <span className="font-bold text-xs text-slate-200">{front.name}</span>
                     <span className={`text-[10px] font-black px-1.5 py-0.5 rounded uppercase ${
-                      winner === 'teamA' ? 'bg-emerald-500/20 text-emerald-400' :
-                      winner === 'teamB' ? 'bg-rose-500/20 text-rose-400' : 'bg-slate-800 text-slate-400'
+                      flagFallTeam
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        : winner === 'teamA' ? 'bg-emerald-500/20 text-emerald-400' :
+                        winner === 'teamB' ? 'bg-rose-500/20 text-rose-400' : 'bg-slate-800 text-slate-400'
                     }`}>
-                      {winner === 'teamA' ? (is1v1 ? 'Ganado' : 'Equipo A') : winner === 'teamB' ? (is1v1 ? 'Perdido' : 'Equipo B') : 'Nulo'}
+                      {flagFallTeam
+                        ? 'Puntos Salvados'
+                        : winner === 'teamA' ? (is1v1 ? 'Ganado' : 'Equipo A') : winner === 'teamB' ? (is1v1 ? 'Perdido' : 'Equipo B') : 'Nulo'}
                     </span>
                   </div>
 
@@ -146,7 +201,9 @@ export function RoundSummaryModal({
                       <span className="text-slate-600 text-sm mx-2">vs</span>
                       <span className="text-rose-400">{teamBScore.total}</span>
                     </div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{reason}</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">
+                      {flagFallTeam ? 'Puntos de cartas jugadas hasta la caída de bandera' : reason}
+                    </div>
                   </div>
 
                   {/* Cartas del Equipo Rival B */}
@@ -195,7 +252,11 @@ export function RoundSummaryModal({
           <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex items-center justify-between text-xs">
             <div>
               <span className="font-bold text-slate-200 block">Puntos Numéricos Sumados al Acumulado:</span>
-              <span className="text-slate-400">Puntos de todos los frentes para resolver posibles desempates globales</span>
+              <span className="text-slate-400">
+                {flagFallTeam
+                  ? 'Conservación oficial: Puntos numéricos de las cartas colocadas en mesa hasta la caída de bandera'
+                  : 'Puntos de todos los frentes para resolver posibles desempates globales'}
+              </span>
             </div>
             <div className="text-right font-mono font-bold text-sm">
               <span className="text-emerald-400">+{roundPointsTeamA} pts</span>

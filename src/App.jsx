@@ -93,9 +93,10 @@ export default function App() {
   const [roundOverTimer, setRoundOverTimer] = useState(60);
   const [roundOverReadyPlayers, setRoundOverReadyPlayers] = useState([]);
 
-  // Avisos oficiales
+  // Avisos oficiales y Caída de Bandera
   const [penaltyNotice, setPenaltyNotice] = useState(null);
   const [initiativeNotice, setInitiativeNotice] = useState(null);
+  const [flagFallTeam, setFlagFallTeam] = useState(null); // 'teamA' | 'teamB' | null
 
   // Frentes de combate: { left: { teamA: [], teamB: [] }, ... }
   const [fronts, setFronts] = useState({
@@ -148,6 +149,7 @@ export default function App() {
     roundOverTimer,
     roundOverReadyPlayers,
     penaltyNotice,
+    flagFallTeam,
   };
 
   // Detectar parámetro ?room=WF-XXXX en la URL
@@ -197,6 +199,7 @@ export default function App() {
       modeId: base.selectedMode,
       roundOverReadyPlayers: base.roundOverReadyPlayers || [],
       roundOverTimer: base.roundOverTimer ?? 60,
+      flagFallTeam: base.flagFallTeam ?? null,
     };
 
     mp.connections.forEach((conn, peerId) => {
@@ -281,6 +284,9 @@ export default function App() {
     if (syncData.roundOverTimer !== undefined) {
       setRoundOverTimer(syncData.roundOverTimer);
     }
+    if (syncData.flagFallTeam !== undefined) {
+      setFlagFallTeam(syncData.flagFallTeam);
+    }
 
     if (syncData.phase === 'roundOver' && prevPhase !== 'roundOver') {
       sound.playReveal();
@@ -306,6 +312,7 @@ export default function App() {
       initiativeNotice: syncData.initiativeNotice,
       roundOverReadyPlayers: syncData.roundOverReadyPlayers ?? stateRef.current.roundOverReadyPlayers ?? [],
       roundOverTimer: syncData.roundOverTimer ?? stateRef.current.roundOverTimer ?? 60,
+      flagFallTeam: syncData.flagFallTeam ?? stateRef.current.flagFallTeam ?? null,
     };
   }
 
@@ -517,6 +524,7 @@ export default function App() {
     setPhase('roundOver');
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
+    setFlagFallTeam(null);
 
     stateRef.current = {
       ...stateRef.current,
@@ -529,6 +537,7 @@ export default function App() {
       teamBCumulativePoints: newTeamBCumulative,
       roundOverTimer: 60,
       roundOverReadyPlayers: [],
+      flagFallTeam: null,
     };
 
     const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
@@ -684,6 +693,7 @@ export default function App() {
     setPhase('roundOver');
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
+    setFlagFallTeam(infringingTeam);
 
     const is1v1 = (selectedMode || stateRef.current.selectedMode) === '1v1';
     let noticeText = '';
@@ -710,6 +720,7 @@ export default function App() {
       roundOverTimer: 60,
       roundOverReadyPlayers: [],
       penaltyNotice: noticeText,
+      flagFallTeam: infringingTeam,
     };
 
     const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
@@ -957,6 +968,7 @@ export default function App() {
       }
     }
     setInitiativeNotice(noticeText);
+    setFlagFallTeam(null);
 
     const isMultiplayerActive = isMultiplayer || forceMultiplayerHost || stateRef.current.isMultiplayer;
     const isHostActive = isHost || forceMultiplayerHost || stateRef.current.isHost;
@@ -980,6 +992,7 @@ export default function App() {
       readyPlayers: initialBotReadyIds,
       roundOverTimer: 60,
       roundOverReadyPlayers: [],
+      flagFallTeam: null,
       isMultiplayer: isMultiplayerActive,
       isHost: isHostActive,
     };
@@ -1755,6 +1768,7 @@ export default function App() {
         players={players}
         countdown={roundOverTimer}
         onToggleReady={handleToggleRoundReady}
+        flagFallTeam={flagFallTeam}
       />
 
       {/* MODAL DE FIN DE PARTIDA CON PRÓRROGA REGLAMENTARIA */}
