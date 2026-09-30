@@ -1,4 +1,5 @@
 import React from 'react';
+import { EyeOff } from 'lucide-react';
 import { SUITS } from '../constants/rules';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -79,9 +80,13 @@ export function Card({
         )}
 
         {/* Sello de Sombra propia */}
-        <div className="absolute bottom-1 left-1 bg-purple-950/95 text-purple-200 border border-purple-500/80 text-[7px] sm:text-[8px] font-serif font-bold px-1 py-0.5 rounded shadow z-20 pointer-events-none tracking-tight uppercase flex items-center gap-0.5 leading-none">
-          <span className="w-1 h-1 rounded-full bg-purple-400"></span>
-          <span>{ui.game.card.shadowBadge}</span>
+        <div
+          className="absolute bottom-1 left-1 z-20 pointer-events-none"
+          title={isEn ? "Your Shadow Card (Hidden from enemies)" : "Tu Carta Sombra (Oculta para rivales)"}
+        >
+          <span className="w-4 h-4 rounded-full bg-purple-950/95 text-purple-300 border border-purple-500/80 flex items-center justify-center shadow">
+            <EyeOff className="w-2.5 h-2.5" />
+          </span>
         </div>
 
         {/* Contenedor interno recortado al borde redondeado de la carta */}
@@ -183,40 +188,42 @@ export function Card({
 
       {/* Insignia de Sinergia / Formación Táctica (en esquina superior derecha, sin tapar el número de la izquierda) */}
       {!isTrump && synergy && synergy.primarySynergy && (!isShadow || isRevealed) && (
-        <div className="absolute top-1 right-1 z-20 pointer-events-none">
+        <div className="absolute top-1 right-1 z-20 pointer-events-none flex items-center justify-end">
           {synergy.isMultiCombo ? (
             <span
-              className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-gradient-to-br from-amber-400 via-yellow-300 to-amber-500 text-stone-950 font-black text-[9px] sm:text-[10px] flex items-center justify-center shadow-md ring-1 ring-amber-300/80 uppercase leading-none select-none"
+              className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-400 via-yellow-300 to-amber-500 text-stone-950 font-black text-[9px] sm:text-[10px] flex items-center justify-center shadow-md ring-1 ring-amber-300/80 uppercase leading-none select-none"
               title="Multi-Combo"
             >
               ★
             </span>
           ) : synergy.inTrio ? (
-            <span className="px-1 py-0.5 rounded bg-purple-900/90 text-purple-200 border border-purple-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase leading-none">
+            <span className="h-4 px-1 rounded bg-purple-900/90 text-purple-200 border border-purple-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase flex items-center justify-center leading-none">
               {isEn ? 'Trio' : 'Trío'}
             </span>
           ) : synergy.inStraight ? (
-            <span className="px-1 py-0.5 rounded bg-sky-950/90 text-cyan-300 border border-cyan-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase leading-none">
+            <span className="h-4 px-1 rounded bg-sky-950/90 text-cyan-300 border border-cyan-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase flex items-center justify-center leading-none">
               {isEn ? 'Str' : 'Esc'}
             </span>
           ) : synergy.inPair ? (
-            <span className="px-1 py-0.5 rounded bg-amber-950/90 text-amber-300 border border-amber-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase leading-none">
+            <span className="h-4 px-1 rounded bg-amber-950/90 text-amber-300 border border-amber-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase flex items-center justify-center leading-none">
               {isEn ? 'Pair' : 'Par'}
             </span>
           ) : (
-            <span className="px-1 py-0.5 rounded bg-stone-900/90 border border-stone-600/70 text-amber-300 font-serif font-bold text-[7px] sm:text-[8px] shadow-sm tracking-tight flex items-center gap-0.5 leading-none">
+            <span className="h-4 px-1 rounded bg-stone-900/90 border border-stone-600/70 text-amber-300 font-serif font-bold text-[7px] sm:text-[8px] shadow-sm tracking-tight flex items-center justify-center gap-0.5 leading-none">
               <span>{suitInfo?.symbol}</span><span>x{synergy.suitCount}</span>
             </span>
           )}
         </div>
       )}
 
-      {/* Indicador de Carta Sombra que ha sido revelada (en esquina inferior izquierda, no choca con nada) */}
+      {/* Indicador de Carta Sombra que ha sido revelada (icono discreto en esquina inferior izquierda) */}
       {isRevealed && isShadow && (
-        <div className="absolute bottom-1 left-1 z-20 pointer-events-none">
-          <span className="bg-purple-950/95 text-purple-200 border border-purple-500/80 text-[7px] sm:text-[8px] font-serif font-bold px-1 py-0.5 rounded shadow-sm uppercase tracking-tight flex items-center gap-0.5 leading-none">
-            <span className="w-1 h-1 rounded-full bg-purple-400"></span>
-            <span>{isEn ? 'Shadow' : 'Sombra'}</span>
+        <div
+          className="absolute bottom-1 left-1 z-20 pointer-events-none"
+          title={isEn ? "Played as a Shadow Card" : "Jugada como Carta Sombra"}
+        >
+          <span className="w-4 h-4 rounded-full bg-purple-950/95 text-purple-300 border border-purple-500/80 flex items-center justify-center shadow-md">
+            <EyeOff className="w-2.5 h-2.5" />
           </span>
         </div>
       )}
@@ -249,23 +256,6 @@ export function Card({
             <span className="leading-none mt-0.5 text-xs sm:text-sm md:text-base">
               {suitInfo?.symbol}
             </span>
-          </div>
-        )}
-
-        {/* Micro-puntos de sinergia en la esquina inferior izquierda (solo cartas no sombra para no tapar el sello) */}
-        {synergy && synergy.synergyCount > 0 && !isShadow && (
-          <div className="absolute bottom-1 left-1.5 z-20 flex items-center gap-0.5 pointer-events-none">
-            {(synergy.inPair || synergy.inTrio) && (
-              <span
-                className={`w-1.5 h-1.5 rounded-full ${synergy.inTrio ? 'bg-purple-500 shadow-[0_0_4px_#c084fc]' : 'bg-amber-400 shadow-[0_0_4px_#fbbf24]'}`}
-              />
-            )}
-            {synergy.inStraight && (
-              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_4px_#22d3ee]" />
-            )}
-            {synergy.inSuitSynergy && (
-              <span className={`w-1.5 h-1.5 rounded-full ${isRed ? 'bg-rose-500 shadow-[0_0_4px_#f43f5e]' : 'bg-slate-400 shadow-[0_0_4px_#cbd5e1]'}`} />
-            )}
           </div>
         )}
       </div>

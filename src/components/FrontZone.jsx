@@ -329,11 +329,6 @@ export function FrontZone({
                     }}
                     onMouseLeave={() => setHoveredCardId(null)}
                   />
-                  {card.playedBy && isTeamMode && (
-                    <span className={`absolute bottom-0.5 right-0.5 z-20 bg-black/90 text-[8px] font-serif font-bold px-1 py-0.2 rounded shadow border ${enemyBorder}`}>
-                      {card.playedBy}
-                    </span>
-                  )}
                 </div>
               );
             })
@@ -406,11 +401,6 @@ export function FrontZone({
                     }}
                     onMouseLeave={() => setHoveredCardId(null)}
                   />
-                  {card.playedBy && isTeamMode && (
-                    <span className={`absolute bottom-0.5 right-0.5 z-20 bg-black/90 text-[8px] font-serif font-bold px-1 py-0.2 rounded shadow border ${allyBorder}`}>
-                      {card.playedBy}
-                    </span>
-                  )}
                 </div>
               );
             })

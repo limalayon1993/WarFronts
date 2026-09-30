@@ -672,11 +672,6 @@ export function InteractiveTutorial({ onBackToMenu }) {
                                 compact
                               />
                             </div>
-                            {c.playedBy && (
-                              <span className="absolute bottom-0.5 right-0.5 z-30 bg-slate-900 text-[8px] font-bold px-1.5 py-0.5 rounded border border-rose-900/50 text-rose-400 shadow-md">
-                                {c.playedBy}
-                              </span>
-                            )}
                           </div>
                         );
                       })
@@ -742,11 +737,6 @@ export function InteractiveTutorial({ onBackToMenu }) {
                                 compact
                               />
                             </div>
-                            {c.playedBy && (
-                              <span className="absolute bottom-0.5 right-0.5 z-30 bg-slate-900 text-[8px] font-bold px-1.5 py-0.5 rounded border border-emerald-900/50 text-emerald-400 shadow-md">
-                                {c.playedBy}
-                              </span>
-                            )}
                           </div>
                         );
                       })

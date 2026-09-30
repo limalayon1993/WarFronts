@@ -233,10 +233,10 @@ export function RoundSummaryModal({
                     </span>
                     <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 py-1">
                       {teamBCards.map((c, i) => (
-                        <div key={i} className="relative">
+                        <div key={i} className="flex flex-col items-center">
                           <Card card={c} isShadow={c.isShadow} isRevealed={true} compact synergy={teamBCardSynergies?.[c.id]} />
-                          {!is1v1 && c.playedBy && (
-                            <span className="absolute bottom-0.5 right-0.5 z-30 bg-slate-950/90 text-rose-300 text-[8px] font-bold px-1 py-0.2 rounded shadow border border-rose-900/50">
+                          {c.playedBy && (
+                            <span className="mt-1 bg-slate-950/90 text-rose-300 text-[8px] font-bold px-1.5 py-0.2 rounded shadow border border-rose-900/50 whitespace-nowrap max-w-[56px] truncate text-center">
                               {c.playedBy}
                             </span>
                           )}
@@ -278,10 +278,10 @@ export function RoundSummaryModal({
                     </span>
                     <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 py-1">
                       {teamACards.map((c, i) => (
-                        <div key={i} className="relative">
+                        <div key={i} className="flex flex-col items-center">
                           <Card card={c} isShadow={c.isShadow} isRevealed={true} compact synergy={teamACardSynergies?.[c.id]} />
-                          {!is1v1 && c.playedBy && (
-                            <span className="absolute bottom-0.5 right-0.5 z-30 bg-slate-950/90 text-emerald-300 text-[8px] font-bold px-1 py-0.2 rounded shadow border border-emerald-900/50">
+                          {c.playedBy && (
+                            <span className="mt-1 bg-slate-950/90 text-emerald-300 text-[8px] font-bold px-1.5 py-0.2 rounded shadow border border-emerald-900/50 whitespace-nowrap max-w-[56px] truncate text-center">
                               {c.playedBy}
                             </span>
                           )}
