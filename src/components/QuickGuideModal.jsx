@@ -11,6 +11,8 @@ import {
   Swords,
   Layers,
   Trophy,
+  BookOpen,
+  Check,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LanguageToggle } from './LanguageToggle';
@@ -155,10 +157,10 @@ export function QuickGuideModal({ isOpen, onClose }) {
             </div>
 
             {/* BLOQUE 2: RESOLUCIÓN DE EMPATES Y CRITERIO FINAL */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+            <div className="casino-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
-                  <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
+                <div className="flex items-center justify-between border-b border-amber-500/15 pb-2 mb-3">
+                  <h3 className="text-xs sm:text-sm font-serif font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
                     <Scale className="w-4 h-4" /> {guideT.block2.title}
                   </h3>
                   <span className="text-[10px] text-slate-400 font-mono">{guideT.block2.tag}</span>
@@ -166,39 +168,39 @@ export function QuickGuideModal({ isOpen, onClose }) {
 
                 <div className="space-y-2 text-xs">
                   {/* Criterio 1 */}
-                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex items-start gap-2.5">
-                    <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-400 font-black flex items-center justify-center shrink-0 text-xs">
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20 flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-300 font-serif font-black flex items-center justify-center shrink-0 text-xs border border-amber-500/40">
                       1
                     </span>
                     <div>
-                      <strong className="text-slate-100 block">{guideT.block2.crit1Title}</strong>
-                      <span className="text-slate-400">
+                      <strong className="text-slate-100 font-serif block">{guideT.block2.crit1Title}</strong>
+                      <span className="text-slate-300 font-serif">
                         {guideT.block2.crit1Desc}
                       </span>
                     </div>
                   </div>
 
                   {/* Criterio 2 */}
-                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex items-start gap-2.5">
-                    <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-400 font-black flex items-center justify-center shrink-0 text-xs">
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20 flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-300 font-serif font-black flex items-center justify-center shrink-0 text-xs border border-amber-500/40">
                       2
                     </span>
                     <div>
-                      <strong className="text-slate-100 block">{guideT.block2.crit2Title}</strong>
-                      <span className="text-slate-400">
+                      <strong className="text-slate-100 font-serif block">{guideT.block2.crit2Title}</strong>
+                      <span className="text-slate-300 font-serif">
                         {guideT.block2.crit2Desc}
                       </span>
                     </div>
                   </div>
 
                   {/* Criterio 3 */}
-                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex items-start gap-2.5">
-                    <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-400 font-black flex items-center justify-center shrink-0 text-xs">
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20 flex items-start gap-2.5">
+                    <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-300 font-serif font-black flex items-center justify-center shrink-0 text-xs border border-amber-500/40">
                       3
                     </span>
                     <div>
-                      <strong className="text-slate-100 block">{guideT.block2.crit3Title}</strong>
-                      <div className="text-[11px] text-slate-400 space-y-0.5 mt-0.5">
+                      <strong className="text-slate-100 font-serif block">{guideT.block2.crit3Title}</strong>
+                      <div className="text-[11px] text-slate-300 font-serif space-y-0.5 mt-0.5">
                         <div>• <strong className="text-emerald-300">{guideT.block2.crit3Sub1}</strong></div>
                         <div>• <strong className="text-amber-300">{guideT.block2.crit3Sub2}</strong></div>
                         <div>• <strong className="text-slate-300">{guideT.block2.crit3Sub3}</strong></div>
@@ -208,87 +210,87 @@ export function QuickGuideModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              <div className="mt-3 pt-2 border-t border-slate-800 flex items-center gap-2 text-[11px] text-slate-400 bg-slate-950/60 px-2.5 py-1.5 rounded">
-                <Layers className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                <span>{guideT.block2.continuousDeck}</span>
+              <div className="mt-3 pt-2 border-t border-amber-500/15 flex items-center gap-2 text-[11px] text-slate-400 bg-black/50 px-2.5 py-1.5 rounded-xl border border-amber-500/10">
+                <Layers className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span className="font-serif">{guideT.block2.continuousDeck}</span>
               </div>
             </div>
           </div>
 
           {/* Fila 2: Las 4 Fases de la Ronda */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
-              <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
+          <div className="casino-panel rounded-2xl p-4 sm:p-5">
+            <div className="flex items-center justify-between border-b border-amber-500/15 pb-2 mb-3">
+              <h3 className="text-xs sm:text-sm font-serif font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
                 <Clock className="w-4 h-4" /> {guideT.block3.title}
               </h3>
-              <span className="text-[10px] bg-slate-800 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">
+              <span className="text-[10px] bg-black/60 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-mono font-bold">
                 {guideT.block3.subtitleTag}
               </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               {/* Fase 1 */}
-              <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+              <div className="bg-black/60 p-3 rounded-xl border border-amber-500/20">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-black text-amber-400">{guideT.block3.phase1.badge}</span>
-                  <span className="text-[9px] bg-slate-800 text-slate-400 px-1 rounded uppercase">{guideT.block3.phase1.tag}</span>
+                  <span className="text-xs font-serif font-black text-amber-400">{guideT.block3.phase1.badge}</span>
+                  <span className="text-[9px] bg-black/80 text-amber-300/80 border border-amber-500/20 px-1 rounded uppercase font-serif">{guideT.block3.phase1.tag}</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-200 mb-1">{guideT.block3.phase1.title}</h4>
-                <ul className="text-[11px] text-slate-400 space-y-1">
+                <h4 className="text-xs font-serif font-bold text-slate-200 mb-1">{guideT.block3.phase1.title}</h4>
+                <ul className="text-[11px] text-slate-300 font-serif space-y-1">
                   <li>• {guideT.block3.phase1.p1}</li>
                   <li>• {guideT.block3.phase1.p2}</li>
                   <li>• {guideT.block3.phase1.p3}</li>
                 </ul>
-                <div className="text-[9px] text-slate-500 mt-2 italic">{guideT.block3.phase1.footer}</div>
+                <div className="text-[9px] text-slate-400 font-serif mt-2 italic">{guideT.block3.phase1.footer}</div>
               </div>
 
               {/* Fase 2 */}
-              <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+              <div className="bg-black/60 p-3 rounded-xl border border-amber-500/20">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-black text-amber-400">{guideT.block3.phase2.badge}</span>
-                  <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1 rounded font-mono">{guideT.block3.phase2.tag}</span>
+                  <span className="text-xs font-serif font-black text-amber-400">{guideT.block3.phase2.badge}</span>
+                  <span className="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1 rounded font-mono">{guideT.block3.phase2.tag}</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-200 mb-1">{guideT.block3.phase2.title}</h4>
-                <ul className="text-[11px] text-slate-400 space-y-1">
+                <h4 className="text-xs font-serif font-bold text-slate-200 mb-1">{guideT.block3.phase2.title}</h4>
+                <ul className="text-[11px] text-slate-300 font-serif space-y-1">
                   <li>• {guideT.block3.phase2.p1}</li>
                   <li className="text-rose-300 font-semibold">• {guideT.block3.phase2.p2}</li>
                 </ul>
-                <div className="text-[9px] text-slate-500 mt-2 italic">{guideT.block3.phase2.footer}</div>
+                <div className="text-[9px] text-slate-400 font-serif mt-2 italic">{guideT.block3.phase2.footer}</div>
               </div>
 
               {/* Fase 3 */}
-              <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+              <div className="bg-black/60 p-3 rounded-xl border border-amber-500/20">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-black text-amber-400">{guideT.block3.phase3.badge}</span>
-                  <span className="text-[9px] bg-slate-800 text-slate-400 px-1 rounded uppercase">{guideT.block3.phase3.tag}</span>
+                  <span className="text-xs font-serif font-black text-amber-400">{guideT.block3.phase3.badge}</span>
+                  <span className="text-[9px] bg-black/80 text-amber-300/80 border border-amber-500/20 px-1 rounded uppercase font-serif">{guideT.block3.phase3.tag}</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-200 mb-1">{guideT.block3.phase3.title}</h4>
-                <ul className="text-[11px] text-slate-400 space-y-1">
+                <h4 className="text-xs font-serif font-bold text-slate-200 mb-1">{guideT.block3.phase3.title}</h4>
+                <ul className="text-[11px] text-slate-300 font-serif space-y-1">
                   <li>• {guideT.block3.phase3.p1}</li>
                   <li className="text-purple-300 font-semibold">• {guideT.block3.phase3.p2}</li>
                 </ul>
-                <div className="text-[9px] text-slate-500 mt-2 italic">{guideT.block3.phase3.footer}</div>
+                <div className="text-[9px] text-slate-400 font-serif mt-2 italic">{guideT.block3.phase3.footer}</div>
               </div>
 
               {/* Fase 4 */}
-              <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
+              <div className="bg-black/60 p-3 rounded-xl border border-amber-500/20">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-black text-amber-400">{guideT.block3.phase4.badge}</span>
-                  <span className="text-[9px] bg-rose-500/20 text-rose-300 px-1 rounded font-mono">{guideT.block3.phase4.tag}</span>
+                  <span className="text-xs font-serif font-black text-amber-400">{guideT.block3.phase4.badge}</span>
+                  <span className="text-[9px] bg-rose-500/20 text-rose-300 border border-rose-500/30 px-1 rounded font-mono">{guideT.block3.phase4.tag}</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-200 mb-1">{guideT.block3.phase4.title}</h4>
-                <ul className="text-[11px] text-slate-400 space-y-1">
+                <h4 className="text-xs font-serif font-bold text-slate-200 mb-1">{guideT.block3.phase4.title}</h4>
+                <ul className="text-[11px] text-slate-300 font-serif space-y-1">
                   <li>• {guideT.block3.phase4.p1}</li>
                   <li>• {guideT.block3.phase4.p2}</li>
                   <li>• {guideT.block3.phase4.p3}</li>
                   <li className="text-rose-400 font-semibold">• {guideT.block3.phase4.p4}</li>
                 </ul>
-                <div className="text-[9px] text-slate-500 mt-2 italic">{guideT.block3.phase4.footer}</div>
+                <div className="text-[9px] text-slate-400 font-serif mt-2 italic">{guideT.block3.phase4.footer}</div>
               </div>
             </div>
 
             {/* Tras completar el despliegue */}
-            <div className="mt-3 bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between text-xs text-slate-300 gap-2">
+            <div className="mt-3 bg-black/50 p-2.5 rounded-xl border border-amber-500/15 flex flex-wrap items-center justify-between text-xs text-slate-300 font-serif gap-2">
               <span className="font-bold text-amber-400 flex items-center gap-1">
                 <Sparkles className="w-3.5 h-3.5" /> {guideT.block3.postDeploy.title}
               </span>
@@ -301,103 +303,103 @@ export function QuickGuideModal({ isOpen, onClose }) {
           {/* Fila 3: Cálculo de Fuerza y Anexo 1v1 */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* BLOQUE 4: CÁLCULO DE FUERZA POR FRENTE */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+            <div className="casino-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
-                  <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
+                <div className="flex items-center justify-between border-b border-amber-500/15 pb-2 mb-3">
+                  <h3 className="text-xs sm:text-sm font-serif font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
                     <Sparkles className="w-4 h-4" /> {guideT.block4.title}
                   </h3>
                   <span className="text-[10px] text-slate-400 font-mono">{guideT.block4.tag}</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mb-3">
-                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">{guideT.block4.numericTitle}</span>
-                    <strong className="text-xs text-slate-100 block">{guideT.block4.nominalValue}</strong>
-                    <p className="text-[11px] text-slate-400 mt-1">
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20">
+                    <span className="text-[10px] uppercase font-serif font-bold text-amber-300/80 block mb-1">{guideT.block4.numericTitle}</span>
+                    <strong className="text-xs text-slate-100 font-serif block">{guideT.block4.nominalValue}</strong>
+                    <p className="text-[11px] text-slate-300 font-serif mt-1">
                       {guideT.block4.numericDesc}
                     </p>
                   </div>
 
-                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">{guideT.block4.figuresTitle}</span>
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20">
+                    <span className="text-[10px] uppercase font-serif font-bold text-amber-300/80 block mb-1">{guideT.block4.figuresTitle}</span>
                     <div className="flex items-center gap-1 font-mono font-bold text-xs text-amber-400">
                       <span>J=11</span> <span>Q=12</span> <span>K=13</span> <span className="text-emerald-400 font-black">A=14</span>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-1">
+                    <p className="text-[11px] text-slate-300 font-serif mt-1">
                       {guideT.block4.aceDesc}
                     </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-indigo-950/40 p-2.5 rounded-lg border border-indigo-800/60">
-                    <div className="flex items-center gap-1 text-[10px] font-bold text-indigo-300 uppercase mb-1">
-                      <Sparkles className="w-3 h-3 text-indigo-400" /> {guideT.block4.synergyTitle}
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/25">
+                    <div className="flex items-center gap-1 text-[10px] font-serif font-bold text-amber-300 uppercase mb-1">
+                      <Sparkles className="w-3 h-3 text-amber-400" /> {guideT.block4.synergyTitle}
                     </div>
-                    <strong className="text-sm text-indigo-200 block">{guideT.block4.synergyBonus}</strong>
-                    <p className="text-[10px] text-slate-400 mt-0.5">
+                    <strong className="text-sm font-serif text-amber-200 block">{guideT.block4.synergyBonus}</strong>
+                    <p className="text-[10px] text-slate-300 font-serif mt-0.5">
                       {guideT.block4.synergyDesc}
                     </p>
                   </div>
 
-                  <div className="bg-amber-950/40 p-2.5 rounded-lg border border-amber-800/60">
-                    <div className="flex items-center gap-1 text-[10px] font-bold text-amber-300 uppercase mb-1">
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/25">
+                    <div className="flex items-center gap-1 text-[10px] font-serif font-bold text-amber-300 uppercase mb-1">
                       <Flame className="w-3 h-3 text-amber-400" /> {guideT.block4.trumpTitle}
                     </div>
-                    <strong className="text-sm text-amber-200 block">{guideT.block4.trumpBonus}</strong>
-                    <p className="text-[10px] text-slate-400 mt-0.5">
+                    <strong className="text-sm font-serif text-amber-200 block">{guideT.block4.trumpBonus}</strong>
+                    <p className="text-[10px] text-slate-300 font-serif mt-0.5">
                       {guideT.block4.trumpDesc}
                     </p>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-3 pt-2 border-t border-slate-800 text-[11px] text-center font-mono text-slate-400">
+              <div className="mt-3 pt-2 border-t border-amber-500/15 text-[11px] text-center font-serif text-slate-400">
                 {guideT.block4.formula}
               </div>
             </div>
 
             {/* ANEXO: MODO DUELO 1V1 (EL ESPEJO DEL 2V2) */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+            <div className="casino-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
-                  <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
+                <div className="flex items-center justify-between border-b border-amber-500/15 pb-2 mb-3">
+                  <h3 className="text-xs sm:text-sm font-serif font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
                     <Swords className="w-4 h-4" /> {guideT.block5.title}
                   </h3>
                   <span className="text-[10px] text-slate-400 font-mono">{guideT.block5.tag}</span>
                 </div>
 
-                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 mb-3">
-                  <div className="text-[11px] text-slate-300 font-semibold mb-1">{guideT.block5.sub1Title}</div>
-                  <div className="text-[10px] text-slate-400 mb-2">{guideT.block5.sub1Desc}</div>
+                <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20 mb-3">
+                  <div className="text-[11px] text-slate-200 font-serif font-semibold mb-1">{guideT.block5.sub1Title}</div>
+                  <div className="text-[10px] text-slate-400 font-serif mb-2">{guideT.block5.sub1Desc}</div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-center text-xs">
-                    <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                      <span className="text-[9px] text-slate-500 block">{guideT.block5.deckLabel}</span>
-                      <strong className="text-slate-200 text-[11px]">{guideT.block5.deckVal}</strong>
+                    <div className="bg-black/70 p-1.5 rounded-lg border border-amber-500/20">
+                      <span className="text-[9px] text-slate-400 font-serif block">{guideT.block5.deckLabel}</span>
+                      <strong className="text-slate-100 text-[11px] font-serif">{guideT.block5.deckVal}</strong>
                     </div>
-                    <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                      <span className="text-[9px] text-slate-500 block">{guideT.block5.handLabel}</span>
-                      <strong className="text-slate-200 text-[11px]">{guideT.block5.handVal}</strong>
+                    <div className="bg-black/70 p-1.5 rounded-lg border border-amber-500/20">
+                      <span className="text-[9px] text-slate-400 font-serif block">{guideT.block5.handLabel}</span>
+                      <strong className="text-slate-100 text-[11px] font-serif">{guideT.block5.handVal}</strong>
                     </div>
-                    <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                      <span className="text-[9px] text-slate-500 block">{guideT.block5.frontLimitLabel}</span>
-                      <strong className="text-slate-200 text-[11px]">{guideT.block5.frontLimitVal}</strong>
+                    <div className="bg-black/70 p-1.5 rounded-lg border border-amber-500/20">
+                      <span className="text-[9px] text-slate-400 font-serif block">{guideT.block5.frontLimitLabel}</span>
+                      <strong className="text-slate-100 text-[11px] font-serif">{guideT.block5.frontLimitVal}</strong>
                     </div>
-                    <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                      <span className="text-[9px] text-slate-500 block">{guideT.block5.shadowsLabel}</span>
-                      <strong className="text-purple-400 text-[11px]">{guideT.block5.shadowsVal}</strong>
+                    <div className="bg-black/70 p-1.5 rounded-lg border border-amber-500/20">
+                      <span className="text-[9px] text-slate-400 font-serif block">{guideT.block5.shadowsLabel}</span>
+                      <strong className="text-purple-300 text-[11px] font-serif">{guideT.block5.shadowsVal}</strong>
                     </div>
                   </div>
-                  <div className="text-[10px] font-mono text-emerald-400 font-bold bg-slate-900 py-1 px-2 rounded text-center border border-slate-800 mt-2">
+                  <div className="text-[10px] font-mono text-emerald-400 font-bold bg-black/70 py-1 px-2 rounded-lg text-center border border-emerald-900/40 mt-2">
                     {guideT.block5.clock1v1}
                   </div>
                 </div>
 
-                <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 space-y-1.5">
-                  <div className="font-semibold text-slate-200 mb-0.5 flex items-center justify-between">
+                <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20 text-[11px] text-slate-300 font-serif space-y-1.5">
+                  <div className="font-semibold text-slate-100 mb-0.5 flex items-center justify-between">
                     <span>{guideT.block5.sub2Title}</span>
-                    <span className="text-[10px] text-amber-400 font-mono font-bold">{guideT.block5.sub2Tag}</span>
+                    <span className="text-[10px] text-amber-300 font-mono font-bold">{guideT.block5.sub2Tag}</span>
                   </div>
                   <div>• {guideT.block5.p1}</div>
                   <div>• {guideT.block5.p2}</div>
@@ -406,22 +408,22 @@ export function QuickGuideModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              <div className="mt-3 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+              <div className="mt-3 pt-2 border-t border-amber-500/15 flex items-center justify-between text-[11px] text-slate-400 font-serif">
                 <span>{guideT.block5.footerDeck}</span>
-                <span className="text-amber-400 font-bold">{guideT.block5.footerMode}</span>
+                <span className="text-amber-300 font-bold">{guideT.block5.footerMode}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Pie con botón de cerrar */}
-        <div className="px-6 py-3 border-t border-slate-800 bg-slate-950 flex items-center justify-between">
-          <span className="text-xs text-slate-500">
+        <div className="px-6 py-3 border-t border-amber-500/20 bg-gradient-to-r from-black via-[#111622] to-black flex items-center justify-between">
+          <span className="text-xs text-slate-400 font-serif">
             {guideT.footerNote}
           </span>
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition"
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-stone-950 font-serif font-black text-xs uppercase tracking-widest shadow-md shadow-amber-500/20 transition cursor-pointer"
           >
             {guideT.closeBtn}
           </button>

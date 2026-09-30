@@ -25,6 +25,7 @@ import {
   Sparkles,
   GraduationCap,
   Timer,
+  Check,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LanguageToggle } from './LanguageToggle';
@@ -351,30 +352,33 @@ export function MainMenu({
                     type="button"
                     onClick={() => setSelectedMode(mode.id)}
                     className={`
-                      text-left rounded-2xl p-4 sm:p-5 border transition-all duration-200 flex flex-col justify-between relative group cursor-pointer
+                      text-left rounded-2xl p-4 sm:p-5 transition-all duration-200 flex flex-col justify-between relative group cursor-pointer
                       ${isSelected
-                        ? 'casino-panel border-amber-400 shadow-[0_12px_28px_rgba(212,175,55,0.25)] ring-1 ring-amber-400/50 -translate-y-1'
-                        : 'bg-[#0d121c]/80 hover:bg-[#121824] border-amber-500/15 hover:border-amber-500/35'
+                        ? 'border-2 border-amber-400 bg-gradient-to-b from-[#182030] to-[#0c101a] shadow-[0_0_25px_rgba(212,175,55,0.35)] ring-2 ring-amber-400/40 -translate-y-1'
+                        : 'border border-amber-500/20 bg-black/60 hover:bg-[#101624] hover:border-amber-500/40 opacity-75 hover:opacity-100'
                       }
                     `}
                   >
-                    {/* Insignia de Barajas */}
-                    <div className="flex items-center justify-between mb-3">
-                      <span className={`text-[10px] font-serif font-bold px-2 py-0.5 rounded-full border ${
-                        isSelected
-                          ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                          : 'bg-black/40 text-slate-400 border-amber-500/15'
-                      }`}>
-                        {mode.decks === 1 ? (isEn ? '1 Deck (52 cards)' : '1 Baraja (52 cartas)') : (isEn ? '2 Decks (104 cards)' : '2 Barajas (104 cartas)')}
-                      </span>
+                    {/* Insignia de Barajas y Estado */}
+                    <div className="flex items-center justify-between mb-3 gap-1">
+                      {isSelected ? (
+                        <span className="text-[10px] font-serif font-black px-2.5 py-0.5 rounded-full border bg-amber-500/25 text-amber-300 border-amber-400 flex items-center gap-1 shadow-sm">
+                          <Check className="w-3 h-3 stroke-[3] text-amber-400" />
+                          {isEn ? 'SELECTED' : 'SELECCIONADO'}
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-serif font-bold px-2 py-0.5 rounded-full border bg-black/50 text-slate-400 border-amber-500/20">
+                          {mode.decks === 1 ? (isEn ? '1 Deck (52 cards)' : '1 Baraja (52 cartas)') : (isEn ? '2 Decks (104 cards)' : '2 Barajas (104 cartas)')}
+                        </span>
+                      )}
 
-                      <span className="text-xs font-mono font-bold text-amber-500/70">
+                      <span className={`text-xs font-mono font-bold ${isSelected ? 'text-amber-300' : 'text-amber-500/70'}`}>
                         {mode.totalPlayers} {isEn ? 'Players' : 'Jugadores'}
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="text-xl font-serif font-black text-slate-100 mb-1 flex items-center justify-between">
+                      <h3 className={`text-xl font-serif font-black mb-1 flex items-center justify-between ${isSelected ? 'text-amber-200' : 'text-slate-100'}`}>
                         {mode.name}
                       </h3>
                       <p className="text-xs font-serif text-amber-400/90 font-semibold mb-2">{mode.subtitle}</p>
@@ -413,21 +417,31 @@ export function MainMenu({
                     type="button"
                     onClick={() => setSelectedTimeSpeed && setSelectedTimeSpeed(timeOpt.id)}
                     className={`
-                      p-4 rounded-xl border transition-all text-left flex items-center justify-between cursor-pointer
+                      p-4 rounded-2xl border-2 transition-all text-left flex items-center justify-between cursor-pointer relative
                       ${isSelected
-                        ? 'casino-panel border-amber-400 ring-1 ring-amber-400/50 text-slate-100 shadow-md'
-                        : 'bg-[#0d121c]/80 hover:bg-[#121824] border-amber-500/15 text-slate-300 hover:border-amber-500/35'
+                        ? 'border-amber-400 bg-gradient-to-b from-[#182030] to-[#0c101a] ring-2 ring-amber-400/40 text-slate-100 shadow-[0_0_20px_rgba(212,175,55,0.3)] -translate-y-0.5'
+                        : 'border-amber-500/20 bg-black/60 hover:bg-[#101624] hover:border-amber-500/40 text-slate-300 opacity-75 hover:opacity-100'
                       }
                     `}
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-serif font-bold text-base">{timeOpt.name}</span>
+                        <span className={`font-serif font-bold text-base ${isSelected ? 'text-amber-200' : 'text-slate-100'}`}>{timeOpt.name}</span>
+                        {isSelected && (
+                          <span className="inline-flex items-center gap-1 text-[9px] font-serif font-black uppercase text-amber-300 bg-amber-500/25 px-2 py-0.5 rounded-full border border-amber-400 shadow-sm">
+                            <Check className="w-2.5 h-2.5 stroke-[3] text-amber-400" />
+                            {isEn ? 'ACTIVE' : 'ACTIVO'}
+                          </span>
+                        )}
                       </div>
                       <span className="text-xs font-serif text-slate-400">{timeOpt.desc}</span>
                     </div>
 
-                    <span className="text-xs font-mono font-bold text-amber-400 bg-black/60 px-2.5 py-1.5 rounded-lg border border-amber-500/25 shadow-inner">
+                    <span className={`text-xs font-mono font-bold px-2.5 py-1.5 rounded-lg border shadow-inner ${
+                      isSelected
+                        ? 'text-amber-300 bg-amber-500/20 border-amber-400'
+                        : 'text-amber-400 bg-black/60 border-amber-500/25'
+                    }`}>
                       {speedConfig?.label}
                     </span>
                   </button>
@@ -461,21 +475,31 @@ export function MainMenu({
                     type="button"
                     onClick={() => setSelectedRhythm(dur.rounds)}
                     className={`
-                      p-4 rounded-xl border transition-all text-left flex items-center justify-between cursor-pointer
+                      p-4 rounded-2xl border-2 transition-all text-left flex items-center justify-between cursor-pointer relative
                       ${isSelected
-                        ? 'casino-panel border-amber-400 ring-1 ring-amber-400/50 text-slate-100 shadow-md'
-                        : 'bg-[#0d121c]/80 hover:bg-[#121824] border-amber-500/15 text-slate-300 hover:border-amber-500/35'
+                        ? 'border-amber-400 bg-gradient-to-b from-[#182030] to-[#0c101a] ring-2 ring-amber-400/40 text-slate-100 shadow-[0_0_20px_rgba(212,175,55,0.3)] -translate-y-0.5'
+                        : 'border-amber-500/20 bg-black/60 hover:bg-[#101624] hover:border-amber-500/40 text-slate-300 opacity-75 hover:opacity-100'
                       }
                     `}
                   >
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-serif font-bold text-base">{dur.name}</span>
+                        <span className={`font-serif font-bold text-base ${isSelected ? 'text-amber-200' : 'text-slate-100'}`}>{dur.name}</span>
+                        {isSelected && (
+                          <span className="inline-flex items-center gap-1 text-[9px] font-serif font-black uppercase text-amber-300 bg-amber-500/25 px-2 py-0.5 rounded-full border border-amber-400 shadow-sm">
+                            <Check className="w-2.5 h-2.5 stroke-[3] text-amber-400" />
+                            {isEn ? 'ACTIVE' : 'ACTIVO'}
+                          </span>
+                        )}
                       </div>
                       <span className="text-xs font-serif text-slate-400">{dur.desc}</span>
                     </div>
 
-                    <span className="text-xs font-mono font-bold text-slate-300 bg-black/60 px-2.5 py-1.5 rounded border border-amber-500/20">
+                    <span className={`text-xs font-mono font-bold px-2.5 py-1.5 rounded-lg border ${
+                      isSelected
+                        ? 'text-amber-300 bg-amber-500/20 border-amber-400'
+                        : 'text-slate-300 bg-black/60 border-amber-500/20'
+                    }`}>
                       {dur.timeEst}
                     </span>
                   </button>
