@@ -80,7 +80,7 @@ export function RoundSummaryModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fadeIn">
-      <div className="bg-[#07090e] border border-amber-500/30 w-full max-w-3xl rounded-3xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden">
+      <div className="bg-[#07090e] border border-amber-500/30 w-full max-w-4xl lg:max-w-5xl rounded-3xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden">
         {/* Cabecera del resultado */}
         <div className={`px-6 py-5 border-b border-amber-500/20 text-center ${
           roundOutcome === 'teamA'
@@ -185,134 +185,186 @@ export function RoundSummaryModal({
 
         {/* Desglose de los 3 Frentes con sombras reveladas */}
         <div className="p-6 overflow-y-auto space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             {frontResults.map(({ front, teamACards, teamBCards, teamAScore, teamBScore, teamACardSynergies, teamBCardSynergies, winner, reason }) => (
               <div
                 key={front.id}
-                className={`p-3 rounded-xl border flex flex-col justify-between ${
+                className={`p-3.5 rounded-2xl border flex flex-col justify-between transition-all ${
                   flagFallTeam
-                    ? 'bg-slate-950/60 border-slate-700/80'
+                    ? 'bg-slate-950/70 border-slate-700/80 shadow-lg'
                     : winner === 'teamA'
-                    ? 'bg-emerald-950/30 border-emerald-500/40'
+                    ? 'bg-[#061217]/90 border-emerald-500/40 shadow-lg shadow-emerald-950/20'
                     : winner === 'teamB'
-                    ? 'bg-rose-950/30 border-rose-500/40'
-                    : 'bg-slate-950/40 border-slate-800'
+                    ? 'bg-[#17060c]/90 border-rose-500/40 shadow-lg shadow-rose-950/20'
+                    : 'bg-[#090c13]/80 border-slate-800 shadow-lg'
                 }`}
               >
                 <div>
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
-                    <span className="font-bold text-xs text-slate-200">{front.name}</span>
-                    <span className={`text-[10px] font-black px-1.5 py-0.5 rounded uppercase ${
-                      flagFallTeam
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                        : winner === 'teamA' ? 'bg-emerald-500/20 text-emerald-400' :
-                        winner === 'teamB' ? 'bg-rose-500/20 text-rose-400' : 'bg-slate-800 text-slate-400'
-                    }`}>
-                      {flagFallTeam
-                        ? (isEn ? 'Saved Points' : 'Puntos Salvados')
-                        : winner === 'teamA' ? (is1v1 ? (isEn ? 'Won' : 'Ganado') : (isEn ? 'Team A' : 'Equipo A')) : winner === 'teamB' ? (is1v1 ? (isEn ? 'Lost' : 'Perdido') : (isEn ? 'Team B' : 'Equipo B')) : (isEn ? 'Tie' : 'Nulo')}
-                    </span>
+                  {/* Información General del Frente (Fuera de los recuadros de equipo) */}
+                  <div className="pb-2.5 mb-2.5 border-b border-slate-800/80">
+                    <div className="flex items-center justify-between pb-1.5">
+                      <span className="font-bold text-xs sm:text-sm text-slate-100">{front.name}</span>
+                      <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider ${
+                        flagFallTeam
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                          : winner === 'teamA' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                          winner === 'teamB' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700'
+                      }`}>
+                        {flagFallTeam
+                          ? (isEn ? 'Saved Points' : 'Puntos Salvados')
+                          : winner === 'teamA' ? (is1v1 ? (isEn ? 'Won' : 'Ganado') : (isEn ? 'Team A' : 'Equipo A')) : winner === 'teamB' ? (is1v1 ? (isEn ? 'Lost' : 'Perdido') : (isEn ? 'Team B' : 'Equipo B')) : (isEn ? 'Tie' : 'Nulo')}
+                      </span>
+                    </div>
+
+                    {/* Comparación General del Frente */}
+                    <div className="text-center py-1.5 px-2 bg-black/40 rounded-xl border border-slate-800/60">
+                      <div className="text-xl font-black font-mono flex items-center justify-center gap-2">
+                        <span className="text-emerald-400">{teamAScore.total}</span>
+                        <span className="text-slate-600 text-xs uppercase font-serif">vs</span>
+                        <span className="text-rose-400">{teamBScore.total}</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {flagFallTeam ? (isEn ? 'Points from cards played before flag fall' : 'Puntos de cartas jugadas hasta la caída de bandera') : reason}
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Comparación numérica */}
-                  <div className="my-3 text-center">
-                    <div className="text-xl font-black font-mono">
-                      <span className="text-emerald-400">{teamAScore.total}</span>
-                      <span className="text-slate-600 text-sm mx-2">vs</span>
-                      <span className="text-rose-400">{teamBScore.total}</span>
-                    </div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">
-                      {flagFallTeam ? (isEn ? 'Points from cards played before flag fall' : 'Puntos de cartas jugadas hasta la caída de bandera') : reason}
-                    </div>
-                  </div>
-
-                  {/* Cartas del Equipo Rival B */}
-                  <div className="mb-2.5">
-                    <span className="text-[10px] text-rose-400/80 font-semibold block mb-1">
-                      {is1v1 ? (isEn ? 'Rival' : 'Rival') : (isEn ? 'Team B' : 'Equipo B')} ({teamBCards.length} {teamBCards.length === 1 ? ui.common.card : ui.common.cards})
-                    </span>
-                    <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 py-1">
-                      {teamBCards.map((c, i) => (
-                        <div key={i} className="flex flex-col items-center">
-                          <Card card={c} isShadow={c.isShadow} isRevealed={true} compact synergy={teamBCardSynergies?.[c.id]} />
-                          {c.playedBy && (
-                            <span className="mt-1 bg-slate-950/90 text-rose-300 text-[8px] font-bold px-1.5 py-0.2 rounded shadow border border-rose-900/50 whitespace-nowrap max-w-[56px] truncate text-center">
-                              {c.playedBy}
+                  {/* Dos Recuadros de Equipos Separados */}
+                  <div className="space-y-2.5">
+                    {/* Recuadro 1: Equipo Rival B */}
+                    <div className="bg-rose-950/20 border border-rose-900/40 rounded-xl p-2.5 flex flex-col justify-between">
+                      <div>
+                        {/* Cabecera del Equipo B con Puntuación Propia */}
+                        <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-rose-900/30">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-rose-300 font-bold">
+                              {is1v1 ? (isEn ? 'Rival' : 'Rival') : (isEn ? 'Team B' : 'Equipo B')}
                             </span>
+                            <span className="text-[10px] text-rose-400/70 font-mono">
+                              ({teamBCards.length} {teamBCards.length === 1 ? ui.common.card : ui.common.cards})
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 bg-rose-950/70 border border-rose-800/60 px-2 py-0.5 rounded-lg shadow-inner">
+                            <span className="text-[9px] uppercase font-bold text-rose-400/80 font-serif">Pts:</span>
+                            <span className="text-xs font-black font-mono text-rose-300">{teamBScore.total}</span>
+                          </div>
+                        </div>
+
+                        {/* Cartas del Equipo Rival B */}
+                        <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 py-1 min-h-[68px] items-center">
+                          {teamBCards.length === 0 ? (
+                            <span className="text-[11px] text-slate-600 italic m-auto">
+                              {isEn ? 'No enemy troops' : 'Sin tropas rivales'}
+                            </span>
+                          ) : (
+                            teamBCards.map((c, i) => (
+                              <div key={i} className="flex flex-col items-center">
+                                <Card card={c} isShadow={c.isShadow} isRevealed={true} compact synergy={teamBCardSynergies?.[c.id]} />
+                                {c.playedBy && (
+                                  <span className="mt-1 bg-slate-950/90 text-rose-300 text-[8px] font-bold px-1.5 py-0.2 rounded shadow border border-rose-900/50 whitespace-nowrap max-w-[56px] truncate text-center">
+                                    {c.playedBy}
+                                  </span>
+                                )}
+                              </div>
+                            ))
                           )}
                         </div>
-                      ))}
-                    </div>
-                    {/* Desglose de puntuación Rival B */}
-                    <div className="flex flex-wrap gap-1 mt-1.5 text-[9px] font-mono">
-                      <span className="bg-slate-900 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800">
-                        Base: {teamBScore.baseTotal}
-                      </span>
-                      {teamBScore.suitSynergyTotal > 0 && (
-                        <span className="bg-indigo-950/80 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)"}>
-                          {isEn ? 'Suit' : 'Palo'} +{teamBScore.suitSynergyTotal}
-                        </span>
-                      )}
-                      {teamBScore.pairTotal > 0 && (
-                        <span className="bg-amber-950/80 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isEn ? "Pair (+10)" : "Pareja (+10)"}>
-                          {isEn ? 'Pair' : 'Pareja'} +{teamBScore.pairTotal}
-                        </span>
-                      )}
-                      {teamBScore.straightTotal > 0 && (
-                        <span className="bg-emerald-950/80 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isEn ? "Short Straight (+15)" : "Escalera Corta (+15)"}>
-                          {isEn ? 'Straight' : 'Escalera'} +{teamBScore.straightTotal}
-                        </span>
-                      )}
-                      {teamBScore.trioTotal > 0 && (
-                        <span className="bg-rose-950/80 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isEn ? "Trio (+20)" : "Trío (+20)"}>
-                          {isEn ? 'Trio' : 'Trío'} +{teamBScore.trioTotal}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                      </div>
 
-                  {/* Cartas del Equipo Aliado A */}
-                  <div>
-                    <span className="text-[10px] text-emerald-400/80 font-semibold block mb-1">
-                      {is1v1 ? (isEn ? 'Your Forces' : 'Tus Fuerzas') : (isEn ? 'Team A (Allies)' : 'Equipo A (Aliados)')} ({teamACards.length} {teamACards.length === 1 ? ui.common.card : ui.common.cards})
-                    </span>
-                    <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 py-1">
-                      {teamACards.map((c, i) => (
-                        <div key={i} className="flex flex-col items-center">
-                          <Card card={c} isShadow={c.isShadow} isRevealed={true} compact synergy={teamACardSynergies?.[c.id]} />
-                          {c.playedBy && (
-                            <span className="mt-1 bg-slate-950/90 text-emerald-300 text-[8px] font-bold px-1.5 py-0.2 rounded shadow border border-emerald-900/50 whitespace-nowrap max-w-[56px] truncate text-center">
-                              {c.playedBy}
+                      {/* Desglose de puntuación Rival B */}
+                      <div className="flex flex-wrap gap-1 mt-2 pt-1.5 border-t border-rose-900/20 text-[9px] font-mono">
+                        <span className="bg-slate-900/90 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800">
+                          Base: {teamBScore.baseTotal}
+                        </span>
+                        {teamBScore.suitSynergyTotal > 0 && (
+                          <span className="bg-indigo-950/80 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)"}>
+                            {isEn ? 'Suit' : 'Palo'} +{teamBScore.suitSynergyTotal}
+                          </span>
+                        )}
+                        {teamBScore.pairTotal > 0 && (
+                          <span className="bg-amber-950/80 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isEn ? "Pair (+10)" : "Pareja (+10)"}>
+                            {isEn ? 'Pair' : 'Pareja'} +{teamBScore.pairTotal}
+                          </span>
+                        )}
+                        {teamBScore.straightTotal > 0 && (
+                          <span className="bg-emerald-950/80 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isEn ? "Short Straight (+15)" : "Escalera Corta (+15)"}>
+                            {isEn ? 'Straight' : 'Escalera'} +{teamBScore.straightTotal}
+                          </span>
+                        )}
+                        {teamBScore.trioTotal > 0 && (
+                          <span className="bg-rose-950/80 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isEn ? "Trio (+20)" : "Trío (+20)"}>
+                            {isEn ? 'Trio' : 'Trío'} +{teamBScore.trioTotal}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Recuadro 2: Equipo Aliado A */}
+                    <div className="bg-emerald-950/20 border border-emerald-900/40 rounded-xl p-2.5 flex flex-col justify-between">
+                      <div>
+                        {/* Cabecera del Equipo A con Puntuación Propia */}
+                        <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-emerald-900/30">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xs text-emerald-300 font-bold">
+                              {is1v1 ? (isEn ? 'Your Forces' : 'Tus Fuerzas') : (isEn ? 'Team A (Allies)' : 'Equipo A (Aliados)')}
                             </span>
+                            <span className="text-[10px] text-emerald-400/70 font-mono">
+                              ({teamACards.length} {teamACards.length === 1 ? ui.common.card : ui.common.cards})
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 bg-emerald-950/70 border border-emerald-800/60 px-2 py-0.5 rounded-lg shadow-inner">
+                            <span className="text-[9px] uppercase font-bold text-emerald-400/80 font-serif">Pts:</span>
+                            <span className="text-xs font-black font-mono text-emerald-300">{teamAScore.total}</span>
+                          </div>
+                        </div>
+
+                        {/* Cartas del Equipo Aliado A */}
+                        <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 py-1 min-h-[68px] items-center">
+                          {teamACards.length === 0 ? (
+                            <span className="text-[11px] text-slate-600 italic m-auto">
+                              {isEn ? 'No allied troops' : 'Sin tropas aliadas'}
+                            </span>
+                          ) : (
+                            teamACards.map((c, i) => (
+                              <div key={i} className="flex flex-col items-center">
+                                <Card card={c} isShadow={c.isShadow} isRevealed={true} compact synergy={teamACardSynergies?.[c.id]} />
+                                {c.playedBy && (
+                                  <span className="mt-1 bg-slate-950/90 text-emerald-300 text-[8px] font-bold px-1.5 py-0.2 rounded shadow border border-emerald-900/50 whitespace-nowrap max-w-[56px] truncate text-center">
+                                    {c.playedBy}
+                                  </span>
+                                )}
+                              </div>
+                            ))
                           )}
                         </div>
-                      ))}
-                    </div>
-                    {/* Desglose de puntuación Aliado A */}
-                    <div className="flex flex-wrap gap-1 mt-1.5 text-[9px] font-mono">
-                      <span className="bg-slate-900 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800">
-                        Base: {teamAScore.baseTotal}
-                      </span>
-                      {teamAScore.suitSynergyTotal > 0 && (
-                        <span className="bg-indigo-950/80 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)"}>
-                          {isEn ? 'Suit' : 'Palo'} +{teamAScore.suitSynergyTotal}
+                      </div>
+
+                      {/* Desglose de puntuación Aliado A */}
+                      <div className="flex flex-wrap gap-1 mt-2 pt-1.5 border-t border-emerald-900/20 text-[9px] font-mono">
+                        <span className="bg-slate-900/90 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800">
+                          Base: {teamAScore.baseTotal}
                         </span>
-                      )}
-                      {teamAScore.pairTotal > 0 && (
-                        <span className="bg-amber-950/80 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isEn ? "Pair (+10)" : "Pareja (+10)"}>
-                          {isEn ? 'Pair' : 'Pareja'} +{teamAScore.pairTotal}
-                        </span>
-                      )}
-                      {teamAScore.straightTotal > 0 && (
-                        <span className="bg-emerald-950/80 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isEn ? "Short Straight (+15)" : "Escalera Corta (+15)"}>
-                          {isEn ? 'Straight' : 'Escalera'} +{teamAScore.straightTotal}
-                        </span>
-                      )}
-                      {teamAScore.trioTotal > 0 && (
-                        <span className="bg-rose-950/80 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isEn ? "Trio (+20)" : "Trío (+20)"}>
-                          {isEn ? 'Trio' : 'Trío'} +{teamAScore.trioTotal}
-                        </span>
-                      )}
+                        {teamAScore.suitSynergyTotal > 0 && (
+                          <span className="bg-indigo-950/80 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)"}>
+                            {isEn ? 'Suit' : 'Palo'} +{teamAScore.suitSynergyTotal}
+                          </span>
+                        )}
+                        {teamAScore.pairTotal > 0 && (
+                          <span className="bg-amber-950/80 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isEn ? "Pair (+10)" : "Pareja (+10)"}>
+                            {isEn ? 'Pair' : 'Pareja'} +{teamAScore.pairTotal}
+                          </span>
+                        )}
+                        {teamAScore.straightTotal > 0 && (
+                          <span className="bg-emerald-950/80 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isEn ? "Short Straight (+15)" : "Escalera Corta (+15)"}>
+                            {isEn ? 'Straight' : 'Escalera'} +{teamAScore.straightTotal}
+                          </span>
+                        )}
+                        {teamAScore.trioTotal > 0 && (
+                          <span className="bg-rose-950/80 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isEn ? "Trio (+20)" : "Trío (+20)"}>
+                            {isEn ? 'Trio' : 'Trío'} +{teamAScore.trioTotal}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
