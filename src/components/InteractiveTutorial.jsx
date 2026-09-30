@@ -4,7 +4,7 @@ import {
   TUTORIAL_INITIAL_HANDS,
   getTutorialSteps,
 } from '../constants/tutorialData';
-import { getLocalizedSuits, getLocalizedFronts, calculateFrontScore } from '../constants/rules';
+import { getLocalizedSuits, getLocalizedFronts, calculateFrontScore, sortFrontCards } from '../constants/rules';
 import { useLanguage } from '../context/LanguageContext';
 import { LanguageToggle } from './LanguageToggle';
 import { Card } from './Card';
@@ -551,8 +551,8 @@ export function InteractiveTutorial({ onBackToMenu }) {
       <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 flex flex-col justify-between gap-3">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 my-auto">
           {localizedFronts.map(front => {
-            const teamACards = fronts[front.id].teamA;
-            const teamBCards = fronts[front.id].teamB;
+            const teamACards = sortFrontCards(fronts[front.id].teamA, isResolutionPhase);
+            const teamBCards = sortFrontCards(fronts[front.id].teamB, isResolutionPhase);
             const totalCards = teamACards.length + teamBCards.length;
             const isTarget = currentStep.type === 'player_turn' && currentStep.requiredFrontKey === front.id;
             const isLocked = currentStep.type === 'player_turn' && currentStep.requiredFrontKey !== front.id;

@@ -421,6 +421,235 @@ export function calculateFrontScore(cards = [], countShadowsOrTrump = true, coun
 }
 
 /**
+ * Orden de palos para el criterio secundario de desempate en la ordenación:
+ * Corazones (♥) -> Diamantes (♦) -> Tréboles (♣) -> Picas (♠)
+ * (Rojos primero, seguidos de negros, cumpliendo el ejemplo del reglamento).
+ */
+export const SUIT_SORT_ORDER = {
+  hearts: 0,
+  diamonds: 1,
+  clubs: 2,
+  spades: 3,
+};
+
+/**
+ * Compara dos cartas con prioridad:
+ * 1º Valor numérico base ascendente (2, 3, ..., 14/As)
+ * 2º Palo / Color
+ */
+export function compareCardsByValueAndSuit(a, b) {
+  if (!a || !b) return 0;
+  if (a.base !== b.base) {
+    return a.base - b.base;
+  }
+  const suitA = SUIT_SORT_ORDER[a.suit] ?? 99;
+  const suitB = SUIT_SORT_ORDER[b.suit] ?? 99;
+  return suitA - suitB;
+}
+
+/**
+ * Ordena las cartas de un frente según número y después palo.
+ *
+ * REGLA OFICIAL DE CARTAS SOMBRA:
+ * Para no revelar ninguna pista sobre su valor numérico a los rivales durante la ronda,
+ * las cartas de sombra no reveladas (o cartas ocultas con '?') permanecen fijas en el
+ * índice exacto donde fueron colocadas cronológicamente. Las cartas visibles se ordenan
+ * ocupando los huecos restantes.
+ *
+ * Cuando la ronda termina (isRevealed = true), todas las tropas se revelan y se ordenan
+ * conjuntamente para permitir una visualización instantánea y limpia del frente completo.
+ *
+ * @param {Array} cards - Lista de cartas en el frente
+ * @param {boolean} isRevealed - Si la ronda ha finalizado y las sombras están reveladas
+ */
+export function sortFrontCards(cards = [], isRevealed = false) {
+  if (!cards || cards.length <= 1) return cards ? [...cards] : [];
+
+  // Localizar índices fijos (sombras no reveladas o cartas ocultas)
+  const fixedIndices = new Set();
+  cards.forEach((card, idx) => {
+    const isUnrevealedShadow = (card.isShadow && !isRevealed) || card.isHidden || card.rank === '?';
+    if (isUnrevealedShadow) {
+      fixedIndices.add(idx);
+    }
+  });
+
+  // Si no hay cartas fijas, ordenar la lista completa directamente
+  if (fixedIndices.size === 0) {
+    return [...cards].sort(compareCardsByValueAndSuit);
+  }
+
+  // Filtrar y ordenar las cartas visibles
+  const nonFixedCards = cards.filter((_, idx) => !fixedIndices.has(idx));
+  nonFixedCards.sort(compareCardsByValueAndSuit);
+
+  // Reconstruir el array respetando las posiciones originales de las cartas sombras
+  let nonFixedIdx = 0;
+  return cards.map((card, idx) => {
+    if (fixedIndices.has(idx)) {
+      return card;
+    }
+    return nonFixedCards[nonFixedIdx++];
+  });
+}
+
+/**
+ * Analiza en detalle las sinergias y formaciones de las cartas de un bando en un frente.
+ * Identifica qué cartas participan en parejas, tríos, escaleras o sinergias de palo,
+ * calcula si una carta participa en múltiples combos (Multi-Combo) y lista las cartas compañeras
+ * para permitir la iluminación interactiva al pasar el cursor (hover).
+ *
+ * Para proteger la información imperfecta del juego, las cartas sombra no reveladas
+ * NO exponen sus sinergias hasta que concluya la ronda (isRevealed = true).
+ *
+ * @param {Array} cards - Lista de cartas del bando
+ * @param {boolean} isRevealed - Si se deben contabilizar cartas sombra reveladas
+ * @param {string} lang - Idioma para etiquetas y tooltips ('es' | 'en')
+ */
+export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es') {
+  const isEn = lang === 'en';
+  const activeCards = cards.filter(c => isRevealed || !c.isShadow);
+  const frontScore = calculateFrontScore(cards, isRevealed);
+
+  const cardSynergies = {};
+  const partnerSets = {};
+
+  cards.forEach(c => {
+    cardSynergies[c.id] = {
+      cardId: c.id,
+      inPair: false,
+      pairRank: null,
+      inTrio: false,
+      trioRank: null,
+      inStraight: false,
+      straightLabels: [],
+      inSuitSynergy: false,
+      suitCount: 0,
+      suitBonus: 0,
+      synergyCount: 0,
+      isMultiCombo: false,
+      primarySynergy: null,
+      partnerCardIds: [],
+      synergyDescriptions: [],
+    };
+    partnerSets[c.id] = new Set();
+  });
+
+  // 1. Sinergias de Palo (+5 pts por carta adicional cuando hay >= 2)
+  Object.entries(frontScore.synergiesBySuit || {}).forEach(([suit, data]) => {
+    if (data.count >= 2) {
+      const suitCards = activeCards.filter(c => c.suit === suit);
+      const suitCardIds = suitCards.map(c => c.id);
+      const suitName = SUITS[suit]?.name || suit;
+      suitCards.forEach(c => {
+        const item = cardSynergies[c.id];
+        if (item) {
+          item.inSuitSynergy = true;
+          item.suitCount = data.count;
+          item.suitBonus = data.bonus;
+          item.synergyDescriptions.push(
+            `${suitName} x${data.count}`
+          );
+          suitCardIds.forEach(id => {
+            if (id !== c.id) partnerSets[c.id].add(id);
+          });
+        }
+      });
+    }
+  });
+
+  // 2. Tríos
+  (frontScore.trios || []).forEach(trio => {
+    const trioCards = activeCards.filter(c => c.base === trio.base);
+    const trioCardIds = trioCards.map(c => c.id);
+    trioCards.forEach(c => {
+      const item = cardSynergies[c.id];
+      if (item) {
+        item.inTrio = true;
+        item.trioRank = trio.rank;
+        item.synergyDescriptions.push(
+          isEn ? `Trio of ${trio.rank}s` : `Trío de ${trio.rank}s`
+        );
+        trioCardIds.forEach(id => {
+          if (id !== c.id) partnerSets[c.id].add(id);
+        });
+      }
+    });
+  });
+
+  // 3. Parejas (excluyendo cartas ya asignadas a un trío)
+  (frontScore.pairs || []).forEach(pair => {
+    const pairCards = activeCards.filter(c => c.base === pair.base && !cardSynergies[c.id]?.inTrio);
+    const pairCardIds = pairCards.map(c => c.id);
+    pairCards.forEach(c => {
+      const item = cardSynergies[c.id];
+      if (item) {
+        item.inPair = true;
+        item.pairRank = pair.rank;
+        item.synergyDescriptions.push(
+          isEn ? `Pair of ${pair.rank}s` : `Pareja de ${pair.rank}s`
+        );
+        pairCardIds.forEach(id => {
+          if (id !== c.id) partnerSets[c.id].add(id);
+        });
+      }
+    });
+  });
+
+  // 4. Escaleras Cortas (3 cartas consecutivas)
+  (frontScore.straights || []).forEach(straight => {
+    const straightCards = activeCards.filter(c => straight.values.includes(c.base));
+    const straightCardIds = straightCards.map(c => c.id);
+    straightCards.forEach(c => {
+      const item = cardSynergies[c.id];
+      if (item) {
+        item.inStraight = true;
+        if (!item.straightLabels.includes(straight.label)) {
+          item.straightLabels.push(straight.label);
+        }
+        item.synergyDescriptions.push(
+          isEn ? `Straight ${straight.label}` : `Escalera ${straight.label}`
+        );
+        straightCardIds.forEach(id => {
+          if (id !== c.id) partnerSets[c.id].add(id);
+        });
+      }
+    });
+  });
+
+  // 5. Determinar Multi-Combos y Sinergia Primaria
+  cards.forEach(c => {
+    const item = cardSynergies[c.id];
+    if (!item) return;
+
+    let distinctTypes = 0;
+    if (item.inTrio || item.inPair) distinctTypes++;
+    if (item.inStraight) distinctTypes++;
+    if (item.inSuitSynergy) distinctTypes++;
+
+    item.synergyCount = distinctTypes;
+    item.isMultiCombo = distinctTypes >= 2;
+
+    if (item.inTrio) {
+      item.primarySynergy = 'trio';
+    } else if (item.inStraight) {
+      item.primarySynergy = 'straight';
+    } else if (item.inPair) {
+      item.primarySynergy = 'pair';
+    } else if (item.inSuitSynergy) {
+      item.primarySynergy = 'suit';
+    }
+
+    item.partnerCardIds = Array.from(partnerSets[c.id] || []);
+  });
+
+  return {
+    frontScore,
+    cardSynergies,
+  };
+}
+
+/**
  * Resuelve el ganador de un frente entre Equipo A y Equipo B
  */
 export function resolveFrontWinner(teamACards, teamBCards, trumpSuitOrLang = 'es', langParam = 'es') {

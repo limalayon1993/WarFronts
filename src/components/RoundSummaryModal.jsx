@@ -1,5 +1,12 @@
 import React from 'react';
-import { FRONTS, resolveFrontWinner, calculateFrontScore, getLocalizedFronts } from '../constants/rules';
+import {
+  FRONTS,
+  resolveFrontWinner,
+  calculateFrontScore,
+  getLocalizedFronts,
+  sortFrontCards,
+  analyzeCardSynergies,
+} from '../constants/rules';
 import { Card } from './Card';
 import { ArrowRight, Award, Clock, CheckCircle2, Users, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -33,17 +40,21 @@ export function RoundSummaryModal({
   const frontResults = FRONTS.map((front, idx) => {
     const teamACards = fronts[front.id].teamA;
     const teamBCards = fronts[front.id].teamB;
-    const teamAScore = calculateFrontScore(teamACards, true);
-    const teamBScore = calculateFrontScore(teamBCards, true);
+    const sortedTeamACards = sortFrontCards(teamACards, true);
+    const sortedTeamBCards = sortFrontCards(teamBCards, true);
+    const { frontScore: teamAScore, cardSynergies: teamACardSynergies } = analyzeCardSynergies(teamACards, true, language);
+    const { frontScore: teamBScore, cardSynergies: teamBCardSynergies } = analyzeCardSynergies(teamBCards, true, language);
     const resolution = resolveFrontWinner(teamACards, teamBCards, language);
     const localizedFront = localizedFronts[idx] || front;
 
     return {
       front: localizedFront,
-      teamACards,
-      teamBCards,
+      teamACards: sortedTeamACards,
+      teamBCards: sortedTeamBCards,
       teamAScore,
       teamBScore,
+      teamACardSynergies,
+      teamBCardSynergies,
       winner: resolution.winner,
       reason: resolution.reason,
     };
@@ -175,7 +186,7 @@ export function RoundSummaryModal({
         {/* Desglose de los 3 Frentes con sombras reveladas */}
         <div className="p-6 overflow-y-auto space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {frontResults.map(({ front, teamACards, teamBCards, teamAScore, teamBScore, winner, reason }) => (
+            {frontResults.map(({ front, teamACards, teamBCards, teamAScore, teamBScore, teamACardSynergies, teamBCardSynergies, winner, reason }) => (
               <div
                 key={front.id}
                 className={`p-3 rounded-xl border flex flex-col justify-between ${
@@ -223,7 +234,7 @@ export function RoundSummaryModal({
                     <div className="flex flex-wrap gap-1">
                       {teamBCards.map((c, i) => (
                         <div key={i} className="relative">
-                          <Card card={c} isShadow={c.isShadow} isRevealed={true} compact />
+                          <Card card={c} isShadow={c.isShadow} isRevealed={true} compact synergy={teamBCardSynergies?.[c.id]} />
                           {c.playedBy && (
                             <span className="absolute -bottom-1 -right-1 z-30 bg-slate-950 text-rose-300 text-[8px] font-bold px-1 py-0.2 rounded shadow-md border border-rose-900/50">
                               {c.playedBy}
@@ -268,7 +279,7 @@ export function RoundSummaryModal({
                     <div className="flex flex-wrap gap-1">
                       {teamACards.map((c, i) => (
                         <div key={i} className="relative">
-                          <Card card={c} isShadow={c.isShadow} isRevealed={true} compact />
+                          <Card card={c} isShadow={c.isShadow} isRevealed={true} compact synergy={teamACardSynergies?.[c.id]} />
                           {c.playedBy && (
                             <span className="absolute -bottom-1 -right-1 z-30 bg-slate-950 text-emerald-300 text-[8px] font-bold px-1 py-0.2 rounded shadow-md border border-emerald-900/50">
                               {c.playedBy}

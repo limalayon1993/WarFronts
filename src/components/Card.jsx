@@ -11,13 +11,26 @@ export function Card({
   isTrump = false,
   isPlayable = false,
   compact = false,
+  synergy = null,
+  isHighlighted = false,
+  isDimmed = false,
   onClick,
   onDragStart,
   onDragEnd,
+  onMouseEnter,
+  onMouseLeave,
 }) {
-  const { ui } = useLanguage();
+  const { isEn, ui } = useLanguage();
   const suitInfo = card ? SUITS[card.suit] : null;
   const isRed = card?.suit === 'hearts' || card?.suit === 'diamonds';
+
+  // Tooltip explicativo con desglose táctico de sinergias activas
+  const synergyTooltip = React.useMemo(() => {
+    if (!card || !synergy || !synergy.synergyDescriptions || synergy.synergyDescriptions.length === 0) return null;
+    if (isShadow && !isRevealed) return null;
+    const suitName = suitInfo?.name || card.suit;
+    return `${card.rank}${suitInfo?.symbol || ''} (${suitName})\n• ${synergy.synergyDescriptions.join('\n• ')}`;
+  }, [card, synergy, suitInfo, isShadow, isRevealed]);
 
   // Si es una carta de sombra no revelada:
   if (isShadow && !isRevealed) {
@@ -121,12 +134,35 @@ export function Card({
     );
   }
 
+  // Determinar el estilo de borde de sinergia
+  let synergyBorderClass = '';
+  if (isHighlighted) {
+    synergyBorderClass = '!ring-2 !ring-amber-300 shadow-[0_0_16px_rgba(251,191,36,0.7)] -translate-y-1.5 z-30 scale-[1.03]';
+  } else if (isDimmed) {
+    synergyBorderClass = 'opacity-35 grayscale-[25%] transition-all duration-200';
+  } else if (synergy && (!isShadow || isRevealed)) {
+    if (synergy.isMultiCombo) {
+      synergyBorderClass = 'ring-1 ring-amber-400/80 shadow-[0_0_8px_rgba(245,158,11,0.35)]';
+    } else if (synergy.inTrio) {
+      synergyBorderClass = 'ring-1 ring-purple-400/80 shadow-[0_0_6px_rgba(168,85,247,0.3)]';
+    } else if (synergy.inStraight) {
+      synergyBorderClass = 'ring-1 ring-cyan-400/80 shadow-[0_0_6px_rgba(34,211,238,0.3)]';
+    } else if (synergy.inPair) {
+      synergyBorderClass = 'ring-1 ring-amber-400/60';
+    } else if (synergy.inSuitSynergy) {
+      synergyBorderClass = isRed ? 'border-rose-400/50' : 'border-slate-300/40';
+    }
+  }
+
   return (
     <div
       draggable={isPlayable}
       onDragStart={isPlayable ? onDragStart : undefined}
       onDragEnd={isPlayable ? onDragEnd : undefined}
       onClick={isPlayable ? onClick : undefined}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      title={synergyTooltip || undefined}
       className={`
         relative rounded-lg transition-all duration-150 select-none
         ${isTrump ? 'casino-card-face-trump border border-amber-400/60' : 'casino-card-face border border-stone-300'}
@@ -134,12 +170,40 @@ export function Card({
         ${isSelected ? 'ring-2 ring-amber-400 scale-105 shadow-[0_10px_25px_rgba(212,175,55,0.3)] -translate-y-2' : ''}
         ${isPlayable ? 'cursor-grab active:cursor-grabbing hover:-translate-y-1.5 hover:shadow-lg' : ''}
         ${isRevealed && isShadow ? 'ring-2 ring-purple-500' : ''}
+        ${synergyBorderClass}
       `}
     >
-      {/* Insignia de Palo Triunfo */}
+      {/* Insignia de Palo Triunfo (Legacy) */}
       {isTrump && (
         <div className="absolute -top-2 -right-1.5 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-stone-950 text-[8px] font-serif font-black px-1.5 py-0.5 rounded shadow-md z-20 pointer-events-none tracking-tight">
           +2
+        </div>
+      )}
+
+      {/* Insignia de Sinergia / Formación Táctica */}
+      {!isTrump && synergy && synergy.primarySynergy && (!isShadow || isRevealed) && (
+        <div className="absolute -top-2 -right-1 z-20 pointer-events-none">
+          {synergy.isMultiCombo ? (
+            <span className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-stone-950 font-serif font-black text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded shadow-md ring-1 ring-amber-200 tracking-tight flex items-center gap-0.5 uppercase">
+              ★ {isEn ? 'Combo' : 'Combo'}
+            </span>
+          ) : synergy.inTrio ? (
+            <span className="bg-gradient-to-r from-purple-800 to-purple-600 text-purple-100 border border-purple-400/60 font-serif font-black text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded shadow-md tracking-tight">
+              {isEn ? 'Trio' : 'Trío'}
+            </span>
+          ) : synergy.inStraight ? (
+            <span className="bg-gradient-to-r from-sky-700 to-blue-600 text-cyan-100 border border-cyan-400/60 font-serif font-black text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded shadow-md tracking-tight">
+              {isEn ? 'Str' : 'Esc'}
+            </span>
+          ) : synergy.inPair ? (
+            <span className="bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 font-serif font-black text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded shadow-md tracking-tight">
+              {isEn ? 'Pair' : 'Par'}
+            </span>
+          ) : (
+            <span className="bg-stone-900/90 border border-amber-500/40 text-amber-300 font-serif font-bold text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded shadow-md tracking-tight flex items-center gap-0.5">
+              <span>{suitInfo?.symbol}</span><span>x{synergy.suitCount}</span>
+            </span>
+          )}
         </div>
       )}
 
@@ -178,6 +242,23 @@ export function Card({
             <span className="leading-none mt-0.5 text-xs sm:text-sm md:text-base">
               {suitInfo?.symbol}
             </span>
+          </div>
+        )}
+
+        {/* Micro-puntos de sinergia en la esquina inferior izquierda */}
+        {synergy && synergy.synergyCount > 0 && (!isShadow || isRevealed) && (
+          <div className="absolute bottom-1 left-1.5 z-20 flex items-center gap-0.5 pointer-events-none">
+            {(synergy.inPair || synergy.inTrio) && (
+              <span
+                className={`w-1.5 h-1.5 rounded-full ${synergy.inTrio ? 'bg-purple-500 shadow-[0_0_4px_#c084fc]' : 'bg-amber-400 shadow-[0_0_4px_#fbbf24]'}`}
+              />
+            )}
+            {synergy.inStraight && (
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_4px_#22d3ee]" />
+            )}
+            {synergy.inSuitSynergy && (
+              <span className={`w-1.5 h-1.5 rounded-full ${isRed ? 'bg-rose-500 shadow-[0_0_4px_#f43f5e]' : 'bg-slate-400 shadow-[0_0_4px_#cbd5e1]'}`} />
+            )}
           </div>
         )}
       </div>
