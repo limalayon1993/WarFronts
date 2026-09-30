@@ -191,11 +191,11 @@ export function RoundSummaryModal({
                 key={front.id}
                 className={`p-3.5 rounded-2xl border flex flex-col justify-between transition-all bg-[#080b12] shadow-xl ${
                   flagFallTeam
-                    ? 'border-amber-500/40 ring-1 ring-amber-500/20'
+                    ? 'border-amber-500/60 shadow-[0_0_20px_rgba(245,158,11,0.2)] ring-1 ring-amber-500/30'
                     : winner === 'teamA'
-                    ? 'border-sky-500/40 shadow-sky-950/20 ring-1 ring-sky-500/20'
+                    ? 'border-emerald-500/70 shadow-[0_0_25px_rgba(16,185,129,0.18)] ring-1 ring-emerald-500/30'
                     : winner === 'teamB'
-                    ? 'border-amber-500/40 shadow-amber-950/20 ring-1 ring-amber-500/20'
+                    ? 'border-rose-500/70 shadow-[0_0_25px_rgba(244,63,94,0.18)] ring-1 ring-rose-500/30'
                     : 'border-slate-800'
                 }`}
               >
@@ -206,13 +206,16 @@ export function RoundSummaryModal({
                       <span className="font-bold text-xs sm:text-sm text-slate-100">{front.name}</span>
                       <span className={`text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider ${
                         flagFallTeam
-                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                          : winner === 'teamA' ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40' :
-                          winner === 'teamB' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-400 border border-slate-700'
+                          ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                          : winner === 'teamA'
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50'
+                          : winner === 'teamB'
+                          ? 'bg-rose-500/20 text-rose-300 border border-rose-500/50'
+                          : 'bg-slate-800 text-slate-400 border border-slate-700'
                       }`}>
                         {flagFallTeam
                           ? (isEn ? 'Saved Points' : 'Puntos Salvados')
-                          : winner === 'teamA' ? (is1v1 ? (isEn ? 'Victory (You)' : 'Victoria (Tú)') : (isEn ? 'Team A' : 'Equipo A')) : winner === 'teamB' ? (is1v1 ? (isEn ? 'Rival Won' : 'Victoria Rival') : (isEn ? 'Team B' : 'Equipo B')) : (isEn ? 'Tie' : 'Nulo')}
+                          : winner === 'teamA' ? (is1v1 ? (isEn ? 'Won' : 'Ganado') : (isEn ? 'Team A' : 'Equipo A')) : winner === 'teamB' ? (is1v1 ? (isEn ? 'Lost' : 'Perdido') : (isEn ? 'Team B' : 'Equipo B')) : (isEn ? 'Tie' : 'Nulo')}
                       </span>
                     </div>
 
