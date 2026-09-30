@@ -3,9 +3,11 @@ import confetti from 'canvas-confetti';
 import {
   TUTORIAL_TRUMP_CARD,
   TUTORIAL_INITIAL_HANDS,
-  TUTORIAL_STEPS,
+  getTutorialSteps,
 } from '../constants/tutorialData';
-import { SUITS, FRONTS, calculateFrontScore } from '../constants/rules';
+import { getLocalizedSuits, getLocalizedFronts, calculateFrontScore } from '../constants/rules';
+import { useLanguage } from '../context/LanguageContext';
+import { LanguageToggle } from './LanguageToggle';
 import { Card } from './Card';
 import { sound } from '../utils/audio';
 import {
@@ -30,6 +32,11 @@ import {
 } from 'lucide-react';
 
 export function InteractiveTutorial({ onBackToMenu }) {
+  const { language, isEn } = useLanguage();
+  const tutorialSteps = getTutorialSteps(language);
+  const localizedSuits = getLocalizedSuits(language);
+  const localizedFronts = getLocalizedFronts(language);
+
   const [stepIndex, setStepIndex] = useState(0);
   const [fronts, setFronts] = useState({
     left: { teamA: [], teamB: [] },
@@ -45,8 +52,8 @@ export function InteractiveTutorial({ onBackToMenu }) {
   const [isMuted, setIsMuted] = useState(false);
   const [warningMessage, setWarningMessage] = useState(null);
 
-  const currentStep = TUTORIAL_STEPS[stepIndex] || TUTORIAL_STEPS[0];
-  const trumpSuit = SUITS[TUTORIAL_TRUMP_CARD.suit];
+  const currentStep = tutorialSteps[stepIndex] || tutorialSteps[0];
+  const trumpSuit = localizedSuits[TUTORIAL_TRUMP_CARD.suit];
   const processedBotStepsRef = useRef(new Set());
 
   // Lanzar confeti al llegar a la graduación
@@ -95,7 +102,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
             ...prev.left,
             teamA: [
               ...prev.left.teamA,
-              { id: 'card-3d', suit: 'diamonds', rank: '3', base: 3, playedBy: 'Aliado A2', isShadow: false },
+              { id: 'card-3d', suit: 'diamonds', rank: '3', base: 3, playedBy: isEn ? 'Ally A2' : 'Aliado A2', isShadow: false },
             ],
           },
           center: {
@@ -135,7 +142,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
     }, 120);
 
     return () => clearTimeout(timer);
-  }, [currentStep]);
+  }, [currentStep, isEn]);
 
   // Alerta temporal ante un clic no permitido
   function triggerWarning(msg) {
@@ -168,18 +175,23 @@ export function InteractiveTutorial({ onBackToMenu }) {
     if (currentStep.type !== 'player_turn') return;
 
     if (card.id !== currentStep.requiredCardId) {
+      let cardLabel = '';
+      if (currentStep.requiredCardId === 'card-kh') {
+        cardLabel = isEn ? 'King of Hearts' : 'Rey de Corazones';
+      } else if (currentStep.requiredCardId === 'card-10s') {
+        cardLabel = isEn ? 'Ten of Spades' : 'Diez de Picas';
+      } else if (currentStep.requiredCardId === 'card-8h') {
+        cardLabel = isEn ? '8 of Hearts' : '8 de Corazones';
+      } else if (currentStep.requiredCardId === 'card-ad') {
+        cardLabel = isEn ? 'Ace of Diamonds' : 'As de Diamantes';
+      } else {
+        cardLabel = isEn ? '4 of Clubs' : '4 de Tréboles';
+      }
+
       triggerWarning(
-        `El tutorial requiere que juegues la carta marcada en dorado (${
-          currentStep.requiredCardId === 'card-kh'
-            ? 'Rey de Corazones'
-            : currentStep.requiredCardId === 'card-10s'
-            ? 'Diez de Picas'
-            : currentStep.requiredCardId === 'card-8h'
-            ? '8 de Corazones'
-            : currentStep.requiredCardId === 'card-ad'
-            ? 'As de Diamantes'
-            : '4 de Tréboles'
-        }). Consulta el panel táctico.`
+        isEn
+          ? `The tutorial requires you to play the card highlighted in gold (${cardLabel}). Check the tactical panel.`
+          : `El tutorial requiere que juegues la carta marcada en dorado (${cardLabel}). Consulta el panel táctico.`
       );
       return;
     }
@@ -194,18 +206,31 @@ export function InteractiveTutorial({ onBackToMenu }) {
 
     const cardIdToPlay = targetCardId || selectedCardId;
     if (!cardIdToPlay) {
-      triggerWarning('Primero selecciona o arrastra la carta recomendada en tu mano inferior.');
+      triggerWarning(
+        isEn
+          ? 'First select or drag the recommended card from your hand.'
+          : 'Primero selecciona o arrastra la carta recomendada en tu mano inferior.'
+      );
       return;
     }
 
     if (frontKey !== currentStep.requiredFrontKey) {
-      const frontName = FRONTS.find(f => f.id === currentStep.requiredFrontKey)?.name;
-      triggerWarning(`Despliegue guiado: Debes colocar esta carta en el ${frontName}.`);
+      const targetFront = localizedFronts.find(f => f.id === currentStep.requiredFrontKey);
+      const frontName = targetFront?.name || currentStep.requiredFrontKey;
+      triggerWarning(
+        isEn
+          ? `Guided deployment: You must place this card in the ${frontName}.`
+          : `Despliegue guiado: Debes colocar esta carta en el ${frontName}.`
+      );
       return;
     }
 
     if (currentStep.requireShadow && !isShadowActive) {
-      triggerWarning('¡Atención! Este paso requiere activar el "Modo Sombra" antes de desplegar.');
+      triggerWarning(
+        isEn
+          ? 'Attention! This step requires activating "Shadow Mode" before deploying.'
+          : '¡Atención! Este paso requiere activar el "Modo Sombra" antes de desplegar.'
+      );
       return;
     }
 
@@ -232,7 +257,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
             ...cardToDeploy,
             isShadow: useShadow,
             isOwner: true,
-            playedBy: 'Tú (A1)',
+            playedBy: isEn ? 'You (A1)' : 'Tú (A1)',
           },
         ],
       },
@@ -278,10 +303,10 @@ export function InteractiveTutorial({ onBackToMenu }) {
             <button
               onClick={onBackToMenu}
               className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1.5 text-xs font-semibold"
-              title="Salir al Menú Principal"
+              title={isEn ? 'Return to Main Menu' : 'Salir al Menú Principal'}
             >
               <Home className="w-4 h-4 text-amber-400" />
-              <span className="hidden sm:inline">Menú Principal</span>
+              <span className="hidden sm:inline">{isEn ? 'Main Menu' : 'Menú Principal'}</span>
             </button>
 
             <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 shadow-md shadow-amber-500/10">
@@ -290,13 +315,17 @@ export function InteractiveTutorial({ onBackToMenu }) {
 
             <div>
               <h1 className="text-sm sm:text-base font-black tracking-wider text-slate-100 uppercase flex items-center gap-2">
-                <span>Academia Táctica</span>
+                <span>{isEn ? 'Tactical Academy' : 'Academia Táctica'}</span>
                 <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full font-bold">
-                  Tutorial Guiado 2v2
+                  {isEn ? 'Guided 2v2 Tutorial' : 'Tutorial Guiado 2v2'}
                 </span>
               </h1>
               <div className="text-[11px] text-slate-400 font-medium">
-                Paso <strong className="text-amber-400">{stepIndex + 1}</strong> de {TUTORIAL_STEPS.length} • Formato 2 contra 2 por Parejas
+                {isEn ? (
+                  <>Step <strong className="text-amber-400">{stepIndex + 1}</strong> of {tutorialSteps.length} • 2 vs 2 Partner Format</>
+                ) : (
+                  <>Paso <strong className="text-amber-400">{stepIndex + 1}</strong> de {tutorialSteps.length} • Formato 2 contra 2 por Parejas</>
+                )}
               </div>
             </div>
           </div>
@@ -308,7 +337,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
             </div>
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
-                <Flame className="w-3 h-3 text-amber-400" /> Palo Triunfo
+                <Flame className="w-3 h-3 text-amber-400" /> {isEn ? 'Trump Suit' : 'Palo Triunfo'}
               </div>
               <div className="text-xs font-semibold text-slate-200">
                 {trumpSuit.name} <span className="text-amber-400 font-bold">(+2 pts)</span>
@@ -324,10 +353,12 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300 ring-2 ring-emerald-500/40 shadow-emerald-500/20 shadow-sm'
                   : 'bg-slate-900/60 border-slate-800 text-slate-500 opacity-60'
               }`}
-              title="Reloj de tu equipo (Equipo A)"
+              title={isEn ? "Your team's clock (Team A)" : 'Reloj de tu equipo (Equipo A)'}
             >
               <div className="flex flex-col text-left">
-                <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">Equipo A</span>
+                <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">
+                  {isEn ? 'Team A' : 'Equipo A'}
+                </span>
                 <span className="text-xs font-black leading-tight">03:20</span>
               </div>
               {(currentStep.type === 'player_turn' || currentStep.botTeam === 'teamA') && (
@@ -343,10 +374,12 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   ? 'bg-rose-950/90 border-rose-400 text-rose-300 ring-2 ring-rose-500/40 shadow-rose-500/20 shadow-sm'
                   : 'bg-slate-900/60 border-slate-800 text-slate-500 opacity-60'
               }`}
-              title="Reloj del equipo rival (Equipo B)"
+              title={isEn ? "Opponent team's clock (Team B)" : 'Reloj del equipo rival (Equipo B)'}
             >
               <div className="flex flex-col text-left">
-                <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">Equipo B</span>
+                <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">
+                  {isEn ? 'Team B' : 'Equipo B'}
+                </span>
                 <span className="text-xs font-black leading-tight">03:20</span>
               </div>
               {currentStep.botTeam === 'teamB' && (
@@ -355,23 +388,28 @@ export function InteractiveTutorial({ onBackToMenu }) {
             </div>
           </div>
 
-          {/* Estado de Equipos & Sonido */}
+          {/* Estado de Equipos & Sonido & Idioma */}
           <div className="flex items-center gap-2">
             <div className="hidden lg:flex items-center gap-2 text-xs font-mono bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">
-              <span className="text-emerald-400 font-bold">Equipo A (Tú y A2)</span>
+              <span className="text-emerald-400 font-bold">{isEn ? 'Team A (You & A2)' : 'Equipo A (Tú y A2)'}</span>
               <span className="text-slate-600">vs</span>
-              <span className="text-rose-400 font-bold">Equipo B (B1 y B2)</span>
+              <span className="text-rose-400 font-bold">{isEn ? 'Team B (B1 & B2)' : 'Equipo B (B1 y B2)'}</span>
             </div>
 
-            <div className="hidden sm:flex items-center gap-1.5 text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1" title="Tu equipo ganó el sorteo de iniciativa para empezar atacando">
-              <span className="text-slate-400">Iniciativa:</span>
-              <span className="text-emerald-400 font-bold">Tu Equipo (1er Ataque)</span>
+            <div
+              className="hidden sm:flex items-center gap-1.5 text-xs bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1"
+              title={isEn ? 'Your team won the initiative draw to attack first' : 'Tu equipo ganó el sorteo de iniciativa para empezar atacando'}
+            >
+              <span className="text-slate-400">{isEn ? 'Initiative:' : 'Iniciativa:'}</span>
+              <span className="text-emerald-400 font-bold">{isEn ? 'Your Team (1st Attack)' : 'Tu Equipo (1er Ataque)'}</span>
             </div>
+
+            <LanguageToggle compact />
 
             <button
               onClick={() => setIsMuted(sound.toggleMute())}
               className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition"
-              title={isMuted ? 'Activar sonido' : 'Silenciar'}
+              title={isMuted ? (isEn ? 'Unmute' : 'Activar sonido') : (isEn ? 'Mute' : 'Silenciar')}
             >
               {isMuted ? <VolumeX className="w-4 h-4 text-slate-500" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
             </button>
@@ -397,7 +435,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
             <div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs font-black uppercase tracking-wider text-amber-400">
-                  {currentStep.instructor || 'Comandante Instructor'}
+                  {currentStep.instructor || (isEn ? 'Instructor Commander' : 'Comandante Instructor')}
                 </span>
                 <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded font-mono">
                   {currentStep.title}
@@ -425,7 +463,15 @@ export function InteractiveTutorial({ onBackToMenu }) {
               onClick={handleAdvanceBotTurn}
               className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer shrink-0"
             >
-              <span>{currentStep.stepId === 20 ? 'Proceder a la Resolución' : 'Entendido, Siguiente Jugada'}</span>
+              <span>
+                {currentStep.stepId === 20
+                  ? isEn
+                    ? 'Proceed to Resolution'
+                    : 'Proceder a la Resolución'
+                  : isEn
+                  ? 'Understood, Next Play'
+                  : 'Entendido, Siguiente Jugada'}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           )}
@@ -438,7 +484,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
             <div className="bg-emerald-950/30 border border-emerald-500/30 rounded-xl p-3">
               <div className="flex items-center gap-1.5 font-bold text-emerald-400 mb-1">
                 <CheckCircle2 className="w-4 h-4" />
-                <span>¿Por qué jugar esta carta y no otra?</span>
+                <span>{isEn ? 'Why play this card and not another?' : '¿Por qué jugar esta carta y no otra?'}</span>
               </div>
               <p className="text-slate-300 leading-relaxed">
                 {currentStep.whyThisCard}
@@ -449,7 +495,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
             <div className="bg-rose-950/20 border border-rose-500/30 rounded-xl p-3">
               <div className="flex items-center gap-1.5 font-bold text-rose-400 mb-1">
                 <AlertCircle className="w-4 h-4" />
-                <span>¿Por qué NO usar las otras cartas de tu mano?</span>
+                <span>{isEn ? 'Why NOT use the other cards in your hand?' : '¿Por qué NO usar las otras cartas de tu mano?'}</span>
               </div>
               <div className="space-y-1 text-slate-300">
                 {currentStep.whyNotOthers?.map((item, idx) => (
@@ -472,7 +518,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
             <div className="bg-indigo-950/30 border border-indigo-500/30 rounded-xl p-3">
               <div className="flex items-center gap-1.5 font-bold text-indigo-400 mb-1">
                 <HelpCircle className="w-4 h-4" />
-                <span>Análisis Táctico: ¿Por qué eligió esta jugada?</span>
+                <span>{isEn ? 'Tactical Analysis: Why did it make this play?' : 'Análisis Táctico: ¿Por qué eligió esta jugada?'}</span>
               </div>
               <p className="text-slate-300 leading-relaxed">
                 {currentStep.whyPlayed}
@@ -487,7 +533,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
             <div className="bg-amber-950/20 border border-amber-500/30 rounded-xl p-3">
               <div className="flex items-center gap-1.5 font-bold text-amber-400 mb-1">
                 <Sparkles className="w-4 h-4" />
-                <span>Consejo Clave del Instructor</span>
+                <span>{isEn ? "Instructor's Key Advice" : 'Consejo Clave del Instructor'}</span>
               </div>
               <p className="text-slate-300 leading-relaxed">
                 {currentStep.tacticalInsight}
@@ -500,7 +546,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
       {/* ÁREA PRINCIPAL: LOS 3 FRENTES DE GUERRA */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 flex flex-col justify-between gap-3">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 my-auto">
-          {FRONTS.map(front => {
+          {localizedFronts.map(front => {
             const teamACards = fronts[front.id].teamA;
             const teamBCards = fronts[front.id].teamB;
             const totalCards = teamACards.length + teamBCards.length;
@@ -559,12 +605,12 @@ export function InteractiveTutorial({ onBackToMenu }) {
                       {front.name}
                       {isTarget && (
                         <span className="bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                          <Zap className="w-2.5 h-2.5 fill-current" /> OBJETIVO AQUÍ
+                          <Zap className="w-2.5 h-2.5 fill-current" /> {isEn ? 'TARGET HERE' : 'OBJETIVO AQUÍ'}
                         </span>
                       )}
                       {isLocked && (
                         <span className="bg-slate-800 text-slate-400 text-[10px] font-medium px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                          <Lock className="w-2.5 h-2.5" /> Bloqueado
+                          <Lock className="w-2.5 h-2.5" /> {isEn ? 'Locked' : 'Bloqueado'}
                         </span>
                       )}
                     </h3>
@@ -572,7 +618,9 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   </div>
 
                   <div className="text-right">
-                    <span className="text-[10px] uppercase font-medium text-slate-400">Capacidad</span>
+                    <span className="text-[10px] uppercase font-medium text-slate-400">
+                      {isEn ? 'Capacity' : 'Capacidad'}
+                    </span>
                     <div className="text-xs font-bold text-slate-200">
                       <span>{totalCards}</span>
                       <span className="text-slate-500"> / 8</span>
@@ -584,16 +632,18 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 <div className="my-2 min-h-[90px] flex flex-col justify-start">
                   <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
                     <span className="font-semibold text-rose-400">
-                      Equipo Rival (B)
+                      {isEn ? 'Opponent Team (B)' : 'Equipo Rival (B)'}
                     </span>
                     <span className="font-mono text-xs text-slate-400">
-                      {teamBCards.length} cartas
+                      {teamBCards.length} {isEn ? 'cards' : 'cartas'}
                     </span>
                   </div>
 
                   <div className="flex flex-wrap gap-1 items-center min-h-[64px] bg-slate-950/40 rounded-lg p-1.5 border border-slate-800/80">
                     {teamBCards.length === 0 ? (
-                      <span className="text-[11px] text-slate-600 italic m-auto">Sin tropas enemigas</span>
+                      <span className="text-[11px] text-slate-600 italic m-auto">
+                        {isEn ? 'No enemy troops' : 'Sin tropas enemigas'}
+                      </span>
                     ) : (
                       teamBCards.map((c, i) => {
                         const isJustPlayed = currentStep.type === 'bot_turn' && (
@@ -606,7 +656,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                             {isJustPlayed && (
                               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-black text-[8px] px-1.5 py-0.5 rounded shadow-lg z-20 whitespace-nowrap animate-bounce flex items-center gap-0.5">
                                 <Sparkles className="w-2.5 h-2.5" />
-                                <span>JUGADA AHORA</span>
+                                <span>{isEn ? 'PLAYED NOW' : 'JUGADA AHORA'}</span>
                               </div>
                             )}
                             <div className={isJustPlayed ? 'ring-2 ring-amber-400 rounded-lg scale-105 transition-all shadow-lg shadow-amber-500/20' : ''}>
@@ -636,7 +686,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
                     <Swords className="w-3.5 h-3.5 text-amber-500/80" />
                     <span>
-                      {teamBCards.length} vs {teamACards.length} tropas
+                      {teamBCards.length} vs {teamACards.length} {isEn ? 'troops' : 'tropas'}
                     </span>
                     <span className="text-slate-700">|</span>
                     <span className="font-mono text-[10px]">
@@ -649,11 +699,11 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   {isTarget ? (
                     <div className="text-xs font-black text-amber-400 flex items-center gap-1 animate-pulse">
                       <Zap className="w-3 h-3" />
-                      <span>¡Haz clic aquí para desplegar!</span>
+                      <span>{isEn ? 'Click here to deploy!' : '¡Haz clic aquí para desplegar!'}</span>
                     </div>
                   ) : (
                     <span className="text-[10px] text-slate-500 font-mono italic">
-                      Zona evaluada
+                      {isEn ? 'Evaluated zone' : 'Zona evaluada'}
                     </span>
                   )}
                 </div>
@@ -662,7 +712,9 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 <div className="my-2 min-h-[90px] flex flex-col justify-end">
                   <div className="flex flex-wrap gap-1 items-center min-h-[64px] bg-slate-950/40 rounded-lg p-1.5 border border-slate-800/80 mb-1.5">
                     {teamACards.length === 0 ? (
-                      <span className="text-[11px] text-slate-600 italic m-auto">Despliega tus tropas aquí</span>
+                      <span className="text-[11px] text-slate-600 italic m-auto">
+                        {isEn ? 'Deploy your troops here' : 'Despliega tus tropas aquí'}
+                      </span>
                     ) : (
                       teamACards.map((c, i) => {
                         const isJustPlayed = currentStep.type === 'bot_turn' && (
@@ -675,7 +727,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                             {isJustPlayed && (
                               <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-black text-[8px] px-1.5 py-0.5 rounded shadow-lg z-20 whitespace-nowrap animate-bounce flex items-center gap-0.5">
                                 <Sparkles className="w-2.5 h-2.5" />
-                                <span>JUGADA AHORA</span>
+                                <span>{isEn ? 'PLAYED NOW' : 'JUGADA AHORA'}</span>
                               </div>
                             )}
                             <div className={isJustPlayed ? 'ring-2 ring-amber-400 rounded-lg scale-105 transition-all shadow-lg shadow-amber-500/20' : ''}>
@@ -701,10 +753,10 @@ export function InteractiveTutorial({ onBackToMenu }) {
 
                   <div className="flex items-center justify-between text-[11px] text-slate-400">
                     <span className="font-semibold text-emerald-400">
-                      Tu Equipo Aliado (A)
+                      {isEn ? 'Your Ally Team (A)' : 'Tu Equipo Aliado (A)'}
                     </span>
                     <span className="font-mono text-xs text-slate-400">
-                      {teamACards.length} cartas
+                      {teamACards.length} {isEn ? 'cards' : 'cartas'}
                     </span>
                   </div>
                 </div>
@@ -724,13 +776,13 @@ export function InteractiveTutorial({ onBackToMenu }) {
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
             <div className="flex items-center gap-3">
               <span className="text-xs font-bold text-slate-200">
-                Tu Mano de Comandante ({playerHand.length} cartas)
+                {isEn ? `Your Commander Hand (${playerHand.length} cards)` : `Tu Mano de Comandante (${playerHand.length} cartas)`}
               </span>
 
               {currentStep.type === 'player_turn' && (
                 <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[10px] uppercase font-black px-2 py-0.5 rounded-full flex items-center gap-1.5 animate-pulse shadow-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  ¡Te toca tirar!
+                  {isEn ? 'Your turn!' : '¡Te toca tirar!'}
                 </span>
               )}
 
@@ -742,7 +794,11 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   if (currentStep.requireShadow) {
                     setIsShadowActive(prev => !prev);
                   } else {
-                    triggerWarning('El instructor indica jugar esta carta de forma visible. No actives la sombra en este turno.');
+                    triggerWarning(
+                      isEn
+                        ? 'The instructor indicates playing this card face up. Do not activate shadow mode on this turn.'
+                        : 'El instructor indica jugar esta carta de forma visible. No actives la sombra en este turno.'
+                    );
                   }
                 }}
                 className={`text-xs px-3 py-1.5 rounded-lg border font-semibold flex items-center gap-1.5 transition ${
@@ -757,10 +813,12 @@ export function InteractiveTutorial({ onBackToMenu }) {
               >
                 <EyeOff className="w-3.5 h-3.5" />
                 <span>
-                  {isShadowActive ? 'Modo Sombra ACTIVO' : 'Jugar como Sombra'}
+                  {isShadowActive
+                    ? isEn ? 'Shadow Mode ACTIVE' : 'Modo Sombra ACTIVO'
+                    : isEn ? 'Play as Shadow' : 'Jugar como Sombra'}
                 </span>
                 <span className="bg-purple-950 px-1.5 py-0.2 rounded text-[10px] font-mono">
-                  {shadowsLeft} restante
+                  {shadowsLeft} {isEn ? 'left' : 'restante'}
                 </span>
               </button>
             </div>
@@ -770,16 +828,22 @@ export function InteractiveTutorial({ onBackToMenu }) {
               {currentStep.type === 'player_turn' ? (
                 <span className="text-xs text-amber-400 font-bold animate-pulse">
                   {selectedCardId
-                    ? '¡Carta seleccionada! Haz clic en el frente marcado para desplegar'
+                    ? isEn
+                      ? 'Card selected! Click on target front to deploy'
+                      : '¡Carta seleccionada! Haz clic en el frente marcado para desplegar'
+                    : isEn
+                    ? 'Select the card highlighted in gold'
                     : 'Selecciona la carta recomendada en dorado'}
                 </span>
               ) : currentStep.type === 'bot_turn' ? (
                 <span className="text-xs text-slate-400">
-                  Turno de los bots: Lee la explicación táctica y pulsa "Siguiente Jugada".
+                  {isEn
+                    ? 'Bots\' turn: Read the tactical analysis and click "Next Play".'
+                    : 'Turno de los bots: Lee la explicación táctica y pulsa "Siguiente Jugada".'}
                 </span>
               ) : (
                 <span className="text-xs text-slate-500">
-                  Fase de preparación del tutorial.
+                  {isEn ? 'Tutorial preparation phase.' : 'Fase de preparación del tutorial.'}
                 </span>
               )}
             </div>
@@ -790,7 +854,11 @@ export function InteractiveTutorial({ onBackToMenu }) {
             {playerHand.length === 0 ? (
               <span className="text-sm text-slate-500 italic">
                 {currentStep.type === 'dialog'
-                  ? 'Recibirás tus 5 cartas reglamentarias al iniciar el despliegue.'
+                  ? isEn
+                    ? 'You will receive your 5 standard cards when deployment begins.'
+                    : 'Recibirás tus 5 cartas reglamentarias al iniciar el despliegue.'
+                  : isEn
+                  ? 'You have deployed all your cards this round.'
                   : 'Has desplegado todas tus cartas de la ronda.'}
               </span>
             ) : (
@@ -805,7 +873,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                     {isRequired && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-950 font-black text-[9px] px-2 py-0.5 rounded-full shadow-lg z-20 whitespace-nowrap animate-bounce flex items-center gap-1">
                         <Sparkles className="w-2.5 h-2.5" />
-                        <span>ELIGE ESTA</span>
+                        <span>{isEn ? 'CHOOSE THIS' : 'ELIGE ESTA'}</span>
                       </div>
                     )}
 
@@ -844,7 +912,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
       </main>
 
       {/* ===================================================================== */}
-      {/* MODALES DE DIÁLOGO DE PASOS INTRODUCTORIOS (0, 1, 2) */}
+      {/* MODALES DE DIÁLOGO DE PASOS INTRODUCTORIOS (0, 1, 2, team_clock) */}
       {/* ===================================================================== */}
       {currentStep.type === 'dialog' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
@@ -877,10 +945,10 @@ export function InteractiveTutorial({ onBackToMenu }) {
               <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 mb-4 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-amber-400" /> Reloj Dual de Equipo (Simulación 2v2)
+                    <Clock className="w-4 h-4 text-amber-400" /> {isEn ? 'Dual Team Clock (2v2 Simulation)' : 'Reloj Dual de Equipo (Simulación 2v2)'}
                   </span>
                   <span className="text-[10px] bg-slate-800 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">
-                    Ritmo Medio (3m 20s)
+                    {isEn ? 'Medium Speed (3m 20s)' : 'Ritmo Medio (3m 20s)'}
                   </span>
                 </div>
 
@@ -888,13 +956,13 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   {/* Reloj Equipo A */}
                   <div className="flex-1 bg-emerald-950/80 border-2 border-emerald-400 p-2.5 rounded-xl text-center shadow-lg shadow-emerald-500/20 ring-2 ring-emerald-500/30">
                     <span className="text-[9px] sm:text-[10px] uppercase font-bold text-emerald-300 block">
-                      Tu Equipo (Tú y A2) • ACTIVO
+                      {isEn ? 'Your Team (You & A2) • ACTIVE' : 'Tu Equipo (Tú y A2) • ACTIVO'}
                     </span>
                     <span className="text-xl sm:text-2xl font-black font-mono text-emerald-300">
                       03:20
                     </span>
                     <div className="text-[9px] text-emerald-400/90 mt-0.5 animate-pulse font-medium">
-                      ⏱️ Descuenta en tu turno
+                      {isEn ? '⏱️ Counts down on your turn' : '⏱️ Descuenta en tu turno'}
                     </div>
                   </div>
 
@@ -903,28 +971,28 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   {/* Reloj Equipo B */}
                   <div className="flex-1 bg-slate-900/60 border border-slate-800 p-2.5 rounded-xl text-center opacity-70">
                     <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 block">
-                      Equipo Rival (B1 y B2) • PAUSADO
+                      {isEn ? 'Opponent Team (B1 & B2) • PAUSED' : 'Equipo Rival (B1 y B2) • PAUSADO'}
                     </span>
                     <span className="text-xl sm:text-2xl font-black font-mono text-slate-400">
                       03:20
                     </span>
                     <div className="text-[9px] text-slate-500 mt-0.5">
-                      Se activa al colocar tu carta
+                      {isEn ? 'Activates when card is placed' : 'Se activa al colocar tu carta'}
                     </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center text-[10px] text-slate-400 pt-1 border-t border-slate-800">
                   <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                    <strong className="text-emerald-400 block font-bold">Rápido</strong>
+                    <strong className="text-emerald-400 block font-bold">{isEn ? 'Fast' : 'Rápido'}</strong>
                     <span className="font-mono">1m 40s (100s)</span>
                   </div>
                   <div className="bg-slate-900 p-1.5 rounded border border-amber-500/40">
-                    <strong className="text-amber-400 block font-bold">Medio</strong>
+                    <strong className="text-amber-400 block font-bold">{isEn ? 'Medium' : 'Medio'}</strong>
                     <span className="font-mono">3m 20s (200s)</span>
                   </div>
                   <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                    <strong className="text-indigo-400 block font-bold">Lento</strong>
+                    <strong className="text-indigo-400 block font-bold">{isEn ? 'Slow' : 'Lento'}</strong>
                     <span className="font-mono">5m 00s (300s)</span>
                   </div>
                 </div>
@@ -936,7 +1004,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 onClick={onBackToMenu}
                 className="text-xs font-bold text-slate-400 hover:text-white transition"
               >
-                Salir al Menú
+                {isEn ? 'Exit to Menu' : 'Salir al Menú'}
               </button>
 
               <button
@@ -961,13 +1029,17 @@ export function InteractiveTutorial({ onBackToMenu }) {
             <div className="px-6 py-5 border-b border-slate-800 text-center bg-gradient-to-r from-emerald-950/80 via-slate-900 to-emerald-950/80">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border bg-emerald-500/20 text-emerald-400 border-emerald-500/40">
                 <Award className="w-4 h-4" />
-                Fase Oficial de Resolución: Ronda Conquistada
+                {isEn ? 'Official Resolution Phase: Round Conquered' : 'Fase Oficial de Resolución: Ronda Conquistada'}
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-100 uppercase tracking-wide">
-                ¡Victoria de Ronda para el Equipo Aliado (A)!
+                {isEn ? 'Round Victory for Allied Team (A)!' : '¡Victoria de Ronda para el Equipo Aliado (A)!'}
               </h2>
               <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                Frentes Ganados: <strong className="text-emerald-400">2</strong> (Centro e Izquierda) vs <strong className="text-rose-400">1</strong> (Derecha). Regla oficial: ¡Al ganar 2 frentes obtenéis el Punto de Ronda!
+                {isEn ? (
+                  <>Fronts Won: <strong className="text-emerald-400">2</strong> (Center and Left) vs <strong className="text-rose-400">1</strong> (Right). Official rule: Winning 2 fronts earns the Round Point!</>
+                ) : (
+                  <>Frentes Ganados: <strong className="text-emerald-400">2</strong> (Centro e Izquierda) vs <strong className="text-rose-400">1</strong> (Derecha). Regla oficial: ¡Al ganar 2 frentes obtenéis el Punto de Ronda!</>
+                )}
               </p>
             </div>
 
@@ -978,9 +1050,11 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="font-bold text-xs text-slate-200">Frente Central</span>
+                      <span className="font-bold text-xs text-slate-200">
+                        {isEn ? 'Center Front' : 'Frente Central'}
+                      </span>
                       <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
-                        Ganado (Equipo A)
+                        {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
                       </span>
                     </div>
 
@@ -990,12 +1064,26 @@ export function InteractiveTutorial({ onBackToMenu }) {
                         <span className="text-slate-600 text-sm mx-2">vs</span>
                         <span className="text-rose-400">37</span>
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">Mayor puntuación total</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {isEn ? 'Higher total score' : 'Mayor puntuación total'}
+                      </div>
                     </div>
 
                     <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                      <div><strong className="text-emerald-400">Equipo A:</strong> K♥ (15) + Q♥ (14) + 8♥ sombra revelada (10) + 9♥ (11) + Sinergia de 4 Corazones (+15 pts) = <strong>65 pts</strong>.</div>
-                      <div><strong className="text-rose-400">Equipo B:</strong> Q♦ (12) + J♥ (13) + 5♥ (7) + Sinergia 2 Corazones (+5 pts) = <strong>37 pts</strong>.</div>
+                      <div>
+                        <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                        {isEn
+                          ? 'K♥ (15) + Q♥ (14) + revealed shadow 8♥ (10) + 9♥ (11) + 4-Hearts Synergy (+15 pts) = '
+                          : 'K♥ (15) + Q♥ (14) + 8♥ sombra revelada (10) + 9♥ (11) + Sinergia de 4 Corazones (+15 pts) = '}
+                        <strong>65 pts</strong>.
+                      </div>
+                      <div>
+                        <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                        {isEn
+                          ? 'Q♦ (12) + J♥ (13) + 5♥ (7) + 2-Hearts Synergy (+5 pts) = '
+                          : 'Q♦ (12) + J♥ (13) + 5♥ (7) + Sinergia 2 Corazones (+5 pts) = '}
+                        <strong>37 pts</strong>.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1004,9 +1092,11 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="font-bold text-xs text-slate-200">Frente Izquierdo</span>
+                      <span className="font-bold text-xs text-slate-200">
+                        {isEn ? 'Left Front' : 'Frente Izquierdo'}
+                      </span>
                       <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
-                        Ganado (Equipo A)
+                        {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
                       </span>
                     </div>
 
@@ -1016,12 +1106,26 @@ export function InteractiveTutorial({ onBackToMenu }) {
                         <span className="text-slate-600 text-sm mx-2">vs</span>
                         <span className="text-rose-400">29</span>
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">Mayor puntuación total</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {isEn ? 'Higher total score' : 'Mayor puntuación total'}
+                      </div>
                     </div>
 
                     <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                      <div><strong className="text-emerald-400">Equipo A:</strong> J♦ (11) + Tu As A♦ (14) + 3♦ (3) + Sinergia de 3 Diamantes (+10 pts) = <strong>38 pts</strong>.</div>
-                      <div><strong className="text-rose-400">Equipo B:</strong> 5♦ (5) + Sombra 10♦ revelada (10) + 4♦ (4) + Sinergia 3 Diamantes (+10 pts) = <strong>29 pts</strong>.</div>
+                      <div>
+                        <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                        {isEn
+                          ? 'J♦ (11) + Your Ace A♦ (14) + 3♦ (3) + 3-Diamonds Synergy (+10 pts) = '
+                          : 'J♦ (11) + Tu As A♦ (14) + 3♦ (3) + Sinergia de 3 Diamantes (+10 pts) = '}
+                        <strong>38 pts</strong>.
+                      </div>
+                      <div>
+                        <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                        {isEn
+                          ? '5♦ (5) + Revealed shadow 10♦ (10) + 4♦ (4) + 3-Diamonds Synergy (+10 pts) = '
+                          : '5♦ (5) + Sombra 10♦ revelada (10) + 4♦ (4) + Sinergia 3 Diamantes (+10 pts) = '}
+                        <strong>29 pts</strong>.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1030,9 +1134,11 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 <div className="p-3.5 rounded-xl border bg-rose-950/20 border-rose-500/40 flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="font-bold text-xs text-slate-200">Frente Derecho</span>
+                      <span className="font-bold text-xs text-slate-200">
+                        {isEn ? 'Right Front' : 'Frente Derecho'}
+                      </span>
                       <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-rose-500/20 text-rose-400">
-                        Equipo B
+                        {isEn ? 'Team B' : 'Equipo B'}
                       </span>
                     </div>
 
@@ -1042,12 +1148,26 @@ export function InteractiveTutorial({ onBackToMenu }) {
                         <span className="text-slate-600 text-sm mx-2">vs</span>
                         <span className="text-rose-400">41</span>
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">Control rival por picas</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {isEn ? 'Opponent spades control' : 'Control rival por picas'}
+                      </div>
                     </div>
 
                     <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                      <div><strong className="text-emerald-400">Equipo A:</strong> 10♠ (10) + 6♠ (6) + 4♣ (4) + Sinergia de 2 Picas (+5 pts) = <strong>25 pts</strong>.</div>
-                      <div><strong className="text-rose-400">Equipo B:</strong> K♠ (13) + 7♠ (7) + 2♣ (2) + 9♠ (9) + Sinergia 3 Picas (+10 pts) = <strong>41 pts</strong>.</div>
+                      <div>
+                        <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                        {isEn
+                          ? '10♠ (10) + 6♠ (6) + 4♣ (4) + 2-Spades Synergy (+5 pts) = '
+                          : '10♠ (10) + 6♠ (6) + 4♣ (4) + Sinergia de 2 Picas (+5 pts) = '}
+                        <strong>25 pts</strong>.
+                      </div>
+                      <div>
+                        <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                        {isEn
+                          ? 'K♠ (13) + 7♠ (7) + 2♣ (2) + 9♠ (9) + 3-Spades Synergy (+10 pts) = '
+                          : 'K♠ (13) + 7♠ (7) + 2♣ (2) + 9♠ (9) + Sinergia 3 Picas (+10 pts) = '}
+                        <strong>41 pts</strong>.
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1057,16 +1177,18 @@ export function InteractiveTutorial({ onBackToMenu }) {
               <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
                 <div>
                   <span className="font-bold text-slate-200 block text-sm">
-                    Puntos Acumulados Totales de la Ronda:
+                    {isEn ? 'Total Round Cumulative Points:' : 'Puntos Acumulados Totales de la Ronda:'}
                   </span>
                   <span className="text-slate-400">
-                    Se suman las puntuaciones numéricas de todos los frentes para resolver posibles desempates globales de partida.
+                    {isEn
+                      ? 'Numerical scores across all fronts are summed to break overall match ties.'
+                      : 'Se suman las puntuaciones numéricas de todos los frentes para resolver posibles desempates globales de partida.'}
                   </span>
                 </div>
                 <div className="font-mono font-bold text-base text-right shrink-0">
-                  <span className="text-emerald-400">Equipo A: 128 pts</span>
+                  <span className="text-emerald-400">{isEn ? 'Team A: 128 pts' : 'Equipo A: 128 pts'}</span>
                   <span className="text-slate-600 mx-2">/</span>
-                  <span className="text-rose-400">Equipo B: 107 pts</span>
+                  <span className="text-rose-400">{isEn ? 'Team B: 107 pts' : 'Equipo B: 107 pts'}</span>
                 </div>
               </div>
             </div>
@@ -1076,7 +1198,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 onClick={() => setStepIndex(prev => prev + 1)}
                 className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition cursor-pointer"
               >
-                <span>Ver Conclusiones y Graduación</span>
+                <span>{isEn ? 'View Conclusions and Graduation' : 'Ver Conclusiones y Graduación'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -1097,42 +1219,76 @@ export function InteractiveTutorial({ onBackToMenu }) {
             </div>
 
             <span className="text-xs font-black uppercase tracking-widest text-amber-400 mb-1">
-              Certificado de Instrucción Táctica
+              {isEn ? 'Tactical Instruction Certificate' : 'Certificado de Instrucción Táctica'}
             </span>
 
             <h2 className="text-2xl sm:text-3xl font-black text-slate-100 uppercase tracking-wide mb-2">
-              ¡COMANDANTE GRADUADO!
+              {isEn ? 'GRADUATE COMMANDER!' : '¡COMANDANTE GRADUADO!'}
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 max-w-md mb-6 leading-relaxed">
-              Has completado el tutorial oficial de <strong>Frentes de Guerra</strong>. Conoces al detalle todas las mecánicas necesarias para disputar cualquier partida competitiva:
+              {isEn ? (
+                <>You have completed the official <strong>WarFronts</strong> tutorial. You now master all the necessary mechanics for competitive play:</>
+              ) : (
+                <>Has completado el tutorial oficial de <strong>Frentes de Guerra</strong>. Conoces al detalle todas las mecánicas necesarias para disputar cualquier partida competitiva:</>
+              )}
             </p>
 
             {/* Checklist de conceptos dominados */}
             <div className="w-full bg-slate-950/80 border border-slate-800 rounded-2xl p-4 mb-6 text-left text-xs space-y-2.5">
               <div className="flex items-center gap-2 text-slate-200">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Regla de los 2 Frentes:</strong> Conquistar al menos 2 de los 3 frentes otorga la ronda.</span>
+                <span>
+                  <strong>{isEn ? '2-Front Rule:' : 'Regla de los 2 Frentes:'}</strong>{' '}
+                  {isEn
+                    ? 'Conquering at least 2 of the 3 battlefronts secures the round.'
+                    : 'Conquistar al menos 2 de los 3 frentes otorga la ronda.'}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-slate-200">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Palo de Triunfo:</strong> Otorga +2 puntos de bonificación en cada carta de ese palo.</span>
+                <span>
+                  <strong>{isEn ? 'Trump Suit:' : 'Palo de Triunfo:'}</strong>{' '}
+                  {isEn
+                    ? 'Grants +2 bonus points to every card played of that suit.'
+                    : 'Otorga +2 puntos de bonificación en cada carta de ese palo.'}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-slate-200">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Sinergias de Palo en 2v2:</strong> +5 puntos por cada carta repetida del mismo palo en un frente.</span>
+                <span>
+                  <strong>{isEn ? 'Suit Synergies in 2v2:' : 'Sinergias de Palo en 2v2:'}</strong>{' '}
+                  {isEn
+                    ? '+5 points for each repeated suit card deployed in a front.'
+                    : '+5 puntos por cada carta repetida del mismo palo en un frente.'}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-slate-200">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Marcador de Sombra:</strong> Despliegue oculto para engañar y proteger bazas clave.</span>
+                <span>
+                  <strong>{isEn ? 'Shadow Marker:' : 'Marcador de Sombra:'}</strong>{' '}
+                  {isEn
+                    ? 'Concealed deployment to bluff and safeguard decisive cards.'
+                    : 'Despliegue oculto para engañar y proteger bazas clave.'}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-slate-200">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Descarte Táctico:</strong> Colocar cartas bajas en frentes perdidos o ganados para sumar puntos acumulados.</span>
+                <span>
+                  <strong>{isEn ? 'Tactical Discard:' : 'Descarte Táctico:'}</strong>{' '}
+                  {isEn
+                    ? 'Placing low cards into secure or conceded sectors to boost cumulative tie-breaker points.'
+                    : 'Colocar cartas bajas en frentes perdidos o ganados para sumar puntos acumulados.'}
+                </span>
               </div>
               <div className="flex items-center gap-2 text-slate-200">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span><strong>Puntos Acumulados:</strong> Deciden el desempate global de la contienda.</span>
+                <span>
+                  <strong>{isEn ? 'Cumulative Points:' : 'Puntos Acumulados:'}</strong>{' '}
+                  {isEn
+                    ? 'Break overall match ties when round points are drawn.'
+                    : 'Deciden el desempate global de la contienda.'}
+                </span>
               </div>
             </div>
 
@@ -1141,7 +1297,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
               onClick={onBackToMenu}
               className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
             >
-              <span>¡Listo para la Batalla! Volver al Menú Principal</span>
+              <span>{isEn ? 'Ready for Battle! Return to Main Menu' : '¡Listo para la Batalla! Volver al Menú Principal'}</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           </div>

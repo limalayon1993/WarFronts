@@ -1,7 +1,9 @@
 import React from 'react';
-import { SUITS } from '../constants/rules';
+import { SUITS, getLocalizedSuits, getLocalizedModes, getLocalizedDurations } from '../constants/rules';
 import { Card } from './Card';
 import { Volume2, VolumeX, BookOpen, RotateCcw, Swords, Flame, Layers, Home, Zap, Wifi } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { LanguageToggle } from './LanguageToggle';
 
 export function ScoreBoard({
   round,
@@ -28,9 +30,16 @@ export function ScoreBoard({
   roomCode = '',
   mySlotId = '',
 }) {
-  const trumpSuit = trumpCard ? SUITS[trumpCard.suit] : null;
+  const { language, isEn, ui } = useLanguage();
+  const localizedSuits = getLocalizedSuits(language);
+  const localizedModes = getLocalizedModes(language);
+  const localizedDurations = getLocalizedDurations(language);
+
+  const trumpSuit = trumpCard ? localizedSuits[trumpCard.suit] : null;
   const is1v1 = modeConfig?.id === '1v1';
-  const effectiveDuration = durationConfig || rhythmConfig;
+  const effectiveMode = localizedModes[modeConfig?.id] || modeConfig;
+  const rawDuration = durationConfig || rhythmConfig;
+  const effectiveDuration = localizedDurations.find(d => d.rounds === rawDuration?.rounds) || rawDuration;
 
   return (
     <header className="bg-slate-950/90 border-b border-slate-800 px-4 py-2.5 backdrop-blur shadow-md">
@@ -41,7 +50,7 @@ export function ScoreBoard({
             <button
               onClick={onBackToMenu}
               className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-amber-400 transition"
-              title="Volver al Menú Principal"
+              title={ui.common.backToMenu}
             >
               <Home className="w-4 h-4" />
             </button>
@@ -50,9 +59,9 @@ export function ScoreBoard({
             </div>
             <div>
               <h1 className="text-sm sm:text-base font-black tracking-wider text-slate-100 uppercase flex items-center gap-1.5 flex-wrap">
-                <span>Frentes de Guerra</span>
+                <span>{ui.common.gameTitle}</span>
                 <span className="text-[10px] bg-slate-800 text-amber-400 px-1.5 py-0.2 rounded border border-slate-700">
-                  {modeConfig?.name}
+                  {effectiveMode?.name}
                 </span>
                 {isMultiplayer && (
                   <span className="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-700/60 px-1.5 py-0.2 rounded font-mono font-bold flex items-center gap-1">
@@ -63,7 +72,7 @@ export function ScoreBoard({
                 )}
               </h1>
               <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                <span className="text-amber-400">Ronda {round}</span> de {totalRounds} (Duración {effectiveDuration?.name})
+                <span className="text-amber-400">{ui.common.round} {round}</span> {ui.common.of} {totalRounds} ({ui.common.duration} {effectiveDuration?.name})
                 {timeConfig && (
                   <>
                     <span className="text-slate-600">•</span>
@@ -80,7 +89,7 @@ export function ScoreBoard({
           {/* Rondas Ganadas */}
           <div className="text-center">
             <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">
-              {is1v1 ? 'Tú vs Rival' : 'Equipo A vs Equipo B'}
+              {is1v1 ? ui.game.scoreboard.youVsRival : ui.game.scoreboard.teamAVsTeamB}
             </span>
             <div className="text-base sm:text-lg font-black font-mono leading-none mt-0.5">
               <span className="text-emerald-400">{teamARoundPoints}</span>
@@ -94,7 +103,7 @@ export function ScoreBoard({
           {/* Puntos Acumulados */}
           <div className="text-center">
             <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">
-              Acumulados
+              {ui.game.scoreboard.accumulated}
             </span>
             <div className="text-xs sm:text-sm font-bold font-mono text-slate-300 leading-none mt-0.5">
               <span className="text-emerald-300">{teamACumulativePoints}</span>
@@ -112,7 +121,7 @@ export function ScoreBoard({
             </div>
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
-                <Flame className="w-3 h-3 text-amber-400" /> Triunfo
+                <Flame className="w-3 h-3 text-amber-400" /> {isEn ? 'Trump Suit' : 'Triunfo'}
               </div>
               <div className="text-xs font-semibold text-slate-200">
                 {trumpSuit?.name} <span className="text-amber-400 font-bold">(+2 pts)</span>
@@ -125,15 +134,17 @@ export function ScoreBoard({
         <div className="hidden lg:flex items-center gap-3 text-xs text-slate-400">
           <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1">
             <Layers className="w-3.5 h-3.5 text-slate-400" />
-            <span>Mazo: <strong className="text-slate-200 font-mono">{drawDeckCount}</strong></span>
+            <span>{ui.game.scoreboard.drawDeck} <strong className="text-slate-200 font-mono">{drawDeckCount}</strong></span>
             <span className="text-slate-700">|</span>
-            <span>Descarte: <strong className="text-slate-200 font-mono">{discardDeckCount}</strong></span>
+            <span>{ui.game.scoreboard.discardDeck} <strong className="text-slate-200 font-mono">{discardDeckCount}</strong></span>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1" title="Equipo que empieza atacando en esta ronda (Iniciativa)">
-            <span>Iniciativa: </span>
+          <div className="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1" title={isEn ? "Team starting the attack in this round (Initiative)" : "Equipo que empieza atacando en esta ronda (Iniciativa)"}>
+            <span>{ui.game.scoreboard.initiative} </span>
             <strong className={initiativeTeam === 'teamA' ? 'text-emerald-400' : 'text-rose-400'}>
-              {initiativeTeam === 'teamA' ? (is1v1 ? 'Tuya (1er Ataque)' : 'Equipo A (1er Ataque)') : (is1v1 ? 'Rival (1er Ataque)' : 'Equipo B (1er Ataque)')}
+              {initiativeTeam === 'teamA'
+                ? (is1v1 ? ui.game.scoreboard.initiativeYours : ui.game.scoreboard.initiativeTeamA)
+                : (is1v1 ? ui.game.scoreboard.initiativeRival : ui.game.scoreboard.initiativeTeamB)}
             </strong>
           </div>
         </div>
@@ -143,7 +154,7 @@ export function ScoreBoard({
           <button
             onClick={onToggleMute}
             className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition"
-            title={isMuted ? 'Activar sonido' : 'Silenciar'}
+            title={isMuted ? ui.common.unmute : ui.common.mute}
           >
             {isMuted ? <VolumeX className="w-4 h-4 text-slate-500" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
           </button>
@@ -152,26 +163,29 @@ export function ScoreBoard({
           <button
             onClick={onOpenQuickGuide}
             className="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 transition flex items-center gap-1 text-xs font-bold"
-            title="Abrir Guía Rápida de Mesa"
+            title={ui.common.quickGuide}
           >
             <Zap className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">Guía Rápida</span>
+            <span className="hidden sm:inline">{ui.common.quickGuide}</span>
           </button>
 
           {/* Manual Completo */}
           <button
             onClick={onOpenFullManual}
             className="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition flex items-center gap-1 text-xs font-semibold"
-            title="Ver Reglamento Oficial Completo"
+            title={ui.common.fullManual}
           >
             <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
-            <span className="hidden sm:inline">Manual</span>
+            <span className="hidden sm:inline">{isEn ? 'Manual' : 'Manual'}</span>
           </button>
+
+          {/* Botón de Cambio de Idioma */}
+          <LanguageToggle compact />
 
           <button
             onClick={onRestartGame}
             className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-rose-400 transition"
-            title="Reiniciar Partida"
+            title={isEn ? 'Restart Match' : 'Reiniciar Partida'}
           >
             <RotateCcw className="w-3.5 h-3.5" />
           </button>

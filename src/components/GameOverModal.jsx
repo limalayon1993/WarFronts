@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { Trophy, Swords, RotateCcw, Home } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export function GameOverModal({
   isOpen,
@@ -13,6 +14,7 @@ export function GameOverModal({
   onBackToMenu,
   onPlayOvertime,
 }) {
+  const { isEn, ui } = useLanguage();
   const is1v1 = modeId === '1v1';
   let winner = 'tie';
   let reason = '';
@@ -20,24 +22,24 @@ export function GameOverModal({
   if (teamARoundPoints > teamBRoundPoints) {
     winner = 'teamA';
     reason = is1v1 
-      ? `Victoria directa por Rondas Ganadas (${teamARoundPoints} a ${teamBRoundPoints})`
-      : `¡Victoria del Equipo Aliado (A) por Rondas Ganadas (${teamARoundPoints} a ${teamBRoundPoints})!`;
+      ? ui.gameOver.reasonRounds1v1Win(teamARoundPoints, teamBRoundPoints)
+      : ui.gameOver.reasonRoundsTeamWin(teamARoundPoints, teamBRoundPoints);
   } else if (teamBRoundPoints > teamARoundPoints) {
     winner = 'teamB';
     reason = is1v1
-      ? `Victoria del rival por Rondas Ganadas (${teamBRoundPoints} a ${teamBRoundPoints})`
-      : `Victoria del Equipo Rival (B) por Rondas Ganadas (${teamBRoundPoints} a ${teamARoundPoints})`;
+      ? ui.gameOver.reasonRounds1v1Lose(teamBRoundPoints, teamARoundPoints)
+      : ui.gameOver.reasonRoundsTeamLose(teamBRoundPoints, teamARoundPoints);
   } else {
     // Empate en rondas: Criterio de Puntos Acumulados
     if (teamACumulativePoints > teamBCumulativePoints) {
       winner = 'teamA';
-      reason = `Desempate por Puntos Acumulados (${teamACumulativePoints} pts vs ${teamBCumulativePoints} pts)`;
+      reason = ui.gameOver.reasonCumulativeWin(teamACumulativePoints, teamBCumulativePoints);
     } else if (teamBCumulativePoints > teamACumulativePoints) {
       winner = 'teamB';
-      reason = `Desempate rival por Puntos Acumulados (${teamBCumulativePoints} pts vs ${teamACumulativePoints} pts)`;
+      reason = ui.gameOver.reasonCumulativeLose(teamBCumulativePoints, teamACumulativePoints);
     } else {
       winner = 'tie';
-      reason = 'Empate exacto tanto en rondas como en puntos acumulados. Criterio oficial: ¡Prórroga de 2 rondas!';
+      reason = ui.gameOver.reasonTieOvertime;
     }
   }
 
@@ -68,13 +70,13 @@ export function GameOverModal({
         </div>
 
         <span className="text-xs font-black uppercase tracking-widest text-slate-400 mb-1">
-          Fin de la Contienda
+          {ui.gameOver.banner}
         </span>
 
         <h2 className="text-3xl font-black text-slate-100 uppercase tracking-wide mb-2">
-          {winner === 'teamA' && (is1v1 ? '¡VICTORIA SUPREMA!' : '¡VICTORIA ALIADA!')}
-          {winner === 'teamB' && (is1v1 ? 'DERROTA EN EL FRENTE' : 'VICTORIA DEL EQUIPO RIVAL')}
-          {winner === 'tie' && 'TABLAS HISTÓRICAS'}
+          {winner === 'teamA' && (is1v1 ? ui.gameOver.supremeVictory : ui.gameOver.alliedVictory)}
+          {winner === 'teamB' && (is1v1 ? ui.gameOver.defeat : ui.gameOver.rivalVictory)}
+          {winner === 'tie' && ui.gameOver.historicDraw}
         </h2>
 
         <p className="text-xs sm:text-sm text-slate-300 max-w-xs mb-6 font-medium">
@@ -84,18 +86,18 @@ export function GameOverModal({
         {/* Marcador final */}
         <div className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-4 mb-6 space-y-3">
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Rondas Ganadas:</span>
+            <span>{ui.gameOver.roundsWonLabel}</span>
             <span className="font-mono font-bold text-sm">
-              <strong className="text-emerald-400">{teamARoundPoints}</strong> {is1v1 ? 'Tú' : 'Equipo A'} — <strong className="text-rose-400">{teamBRoundPoints}</strong> {is1v1 ? 'Rival' : 'Equipo B'}
+              <strong className="text-emerald-400">{teamARoundPoints}</strong> {is1v1 ? (isEn ? 'You' : 'Tú') : (isEn ? 'Team A' : 'Equipo A')} — <strong className="text-rose-400">{teamBRoundPoints}</strong> {is1v1 ? (isEn ? 'Rival' : 'Rival') : (isEn ? 'Team B' : 'Equipo B')}
             </span>
           </div>
 
           <div className="h-px bg-slate-800" />
 
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Puntos Acumulados Totales:</span>
+            <span>{ui.gameOver.cumulativePointsLabel}</span>
             <span className="font-mono font-bold text-sm">
-              <strong className="text-emerald-400">{teamACumulativePoints}</strong> pts — <strong className="text-rose-400">{teamBCumulativePoints}</strong> pts
+              <strong className="text-emerald-400">{teamACumulativePoints}</strong> {ui.common.pts} — <strong className="text-rose-400">{teamBCumulativePoints}</strong> {ui.common.pts}
             </span>
           </div>
         </div>
@@ -108,7 +110,7 @@ export function GameOverModal({
               className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition"
             >
               <Swords className="w-4 h-4" />
-              <span>¡Disputar Prórroga Oficial (+2 Rondas)!</span>
+              <span>{ui.gameOver.playOvertimeBtn}</span>
             </button>
           )}
 
@@ -118,7 +120,7 @@ export function GameOverModal({
               className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition"
             >
               <RotateCcw className="w-4 h-4" />
-              <span>Revancha Rápida</span>
+              <span>{ui.gameOver.playAgainBtn}</span>
             </button>
 
             <button
@@ -126,7 +128,7 @@ export function GameOverModal({
               className="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition"
             >
               <Home className="w-4 h-4" />
-              <span>Menú Principal</span>
+              <span>{ui.gameOver.returnMenuBtn}</span>
             </button>
           </div>
         </div>

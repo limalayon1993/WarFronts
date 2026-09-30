@@ -27,6 +27,25 @@ export const FRONTS = [
   { id: 'right', name: 'Frente Derecho', subtitle: 'Flanco Este' },
 ];
 
+export function getLocalizedSuits(lang = 'es') {
+  const isEn = lang === 'en';
+  return {
+    hearts: { key: 'hearts', symbol: '♥', name: isEn ? 'Hearts' : 'Corazones', color: 'text-rose-500' },
+    diamonds: { key: 'diamonds', symbol: '♦', name: isEn ? 'Diamonds' : 'Diamantes', color: 'text-rose-500' },
+    clubs: { key: 'clubs', symbol: '♣', name: isEn ? 'Clubs' : 'Tréboles', color: 'text-slate-100' },
+    spades: { key: 'spades', symbol: '♠', name: isEn ? 'Spades' : 'Picas', color: 'text-slate-100' },
+  };
+}
+
+export function getLocalizedFronts(lang = 'es') {
+  const isEn = lang === 'en';
+  return [
+    { id: 'left', name: isEn ? 'Left Front' : 'Frente Izquierdo', subtitle: isEn ? 'West Flank' : 'Flanco Oeste' },
+    { id: 'center', name: isEn ? 'Center Front' : 'Frente Central', subtitle: isEn ? 'Main Line' : 'Línea Principal' },
+    { id: 'right', name: isEn ? 'Right Front' : 'Frente Derecho', subtitle: isEn ? 'East Flank' : 'Flanco Este' },
+  ];
+}
+
 // Modos de juego oficiales según el reglamento v1.6
 export const GAME_MODES = {
   '1v1': {
@@ -95,6 +114,54 @@ export const TEAM_TIME_OPTIONS = [
   { id: 'medio', name: 'Medio', desc: 'Equilibrio táctico estándar' },
   { id: 'lento', name: 'Lento', desc: 'Máxima profundidad y cálculo' },
 ];
+
+export function getLocalizedModes(lang = 'es') {
+  const isEn = lang === 'en';
+  return {
+    '1v1': {
+      ...GAME_MODES['1v1'],
+      name: isEn ? '1 vs 1' : '1 contra 1',
+      subtitle: isEn ? 'Tactical Commanders Duel' : 'Duelo Táctico de Comandantes',
+      description: isEn ? '1 deck (52 cards). 10 cards per player, 2 shadows, limit of 8 cards per front.' : GAME_MODES['1v1'].description,
+    },
+    '2v2': {
+      ...GAME_MODES['2v2'],
+      name: isEn ? '2 vs 2' : '2 contra 2',
+      subtitle: isEn ? 'Tactical Squads by Pairs' : 'Escuadrón Táctico por Parejas',
+      description: isEn ? '1 deck (52 cards). 4 players, 5 cards each, 1 shadow, limit of 8 cards per front.' : GAME_MODES['2v2'].description,
+    },
+    '3v3': {
+      ...GAME_MODES['3v3'],
+      name: isEn ? '3 vs 3' : '3 contra 3',
+      subtitle: isEn ? 'Extended Front Battle' : 'Batalla de Frente Ampliado',
+      description: isEn ? '2 combined decks (104 cards). 6 players, 5 cards each, limit of 12 cards per front.' : GAME_MODES['3v3'].description,
+    },
+    '4v4': {
+      ...GAME_MODES['4v4'],
+      name: isEn ? '4 vs 4' : '4 contra 4',
+      subtitle: isEn ? 'Total Army Warfare' : 'Guerra Total de Ejércitos',
+      description: isEn ? '2 combined decks (104 cards). 8 players, 5 cards each, limit of 16 cards per front.' : GAME_MODES['4v4'].description,
+    },
+  };
+}
+
+export function getLocalizedDurations(lang = 'es') {
+  const isEn = lang === 'en';
+  return [
+    { id: 'corta', name: isEn ? 'Short' : 'Corta', rounds: 4, desc: isEn ? '4 Rounds' : '4 Rondas', timeEst: '~10 min' },
+    { id: 'mediana', name: isEn ? 'Medium' : 'Mediana', rounds: 6, desc: isEn ? '6 Rounds' : '6 Rondas', timeEst: '~18 min' },
+    { id: 'larga', name: isEn ? 'Long' : 'Larga', rounds: 8, desc: isEn ? '8 Rounds' : '8 Rondas', timeEst: '~25 min' },
+  ];
+}
+
+export function getLocalizedTimeOptions(lang = 'es') {
+  const isEn = lang === 'en';
+  return [
+    { id: 'rapido', name: isEn ? 'Fast' : 'Rápido', desc: isEn ? 'Agile & dynamic tempo' : 'Ritmo ágil y dinámico' },
+    { id: 'medio', name: isEn ? 'Medium' : 'Medio', desc: isEn ? 'Standard tactical balance' : 'Equilibrio táctico estándar' },
+    { id: 'lento', name: isEn ? 'Slow' : 'Lento', desc: isEn ? 'Maximum depth & calculation' : 'Máxima profundidad y cálculo' },
+  ];
+}
 
 // Tiempos oficiales por formato (Reloj de Equipo compartido por ronda) según Capítulo 3 del reglamento v1.6
 export const TEAM_TIMES = {
@@ -238,31 +305,36 @@ export function calculateFrontScore(cards, trumpSuit, countShadows = true) {
 /**
  * Resuelve el ganador de un frente entre Equipo A y Equipo B
  */
-export function resolveFrontWinner(teamACards, teamBCards, trumpSuit) {
+export function resolveFrontWinner(teamACards, teamBCards, trumpSuit, lang = 'es') {
   const teamACalc = calculateFrontScore(teamACards, trumpSuit, true);
   const teamBCalc = calculateFrontScore(teamBCards, trumpSuit, true);
+  const isEn = lang === 'en';
 
   if (teamACalc.total > teamBCalc.total) {
-    return { winner: 'teamA', reason: 'Mayor puntuación total' };
+    return { winner: 'teamA', reason: isEn ? 'Higher total score' : 'Mayor puntuación total' };
   }
   if (teamBCalc.total > teamACalc.total) {
-    return { winner: 'teamB', reason: 'Mayor puntuación total' };
+    return { winner: 'teamB', reason: isEn ? 'Higher total score' : 'Mayor puntuación total' };
   }
 
   // Empate en puntuación: Criterio oficial de la carta individual de mayor valor base
   if (teamACalc.highestBaseCard > teamBCalc.highestBaseCard) {
     return {
       winner: 'teamA',
-      reason: `Desempate por carta más alta (${teamACalc.highestBaseCard} vs ${teamBCalc.highestBaseCard})`
+      reason: isEn
+        ? `Tie-breaker by highest base card (${teamACalc.highestBaseCard} vs ${teamBCalc.highestBaseCard})`
+        : `Desempate por carta más alta (${teamACalc.highestBaseCard} vs ${teamBCalc.highestBaseCard})`
     };
   }
   if (teamBCalc.highestBaseCard > teamACalc.highestBaseCard) {
     return {
       winner: 'teamB',
-      reason: `Desempate por carta más alta (${teamBCalc.highestBaseCard} vs ${teamACalc.highestBaseCard})`
+      reason: isEn
+        ? `Tie-breaker by highest base card (${teamBCalc.highestBaseCard} vs ${teamACalc.highestBaseCard})`
+        : `Desempate por carta más alta (${teamBCalc.highestBaseCard} vs ${teamACalc.highestBaseCard})`
     };
   }
 
   // Empate absoluto: Frente Nulo
-  return { winner: 'tie', reason: 'Frente Nulo por empate exacto' };
+  return { winner: 'tie', reason: isEn ? 'Void front due to exact tie' : 'Frente Nulo por empate exacto' };
 }

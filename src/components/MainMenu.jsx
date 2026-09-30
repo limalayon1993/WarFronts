@@ -4,6 +4,9 @@ import {
   GAME_DURATIONS,
   TEAM_TIMES,
   TEAM_TIME_OPTIONS,
+  getLocalizedModes,
+  getLocalizedDurations,
+  getLocalizedTimeOptions,
 } from '../constants/rules';
 import {
   Swords,
@@ -23,6 +26,8 @@ import {
   GraduationCap,
   Timer,
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { LanguageToggle } from './LanguageToggle';
 
 export function MainMenu({
   selectedMode,
@@ -40,14 +45,19 @@ export function MainMenu({
   onToggleMute,
   initialView = 'landing',
 }) {
+  const { language, isEn, ui } = useLanguage();
+  const localizedModes = getLocalizedModes(language);
+  const localizedDurations = getLocalizedDurations(language);
+  const localizedTimeOptions = getLocalizedTimeOptions(language);
+
   // 'landing' (2 botones principales) | 'bots' (configurar y crear partida contra bots)
   const [view, setView] = useState(initialView);
 
-  const currentMode = GAME_MODES[selectedMode] || GAME_MODES['1v1'];
-  const currentDuration = GAME_DURATIONS.find(d => d.rounds === selectedRhythm) || GAME_DURATIONS[1];
+  const currentMode = localizedModes[selectedMode] || localizedModes['1v1'];
+  const currentDuration = localizedDurations.find(d => d.rounds === selectedRhythm) || localizedDurations[1];
   const modeTimes = TEAM_TIMES[selectedMode] || TEAM_TIMES['2v2'];
   const currentTimeConfig = modeTimes[selectedTimeSpeed] || modeTimes['medio'];
-  const currentTimeOption = TEAM_TIME_OPTIONS.find(t => t.id === selectedTimeSpeed) || TEAM_TIME_OPTIONS[1];
+  const currentTimeOption = localizedTimeOptions.find(t => t.id === selectedTimeSpeed) || localizedTimeOptions[1];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between p-4 sm:p-6 lg:p-8 relative overflow-hidden select-none">
@@ -56,32 +66,37 @@ export function MainMenu({
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
 
       {/* Cabecera superior común */}
-      <header className="max-w-6xl w-full mx-auto flex items-center justify-between z-10">
+      <header className="max-w-6xl w-full mx-auto flex flex-wrap items-center justify-between gap-3 z-10">
         {view === 'landing' ? (
           <div className="flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-amber-500/20 shadow-lg">
               <Swords className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-xs font-black tracking-widest text-amber-400 uppercase">Sala Táctica</span>
-              <div className="text-sm font-bold text-slate-300">Cuartel General</div>
+              <span className="text-xs font-black tracking-widest text-amber-400 uppercase">
+                {isEn ? 'HQ Tactical Room' : 'Sala Táctica'}
+              </span>
+              <div className="text-sm font-bold text-slate-300">
+                {isEn ? 'General Headquarters' : 'Cuartel General'}
+              </div>
             </div>
           </div>
         ) : (
           <button
             onClick={() => setView('landing')}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition text-xs font-bold shadow"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition text-xs font-bold shadow cursor-pointer"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Volver al Menú</span>
+            <span>{ui.common.backToMenu}</span>
           </button>
         )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Botón de Silenciar */}
           <button
             onClick={onToggleMute}
-            className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition"
-            title={isMuted ? 'Activar sonido' : 'Silenciar'}
+            className="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition cursor-pointer"
+            title={isMuted ? ui.common.unmute : ui.common.mute}
           >
             {isMuted ? <VolumeX className="w-4 h-4 text-slate-500" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
           </button>
@@ -89,32 +104,35 @@ export function MainMenu({
           {/* Botón de Tutorial Guiado */}
           <button
             onClick={onOpenTutorial}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 hover:from-emerald-500/30 hover:to-emerald-600/30 border border-emerald-500/40 text-emerald-300 hover:text-emerald-200 transition flex items-center gap-1.5 text-xs font-bold shadow"
-            title="Iniciar Tutorial Interactivo Guiado 2v2"
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-500/20 to-emerald-600/20 hover:from-emerald-500/30 hover:to-emerald-600/30 border border-emerald-500/40 text-emerald-300 hover:text-emerald-200 transition flex items-center gap-1.5 text-xs font-bold shadow cursor-pointer"
+            title={ui.common.tutorial}
           >
             <GraduationCap className="w-4 h-4 text-emerald-400" />
-            <span>Tutorial</span>
+            <span>{ui.common.tutorial}</span>
           </button>
 
           {/* Botón de Guía Rápida de Mesa */}
           <button
             onClick={onOpenQuickGuide}
-            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/40 text-amber-300 hover:text-amber-200 transition flex items-center gap-1.5 text-xs font-bold shadow"
-            title="Abrir Hoja de Referencia Rápida"
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 border border-amber-500/40 text-amber-300 hover:text-amber-200 transition flex items-center gap-1.5 text-xs font-bold shadow cursor-pointer"
+            title={ui.common.quickGuide}
           >
             <Zap className="w-4 h-4 text-amber-400" />
-            <span>Guía Rápida</span>
+            <span>{ui.common.quickGuide}</span>
           </button>
 
           {/* Botón de Manual Completo */}
           <button
             onClick={onOpenFullManual}
-            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition flex items-center gap-1.5 text-xs font-semibold"
-            title="Ver Reglamento Oficial Completo"
+            className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
+            title={ui.common.fullManual}
           >
             <BookOpen className="w-4 h-4 text-indigo-400" />
-            <span>Manual Completo</span>
+            <span>{ui.common.fullManual}</span>
           </button>
+
+          {/* Botón de Cambio de Idioma (ES / EN) al lado de Tutorial, Guía y Manual */}
+          <LanguageToggle />
         </div>
       </header>
 
@@ -124,19 +142,19 @@ export function MainMenu({
           {/* Título y Presentación */}
           <div className="text-center mb-8 sm:mb-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-amber-400 text-xs font-bold uppercase tracking-wider mb-3">
-              <Flame className="w-3.5 h-3.5 text-amber-400" /> Versión Oficial 1.6 • Inteligencia Táctica
+              <Flame className="w-3.5 h-3.5 text-amber-400" /> {ui.common.versionBadge}
             </div>
 
             <h1 className="text-4xl sm:text-6xl font-black tracking-wider text-slate-100 uppercase drop-shadow-md">
-              Frentes de Guerra
+              {ui.common.gameTitle}
             </h1>
 
             <p className="text-sm sm:text-base text-slate-400 mt-2 max-w-xl mx-auto">
-              Juego táctico de cartas por control de zonas, información imperfecta y sinergias sin microgestión.
+              {ui.menu.subtitle}
             </p>
 
             <div className="inline-flex items-center gap-2 mt-5 px-3.5 py-1 rounded-full bg-slate-900/80 border border-slate-800/80 text-[11px] font-bold uppercase tracking-widest text-slate-400">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Selecciona tu modalidad de juego
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" /> {ui.menu.selectModePrompt}
             </div>
           </div>
 
@@ -156,34 +174,34 @@ export function MainMenu({
                     <GraduationCap className="w-7 h-7" />
                   </div>
                   <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                    Paso a Paso
+                    {ui.menu.cards.tutorial.badge}
                   </span>
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-black text-slate-100 group-hover:text-emerald-300 transition-colors uppercase tracking-wide">
-                  Tutorial
+                  {ui.menu.cards.tutorial.title}
                 </h2>
 
                 <p className="text-xs sm:text-sm text-slate-400 mt-2.5 leading-relaxed">
-                  Partida interactiva 2v2 con bots donde te llevamos de la mano de principio a fin. Aprende qué cartas usar, por qué usarlas y las tácticas del rival.
+                  {ui.menu.cards.tutorial.desc}
                 </p>
 
                 <div className="flex flex-wrap gap-2 mt-5">
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    🎓 100% Guiado
+                    {ui.menu.cards.tutorial.tag}
                   </span>
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    👥 Partida 2v2
+                    {isEn ? '👥 2v2 Match' : '👥 Partida 2v2'}
                   </span>
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    💡 Sin azar
+                    {isEn ? '💡 Zero RNG' : '💡 Sin azar'}
                   </span>
                 </div>
               </div>
 
               <div className="mt-8 pt-4 border-t border-slate-800/80 flex items-center justify-between">
                 <span className="text-xs font-black uppercase tracking-wider text-emerald-400 group-hover:text-emerald-300 transition-colors flex items-center gap-1.5">
-                  Iniciar Tutorial
+                  {ui.menu.cards.tutorial.btn}
                 </span>
                 <div className="w-9 h-9 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-bold shadow-md shadow-emerald-500/20 group-hover:translate-x-1 transition-transform">
                   <ArrowRight className="w-4 h-4" />
@@ -205,34 +223,34 @@ export function MainMenu({
                     <Bot className="w-7 h-7" />
                   </div>
                   <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                    Modo Local
+                    {ui.menu.cards.bots.badge}
                   </span>
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-black text-slate-100 group-hover:text-amber-300 transition-colors uppercase tracking-wide">
-                  Jugar con bots
+                  {ui.menu.cards.bots.title}
                 </h2>
 
                 <p className="text-xs sm:text-sm text-slate-400 mt-2.5 leading-relaxed">
-                  Enfréntate a la IA táctica en partidas individuales o por equipos. Selecciona el formato (1v1 a 4v4), tiempo de equipo y duración en rondas antes del despliegue.
+                  {ui.menu.cards.bots.desc}
                 </p>
 
                 <div className="flex flex-wrap gap-2 mt-5">
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    ⚡ 1v1 a 4v4
+                    {isEn ? '⚡ 1v1 to 4v4' : '⚡ 1v1 a 4v4'}
                   </span>
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    🤖 IA Táctica
+                    {isEn ? '🤖 Tactical AI' : '🤖 IA Táctica'}
                   </span>
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    ⏱ Sin esperas
+                    {isEn ? '⏱ Instant Play' : '⏱ Sin esperas'}
                   </span>
                 </div>
               </div>
 
               <div className="mt-8 pt-4 border-t border-slate-800/80 flex items-center justify-between">
                 <span className="text-xs font-black uppercase tracking-wider text-amber-400 group-hover:text-amber-300 transition-colors flex items-center gap-1.5">
-                  Configurar Partida
+                  {ui.menu.cards.bots.btn}
                 </span>
                 <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold shadow-md shadow-amber-500/20 group-hover:translate-x-1 transition-transform">
                   <ArrowRight className="w-4 h-4" />
@@ -254,34 +272,34 @@ export function MainMenu({
                     <Wifi className="w-7 h-7" />
                   </div>
                   <span className="text-[11px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
-                    Online P2P
+                    {ui.menu.cards.multiplayer.badge}
                   </span>
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-black text-slate-100 group-hover:text-indigo-300 transition-colors uppercase tracking-wide">
-                  Multijugador
+                  {ui.menu.cards.multiplayer.title}
                 </h2>
 
                 <p className="text-xs sm:text-sm text-slate-400 mt-2.5 leading-relaxed">
-                  Crea una sala privada para invitar amigos o únete con un código de sala en tiempo real. Conexión directa jugador a jugador sin registros ni servidores.
+                  {ui.menu.cards.multiplayer.desc}
                 </p>
 
                 <div className="flex flex-wrap gap-2 mt-5">
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    🌐 Código Sala
+                    {isEn ? '🌐 Room Code' : '🌐 Código Sala'}
                   </span>
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    👥 Hasta 8 Jugadores
+                    {isEn ? '👥 Up to 8 Players' : '👥 Hasta 8 Jugadores'}
                   </span>
                   <span className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300">
-                    💬 Chat en Vivo
+                    {isEn ? '💬 Live Chat' : '💬 Chat en Vivo'}
                   </span>
                 </div>
               </div>
 
               <div className="mt-8 pt-4 border-t border-slate-800/80 flex items-center justify-between">
                 <span className="text-xs font-black uppercase tracking-wider text-indigo-400 group-hover:text-indigo-300 transition-colors flex items-center gap-1.5">
-                  Crear o Unirse a Sala
+                  {ui.menu.cards.multiplayer.btn}
                 </span>
                 <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-indigo-600/20 group-hover:translate-x-1 transition-transform">
                   <ArrowRight className="w-4 h-4" />
@@ -298,15 +316,17 @@ export function MainMenu({
           {/* Título de la Fase */}
           <div className="text-center mb-6 sm:mb-8">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">
-              <Bot className="w-3.5 h-3.5 text-amber-400" /> Partida Local vs Bots
+              <Bot className="w-3.5 h-3.5 text-amber-400" /> {isEn ? 'Local Match vs Bots' : 'Partida Local vs Bots'}
             </div>
 
             <h2 className="text-3xl sm:text-5xl font-black tracking-wider text-slate-100 uppercase">
-              Crear Partida con Bots
+              {ui.menu.setup.title}
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl mx-auto">
-              Configura el formato táctico de combate, el tiempo de equipo por ronda y la duración de la partida.
+              {isEn
+                ? 'Configure tactical combat format, team clock per round, and match duration.'
+                : 'Configura el formato táctico de combate, el tiempo de equipo por ronda y la duración de la partida.'}
             </p>
           </div>
 
@@ -314,13 +334,15 @@ export function MainMenu({
           <div className="w-full mb-7">
             <div className="flex items-center justify-between mb-3 px-1">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-amber-400" /> 1. Elige el Formato de Juego
+                <Users className="w-4 h-4 text-amber-400" /> {ui.menu.setup.step1}
               </span>
-              <span className="text-xs text-slate-500">1v1, 2v2, 3v3 y 4v4 con Inteligencia Artificial</span>
+              <span className="text-xs text-slate-500">
+                {isEn ? '1v1, 2v2, 3v3 and 4v4 with Artificial Intelligence' : '1v1, 2v2, 3v3 y 4v4 con Inteligencia Artificial'}
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              {Object.values(GAME_MODES).map((mode) => {
+              {Object.values(localizedModes).map((mode) => {
                 const isSelected = selectedMode === mode.id;
                 return (
                   <button
@@ -342,11 +364,11 @@ export function MainMenu({
                           ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                           : 'bg-slate-800 text-slate-400 border-slate-700'
                       }`}>
-                        {mode.decks === 1 ? '1 Baraja (52 cartas)' : '2 Barajas (104 cartas)'}
+                        {mode.decks === 1 ? (isEn ? '1 Deck (52 cards)' : '1 Baraja (52 cartas)') : (isEn ? '2 Decks (104 cards)' : '2 Barajas (104 cartas)')}
                       </span>
 
                       <span className="text-xs font-mono font-bold text-slate-400">
-                        {mode.totalPlayers} Jugadores
+                        {mode.totalPlayers} {isEn ? 'Players' : 'Jugadores'}
                       </span>
                     </div>
 
@@ -360,8 +382,8 @@ export function MainMenu({
 
                     {/* Resumen táctico inferior */}
                     <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 font-mono">
-                      <span>Límite Frente: <strong className="text-slate-300">{mode.maxFrontCards}</strong></span>
-                      <span>Sombras: <strong className="text-purple-400">{mode.shadowsPerPlayer}</strong></span>
+                      <span>{isEn ? 'Front Cap:' : 'Límite Frente:'} <strong className="text-slate-300">{mode.maxFrontCards}</strong></span>
+                      <span>{isEn ? 'Shadows:' : 'Sombras:'} <strong className="text-purple-400">{mode.shadowsPerPlayer}</strong></span>
                     </div>
                   </button>
                 );
@@ -373,13 +395,15 @@ export function MainMenu({
           <div className="w-full mb-7">
             <div className="flex items-center justify-between mb-3 px-1">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <Timer className="w-4 h-4 text-amber-400" /> 2. Elige el Tiempo de Equipo (Reloj Compartido)
+                <Timer className="w-4 h-4 text-amber-400" /> {ui.menu.setup.step3}
               </span>
-              <span className="text-xs text-slate-500">Bolsa de tiempo conjunta por equipo para cada ronda</span>
+              <span className="text-xs text-slate-500">
+                {isEn ? 'Joint team time bank for each round' : 'Bolsa de tiempo conjunta por equipo para cada ronda'}
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              {TEAM_TIME_OPTIONS.map((timeOpt) => {
+              {localizedTimeOptions.map((timeOpt) => {
                 const isSelected = selectedTimeSpeed === timeOpt.id;
                 const speedConfig = modeTimes[timeOpt.id];
                 return (
@@ -410,7 +434,9 @@ export function MainMenu({
               })}
             </div>
             <p className="text-[11px] text-slate-500 mt-2 px-1">
-              ⏱️ El tiempo es compartido para todo el equipo y se consume durante los turnos de sus componentes. Se reinicia al valor completo en cada nueva ronda.
+              {isEn
+                ? '⏱️ Time is shared across the entire team and counts down during members\' turns. Resets to full value each round.'
+                : '⏱️ El tiempo es compartido para todo el equipo y se consume durante los turnos de sus componentes. Se reinicia al valor completo en cada nueva ronda.'}
             </p>
           </div>
 
@@ -418,13 +444,15 @@ export function MainMenu({
           <div className="w-full mb-7">
             <div className="flex items-center justify-between mb-3 px-1">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-amber-400" /> 3. Elige la Duración de la Partida
+                <Clock className="w-4 h-4 text-amber-400" /> {ui.menu.setup.step2}
               </span>
-              <span className="text-xs text-slate-500">Determina el total de rondas reglamentarias a disputar</span>
+              <span className="text-xs text-slate-500">
+                {isEn ? 'Determines the total number of regular rounds to contest' : 'Determina el total de rondas reglamentarias a disputar'}
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-              {GAME_DURATIONS.map((dur) => {
+              {localizedDurations.map((dur) => {
                 const isSelected = selectedRhythm === dur.rounds;
                 return (
                   <button
@@ -459,13 +487,17 @@ export function MainMenu({
           <div className="w-full max-w-4xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
               <span className="text-[11px] uppercase font-bold text-amber-400 tracking-wider block">
-                Configuración Seleccionada
+                {isEn ? 'Selected Configuration' : 'Configuración Seleccionada'}
               </span>
               <div className="text-base font-black text-slate-100">
-                Modo {currentMode.name} • Tiempo {currentTimeConfig.label} ({currentTimeOption.name}) • Duración {currentDuration.name} ({currentDuration.rounds} Rondas)
+                {isEn
+                  ? `Mode: ${currentMode.name} • Time: ${currentTimeConfig.label} (${currentTimeOption.name}) • Duration: ${currentDuration.name} (${currentDuration.rounds} Rounds)`
+                  : `Modo ${currentMode.name} • Tiempo ${currentTimeConfig.label} (${currentTimeOption.name}) • Duración ${currentDuration.name} (${currentDuration.rounds} Rondas)`}
               </div>
               <div className="text-xs text-slate-400 mt-0.5">
-                Jugarás como comandante en el equipo aliado contra la IA. Reloj de equipo reiniciado cada ronda.
+                {isEn
+                  ? 'You will play as commander in the allied squad against AI. Team clock resets every round.'
+                  : 'Jugarás como comandante en el equipo aliado contra la IA. Reloj de equipo reiniciado cada ronda.'}
               </div>
             </div>
 
@@ -477,7 +509,7 @@ export function MainMenu({
                 className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border border-slate-700 transition"
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Volver</span>
+                <span>{ui.menu.setup.cancelBtn}</span>
               </button>
 
               {/* Botón Iniciar Partida vs Bots */}
@@ -487,7 +519,7 @@ export function MainMenu({
                 className="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-amber-500/25 shadow-xl transition-all duration-150 hover:scale-105 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-current" />
-                <span>Iniciar Partida</span>
+                <span>{ui.menu.setup.startMatchBtn}</span>
               </button>
             </div>
           </div>
@@ -496,11 +528,11 @@ export function MainMenu({
 
       {/* Pie inferior común */}
       <footer className="max-w-6xl w-full mx-auto text-center text-xs text-slate-500 py-2 border-t border-slate-900 z-10 flex flex-wrap items-center justify-between gap-2">
-        <span>Frentes de Guerra v1.6 — Edición Oficial Competitiva</span>
+        <span>{ui.menu.footer.rights}</span>
         <div className="flex items-center gap-3 text-slate-400">
-          <button onClick={onOpenQuickGuide} className="hover:text-amber-400 transition">Guía Rápida de Mesa</button>
+          <button onClick={onOpenQuickGuide} className="hover:text-amber-400 transition">{ui.common.quickGuide}</button>
           <span>•</span>
-          <button onClick={onOpenFullManual} className="hover:text-indigo-400 transition">Reglamento Completo</button>
+          <button onClick={onOpenFullManual} className="hover:text-indigo-400 transition">{ui.common.fullManual}</button>
         </div>
       </footer>
     </div>

@@ -13,7 +13,9 @@ import {
   formatClockTime,
   calculateFrontScore,
   resolveFrontWinner,
+  getLocalizedFronts,
 } from './constants/rules';
+import { useLanguage } from './context/LanguageContext';
 import { chooseBotMove } from './utils/aiBot';
 import { sound } from './utils/audio';
 import { mp, sanitizeGameStateForPlayer } from './utils/multiplayer';
@@ -40,6 +42,9 @@ import {
 } from 'lucide-react';
 
 export default function App() {
+  const { language, isEn, ui } = useLanguage();
+  const localizedFronts = getLocalizedFronts(language);
+
   // Estado de Pantalla: 'menu' | 'multiplayer_lobby' | 'game'
   const [screen, setScreen] = useState('menu');
   const [initialRoomCode, setInitialRoomCode] = useState('');
@@ -97,6 +102,32 @@ export default function App() {
   const [penaltyNotice, setPenaltyNotice] = useState(null);
   const [initiativeNotice, setInitiativeNotice] = useState(null);
   const [flagFallTeam, setFlagFallTeam] = useState(null); // 'teamA' | 'teamB' | null
+
+  function getInitiativeNoticeText(notice) {
+    if (!notice) return '';
+    if (typeof notice === 'string') return notice;
+    const { roundNumber, initiativeTeam: iteam, is1v1: isOne, isMp: isMulti } = notice;
+    const isTeamA = iteam === 'teamA';
+    if (roundNumber === 1) {
+      if (isMulti) return ui.game.notices.initiativeDrawMp(iteam);
+      if (isOne) return isTeamA ? ui.game.notices.initiativeDraw1v1TeamA : ui.game.notices.initiativeDraw1v1TeamB;
+      return isTeamA ? ui.game.notices.initiativeDrawTeamA : ui.game.notices.initiativeDrawTeamB;
+    } else {
+      if (isMulti) return ui.game.notices.initiativeRotMp(roundNumber, iteam);
+      if (isOne) return isTeamA ? ui.game.notices.initiativeRot1v1TeamA(roundNumber) : ui.game.notices.initiativeRot1v1TeamB(roundNumber);
+      return isTeamA ? ui.game.notices.initiativeRotTeamA(roundNumber) : ui.game.notices.initiativeRotTeamB(roundNumber);
+    }
+  }
+
+  function getPenaltyNoticeText(penalty) {
+    if (!penalty) return '';
+    if (typeof penalty === 'string') return penalty;
+    const { infringingTeam, is1v1: isOne } = penalty;
+    if (isOne) {
+      return infringingTeam === 'teamA' ? ui.game.notices.flagFall1v1TeamA : ui.game.notices.flagFall1v1TeamB;
+    }
+    return infringingTeam === 'teamA' ? ui.game.notices.flagFallTeamA : ui.game.notices.flagFallTeamB;
+  }
 
   // Frentes de combate: { left: { teamA: [], teamB: [] }, ... }
   const [fronts, setFronts] = useState({
@@ -407,7 +438,7 @@ export default function App() {
       }
       return ordered.map(s => ({
         id: s.slotId,
-        name: s.playerName || (s.isBot ? `Bot ${s.slotId}` : `Jugador ${s.slotId}`),
+        name: s.playerName || (s.isBot ? `Bot ${s.slotId}` : (isEn ? `Player ${s.slotId}` : `Jugador ${s.slotId}`)),
         team: s.team,
         isHuman: s.isHuman,
         isBot: s.isBot,
@@ -424,7 +455,7 @@ export default function App() {
       for (let i = 1; i <= teamSize; i++) {
         list.push({
           id: `A${i}`,
-          name: i === 1 ? 'Tú (A1)' : `Aliado A${i}`,
+          name: i === 1 ? (isEn ? 'You (A1)' : 'Tú (A1)') : (isEn ? `Ally A${i}` : `Aliado A${i}`),
           team: 'teamA',
           isHuman: i === 1,
           isBot: i !== 1,
@@ -434,7 +465,7 @@ export default function App() {
         });
         list.push({
           id: `B${i}`,
-          name: `Rival B${i}`,
+          name: isEn ? `Rival B${i}` : `Rival B${i}`,
           team: 'teamB',
           isHuman: false,
           isBot: true,
@@ -447,7 +478,7 @@ export default function App() {
       for (let i = 1; i <= teamSize; i++) {
         list.push({
           id: `B${i}`,
-          name: `Rival B${i}`,
+          name: isEn ? `Rival B${i}` : `Rival B${i}`,
           team: 'teamB',
           isHuman: false,
           isBot: true,
@@ -457,7 +488,7 @@ export default function App() {
         });
         list.push({
           id: `A${i}`,
-          name: i === 1 ? 'Tú (A1)' : `Aliado A${i}`,
+          name: i === 1 ? (isEn ? 'You (A1)' : 'Tú (A1)') : (isEn ? `Ally A${i}` : `Aliado A${i}`),
           team: 'teamA',
           isHuman: i === 1,
           isBot: i !== 1,
@@ -497,7 +528,7 @@ export default function App() {
       teamARoundScoreSum += teamAScore.total;
       teamBRoundScoreSum += teamBScore.total;
 
-      const resolution = resolveFrontWinner(teamACards, teamBCards, activeTrumpSuit);
+      const resolution = resolveFrontWinner(teamACards, teamBCards, activeTrumpSuit, language);
       if (resolution.winner === 'teamA') teamAFrontWins++;
       if (resolution.winner === 'teamB') teamBFrontWins++;
     });
@@ -696,18 +727,9 @@ export default function App() {
     setFlagFallTeam(infringingTeam);
 
     const is1v1 = (selectedMode || stateRef.current.selectedMode) === '1v1';
-    let noticeText = '';
-    if (is1v1) {
-      noticeText = infringingTeam === 'teamA'
-        ? '⏱️ ¡Caída de Bandera! Se agotó tu reloj de equipo (00:00). El rival gana la ronda (+1 Punto de Ronda).'
-        : '⏱️ ¡Caída de Bandera! Se agotó el reloj de equipo del rival (00:00). ¡Ganas la ronda (+1 Punto de Ronda)!';
-    } else {
-      noticeText = infringingTeam === 'teamA'
-        ? '⏱️ ¡Caída de Bandera! Se agotó el reloj del Equipo Aliado (A) a 00:00. El Equipo B suma +1 Punto de Ronda.'
-        : '⏱️ ¡Caída de Bandera! Se agotó el reloj del Equipo Rival (B) a 00:00. El Equipo Aliado (A) suma +1 Punto de Ronda.';
-    }
+    const penaltyNoticeObj = { infringingTeam, is1v1 };
 
-    setPenaltyNotice(noticeText);
+    setPenaltyNotice(penaltyNoticeObj);
     setTimeout(() => setPenaltyNotice(null), 6000);
 
     stateRef.current = {
@@ -719,7 +741,7 @@ export default function App() {
       teamBCumulativePoints: newTeamBCumulative,
       roundOverTimer: 60,
       roundOverReadyPlayers: [],
-      penaltyNotice: noticeText,
+      penaltyNotice: penaltyNoticeObj,
       flagFallTeam: infringingTeam,
     };
 
@@ -728,7 +750,7 @@ export default function App() {
     if (isMp && isHst) {
       mp.broadcast({
         type: 'PENALTY_NOTICE',
-        notice: noticeText,
+        notice: getPenaltyNoticeText(penaltyNoticeObj),
       });
       broadcastStateToClients(stateRef.current);
     }
@@ -949,25 +971,13 @@ export default function App() {
     const is1v1 = activeModeId === '1v1';
     const isMp = isMultiplayer || forceMultiplayerHost || stateRef.current.isMultiplayer;
 
-    let noticeText = '';
-    if (roundNumber === 1) {
-      if (isMp) {
-        noticeText = `🎲 Sorteo de Iniciativa (Ronda 1): ¡Le ha tocado empezar atacando al ${isTeamA ? 'Equipo A' : 'Equipo B'}!`;
-      } else if (is1v1) {
-        noticeText = `🎲 Sorteo de Iniciativa (Ronda 1): ¡${isTeamA ? 'Te ha tocado a TI empezar atacando' : 'Le ha tocado al RIVAL empezar atacando'}!`;
-      } else {
-        noticeText = `🎲 Sorteo de Iniciativa (Ronda 1): ¡${isTeamA ? 'Le ha tocado a TU EQUIPO (A) empezar atacando' : 'Le ha tocado al EQUIPO RIVAL (B) empezar atacando'}!`;
-      }
-    } else {
-      if (isMp) {
-        noticeText = `🔄 Rotación de Iniciativa (Ronda ${roundNumber}): Por reglamento alterna la iniciativa. Empieza atacando el ${isTeamA ? 'Equipo A' : 'Equipo B'}.`;
-      } else if (is1v1) {
-        noticeText = `🔄 Rotación de Iniciativa (Ronda ${roundNumber}): Por reglamento alterna la iniciativa. Ahora ${isTeamA ? 'te toca a TI empezar atacando' : 'le toca al RIVAL empezar atacando'}.`;
-      } else {
-        noticeText = `🔄 Rotación de Iniciativa (Ronda ${roundNumber}): Por reglamento alterna la iniciativa. Ahora ${isTeamA ? 'le toca a TU EQUIPO (A) empezar atacando' : 'le toca al EQUIPO RIVAL (B) empezar atacando'}.`;
-      }
-    }
-    setInitiativeNotice(noticeText);
+    const noticeObj = {
+      roundNumber,
+      initiativeTeam: newInitiativeTeam,
+      is1v1,
+      isMp,
+    };
+    setInitiativeNotice(noticeObj);
     setFlagFallTeam(null);
 
     const isMultiplayerActive = isMultiplayer || forceMultiplayerHost || stateRef.current.isMultiplayer;
@@ -977,7 +987,7 @@ export default function App() {
       ...stateRef.current,
       round: roundNumber,
       initiativeTeam: newInitiativeTeam,
-      initiativeNotice: noticeText,
+      initiativeNotice: noticeObj,
       drawDeck: pool,
       discardDeck: discards,
       trumpCard: trump,
@@ -1536,13 +1546,13 @@ export default function App() {
         <div className="bg-gradient-to-r from-amber-950/95 via-indigo-950/95 to-slate-900 border-b border-amber-500/50 text-amber-200 px-4 py-2 text-xs flex items-center justify-between shadow-lg animate-fadeIn">
           <div className="flex items-center gap-2.5">
             <Dices className="w-4 h-4 text-amber-400 shrink-0 animate-bounce" />
-            <span className="font-semibold text-slate-100">{initiativeNotice}</span>
+            <span className="font-semibold text-slate-100">{getInitiativeNoticeText(initiativeNotice)}</span>
           </div>
           <button
             onClick={() => setInitiativeNotice(null)}
             className="text-[10px] uppercase font-bold text-amber-400 hover:text-white px-2.5 py-0.5 rounded bg-slate-900/60 border border-amber-500/30 hover:border-amber-400 transition"
           >
-            Entendido
+            {ui.common?.ok || (isEn ? 'Understood' : 'Entendido')}
           </button>
         </div>
       )}
@@ -1551,7 +1561,7 @@ export default function App() {
       {penaltyNotice && (
         <div className="bg-rose-950/95 border-b border-rose-700 text-rose-200 px-4 py-2 text-xs flex items-center gap-2 shadow-lg animate-bounce">
           <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-          <span className="font-semibold">{penaltyNotice}</span>
+          <span className="font-semibold">{getPenaltyNoticeText(penaltyNotice)}</span>
         </div>
       )}
 
@@ -1561,15 +1571,7 @@ export default function App() {
           <div className="flex items-center gap-2 max-w-2xl">
             <Clock className="w-4 h-4 shrink-0 animate-spin" />
             <span>
-              {selectedMode === '1v1' ? (
-                <>
-                  <strong>FASE 2: Fase Táctica (30s) — SIN CARTAS EN MANO.</strong> Planificación táctica individual: prepara mentalmente tu táctica y contrataque antes del reparto.
-                </>
-              ) : (
-                <>
-                  <strong>FASE 2: Táctica de Equipo (30s) — SIN CARTAS EN MANO.</strong> Planificad zonas prioritarias antes del reparto (Regla anti-jugador alfa).
-                </>
-              )}
+              {selectedMode === '1v1' ? ui.game.planning.banner1v1 : ui.game.planning.bannerTeam}
             </span>
           </div>
 
@@ -1586,7 +1588,7 @@ export default function App() {
                 className="bg-slate-950 hover:bg-slate-900 text-amber-400 px-3.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 shadow transition cursor-pointer"
               >
                 <Play className="w-3 h-3 fill-current" />
-                <span>{selectedMode === '1v1' ? '¡Iniciar Duelo!' : '¡Empezar Ya!'}</span>
+                <span>{selectedMode === '1v1' ? ui.game.planning.startDuelBtn : ui.game.planning.startNowBtn}</span>
               </button>
             ) : (
               <button
@@ -1606,7 +1608,7 @@ export default function App() {
               >
                 <Check className={`w-3.5 h-3.5 ${readyPlayers.includes(mySlotId) ? 'stroke-[3]' : ''}`} />
                 <span>
-                  {readyPlayers.includes(mySlotId) ? '¡Listo!' : '¡Preparado!'} (
+                  {readyPlayers.includes(mySlotId) ? ui.game.planning.readyBtn : ui.game.planning.preparingBtn} (
                   {readyPlayers.filter(id => {
                     const p = players.find(player => player.id === id);
                     return p && p.isHuman && !p.isBot;
@@ -1622,7 +1624,7 @@ export default function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 flex flex-col justify-between gap-3">
         {/* LOS 3 FRENTES DE GUERRA (SIN CONTADOR DE PUNTOS AUTOMÁTICO) */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 my-auto">
-          {FRONTS.map(front => (
+          {localizedFronts.map(front => (
             <FrontZone
               key={front.id}
               frontKey={front.id}
@@ -1655,13 +1657,13 @@ export default function App() {
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold text-slate-200">
-                Tu Mano: {localPlayer?.name || 'Comandante'} ({localPlayer?.hand?.length || 0} cartas)
+                {ui.game.hand.yourHandTitle(localPlayer?.name || (isEn ? 'Commander' : 'Comandante'), localPlayer?.hand?.length || 0)}
               </span>
 
               {isMyTurn && (
                 <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[10px] uppercase font-black px-2 py-0.5 rounded-full flex items-center gap-1.5 animate-pulse shadow-sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                  ¡Te toca tirar!
+                  {ui.game.hand.yourTurnBadge}
                 </span>
               )}
 
@@ -1680,10 +1682,10 @@ export default function App() {
               >
                 <EyeOff className="w-3.5 h-3.5" />
                 <span>
-                  {isShadowMode ? 'Modo Sombra ACTIVO' : 'Jugar como Sombra'}
+                  {isShadowMode ? ui.game.hand.shadowActiveBtn : ui.game.hand.playShadowBtn}
                 </span>
                 <span className="bg-purple-950/80 px-1.5 py-0.2 rounded text-[10px] font-mono">
-                  {localPlayer?.shadowsLeft || 0} restantes
+                  {ui.game.hand.shadowsRemaining(localPlayer?.shadowsLeft || 0)}
                 </span>
               </button>
             </div>
@@ -1693,16 +1695,16 @@ export default function App() {
               {isMyTurn ? (
                 <span className="text-xs text-amber-400 font-bold animate-pulse">
                   {selectedCardId
-                    ? `Haz clic o arrastra al frente para desplegar (Reloj: ${formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock)})`
-                    : `Es tu turno: arrastra o elige una carta (Reloj: ${formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock)})`}
+                    ? ui.game.hand.actionInstructionDrag(formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock))
+                    : ui.game.hand.actionInstructionPick(formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock))}
                 </span>
               ) : phase === 'planning' ? (
                 <span className="text-xs text-amber-300">
-                  {selectedMode === '1v1' ? 'Fase táctica: prepara tu estrategia mentalmente...' : 'Planificad táctica macro (sin cartas)...'}
+                  {selectedMode === '1v1' ? ui.game.hand.planningInstruction1v1 : ui.game.hand.planningInstructionTeam}
                 </span>
               ) : (
                 <span className="text-xs text-slate-500">
-                  Esperando el turno de {players.find(p => p.id === currentTurnPlayerId)?.name || 'otro jugador'}...
+                  {ui.game.hand.waitingForTurn(players.find(p => p.id === currentTurnPlayerId)?.name || (isEn ? 'another player' : 'otro jugador'))}
                 </span>
               )}
             </div>
@@ -1713,8 +1715,8 @@ export default function App() {
             {!localPlayer || !localPlayer.hand || localPlayer.hand.length === 0 ? (
               <span className="text-sm text-slate-500 italic">
                 {phase === 'planning'
-                  ? `Fase de Táctica: Recibirás tus ${modeConfig.handSize} cartas al comenzar el despliegue.`
-                  : 'Has desplegado todas tus tropas de esta ronda.'}
+                  ? ui.game.hand.emptyHandPlanning(modeConfig.handSize)
+                  : ui.game.hand.emptyHandPlayed}
               </span>
             ) : (
               localPlayer.hand.map(card => {

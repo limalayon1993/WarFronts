@@ -23,21 +23,28 @@ import {
   GAME_DURATIONS,
   TEAM_TIMES,
   TEAM_TIME_OPTIONS,
+  getLocalizedModes,
+  getLocalizedDurations,
+  getLocalizedTimeOptions,
 } from '../constants/rules';
 import { mp, formatRoomCode, generateRoomCode } from '../utils/multiplayer';
+import { useLanguage } from '../context/LanguageContext';
+import { LanguageToggle } from './LanguageToggle';
 
 export function MultiplayerLobby({
   onStartMultiplayerGame,
   onBackToMenu,
   initialRoomCode = '',
 }) {
+  const { language, isEn, ui } = useLanguage();
+
   // Estado de conexión: 'idle' | 'creating' | 'joining' | 'inLobby'
   const [connectionStatus, setConnectionStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState(null);
 
   // Formulario de conexión
   const [activeTab, setActiveTab] = useState(initialRoomCode ? 'join' : 'create');
-  const [playerName, setPlayerName] = useState(() => localStorage.getItem('wf_player_name') || 'Comandante');
+  const [playerName, setPlayerName] = useState(() => localStorage.getItem('wf_player_name') || (isEn ? 'Commander' : 'Comandante'));
   const [inputRoomCode, setInputRoomCode] = useState(initialRoomCode || '');
   const [selectedMode, setSelectedMode] = useState('2v2');
   const [selectedRhythm, setSelectedRhythm] = useState(6);
@@ -131,7 +138,7 @@ export function MultiplayerLobby({
           return s;
         });
         broadcastLobbyState(updated, selectedMode, selectedRhythm, false);
-        mp.sendChat(`El comandante ${found.playerName} (${found.slotId}) se ha desconectado.`);
+        mp.sendChat(isEn ? `Commander ${found.playerName} (${found.slotId}) disconnected.` : `El comandante ${found.playerName} (${found.slotId}) se ha desconectado.`);
         return updated;
       });
     });
@@ -147,7 +154,7 @@ export function MultiplayerLobby({
       unsubDisconnect();
       unsubClientDisc();
     };
-  }, [onStartMultiplayerGame, lobbySlots, selectedMode, selectedRhythm, selectedTimeSpeed, autoFillBots]);
+  }, [onStartMultiplayerGame, lobbySlots, selectedMode, selectedRhythm, selectedTimeSpeed, autoFillBots, isEn]);
 
   // Inicializar slots de la sala (todos los puestos no-host empiezan vacíos)
   const buildInitialSlots = (modeId, hostName, fillWithBots = false) => {
@@ -159,11 +166,11 @@ export function MultiplayerLobby({
     for (let i = 1; i <= teamSize; i++) {
       slots.push({
         slotId: `A${i}`,
-        label: i === 1 ? 'Capitán Aliado (A1)' : `Aliado A${i}`,
+        label: i === 1 ? (isEn ? 'Allied Captain (A1)' : 'Capitán Aliado (A1)') : (isEn ? `Ally A${i}` : `Aliado A${i}`),
         team: 'teamA',
         isHost: i === 1,
         peerId: i === 1 ? mp.myPeerId : null,
-        playerName: i === 1 ? hostName : (fillWithBots ? `Bot A${i}` : 'Vacío'),
+        playerName: i === 1 ? hostName : (fillWithBots ? `Bot A${i}` : (isEn ? 'Empty' : 'Vacío')),
         isBot: i !== 1 && fillWithBots,
         isHuman: i === 1,
       });
@@ -173,11 +180,11 @@ export function MultiplayerLobby({
     for (let i = 1; i <= teamSize; i++) {
       slots.push({
         slotId: `B${i}`,
-        label: i === 1 ? 'Capitán Rival (B1)' : `Rival B${i}`,
+        label: i === 1 ? (isEn ? 'Rival Captain (B1)' : 'Capitán Rival (B1)') : (isEn ? `Rival B${i}` : `Rival B${i}`),
         team: 'teamB',
         isHost: false,
         peerId: null,
-        playerName: fillWithBots ? `Bot B${i}` : 'Vacío',
+        playerName: fillWithBots ? `Bot B${i}` : (isEn ? 'Empty' : 'Vacío'),
         isBot: fillWithBots,
         isHuman: false,
       });
@@ -205,10 +212,10 @@ export function MultiplayerLobby({
 
       // Notificar chat de bienvenida
       setChatMessages([
-        { senderName: 'Sistema', text: `¡Sala ${res.roomCode} creada! Comparte el código con tus compañeros y rivales.` }
+        { senderName: isEn ? 'System' : 'Sistema', text: isEn ? `Room ${res.roomCode} created! Share the code with your teammates and rivals.` : `¡Sala ${res.roomCode} creada! Comparte el código con tus compañeros y rivales.` }
       ]);
     } catch (err) {
-      setErrorMessage(err.message || 'No se pudo crear la sala.');
+      setErrorMessage(err.message || (isEn ? 'Could not create room.' : 'No se pudo crear la sala.'));
       setConnectionStatus('idle');
     }
   };
@@ -216,7 +223,7 @@ export function MultiplayerLobby({
   // Unirse a Sala (Client)
   const handleJoinRoom = async () => {
     if (!inputRoomCode.trim()) {
-      setErrorMessage('Por favor introduce un código de sala válido.');
+      setErrorMessage(isEn ? 'Please enter a valid room code.' : 'Por favor introduce un código de sala válido.');
       return;
     }
 
@@ -229,10 +236,10 @@ export function MultiplayerLobby({
       setIsHost(false);
       setConnectionStatus('inLobby');
       setChatMessages([
-        { senderName: 'Sistema', text: `Conectado a la sala ${res.roomCode}. Esperando asignación de puesto...` }
+        { senderName: isEn ? 'System' : 'Sistema', text: isEn ? `Connected to room ${res.roomCode}. Waiting for slot assignment...` : `Conectado a la sala ${res.roomCode}. Esperando asignación de puesto...` }
       ]);
     } catch (err) {
-      setErrorMessage(err.message || 'Error al conectar a la sala.');
+      setErrorMessage(err.message || (isEn ? 'Error connecting to room.' : 'Error al conectar a la sala.'));
       setConnectionStatus('idle');
     }
   };
@@ -243,7 +250,7 @@ export function MultiplayerLobby({
       // Buscar el primer slot disponible (que sea bot o vacío)
       const targetIndex = prevSlots.findIndex(s => !s.isHuman);
       if (targetIndex === -1) {
-        conn.send({ type: 'ERROR', message: 'La sala está completa.' });
+        conn.send({ type: 'ERROR', message: isEn ? 'The room is full.' : 'La sala está completa.' });
         return prevSlots;
       }
 
@@ -326,7 +333,7 @@ export function MultiplayerLobby({
           return {
             ...slot,
             isBot: nextIsBot,
-            playerName: nextIsBot ? `Bot ${slot.slotId}` : 'Vacío',
+            playerName: nextIsBot ? `Bot ${slot.slotId}` : (isEn ? 'Empty' : 'Vacío'),
           };
         }
         return slot;
@@ -357,7 +364,7 @@ export function MultiplayerLobby({
             return {
               ...slot,
               isBot: false,
-              playerName: 'Vacío',
+              playerName: isEn ? 'Empty' : 'Vacío',
             };
           }
         }
@@ -417,7 +424,9 @@ export function MultiplayerLobby({
     const emptySlots = lobbySlots.filter(s => !s.isHuman && !s.isBot);
     if (emptySlots.length > 0) {
       setErrorMessage(
-        `Hay ${emptySlots.length} puesto(s) vacío(s). Espera a más jugadores, pulsa '+ Bot' en los huecos o usa el botón 'Rellenar con Bots' para poder iniciar.`
+        isEn
+          ? `There are ${emptySlots.length} empty slot(s). Wait for more players, click '+ Bot' on slots or use 'Fill with Bots' to start.`
+          : `Hay ${emptySlots.length} puesto(s) vacío(s). Espera a más jugadores, pulsa '+ Bot' en los huecos o usa el botón 'Rellenar con Bots' para poder iniciar.`
       );
       return;
     }
@@ -465,10 +474,13 @@ export function MultiplayerLobby({
     onBackToMenu();
   };
 
-  const modeConfig = GAME_MODES[selectedMode] || GAME_MODES['2v2'];
+  const localizedModes = getLocalizedModes(language);
+  const localizedDurations = getLocalizedDurations(language);
+  const localizedTimeOptions = getLocalizedTimeOptions(language);
+  const modeConfig = localizedModes[selectedMode] || localizedModes['2v2'];
   const modeTimes = TEAM_TIMES[selectedMode] || TEAM_TIMES['2v2'];
   const currentTimeConfig = modeTimes[selectedTimeSpeed] || modeTimes['medio'];
-  const currentDuration = GAME_DURATIONS.find(d => d.rounds === selectedRhythm) || GAME_DURATIONS[1];
+  const currentDuration = localizedDurations.find(d => d.rounds === selectedRhythm) || localizedDurations[1];
 
   // PANTALLA 1: CONEXIÓN O CREACIÓN (Si aún no está en sala)
   if (connectionStatus !== 'inLobby') {
@@ -481,16 +493,19 @@ export function MultiplayerLobby({
             className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white transition text-xs font-bold border border-slate-800"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Volver al Menú</span>
+            <span>{ui.common.backToMenu}</span>
           </button>
 
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
-              <Wifi className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider">Multijugador P2P</div>
-              <div className="text-xs text-slate-400">Frentes de Guerra Online</div>
+          <div className="flex items-center gap-3">
+            <LanguageToggle compact />
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+                <Wifi className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider">{ui.multiplayer.headerTitle}</div>
+                <div className="text-xs text-slate-400">{ui.multiplayer.headerSubtitle}</div>
+              </div>
             </div>
           </div>
         </header>
@@ -500,17 +515,17 @@ export function MultiplayerLobby({
           <div className="text-center">
             <h2 className="text-2xl font-black text-slate-100 uppercase tracking-wide flex items-center justify-center gap-2">
               <Swords className="w-6 h-6 text-amber-400" />
-              <span>Guerra en Red</span>
+              <span>{ui.multiplayer.connectBoxTitle}</span>
             </h2>
             <p className="text-xs text-slate-400 mt-1">
-              Conexión directa jugador a jugador sin servidores externos.
+              {ui.multiplayer.connectBoxSubtitle}
             </p>
           </div>
 
           {/* Nombre de Jugador */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-              Tu Nombre de Comandante
+              {ui.multiplayer.nameLabel}
             </label>
             <div className="relative">
               <User className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
@@ -519,7 +534,7 @@ export function MultiplayerLobby({
                 maxLength={20}
                 value={playerName}
                 onChange={(e) => handleNameChange(e.target.value)}
-                placeholder="Ej. Comandante Antonio"
+                placeholder={ui.multiplayer.namePlaceholder}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-sm text-slate-100 font-semibold focus:outline-none focus:border-amber-500 transition"
               />
             </div>
@@ -535,7 +550,7 @@ export function MultiplayerLobby({
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              Crear Nueva Sala
+              {ui.multiplayer.tabCreate}
             </button>
             <button
               onClick={() => setActiveTab('join')}
@@ -545,7 +560,7 @@ export function MultiplayerLobby({
                   : 'text-slate-400 hover:text-white'
               }`}
             >
-              Unirse a Sala
+              {ui.multiplayer.tabJoin}
             </button>
           </div>
 
@@ -561,10 +576,10 @@ export function MultiplayerLobby({
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                  Formato de Batalla
+                  {ui.multiplayer.formatLabel}
                 </label>
                 <div className="grid grid-cols-2 gap-2">
-                  {Object.values(GAME_MODES).map((mode) => (
+                  {Object.values(localizedModes).map((mode) => (
                     <button
                       key={mode.id}
                       type="button"
@@ -576,7 +591,7 @@ export function MultiplayerLobby({
                       }`}
                     >
                       <strong className="block text-slate-200">{mode.name}</strong>
-                      <span className="text-[10px] text-slate-500">{mode.totalPlayers} jugadores</span>
+                      <span className="text-[10px] text-slate-500">{mode.totalPlayers} {isEn ? 'players' : 'jugadores'}</span>
                     </button>
                   ))}
                 </div>
@@ -587,12 +602,12 @@ export function MultiplayerLobby({
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
                     <Timer className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Tiempo de Equipo (Reloj Compartido)</span>
+                    <span>{ui.multiplayer.clockLabel}</span>
                   </label>
-                  <span className="text-[10px] text-slate-500">Por ronda</span>
+                  <span className="text-[10px] text-slate-500">{isEn ? 'Per round' : 'Por ronda'}</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
-                  {TEAM_TIME_OPTIONS.map((t) => {
+                  {localizedTimeOptions.map((t) => {
                     const speedCfg = modeTimes[t.id];
                     return (
                       <button
@@ -616,10 +631,10 @@ export function MultiplayerLobby({
               {/* Selección de Duración de la Partida */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                  Duración de la Partida (Rondas)
+                  {ui.multiplayer.durationLabel}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {GAME_DURATIONS.map((dur) => (
+                  {localizedDurations.map((dur) => (
                     <button
                       key={dur.rounds}
                       type="button"
@@ -631,7 +646,7 @@ export function MultiplayerLobby({
                       }`}
                     >
                       <div>{dur.name}</div>
-                      <div className="text-[10px] text-slate-500 font-normal">{dur.rounds} rondas</div>
+                      <div className="text-[10px] text-slate-500 font-normal">{dur.rounds} {isEn ? 'rounds' : 'rondas'}</div>
                     </button>
                   ))}
                 </div>
@@ -643,7 +658,7 @@ export function MultiplayerLobby({
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition disabled:opacity-50"
               >
                 <Play className="w-4 h-4 fill-current" />
-                <span>{connectionStatus === 'creating' ? 'Creando Sala...' : 'Crear Sala Táctica'}</span>
+                <span>{connectionStatus === 'creating' ? ui.multiplayer.creatingRoom : ui.multiplayer.createRoomBtn}</span>
               </button>
             </div>
           )}
@@ -653,14 +668,14 @@ export function MultiplayerLobby({
             <div className="space-y-4">
               <div className="space-y-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block">
-                  Código de Sala
+                  {ui.multiplayer.roomCodeLabel}
                 </label>
                 <input
                   type="text"
                   maxLength={10}
                   value={inputRoomCode}
                   onChange={(e) => setInputRoomCode(e.target.value.toUpperCase())}
-                  placeholder="Ej. WF-A892"
+                  placeholder={ui.multiplayer.roomCodePlaceholder}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-center text-lg font-mono font-black tracking-widest text-amber-400 uppercase focus:outline-none focus:border-amber-500 transition"
                 />
               </div>
@@ -671,14 +686,14 @@ export function MultiplayerLobby({
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg transition disabled:opacity-50"
               >
                 <Wifi className="w-4 h-4" />
-                <span>{connectionStatus === 'joining' ? 'Conectando...' : 'Unirse a la Batalla'}</span>
+                <span>{connectionStatus === 'joining' ? ui.multiplayer.joiningRoom : ui.multiplayer.joinRoomBtn}</span>
               </button>
             </div>
           )}
         </main>
 
         <footer className="text-center text-xs text-slate-500">
-          Multijugador P2P compatible con redes locales e Internet
+          {isEn ? 'P2P Multiplayer compatible with local networks and Internet' : 'Multijugador P2P compatible con redes locales e Internet'}
         </footer>
       </div>
     );
@@ -697,17 +712,17 @@ export function MultiplayerLobby({
           <button
             onClick={handleLeaveLobby}
             className="p-2 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-white transition"
-            title="Salir de la sala"
+            title={ui.multiplayer.leaveRoom}
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs uppercase font-black text-amber-400 tracking-wider">
-                Sala Multijugador
+                {isEn ? 'Multiplayer Room' : 'Sala Multijugador'}
               </span>
               <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded font-mono font-bold">
-                {modeConfig.name} • {currentTimeConfig?.text || currentTimeConfig?.label} • Duración {currentDuration?.name} ({selectedRhythm} Rondas)
+                {modeConfig.name} • {currentTimeConfig?.text || currentTimeConfig?.label} • {isEn ? 'Duration' : 'Duración'} {currentDuration?.name} ({selectedRhythm} {isEn ? 'Rounds' : 'Rondas'})
               </span>
             </div>
             <div className="flex items-center gap-2 mt-0.5">
@@ -717,18 +732,18 @@ export function MultiplayerLobby({
               <button
                 onClick={handleCopyCode}
                 className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition text-xs flex items-center gap-1 font-semibold"
-                title="Copiar código de sala"
+                title={ui.multiplayer.copyCode}
               >
                 {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span className="hidden sm:inline">{copiedCode ? '¡Copiado!' : 'Copiar'}</span>
+                <span className="hidden sm:inline">{copiedCode ? ui.multiplayer.copiedCode : ui.multiplayer.copyCode}</span>
               </button>
               <button
                 onClick={handleCopyLink}
                 className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition text-xs flex items-center gap-1 font-semibold"
-                title="Copiar enlace de invitación"
+                title={ui.multiplayer.copyLink}
               >
                 {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5" />}
-                <span className="hidden sm:inline">{copiedLink ? '¡Enlace copiado!' : 'Invitar'}</span>
+                <span className="hidden sm:inline">{copiedLink ? ui.multiplayer.copiedLink : ui.multiplayer.copyLink}</span>
               </button>
             </div>
           </div>
@@ -736,10 +751,11 @@ export function MultiplayerLobby({
 
         {/* Rol y estado */}
         <div className="flex items-center gap-3">
+          <LanguageToggle compact />
           <div className="text-right">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block">Tu Rol</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block">{isEn ? 'Your Role' : 'Tu Rol'}</span>
             <span className="text-xs font-black text-emerald-400 font-mono">
-              {isHost ? '★ Anfitrión' : 'Comandante Invitado'} ({mySlotId})
+              {isHost ? (isEn ? '★ Host' : '★ Anfitrión') : (isEn ? 'Guest Commander' : 'Comandante Invitado')} ({mySlotId})
             </span>
           </div>
 
@@ -748,10 +764,10 @@ export function MultiplayerLobby({
               <button
                 onClick={handleFillAllBots}
                 className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-amber-300 text-xs font-bold border border-slate-700 transition flex items-center gap-1.5"
-                title={hasAnyEmptySlot ? 'Rellenar huecos vacíos con Bots' : 'Vaciar todos los Bots'}
+                title={hasAnyEmptySlot ? (isEn ? 'Fill empty slots with Bots' : 'Rellenar huecos vacíos con Bots') : (isEn ? 'Clear all Bots' : 'Vaciar todos los Bots')}
               >
                 <Bot className="w-3.5 h-3.5 text-amber-400" />
-                <span>{hasAnyEmptySlot ? 'Rellenar con Bots' : 'Vaciar Bots'}</span>
+                <span>{hasAnyEmptySlot ? (isEn ? 'Fill with Bots' : 'Rellenar con Bots') : (isEn ? 'Clear Bots' : 'Vaciar Bots')}</span>
               </button>
 
               <button
@@ -759,7 +775,7 @@ export function MultiplayerLobby({
                 className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-amber-500/20 transition hover:scale-105 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-current" />
-                <span>¡Comenzar Batalla!</span>
+                <span>{ui.multiplayer.startGameBtn}</span>
               </button>
             </div>
           )}
@@ -791,11 +807,11 @@ export function MultiplayerLobby({
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
                 <h3 className="font-black text-emerald-400 text-base uppercase tracking-wider">
-                  Equipo Aliado (A)
+                  {ui.multiplayer.teamALabel}
                 </h3>
               </div>
               <span className="text-xs font-mono font-bold text-slate-400">
-                {teamASlots.filter(s => s.isHuman).length} Humanos / {teamASlots.length} Puestos
+                {teamASlots.filter(s => s.isHuman).length} {isEn ? 'Humans' : 'Humanos'} / {teamASlots.length} {isEn ? 'Slots' : 'Puestos'}
               </span>
             </div>
 
@@ -836,7 +852,7 @@ export function MultiplayerLobby({
                       <div>
                         <div className="flex items-center gap-1.5">
                           {isEmpty ? (
-                            <strong className="text-xs text-slate-500 italic">Puesto Vacío</strong>
+                            <strong className="text-xs text-slate-500 italic">{isEn ? 'Empty Slot' : 'Puesto Vacío'}</strong>
                           ) : (
                             <strong className={`text-xs ${slot.isBot ? 'text-amber-200' : 'text-slate-100'}`}>
                               {slot.playerName}
@@ -850,17 +866,17 @@ export function MultiplayerLobby({
                           )}
                           {slot.isBot && (
                             <span className="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 rounded font-bold uppercase">
-                              IA Bot
+                              {isEn ? 'AI Bot' : 'IA Bot'}
                             </span>
                           )}
                           {isMe && (
                             <span className="text-[9px] bg-emerald-500 text-slate-950 px-1 rounded font-black uppercase">
-                              Tú
+                              {isEn ? 'You' : 'Tú'}
                             </span>
                           )}
                         </div>
                         <span className="text-[10px] text-slate-500 font-mono">
-                          {slot.label} {isEmpty && '• Esperando jugador o bot'}
+                          {slot.label} {isEmpty && (isEn ? '• Waiting for player or bot' : '• Esperando jugador o bot')}
                         </span>
                       </div>
                     </div>
@@ -878,7 +894,7 @@ export function MultiplayerLobby({
                           }}
                           className="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-600/40 text-xs font-bold transition"
                         >
-                          Ocupar
+                          {ui.multiplayer.takeSlot}
                         </button>
                       )}
 
@@ -890,9 +906,9 @@ export function MultiplayerLobby({
                               ? 'bg-rose-950/40 hover:bg-rose-900/50 text-rose-300 border-rose-800/50'
                               : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30'
                           }`}
-                          title={slot.isBot ? 'Vaciar este puesto' : 'Asignar un Bot a este puesto'}
+                          title={slot.isBot ? (isEn ? 'Empty this slot' : 'Vaciar este puesto') : (isEn ? 'Assign a Bot to this slot' : 'Asignar un Bot a este puesto')}
                         >
-                          {slot.isBot ? 'Quitar Bot' : '+ Añadir Bot'}
+                          {slot.isBot ? (isEn ? 'Remove Bot' : 'Quitar Bot') : (isEn ? '+ Add Bot' : '+ Añadir Bot')}
                         </button>
                       )}
                     </div>
@@ -903,8 +919,8 @@ export function MultiplayerLobby({
           </div>
 
           <div className="pt-3 border-t border-slate-800/80 text-[11px] text-slate-500 font-mono flex items-center justify-between">
-            <span>Iniciativa: Determinada en Ronda 1</span>
-            <span className="text-emerald-400 font-bold">Flanco Aliado</span>
+            <span>{isEn ? 'Initiative: Determined in Round 1' : 'Iniciativa: Determinada en Ronda 1'}</span>
+            <span className="text-emerald-400 font-bold">{isEn ? 'Allied Flank' : 'Flanco Aliado'}</span>
           </div>
         </div>
 
@@ -915,11 +931,11 @@ export function MultiplayerLobby({
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-rose-400 animate-pulse" />
                 <h3 className="font-black text-rose-400 text-base uppercase tracking-wider">
-                  Equipo Rival (B)
+                  {ui.multiplayer.teamBLabel}
                 </h3>
               </div>
               <span className="text-xs font-mono font-bold text-slate-400">
-                {teamBSlots.filter(s => s.isHuman).length} Humanos / {teamBSlots.length} Puestos
+                {teamBSlots.filter(s => s.isHuman).length} {isEn ? 'Humans' : 'Humanos'} / {teamBSlots.length} {isEn ? 'Slots' : 'Puestos'}
               </span>
             </div>
 
@@ -960,7 +976,7 @@ export function MultiplayerLobby({
                       <div>
                         <div className="flex items-center gap-1.5">
                           {isEmpty ? (
-                            <strong className="text-xs text-slate-500 italic">Puesto Vacío</strong>
+                            <strong className="text-xs text-slate-500 italic">{isEn ? 'Empty Slot' : 'Puesto Vacío'}</strong>
                           ) : (
                             <strong className={`text-xs ${slot.isBot ? 'text-amber-200' : 'text-slate-100'}`}>
                               {slot.playerName}
@@ -969,17 +985,17 @@ export function MultiplayerLobby({
 
                           {slot.isBot && (
                             <span className="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 rounded font-bold uppercase">
-                              IA Bot
+                              {isEn ? 'AI Bot' : 'IA Bot'}
                             </span>
                           )}
                           {isMe && (
                             <span className="text-[9px] bg-rose-500 text-slate-950 px-1 rounded font-black uppercase">
-                              Tú
+                              {isEn ? 'You' : 'Tú'}
                             </span>
                           )}
                         </div>
                         <span className="text-[10px] text-slate-500 font-mono">
-                          {slot.label} {isEmpty && '• Esperando jugador o bot'}
+                          {slot.label} {isEmpty && (isEn ? '• Waiting for player or bot' : '• Esperando jugador o bot')}
                         </span>
                       </div>
                     </div>
@@ -997,7 +1013,7 @@ export function MultiplayerLobby({
                           }}
                           className="px-2.5 py-1 rounded-lg bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-600/40 text-xs font-bold transition"
                         >
-                          Ocupar
+                          {ui.multiplayer.takeSlot}
                         </button>
                       )}
 
@@ -1009,9 +1025,9 @@ export function MultiplayerLobby({
                               ? 'bg-rose-950/40 hover:bg-rose-900/50 text-rose-300 border-rose-800/50'
                               : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border-amber-500/30'
                           }`}
-                          title={slot.isBot ? 'Vaciar este puesto' : 'Asignar un Bot a este puesto'}
+                          title={slot.isBot ? (isEn ? 'Empty this slot' : 'Vaciar este puesto') : (isEn ? 'Assign a Bot to this slot' : 'Asignar un Bot a este puesto')}
                         >
-                          {slot.isBot ? 'Quitar Bot' : '+ Añadir Bot'}
+                          {slot.isBot ? (isEn ? 'Remove Bot' : 'Quitar Bot') : (isEn ? '+ Add Bot' : '+ Añadir Bot')}
                         </button>
                       )}
                     </div>
@@ -1022,8 +1038,8 @@ export function MultiplayerLobby({
           </div>
 
           <div className="pt-3 border-t border-slate-800/80 text-[11px] text-slate-500 font-mono flex items-center justify-between">
-            <span>Iniciativa: Determinada en Ronda 1</span>
-            <span className="text-rose-400 font-bold">Flanco Rival</span>
+            <span>{isEn ? 'Initiative: Determined in Round 1' : 'Iniciativa: Determinada en Ronda 1'}</span>
+            <span className="text-rose-400 font-bold">{isEn ? 'Rival Flank' : 'Flanco Rival'}</span>
           </div>
         </div>
       </main>
@@ -1033,16 +1049,16 @@ export function MultiplayerLobby({
         <div className="w-full sm:w-1/2 flex flex-col">
           <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-slate-400 mb-1">
             <MessageSquare className="w-3 h-3 text-amber-400" />
-            <span>Chat de Sala</span>
+            <span>{ui.multiplayer.chatTitle}</span>
           </div>
 
           <div className="h-16 overflow-y-auto bg-slate-950 p-2 rounded-lg border border-slate-800 text-[11px] space-y-1 mb-2">
             {chatMessages.length === 0 ? (
-              <span className="text-slate-600 italic">No hay mensajes aún en la sala...</span>
+              <span className="text-slate-600 italic">{isEn ? 'No messages yet in the room...' : 'No hay mensajes aún en la sala...'}</span>
             ) : (
               chatMessages.map((m, idx) => (
                 <div key={idx} className="leading-tight">
-                  <strong className={m.senderName === 'Sistema' ? 'text-amber-400' : 'text-slate-300'}>
+                  <strong className={m.senderName === 'Sistema' || m.senderName === 'System' ? 'text-amber-400' : 'text-slate-300'}>
                     {m.senderName}:
                   </strong>{' '}
                   <span className="text-slate-400">{m.text}</span>
@@ -1056,7 +1072,7 @@ export function MultiplayerLobby({
               type="text"
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Mensaje a la sala..."
+              placeholder={ui.multiplayer.chatPlaceholder}
               className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-amber-500"
             />
             <button
@@ -1073,16 +1089,16 @@ export function MultiplayerLobby({
           {isHost ? (
             <div className="text-xs text-slate-400">
               <span className="text-amber-400 font-bold block mb-1">
-                ¿Todo listo para el combate?
+                {isEn ? 'Ready for combat?' : '¿Todo listo para el combate?'}
               </span>
-              Haz clic en <strong>¡Comenzar Batalla!</strong> para repartir las tropas.
+              {isEn ? 'Click Start Battle! to deal troops.' : 'Haz clic en ¡Comenzar Batalla! para repartir las tropas.'}
             </div>
           ) : (
             <div className="text-xs text-slate-400">
               <span className="text-emerald-400 font-bold block mb-1">
-                Conectado a la sala
+                {isEn ? 'Connected to room' : 'Conectado a la sala'}
               </span>
-              Esperando a que el anfitrión inicie la partida...
+              {isEn ? 'Waiting for host to start match...' : 'Esperando a que el anfitrión inicie la partida...'}
             </div>
           )}
         </div>

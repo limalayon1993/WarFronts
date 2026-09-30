@@ -12,8 +12,11 @@ import {
   Layers,
   Trophy,
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { LanguageToggle } from './LanguageToggle';
 
 export function QuickGuideModal({ isOpen, onClose }) {
+  const { guideT, ui } = useLanguage();
   if (!isOpen) return null;
 
   return (
@@ -28,14 +31,14 @@ export function QuickGuideModal({ isOpen, onClose }) {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base sm:text-lg font-black tracking-wider uppercase text-slate-100">
-                  Frentes de Guerra — Guía Rápida de Mesa v1.6
+                  {guideT.title}
                 </h2>
                 <span className="text-[10px] bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-black uppercase">
-                  Hoja de Referencia
+                  {guideT.badge}
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Edición Oficial por Equipos (2v2, 3v3, 4v4) + Anexo Duelo 1v1
+                {guideT.subtitle}
               </p>
             </div>
           </div>
@@ -43,21 +46,22 @@ export function QuickGuideModal({ isOpen, onClose }) {
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-3 text-xs text-slate-400 font-medium">
               <span className="flex items-center gap-1 text-slate-300">
-                <Swords className="w-3.5 h-3.5 text-amber-400" /> 3 Frentes: Izquierdo, Centro, Derecho
+                <Swords className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.fronts}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 text-slate-300">
-                <Trophy className="w-3.5 h-3.5 text-amber-400" /> Rondas: Corta: 4 • Mediana: 6 • Larga: 8
+                <Trophy className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.rounds}
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 text-slate-300">
-                <Clock className="w-3.5 h-3.5 text-amber-400" /> Reloj Equipo: R (10s/t) • M (20s/t) • L (30s/t)
+                <Clock className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.clocks}
               </span>
             </div>
+            <LanguageToggle compact />
             <button
               onClick={onClose}
               className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
-              title="Cerrar Guía"
+              title={guideT.closeBtn}
             >
               <X className="w-5 h-5" />
             </button>
@@ -73,57 +77,57 @@ export function QuickGuideModal({ isOpen, onClose }) {
               <div>
                 <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
                   <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
-                    <Users className="w-4 h-4" /> 1. Especificaciones y Límites por Modo
+                    <Users className="w-4 h-4" /> {guideT.block1.title}
                   </h3>
-                  <span className="text-[10px] text-slate-400 font-mono">Formato Oficial v1.6</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{guideT.block1.formatTag}</span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 mb-3 text-center">
                   {/* Modo 2v2 */}
                   <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
                     <div className="text-[10px] uppercase font-bold text-amber-400 flex items-center justify-center gap-1">
-                      <span>Modo 2v2</span>
-                      <span className="text-slate-500 font-normal">(4 jug.)</span>
+                      <span>{guideT.block1.mode2v2.title}</span>
+                      <span className="text-slate-500 font-normal">{guideT.block1.mode2v2.players}</span>
                     </div>
-                    <div className="text-lg font-black text-slate-100 my-0.5">8 Cartas</div>
-                    <div className="text-[10px] text-rose-400 font-semibold">Límite TOTAL / frente</div>
+                    <div className="text-lg font-black text-slate-100 my-0.5">{guideT.block1.mode2v2.limit}</div>
+                    <div className="text-[10px] text-rose-400 font-semibold">{guideT.block1.mode2v2.limitLabel}</div>
                     <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
-                      🎴 1 Baraja • 5 c/jug (10 turnos)
+                      {guideT.block1.mode2v2.detail}
                     </div>
                     <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-slate-900 py-0.5 px-1 rounded">
-                      R: 1:40 | M: 3:20 | L: 5:00
+                      {guideT.block1.mode2v2.clock}
                     </div>
                   </div>
 
                   {/* Modo 3v3 */}
                   <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
                     <div className="text-[10px] uppercase font-bold text-amber-400 flex items-center justify-center gap-1">
-                      <span>Modo 3v3</span>
-                      <span className="text-slate-500 font-normal">(6 jug.)</span>
+                      <span>{guideT.block1.mode3v3.title}</span>
+                      <span className="text-slate-500 font-normal">{guideT.block1.mode3v3.players}</span>
                     </div>
-                    <div className="text-lg font-black text-slate-100 my-0.5">12 Cartas</div>
-                    <div className="text-[10px] text-rose-400 font-semibold">Límite TOTAL / frente</div>
+                    <div className="text-lg font-black text-slate-100 my-0.5">{guideT.block1.mode3v3.limit}</div>
+                    <div className="text-[10px] text-rose-400 font-semibold">{guideT.block1.mode3v3.limitLabel}</div>
                     <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
-                      🎴 2 Barajas • 5 c/jug (15 turnos)
+                      {guideT.block1.mode3v3.detail}
                     </div>
                     <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-slate-900 py-0.5 px-1 rounded">
-                      R: 2:30 | M: 5:00 | L: 7:30
+                      {guideT.block1.mode3v3.clock}
                     </div>
                   </div>
 
                   {/* Modo 4v4 */}
                   <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
                     <div className="text-[10px] uppercase font-bold text-amber-400 flex items-center justify-center gap-1">
-                      <span>Modo 4v4</span>
-                      <span className="text-slate-500 font-normal">(8 jug.)</span>
+                      <span>{guideT.block1.mode4v4.title}</span>
+                      <span className="text-slate-500 font-normal">{guideT.block1.mode4v4.players}</span>
                     </div>
-                    <div className="text-lg font-black text-slate-100 my-0.5">16 Cartas</div>
-                    <div className="text-[10px] text-rose-400 font-semibold">Límite TOTAL / frente</div>
+                    <div className="text-lg font-black text-slate-100 my-0.5">{guideT.block1.mode4v4.limit}</div>
+                    <div className="text-[10px] text-rose-400 font-semibold">{guideT.block1.mode4v4.limitLabel}</div>
                     <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
-                      🎴 2 Barajas • 5 c/jug (20 turnos)
+                      {guideT.block1.mode4v4.detail}
                     </div>
                     <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-slate-900 py-0.5 px-1 rounded">
-                      R: 3:20 | M: 6:40 | L: 10:00
+                      {guideT.block1.mode4v4.clock}
                     </div>
                   </div>
                 </div>
@@ -132,21 +136,21 @@ export function QuickGuideModal({ isOpen, onClose }) {
                   <div className="flex items-start gap-2 bg-slate-950/60 p-2 rounded border border-slate-800/80">
                     <ShieldAlert className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
                     <span>
-                      <strong className="text-rose-300">Límite Compartido (Saturación):</strong> Suma de cartas de AMBOS equipos en un frente. Al alcanzar el tope, el frente se cierra inmediatamente.
+                      {guideT.block1.saturationNotice}
                     </span>
                   </div>
                   <div className="flex items-start gap-2 bg-slate-950/60 p-2 rounded border border-slate-800/80">
                     <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                     <span>
-                      <strong className="text-amber-300">Rotación de Iniciativa:</strong> Ronda 1 por sorteo aleatorio (corte de baraja en presencial). Desde Ronda 2 rota automáticamente al rival.
+                      {guideT.block1.initiativeNotice}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className="mt-3 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] font-semibold text-slate-400">
-                <span>Partida Oficial: Según la duración elegida</span>
-                <span className="text-emerald-400 font-bold">Gana quien sume más Puntos de Ronda</span>
+                <span>{guideT.block1.matchSummary}</span>
+                <span className="text-emerald-400 font-bold">{guideT.block1.winSummary}</span>
               </div>
             </div>
 
@@ -155,9 +159,9 @@ export function QuickGuideModal({ isOpen, onClose }) {
               <div>
                 <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
                   <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
-                    <Scale className="w-4 h-4" /> 2. Resolución de Empates y Criterio Final
+                    <Scale className="w-4 h-4" /> {guideT.block2.title}
                   </h3>
-                  <span className="text-[10px] text-slate-400 font-mono">Jerarquía Oficial</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{guideT.block2.tag}</span>
                 </div>
 
                 <div className="space-y-2 text-xs">
@@ -167,9 +171,9 @@ export function QuickGuideModal({ isOpen, onClose }) {
                       1
                     </span>
                     <div>
-                      <strong className="text-slate-100 block">Empate en Puntaje de Frente:</strong>
+                      <strong className="text-slate-100 block">{guideT.block2.crit1Title}</strong>
                       <span className="text-slate-400">
-                        Gana el equipo que posea la <span className="text-amber-300 font-bold">carta individual de mayor valor base</span> jugada en él. Si persiste el empate exacto, el Frente se declara Nulo.
+                        {guideT.block2.crit1Desc}
                       </span>
                     </div>
                   </div>
@@ -180,9 +184,9 @@ export function QuickGuideModal({ isOpen, onClose }) {
                       2
                     </span>
                     <div>
-                      <strong className="text-slate-100 block">Empate de Ronda (ej. 1-1 y 1 Nulo):</strong>
+                      <strong className="text-slate-100 block">{guideT.block2.crit2Title}</strong>
                       <span className="text-slate-400">
-                        Ronda Nula. Ninguno suma punto de ronda, pero <span className="text-emerald-400 font-bold">SE REGISTRAN</span> los puntos numéricos acumulados de todos los frentes.
+                        {guideT.block2.crit2Desc}
                       </span>
                     </div>
                   </div>
@@ -193,11 +197,11 @@ export function QuickGuideModal({ isOpen, onClose }) {
                       3
                     </span>
                     <div>
-                      <strong className="text-slate-100 block">Desempate de Partida:</strong>
+                      <strong className="text-slate-100 block">{guideT.block2.crit3Title}</strong>
                       <div className="text-[11px] text-slate-400 space-y-0.5 mt-0.5">
-                        <div>• <strong className="text-emerald-300">1º Puntos Acumulados:</strong> Suma total de puntos numéricos de todos los frentes a lo largo de las rondas.</div>
-                        <div>• <strong className="text-amber-300">2º Prórroga:</strong> 2 rondas adicionales si persiste el empate exacto en acumulados.</div>
-                        <div>• <strong className="text-slate-300">3º Acumulación Continua:</strong> Si se empata prórroga, se suman puntos hasta desempate definitivo.</div>
+                        <div>• <strong className="text-emerald-300">{guideT.block2.crit3Sub1}</strong></div>
+                        <div>• <strong className="text-amber-300">{guideT.block2.crit3Sub2}</strong></div>
+                        <div>• <strong className="text-slate-300">{guideT.block2.crit3Sub3}</strong></div>
                       </div>
                     </div>
                   </div>
@@ -206,7 +210,7 @@ export function QuickGuideModal({ isOpen, onClose }) {
 
               <div className="mt-3 pt-2 border-t border-slate-800 flex items-center gap-2 text-[11px] text-slate-400 bg-slate-950/60 px-2.5 py-1.5 rounded">
                 <Layers className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                <span><strong className="text-slate-200">Mazo Continuo:</strong> El pozo de descartes NO se rebaraja entre rondas salvo que se agote el mazo principal.</span>
+                <span>{guideT.block2.continuousDeck}</span>
               </div>
             </div>
           </div>
@@ -215,10 +219,10 @@ export function QuickGuideModal({ isOpen, onClose }) {
           <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4">
             <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
               <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
-                <Clock className="w-4 h-4" /> 3. Las 4 Fases de la Ronda (Secuencia de Turno Inflexible)
+                <Clock className="w-4 h-4" /> {guideT.block3.title}
               </h3>
               <span className="text-[10px] bg-slate-800 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">
-                Táctica: 30s | Reloj de Equipo Compartido • 4 Pasos Estrictos
+                {guideT.block3.subtitleTag}
               </span>
             </div>
 
@@ -226,71 +230,71 @@ export function QuickGuideModal({ isOpen, onClose }) {
               {/* Fase 1 */}
               <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-black text-amber-400">FASE 1</span>
-                  <span className="text-[9px] bg-slate-800 text-slate-400 px-1 rounded uppercase">Setup</span>
+                  <span className="text-xs font-black text-amber-400">{guideT.block3.phase1.badge}</span>
+                  <span className="text-[9px] bg-slate-800 text-slate-400 px-1 rounded uppercase">{guideT.block3.phase1.tag}</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-200 mb-1">Preparación & Triunfo</h4>
+                <h4 className="text-xs font-bold text-slate-200 mb-1">{guideT.block3.phase1.title}</h4>
                 <ul className="text-[11px] text-slate-400 space-y-1">
-                  <li>• <strong>Palo Triunfo:</strong> Revelar 1ª carta del mazo (<span className="text-amber-400">+2 pts</span> por carta de este palo).</li>
-                  <li>• <strong>Marcador Sombra:</strong> Colocar en estado activo frente a cada jugador.</li>
-                  <li>• <strong>Iniciativa:</strong> Rota al equipo rival cada ronda.</li>
+                  <li>• {guideT.block3.phase1.p1}</li>
+                  <li>• {guideT.block3.phase1.p2}</li>
+                  <li>• {guideT.block3.phase1.p3}</li>
                 </ul>
-                <div className="text-[9px] text-slate-500 mt-2 italic">La carta de triunfo va al descarte al terminar la ronda.</div>
+                <div className="text-[9px] text-slate-500 mt-2 italic">{guideT.block3.phase1.footer}</div>
               </div>
 
               {/* Fase 2 */}
               <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-black text-amber-400">FASE 2</span>
-                  <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1 rounded font-mono">30 Segundos</span>
+                  <span className="text-xs font-black text-amber-400">{guideT.block3.phase2.badge}</span>
+                  <span className="text-[9px] bg-amber-500/20 text-amber-300 px-1 rounded font-mono">{guideT.block3.phase2.tag}</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-200 mb-1">Táctica de Equipo</h4>
+                <h4 className="text-xs font-bold text-slate-200 mb-1">{guideT.block3.phase2.title}</h4>
                 <ul className="text-[11px] text-slate-400 space-y-1">
-                  <li>• <strong>Comunicación Libre:</strong> Coordinar estrategia macro, frentes a priorizar y roles/señas.</li>
-                  <li className="text-rose-300 font-semibold">• <strong>SIN CARTAS EN MANO:</strong> Evita el "Jugador Alfa" al no conocer la mano exacta.</li>
+                  <li>• {guideT.block3.phase2.p1}</li>
+                  <li className="text-rose-300 font-semibold">• {guideT.block3.phase2.p2}</li>
                 </ul>
-                <div className="text-[9px] text-slate-500 mt-2 italic">Planificación general antes del reparto.</div>
+                <div className="text-[9px] text-slate-500 mt-2 italic">{guideT.block3.phase2.footer}</div>
               </div>
 
               {/* Fase 3 */}
               <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-black text-amber-400">FASE 3</span>
-                  <span className="text-[9px] bg-slate-800 text-slate-400 px-1 rounded uppercase">Reparto</span>
+                  <span className="text-xs font-black text-amber-400">{guideT.block3.phase3.badge}</span>
+                  <span className="text-[9px] bg-slate-800 text-slate-400 px-1 rounded uppercase">{guideT.block3.phase3.tag}</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-200 mb-1">Reparto de Cartas</h4>
+                <h4 className="text-xs font-bold text-slate-200 mb-1">{guideT.block3.phase3.title}</h4>
                 <ul className="text-[11px] text-slate-400 space-y-1">
-                  <li>• <strong>5 Cartas:</strong> Se reparten boca abajo a cada jugador del mazo principal.</li>
-                  <li className="text-purple-300 font-semibold">• <strong>SILENCIO ABSOLUTO:</strong> Prohibido hablar o hacer señas desde este instante.</li>
+                  <li>• {guideT.block3.phase3.p1}</li>
+                  <li className="text-purple-300 font-semibold">• {guideT.block3.phase3.p2}</li>
                 </ul>
-                <div className="text-[9px] text-slate-500 mt-2 italic">Inicia el despliegue a ciegas y deducción.</div>
+                <div className="text-[9px] text-slate-500 mt-2 italic">{guideT.block3.phase3.footer}</div>
               </div>
 
               {/* Fase 4 */}
               <div className="bg-slate-950 p-3 rounded-lg border border-slate-800">
                 <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-black text-amber-400">FASE 4</span>
-                  <span className="text-[9px] bg-rose-500/20 text-rose-300 px-1 rounded font-mono">Reloj de Equipo</span>
+                  <span className="text-xs font-black text-amber-400">{guideT.block3.phase4.badge}</span>
+                  <span className="text-[9px] bg-rose-500/20 text-rose-300 px-1 rounded font-mono">{guideT.block3.phase4.tag}</span>
                 </div>
-                <h4 className="text-xs font-bold text-slate-200 mb-1">Despliegue Táctico</h4>
+                <h4 className="text-xs font-bold text-slate-200 mb-1">{guideT.block3.phase4.title}</h4>
                 <ul className="text-[11px] text-slate-400 space-y-1">
-                  <li>• <strong>Turnos 1 a 1:</strong> Alternado (<span className="font-mono">1A➔1B➔2A➔2B</span>).</li>
-                  <li>• <strong>Acción:</strong> Jugar 1 carta en frente no saturado y conmutar reloj.</li>
-                  <li>• <strong>Carta Sombra:</strong> Máx 1 boca abajo por jugador volteando marcador.</li>
-                  <li className="text-rose-400 font-semibold">• <strong>Caída de Bandera (00:00):</strong> El rival gana la ronda (+1 Pt) y se conservan acumulados en mesa.</li>
+                  <li>• {guideT.block3.phase4.p1}</li>
+                  <li>• {guideT.block3.phase4.p2}</li>
+                  <li>• {guideT.block3.phase4.p3}</li>
+                  <li className="text-rose-400 font-semibold">• {guideT.block3.phase4.p4}</li>
                 </ul>
-                <div className="text-[9px] text-slate-500 mt-2 italic">Cierre al colocar las 5 cartas.</div>
+                <div className="text-[9px] text-slate-500 mt-2 italic">{guideT.block3.phase4.footer}</div>
               </div>
             </div>
 
             {/* Tras completar el despliegue */}
             <div className="mt-3 bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex flex-wrap items-center justify-between text-xs text-slate-300 gap-2">
               <span className="font-bold text-amber-400 flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" /> TRAS COMPLETAR EL DESPLIEGUE:
+                <Sparkles className="w-3.5 h-3.5" /> {guideT.block3.postDeploy.title}
               </span>
-              <span>1. <strong>Revelación:</strong> Voltear todas las Cartas Sombra.</span>
-              <span>2. <strong>Suma:</strong> Valor Base + Sinergias (+5) + Triunfos (+2).</span>
-              <span className="text-emerald-400 font-bold">3. <strong>Ganador:</strong> Ganar al menos 2 de 3 frentes = +1 Pt de Ronda.</span>
+              <span>{guideT.block3.postDeploy.s1}</span>
+              <span>{guideT.block3.postDeploy.s2}</span>
+              <span className="text-emerald-400 font-bold">{guideT.block3.postDeploy.s3}</span>
             </div>
           </div>
 
@@ -301,27 +305,27 @@ export function QuickGuideModal({ isOpen, onClose }) {
               <div>
                 <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
                   <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
-                    <Sparkles className="w-4 h-4" /> 4. Cálculo de Fuerza por Frente (Suma Total)
+                    <Sparkles className="w-4 h-4" /> {guideT.block4.title}
                   </h3>
-                  <span className="text-[10px] text-slate-400 font-mono">Valores Base + Bonos</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{guideT.block4.tag}</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 mb-3">
                   <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Cartas Numéricas</span>
-                    <strong className="text-xs text-slate-100 block">Valor Nominal</strong>
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">{guideT.block4.numericTitle}</span>
+                    <strong className="text-xs text-slate-100 block">{guideT.block4.nominalValue}</strong>
                     <p className="text-[11px] text-slate-400 mt-1">
-                      Cartas del 2 al 10 otorgan su valor exacto (2 = 2 pts, 10 = 10 pts).
+                      {guideT.block4.numericDesc}
                     </p>
                   </div>
 
                   <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                    <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Figuras y As</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">{guideT.block4.figuresTitle}</span>
                     <div className="flex items-center gap-1 font-mono font-bold text-xs text-amber-400">
                       <span>J=11</span> <span>Q=12</span> <span>K=13</span> <span className="text-emerald-400 font-black">A=14</span>
                     </div>
                     <p className="text-[11px] text-slate-400 mt-1">
-                      El As (A) es la carta de mayor valor base (14 pts).
+                      {guideT.block4.aceDesc}
                     </p>
                   </div>
                 </div>
@@ -329,28 +333,28 @@ export function QuickGuideModal({ isOpen, onClose }) {
                 <div className="grid grid-cols-2 gap-2">
                   <div className="bg-indigo-950/40 p-2.5 rounded-lg border border-indigo-800/60">
                     <div className="flex items-center gap-1 text-[10px] font-bold text-indigo-300 uppercase mb-1">
-                      <Sparkles className="w-3 h-3 text-indigo-400" /> Sinergia de Palo
+                      <Sparkles className="w-3 h-3 text-indigo-400" /> {guideT.block4.synergyTitle}
                     </div>
-                    <strong className="text-sm text-indigo-200 block">+5 Puntos Bono</strong>
+                    <strong className="text-sm text-indigo-200 block">{guideT.block4.synergyBonus}</strong>
                     <p className="text-[10px] text-slate-400 mt-0.5">
-                      Por cada carta adicional del mismo palo que ponga tu equipo en un mismo frente.
+                      {guideT.block4.synergyDesc}
                     </p>
                   </div>
 
                   <div className="bg-amber-950/40 p-2.5 rounded-lg border border-amber-800/60">
                     <div className="flex items-center gap-1 text-[10px] font-bold text-amber-300 uppercase mb-1">
-                      <Flame className="w-3 h-3 text-amber-400" /> Palo Triunfo
+                      <Flame className="w-3 h-3 text-amber-400" /> {guideT.block4.trumpTitle}
                     </div>
-                    <strong className="text-sm text-amber-200 block">+2 Puntos Extra</strong>
+                    <strong className="text-sm text-amber-200 block">{guideT.block4.trumpBonus}</strong>
                     <p className="text-[10px] text-slate-400 mt-0.5">
-                      Por cada carta jugada que coincida con el palo de triunfo revelado en Fase 1.
+                      {guideT.block4.trumpDesc}
                     </p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-3 pt-2 border-t border-slate-800 text-[11px] text-center font-mono text-slate-400">
-                Cálculo: <strong className="text-slate-200">Valor Base + Sinergias (+5) + Triunfos (+2)</strong>
+                {guideT.block4.formula}
               </div>
             </div>
 
@@ -359,60 +363,52 @@ export function QuickGuideModal({ isOpen, onClose }) {
               <div>
                 <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
                   <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
-                    <Swords className="w-4 h-4" /> Anexo: Modo Duelo 1v1 (El Espejo del 2v2)
+                    <Swords className="w-4 h-4" /> {guideT.block5.title}
                   </h3>
-                  <span className="text-[10px] text-slate-400 font-mono">2 Jugadores • Rondas según Duración</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{guideT.block5.tag}</span>
                 </div>
 
                 <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 mb-3">
-                  <div className="text-[11px] text-slate-300 font-semibold mb-1">1. Ajustes Matemáticos y Mecánicos</div>
-                  <div className="text-[10px] text-slate-400 mb-2">Simula un 2v2: una sola mente controla las 10 cartas del equipo.</div>
+                  <div className="text-[11px] text-slate-300 font-semibold mb-1">{guideT.block5.sub1Title}</div>
+                  <div className="text-[10px] text-slate-400 mb-2">{guideT.block5.sub1Desc}</div>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-center text-xs">
                     <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                      <span className="text-[9px] text-slate-500 block">Baraja</span>
-                      <strong className="text-slate-200 text-[11px]">1 (52 cartas)</strong>
+                      <span className="text-[9px] text-slate-500 block">{guideT.block5.deckLabel}</span>
+                      <strong className="text-slate-200 text-[11px]">{guideT.block5.deckVal}</strong>
                     </div>
                     <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                      <span className="text-[9px] text-slate-500 block">Mano</span>
-                      <strong className="text-slate-200 text-[11px]">10 cartas</strong>
+                      <span className="text-[9px] text-slate-500 block">{guideT.block5.handLabel}</span>
+                      <strong className="text-slate-200 text-[11px]">{guideT.block5.handVal}</strong>
                     </div>
                     <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                      <span className="text-[9px] text-slate-500 block">Límite Frente</span>
-                      <strong className="text-slate-200 text-[11px]">8 cartas</strong>
+                      <span className="text-[9px] text-slate-500 block">{guideT.block5.frontLimitLabel}</span>
+                      <strong className="text-slate-200 text-[11px]">{guideT.block5.frontLimitVal}</strong>
                     </div>
                     <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                      <span className="text-[9px] text-slate-500 block">Sombras</span>
-                      <strong className="text-purple-400 text-[11px]">2 por jugador</strong>
+                      <span className="text-[9px] text-slate-500 block">{guideT.block5.shadowsLabel}</span>
+                      <strong className="text-purple-400 text-[11px]">{guideT.block5.shadowsVal}</strong>
                     </div>
                   </div>
-                  <div className="text-[10px] font-mono text-emerald-400 font-bold bg-slate-900 py-1 px-2 rounded text-center border border-slate-800">
-                    ⏱️ Reloj Dual 1v1: R: 1:40 | M: 3:20 | L: 5:00
+                  <div className="text-[10px] font-mono text-emerald-400 font-bold bg-slate-900 py-1 px-2 rounded text-center border border-slate-800 mt-2">
+                    {guideT.block5.clock1v1}
                   </div>
                 </div>
 
                 <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-[11px] text-slate-300 space-y-1.5">
                   <div className="font-semibold text-slate-200 mb-0.5 flex items-center justify-between">
-                    <span>2. Las 4 Fases (Idénticas al Modo Equipos):</span>
-                    <span className="text-[10px] text-amber-400 font-mono font-bold">Táctica: 30s | Reloj Dual</span>
+                    <span>{guideT.block5.sub2Title}</span>
+                    <span className="text-[10px] text-amber-400 font-mono font-bold">{guideT.block5.sub2Tag}</span>
                   </div>
-                  <div>
-                    • <strong className="text-amber-300">FASE 1: Preparación & Triunfo:</strong> Revelar Palo Triunfo (+2 pts). Activar los 2 Marcadores Sombra por jugador y rotar iniciativa.
-                  </div>
-                  <div>
-                    • <strong className="text-amber-300">FASE 2: Fase Táctica (30s):</strong> <strong className="text-amber-200">Planificación Táctica Individual:</strong> En vez de comunicarse, cada jugador dispone de 30s <span className="text-rose-300 font-semibold">sin cartas en mano</span> para preparar mentalmente la táctica y contrataque que ejecutará contra su oponente.
-                  </div>
-                  <div>
-                    • <strong className="text-amber-300">FASE 3: Reparto de Cartas (Silencio):</strong> Se reparten boca abajo 10 cartas a cada duelista. Silencio absoluto y concentración.
-                  </div>
-                  <div>
-                    • <strong className="text-amber-300">FASE 4: Despliegue Táctico (Reloj de Jugador):</strong> Turnos 1 a 1 alternados (1 carta/turno en frente no saturado). Hasta 2 Cartas Sombra. Caída de Bandera a 00:00 da la ronda al rival conservando puntos de mesa. Cierre al jugar las 10 cartas.
-                  </div>
+                  <div>• {guideT.block5.p1}</div>
+                  <div>• {guideT.block5.p2}</div>
+                  <div>• {guideT.block5.p3}</div>
+                  <div>• {guideT.block5.p4}</div>
                 </div>
               </div>
 
               <div className="mt-3 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
-                <span>⚡ Mazo Continuo: Sin rebarajar entre rondas salvo agotamiento</span>
-                <span className="text-amber-400 font-bold">Modalidad Duelo 1v1 Oficial</span>
+                <span>{guideT.block5.footerDeck}</span>
+                <span className="text-amber-400 font-bold">{guideT.block5.footerMode}</span>
               </div>
             </div>
           </div>
@@ -421,13 +417,13 @@ export function QuickGuideModal({ isOpen, onClose }) {
         {/* Pie con botón de cerrar */}
         <div className="px-6 py-3 border-t border-slate-800 bg-slate-950 flex items-center justify-between">
           <span className="text-xs text-slate-500">
-            Puedes consultar esta hoja de referencia en cualquier momento durante la partida.
+            {guideT.footerNote}
           </span>
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition"
           >
-            Cerrar Guía
+            {guideT.closeBtn}
           </button>
         </div>
       </div>

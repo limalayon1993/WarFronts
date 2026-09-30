@@ -1,6 +1,7 @@
 import React from 'react';
 import { SUITS } from '../constants/rules';
 import { Shield, Sparkles, EyeOff } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export function Card({
   card,
@@ -15,6 +16,7 @@ export function Card({
   onDragStart,
   onDragEnd,
 }) {
+  const { ui } = useLanguage();
   const suitInfo = card ? SUITS[card.suit] : null;
   const isRed = card?.suit === 'hearts' || card?.suit === 'diamonds';
 
@@ -37,8 +39,8 @@ export function Card({
         >
           <div className="absolute inset-1 rounded border border-indigo-500/20 bg-indigo-950/40 flex flex-col items-center justify-center p-1 text-center">
             <EyeOff className="w-5 h-5 text-indigo-400/80 mb-0.5 animate-pulse" />
-            <span className="text-[9px] font-bold text-indigo-300 tracking-wider uppercase">Sombra</span>
-            <span className="text-[7px] text-slate-500 hidden sm:block">Oculta</span>
+            <span className="text-[9px] font-bold text-indigo-300 tracking-wider uppercase">{ui.game.card.shadowBadge}</span>
+            <span className="text-[7px] text-slate-500 hidden sm:block">{ui.game.card.hiddenBadge}</span>
           </div>
         </div>
       );
@@ -143,7 +145,7 @@ export function Card({
       {/* Indicador de Carta Sombra que ha sido revelada */}
       {isRevealed && isShadow && (
         <div className="absolute -top-2 -left-2 bg-purple-700 text-white text-[8px] font-bold px-1.5 py-0.5 rounded shadow z-20 pointer-events-none">
-          REVELADA
+          {ui.game.card.revealedBadge}
         </div>
       )}
 
