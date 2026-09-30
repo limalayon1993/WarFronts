@@ -643,7 +643,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                     </span>
                   </div>
 
-                  <div className="flex flex-wrap gap-1 items-center min-h-[64px] bg-slate-950/40 rounded-lg p-1.5 border border-slate-800/80">
+                  <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 items-center min-h-[64px] bg-slate-950/40 rounded-lg p-2 border border-slate-800/80">
                     {teamBCards.length === 0 ? (
                       <span className="text-[11px] text-slate-600 italic m-auto">
                         {isEn ? 'No enemy troops' : 'Sin tropas enemigas'}
@@ -673,7 +673,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                               />
                             </div>
                             {c.playedBy && (
-                              <span className="absolute -bottom-1 -right-1 z-30 bg-slate-900 text-[8px] font-bold px-1.5 py-0.5 rounded border border-rose-900/50 text-rose-400 shadow-md">
+                              <span className="absolute bottom-0.5 right-0.5 z-30 bg-slate-900 text-[8px] font-bold px-1.5 py-0.5 rounded border border-rose-900/50 text-rose-400 shadow-md">
                                 {c.playedBy}
                               </span>
                             )}
@@ -713,7 +713,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
 
                 {/* Tropas del Equipo A (Tú y Aliado A2) */}
                 <div className="my-2 min-h-[90px] flex flex-col justify-end">
-                  <div className="flex flex-wrap gap-1 items-center min-h-[64px] bg-slate-950/40 rounded-lg p-1.5 border border-slate-800/80 mb-1.5">
+                  <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 items-center min-h-[64px] bg-slate-950/40 rounded-lg p-2 border border-slate-800/80 mb-1.5">
                     {teamACards.length === 0 ? (
                       <span className="text-[11px] text-slate-600 italic m-auto">
                         {isEn ? 'Deploy your troops here' : 'Despliega tus tropas aquí'}
@@ -743,7 +743,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                               />
                             </div>
                             {c.playedBy && (
-                              <span className="absolute -bottom-1 -right-1 z-30 bg-slate-900 text-[8px] font-bold px-1.5 py-0.5 rounded border border-emerald-900/50 text-emerald-400 shadow-md">
+                              <span className="absolute bottom-0.5 right-0.5 z-30 bg-slate-900 text-[8px] font-bold px-1.5 py-0.5 rounded border border-emerald-900/50 text-emerald-400 shadow-md">
                                 {c.playedBy}
                               </span>
                             )}

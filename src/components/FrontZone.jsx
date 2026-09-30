@@ -299,7 +299,7 @@ export function FrontZone({
         {renderSynergyChips(enemyScore, 'enemy')}
 
         {/* Cartas del Rival (Ordenadas: número y palo, con sombras fijas en su índice) */}
-        <div className="flex flex-wrap gap-1.5 items-center min-h-[64px] bg-black/45 rounded-xl p-2 border border-amber-500/10 shadow-inner">
+        <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 items-center min-h-[72px] bg-black/45 rounded-xl p-2.5 border border-amber-500/10 shadow-inner">
           {sortedEnemyCards.length === 0 ? (
             <span className="text-[11px] font-serif text-slate-500 italic m-auto">
               {isEn ? 'No enemy troops deployed' : 'Sin tropas enemigas desplegadas'}
@@ -329,8 +329,8 @@ export function FrontZone({
                     }}
                     onMouseLeave={() => setHoveredCardId(null)}
                   />
-                  {card.playedBy && (
-                    <span className={`absolute -bottom-1 -right-1 z-30 bg-black text-[9px] font-serif font-bold px-1.5 py-0.5 rounded shadow-lg border ${enemyBorder}`}>
+                  {card.playedBy && isTeamMode && (
+                    <span className={`absolute bottom-0.5 right-0.5 z-20 bg-black/90 text-[8px] font-serif font-bold px-1 py-0.2 rounded shadow border ${enemyBorder}`}>
                       {card.playedBy}
                     </span>
                   )}
@@ -376,7 +376,7 @@ export function FrontZone({
         {renderSynergyChips(allyScore, 'ally')}
 
         {/* Cartas de las Fuerzas Propias / Aliadas (Ordenadas) */}
-        <div className="flex flex-wrap gap-1.5 items-center min-h-[64px] bg-black/45 rounded-xl p-2 border border-amber-500/10 shadow-inner mb-1.5">
+        <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 items-center min-h-[72px] bg-black/45 rounded-xl p-2.5 border border-amber-500/10 shadow-inner mb-1.5">
           {sortedAllyCards.length === 0 ? (
             <span className="text-[11px] font-serif text-slate-500 italic m-auto">
               {isEn ? 'Deploy your forces here' : 'Despliega tus fuerzas aquí'}
@@ -406,8 +406,8 @@ export function FrontZone({
                     }}
                     onMouseLeave={() => setHoveredCardId(null)}
                   />
-                  {card.playedBy && (
-                    <span className={`absolute -bottom-1 -right-1 z-30 bg-black text-[9px] font-serif font-bold px-1.5 py-0.5 rounded shadow-lg border ${allyBorder}`}>
+                  {card.playedBy && isTeamMode && (
+                    <span className={`absolute bottom-0.5 right-0.5 z-20 bg-black/90 text-[8px] font-serif font-bold px-1 py-0.2 rounded shadow border ${allyBorder}`}>
                       {card.playedBy}
                     </span>
                   )}

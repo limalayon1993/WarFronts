@@ -231,12 +231,12 @@ export function RoundSummaryModal({
                     <span className="text-[10px] text-rose-400/80 font-semibold block mb-1">
                       {is1v1 ? (isEn ? 'Rival' : 'Rival') : (isEn ? 'Team B' : 'Equipo B')} ({teamBCards.length} {teamBCards.length === 1 ? ui.common.card : ui.common.cards})
                     </span>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 py-1">
                       {teamBCards.map((c, i) => (
                         <div key={i} className="relative">
                           <Card card={c} isShadow={c.isShadow} isRevealed={true} compact synergy={teamBCardSynergies?.[c.id]} />
-                          {c.playedBy && (
-                            <span className="absolute -bottom-1 -right-1 z-30 bg-slate-950 text-rose-300 text-[8px] font-bold px-1 py-0.2 rounded shadow-md border border-rose-900/50">
+                          {!is1v1 && c.playedBy && (
+                            <span className="absolute bottom-0.5 right-0.5 z-30 bg-slate-950/90 text-rose-300 text-[8px] font-bold px-1 py-0.2 rounded shadow border border-rose-900/50">
                               {c.playedBy}
                             </span>
                           )}
@@ -276,12 +276,12 @@ export function RoundSummaryModal({
                     <span className="text-[10px] text-emerald-400/80 font-semibold block mb-1">
                       {is1v1 ? (isEn ? 'Your Forces' : 'Tus Fuerzas') : (isEn ? 'Team A (Allies)' : 'Equipo A (Aliados)')} ({teamACards.length} {teamACards.length === 1 ? ui.common.card : ui.common.cards})
                     </span>
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 py-1">
                       {teamACards.map((c, i) => (
                         <div key={i} className="relative">
                           <Card card={c} isShadow={c.isShadow} isRevealed={true} compact synergy={teamACardSynergies?.[c.id]} />
-                          {c.playedBy && (
-                            <span className="absolute -bottom-1 -right-1 z-30 bg-slate-950 text-emerald-300 text-[8px] font-bold px-1 py-0.2 rounded shadow-md border border-emerald-900/50">
+                          {!is1v1 && c.playedBy && (
+                            <span className="absolute bottom-0.5 right-0.5 z-30 bg-slate-950/90 text-emerald-300 text-[8px] font-bold px-1 py-0.2 rounded shadow border border-emerald-900/50">
                               {c.playedBy}
                             </span>
                           )}

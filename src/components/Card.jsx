@@ -79,8 +79,9 @@ export function Card({
         )}
 
         {/* Sello de Sombra propia */}
-        <div className="absolute -top-2 -left-1.5 bg-purple-950 text-purple-200 border border-purple-600/60 text-[7px] font-serif font-bold px-1.5 py-0.5 rounded shadow z-20 pointer-events-none tracking-wider uppercase">
-          {ui.game.card.shadowBadge}
+        <div className="absolute bottom-1 left-1 bg-purple-950/95 text-purple-200 border border-purple-500/80 text-[7px] sm:text-[8px] font-serif font-bold px-1 py-0.5 rounded shadow z-20 pointer-events-none tracking-tight uppercase flex items-center gap-0.5 leading-none">
+          <span className="w-1 h-1 rounded-full bg-purple-400"></span>
+          <span>{ui.game.card.shadowBadge}</span>
         </div>
 
         {/* Contenedor interno recortado al borde redondeado de la carta */}
@@ -180,37 +181,43 @@ export function Card({
         </div>
       )}
 
-      {/* Insignia de Sinergia / Formación Táctica */}
+      {/* Insignia de Sinergia / Formación Táctica (en esquina superior derecha, sin tapar el número de la izquierda) */}
       {!isTrump && synergy && synergy.primarySynergy && (!isShadow || isRevealed) && (
-        <div className="absolute -top-2 -right-1 z-20 pointer-events-none">
+        <div className="absolute top-1 right-1 z-20 pointer-events-none">
           {synergy.isMultiCombo ? (
-            <span className="bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-600 text-stone-950 font-serif font-black text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded shadow-md ring-1 ring-amber-200 tracking-tight flex items-center gap-0.5 uppercase">
-              ★ {isEn ? 'Combo' : 'Combo'}
+            <span
+              className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-gradient-to-br from-amber-400 via-yellow-300 to-amber-500 text-stone-950 font-black text-[9px] sm:text-[10px] flex items-center justify-center shadow-md ring-1 ring-amber-300/80 uppercase leading-none select-none"
+              title="Multi-Combo"
+            >
+              ★
             </span>
           ) : synergy.inTrio ? (
-            <span className="bg-gradient-to-r from-purple-800 to-purple-600 text-purple-100 border border-purple-400/60 font-serif font-black text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded shadow-md tracking-tight">
+            <span className="px-1 py-0.5 rounded bg-purple-900/90 text-purple-200 border border-purple-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase leading-none">
               {isEn ? 'Trio' : 'Trío'}
             </span>
           ) : synergy.inStraight ? (
-            <span className="bg-gradient-to-r from-sky-700 to-blue-600 text-cyan-100 border border-cyan-400/60 font-serif font-black text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded shadow-md tracking-tight">
+            <span className="px-1 py-0.5 rounded bg-sky-950/90 text-cyan-300 border border-cyan-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase leading-none">
               {isEn ? 'Str' : 'Esc'}
             </span>
           ) : synergy.inPair ? (
-            <span className="bg-gradient-to-r from-amber-600 to-amber-500 text-stone-950 font-serif font-black text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded shadow-md tracking-tight">
+            <span className="px-1 py-0.5 rounded bg-amber-950/90 text-amber-300 border border-amber-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase leading-none">
               {isEn ? 'Pair' : 'Par'}
             </span>
           ) : (
-            <span className="bg-stone-900/90 border border-amber-500/40 text-amber-300 font-serif font-bold text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded shadow-md tracking-tight flex items-center gap-0.5">
+            <span className="px-1 py-0.5 rounded bg-stone-900/90 border border-stone-600/70 text-amber-300 font-serif font-bold text-[7px] sm:text-[8px] shadow-sm tracking-tight flex items-center gap-0.5 leading-none">
               <span>{suitInfo?.symbol}</span><span>x{synergy.suitCount}</span>
             </span>
           )}
         </div>
       )}
 
-      {/* Indicador de Carta Sombra que ha sido revelada */}
+      {/* Indicador de Carta Sombra que ha sido revelada (en esquina inferior izquierda, no choca con nada) */}
       {isRevealed && isShadow && (
-        <div className="absolute -top-2 -left-1.5 bg-purple-950 text-purple-200 border border-purple-600/60 text-[7px] font-serif font-bold px-1.5 py-0.5 rounded shadow z-20 pointer-events-none tracking-wider uppercase">
-          {ui.game.card.revealedBadge}
+        <div className="absolute bottom-1 left-1 z-20 pointer-events-none">
+          <span className="bg-purple-950/95 text-purple-200 border border-purple-500/80 text-[7px] sm:text-[8px] font-serif font-bold px-1 py-0.5 rounded shadow-sm uppercase tracking-tight flex items-center gap-0.5 leading-none">
+            <span className="w-1 h-1 rounded-full bg-purple-400"></span>
+            <span>{isEn ? 'Shadow' : 'Sombra'}</span>
+          </span>
         </div>
       )}
 
@@ -245,8 +252,8 @@ export function Card({
           </div>
         )}
 
-        {/* Micro-puntos de sinergia en la esquina inferior izquierda */}
-        {synergy && synergy.synergyCount > 0 && (!isShadow || isRevealed) && (
+        {/* Micro-puntos de sinergia en la esquina inferior izquierda (solo cartas no sombra para no tapar el sello) */}
+        {synergy && synergy.synergyCount > 0 && !isShadow && (
           <div className="absolute bottom-1 left-1.5 z-20 flex items-center gap-0.5 pointer-events-none">
             {(synergy.inPair || synergy.inTrio) && (
               <span
