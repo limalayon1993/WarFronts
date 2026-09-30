@@ -9,7 +9,6 @@ export function FrontZone({
   frontInfo,
   teamACards = [], // Tropas del Equipo A
   teamBCards = [], // Tropas del Equipo B
-  trumpSuit,
   isRoundOver = false,
   selectedCard = null,
   draggingCard = null,
@@ -144,7 +143,6 @@ export function FrontZone({
                     isShadow={card.isShadow}
                     isRevealed={isRoundOver}
                     isOwner={isOwner}
-                    isTrump={card.suit === trumpSuit}
                     compact
                   />
                   {card.playedBy && (
@@ -206,7 +204,6 @@ export function FrontZone({
                     isShadow={card.isShadow}
                     isRevealed={isRoundOver}
                     isOwner={isOwner}
-                    isTrump={card.suit === trumpSuit}
                     compact
                   />
                   {card.playedBy && (

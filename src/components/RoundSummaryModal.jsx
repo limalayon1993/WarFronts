@@ -9,7 +9,6 @@ export function RoundSummaryModal({
   round,
   totalRounds,
   fronts,
-  trumpSuit,
   modeId = '1v1',
   onNextRound,
   isMultiplayer = false,
@@ -34,9 +33,9 @@ export function RoundSummaryModal({
   const frontResults = FRONTS.map((front, idx) => {
     const teamACards = fronts[front.id].teamA;
     const teamBCards = fronts[front.id].teamB;
-    const teamAScore = calculateFrontScore(teamACards, trumpSuit, true);
-    const teamBScore = calculateFrontScore(teamBCards, trumpSuit, true);
-    const resolution = resolveFrontWinner(teamACards, teamBCards, trumpSuit, language);
+    const teamAScore = calculateFrontScore(teamACards, true);
+    const teamBScore = calculateFrontScore(teamBCards, true);
+    const resolution = resolveFrontWinner(teamACards, teamBCards, language);
     const localizedFront = localizedFronts[idx] || front;
 
     return {
@@ -217,7 +216,7 @@ export function RoundSummaryModal({
                   </div>
 
                   {/* Cartas del Equipo Rival B */}
-                  <div className="mb-2">
+                  <div className="mb-2.5">
                     <span className="text-[10px] text-rose-400/80 font-semibold block mb-1">
                       {is1v1 ? (isEn ? 'Rival' : 'Rival') : (isEn ? 'Team B' : 'Equipo B')} ({teamBCards.length} {teamBCards.length === 1 ? ui.common.card : ui.common.cards})
                     </span>
@@ -232,6 +231,32 @@ export function RoundSummaryModal({
                           )}
                         </div>
                       ))}
+                    </div>
+                    {/* Desglose de puntuación Rival B */}
+                    <div className="flex flex-wrap gap-1 mt-1.5 text-[9px] font-mono">
+                      <span className="bg-slate-900 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800">
+                        Base: {teamBScore.baseTotal}
+                      </span>
+                      {teamBScore.suitSynergyTotal > 0 && (
+                        <span className="bg-indigo-950/80 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)"}>
+                          {isEn ? 'Suit' : 'Palo'} +{teamBScore.suitSynergyTotal}
+                        </span>
+                      )}
+                      {teamBScore.pairTotal > 0 && (
+                        <span className="bg-amber-950/80 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isEn ? "Pair (+10)" : "Pareja (+10)"}>
+                          {isEn ? 'Pair' : 'Pareja'} +{teamBScore.pairTotal}
+                        </span>
+                      )}
+                      {teamBScore.straightTotal > 0 && (
+                        <span className="bg-emerald-950/80 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isEn ? "Short Straight (+15)" : "Escalera Corta (+15)"}>
+                          {isEn ? 'Straight' : 'Escalera'} +{teamBScore.straightTotal}
+                        </span>
+                      )}
+                      {teamBScore.trioTotal > 0 && (
+                        <span className="bg-rose-950/80 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isEn ? "Trio (+20)" : "Trío (+20)"}>
+                          {isEn ? 'Trio' : 'Trío'} +{teamBScore.trioTotal}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -251,6 +276,32 @@ export function RoundSummaryModal({
                           )}
                         </div>
                       ))}
+                    </div>
+                    {/* Desglose de puntuación Aliado A */}
+                    <div className="flex flex-wrap gap-1 mt-1.5 text-[9px] font-mono">
+                      <span className="bg-slate-900 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800">
+                        Base: {teamAScore.baseTotal}
+                      </span>
+                      {teamAScore.suitSynergyTotal > 0 && (
+                        <span className="bg-indigo-950/80 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)"}>
+                          {isEn ? 'Suit' : 'Palo'} +{teamAScore.suitSynergyTotal}
+                        </span>
+                      )}
+                      {teamAScore.pairTotal > 0 && (
+                        <span className="bg-amber-950/80 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isEn ? "Pair (+10)" : "Pareja (+10)"}>
+                          {isEn ? 'Pair' : 'Pareja'} +{teamAScore.pairTotal}
+                        </span>
+                      )}
+                      {teamAScore.straightTotal > 0 && (
+                        <span className="bg-emerald-950/80 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isEn ? "Short Straight (+15)" : "Escalera Corta (+15)"}>
+                          {isEn ? 'Straight' : 'Escalera'} +{teamAScore.straightTotal}
+                        </span>
+                      )}
+                      {teamAScore.trioTotal > 0 && (
+                        <span className="bg-rose-950/80 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isEn ? "Trio (+20)" : "Trío (+20)"}>
+                          {isEn ? 'Trio' : 'Trío'} +{teamAScore.trioTotal}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

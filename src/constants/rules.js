@@ -245,19 +245,84 @@ export function shuffleDeck(deck) {
 }
 
 /**
- * Calcula el desglose de puntuación de un equipo en un frente.
- * @param {Array} cards - Lista de cartas del equipo en ese frente
- * @param {string} trumpSuit - Palo de triunfo
- * @param {boolean} countShadows - Si true cuenta cartas sombra (fin de ronda)
+ * Convierte el valor base numérico en el identificador o etiqueta de rango (J, Q, K, A o número).
  */
-export function calculateFrontScore(cards, trumpSuit, countShadows = true) {
+export function getRankLabel(val) {
+  if (val === 11) return 'J';
+  if (val === 12) return 'Q';
+  if (val === 13) return 'K';
+  if (val === 14) return 'A';
+  return String(val);
+}
+
+/**
+ * Detecta las escaleras cortas (3 cartas de valores numéricos consecutivos).
+ * Encuentra el número máximo de tríos consecutivos disjuntos.
+ * Admite 2..14 (donde J=11, Q=12, K=13, A=14) así como [14, 2, 3] (A-2-3).
+ */
+export function findShortStraights(cardValues) {
+  const templates = [];
+  for (let v = 2; v <= 12; v++) {
+    templates.push([v, v + 1, v + 2]);
+  }
+  templates.push([14, 2, 3]); // Escalera A-2-3
+
+  const counts = {};
+  for (const val of cardValues) {
+    counts[val] = (counts[val] || 0) + 1;
+  }
+
+  function helper(startIndex, currentCounts) {
+    let best = [];
+    for (let i = startIndex; i < templates.length; i++) {
+      const [v1, v2, v3] = templates[i];
+      if ((currentCounts[v1] || 0) > 0 && (currentCounts[v2] || 0) > 0 && (currentCounts[v3] || 0) > 0) {
+        const nextCounts = { ...currentCounts };
+        nextCounts[v1]--;
+        nextCounts[v2]--;
+        nextCounts[v3]--;
+        const sub = helper(i, nextCounts);
+        if (sub.length + 1 > best.length) {
+          best = [[v1, v2, v3], ...sub];
+        }
+      }
+    }
+    return best;
+  }
+
+  return helper(0, counts);
+}
+
+/**
+ * Calcula el desglose de puntuación de un equipo en un frente según el reglamento oficial v1.6 / v2.0.
+ * La mecánica de la carta de sinergia/triunfo se ha eliminado por completo.
+ * Nuevas sinergias y formaciones oficiales:
+ * - Valor base: 2 al 10 nominal, J=11, Q=12, K=13, A=14
+ * - Sinergia de Palo: +5 Puntos (por cada carta adicional del mismo palo en el frente)
+ * - Pareja: +10 Puntos (2 cartas del mismo valor)
+ * - Escalera Corta: +15 Puntos (3 cartas consecutivas)
+ * - Trío: +20 Puntos (3 cartas del mismo valor). Aclaración oficial: Formar un Trío anula automáticamente
+ *   la bonificación de la Pareja por las mismas cartas; no se suman +20 y +10 por las mismas cartas.
+ *
+ * @param {Array} cards - Lista de cartas del equipo en ese frente
+ * @param {boolean|string} countShadowsOrTrump - Si booleano: cuenta sombras; si string (antiguo trumpSuit): retrocompatibilidad
+ * @param {boolean} countShadowsParam - Opcional si se pasa trumpSuit antes
+ */
+export function calculateFrontScore(cards = [], countShadowsOrTrump = true, countShadowsParam = true) {
+  let countShadows = true;
+  if (typeof countShadowsOrTrump === 'boolean') {
+    countShadows = countShadowsOrTrump;
+  } else if (typeof countShadowsParam === 'boolean') {
+    countShadows = countShadowsParam;
+  }
+
   const activeCards = cards.filter(c => countShadows || !c.isShadow);
 
   let baseTotal = 0;
-  let trumpTotal = 0;
-  let synergyTotal = 0;
-  const suitCounts = {};
   let highestBaseCard = 0;
+  const suitCounts = {};
+  const rankCounts = {};
+  const activeValues = [];
 
   activeCards.forEach(card => {
     baseTotal += card.base;
@@ -265,21 +330,18 @@ export function calculateFrontScore(cards, trumpSuit, countShadows = true) {
       highestBaseCard = card.base;
     }
 
-    // Palo Triunfo (+2 pts)
-    if (card.suit === trumpSuit) {
-      trumpTotal += 2;
-    }
-
-    // Conteo para sinergia
     suitCounts[card.suit] = (suitCounts[card.suit] || 0) + 1;
+    rankCounts[card.base] = (rankCounts[card.base] || 0) + 1;
+    activeValues.push(card.base);
   });
 
-  // Sinergia de palo (+5 pts por cada carta adicional del mismo palo)
+  // 1. Sinergia de palo (+5 pts por cada carta adicional del mismo palo)
+  let suitSynergyTotal = 0;
   const synergiesBySuit = {};
   Object.entries(suitCounts).forEach(([suit, count]) => {
     if (count >= 2) {
       const bonus = (count - 1) * 5;
-      synergyTotal += bonus;
+      suitSynergyTotal += bonus;
       synergiesBySuit[suit] = {
         count,
         bonus,
@@ -287,14 +349,70 @@ export function calculateFrontScore(cards, trumpSuit, countShadows = true) {
     }
   });
 
-  const total = baseTotal + trumpTotal + synergyTotal;
+  // 2. Parejas (+10 pts) y Tríos (+20 pts, anula la Pareja para esas cartas)
+  let pairTotal = 0;
+  let trioTotal = 0;
+  const pairs = [];
+  const trios = [];
+
+  Object.entries(rankCounts).forEach(([baseStr, count]) => {
+    const base = Number(baseStr);
+    const rankLabel = getRankLabel(base);
+
+    const numTrios = Math.floor(count / 3);
+    const remainingAfterTrios = count % 3;
+    const numPairs = Math.floor(remainingAfterTrios / 2);
+
+    for (let i = 0; i < numTrios; i++) {
+      trios.push({
+        base,
+        rank: rankLabel,
+        bonus: 20,
+      });
+      trioTotal += 20;
+    }
+
+    for (let i = 0; i < numPairs; i++) {
+      pairs.push({
+        base,
+        rank: rankLabel,
+        bonus: 10,
+      });
+      pairTotal += 10;
+    }
+  });
+
+  // 3. Escalera Corta (+15 pts por 3 cartas consecutivas)
+  const straightTriplets = findShortStraights(activeValues);
+  const straights = straightTriplets.map(triplet => {
+    const isAceLow = triplet.includes(14) && triplet.includes(2) && triplet.includes(3);
+    const sortedVals = isAceLow ? [14, 2, 3] : [...triplet].sort((a, b) => a - b);
+    const rankLabels = sortedVals.map(getRankLabel);
+    return {
+      values: sortedVals,
+      ranks: rankLabels,
+      bonus: 15,
+      label: rankLabels.join('-'),
+    };
+  });
+  const straightTotal = straights.length * 15;
+
+  const synergyTotal = suitSynergyTotal + pairTotal + trioTotal + straightTotal;
+  const total = baseTotal + synergyTotal;
 
   return {
     total,
     baseTotal,
-    trumpTotal,
+    suitSynergyTotal,
+    pairTotal,
+    trioTotal,
+    straightTotal,
     synergyTotal,
     synergiesBySuit,
+    pairs,
+    trios,
+    straights,
+    trumpTotal: 0, // Conservado en 0 para evitar errores si algún componente legacy lo lee
     highestBaseCard,
     cardCount: cards.length,
     activeCount: activeCards.length,
@@ -305,9 +423,13 @@ export function calculateFrontScore(cards, trumpSuit, countShadows = true) {
 /**
  * Resuelve el ganador de un frente entre Equipo A y Equipo B
  */
-export function resolveFrontWinner(teamACards, teamBCards, trumpSuit, lang = 'es') {
-  const teamACalc = calculateFrontScore(teamACards, trumpSuit, true);
-  const teamBCalc = calculateFrontScore(teamBCards, trumpSuit, true);
+export function resolveFrontWinner(teamACards, teamBCards, trumpSuitOrLang = 'es', langParam = 'es') {
+  const lang = typeof trumpSuitOrLang === 'string' && (trumpSuitOrLang === 'es' || trumpSuitOrLang === 'en')
+    ? trumpSuitOrLang
+    : (typeof langParam === 'string' ? langParam : 'es');
+
+  const teamACalc = calculateFrontScore(teamACards, true);
+  const teamBCalc = calculateFrontScore(teamBCards, true);
   const isEn = lang === 'en';
 
   if (teamACalc.total > teamBCalc.total) {

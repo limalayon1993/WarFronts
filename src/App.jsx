@@ -84,7 +84,6 @@ export default function App() {
   // Mazos
   const [drawDeck, setDrawDeck] = useState([]);
   const [discardDeck, setDiscardDeck] = useState([]);
-  const [trumpCard, setTrumpCard] = useState(null);
 
   // Jugadores y turnos
   const [players, setPlayers] = useState([]);
@@ -164,7 +163,6 @@ export default function App() {
     phase,
     round,
     totalMatchRounds,
-    trumpCard,
     teamARoundPoints,
     teamBRoundPoints,
     teamACumulativePoints,
@@ -217,7 +215,7 @@ export default function App() {
       phase: base.phase,
       round: base.round,
       totalMatchRounds: base.totalMatchRounds,
-      trumpCard: base.trumpCard,
+      trumpCard: null,
       teamARoundPoints: base.teamARoundPoints,
       teamBRoundPoints: base.teamBRoundPoints,
       teamACumulativePoints: base.teamACumulativePoints,
@@ -300,7 +298,6 @@ export default function App() {
     setPhase(syncData.phase);
     setRound(syncData.round);
     setTotalMatchRounds(syncData.totalMatchRounds);
-    setTrumpCard(syncData.trumpCard);
     setTeamARoundPoints(syncData.teamARoundPoints);
     setTeamBRoundPoints(syncData.teamBRoundPoints);
     setTeamACumulativePoints(syncData.teamACumulativePoints);
@@ -334,7 +331,6 @@ export default function App() {
       phase: syncData.phase,
       round: syncData.round,
       totalMatchRounds: syncData.totalMatchRounds,
-      trumpCard: syncData.trumpCard,
       teamARoundPoints: syncData.teamARoundPoints,
       teamBRoundPoints: syncData.teamBRoundPoints,
       teamACumulativePoints: syncData.teamACumulativePoints,
@@ -512,7 +508,6 @@ export default function App() {
 
     const activeFronts = currentFronts || stateRef.current.fronts || fronts;
     const activePlayersList = currentPlayersList || stateRef.current.players || players;
-    const activeTrumpSuit = stateRef.current.trumpCard?.suit || trumpCard?.suit;
 
     let teamARoundScoreSum = 0;
     let teamBRoundScoreSum = 0;
@@ -522,13 +517,13 @@ export default function App() {
     FRONTS.forEach(front => {
       const teamACards = activeFronts[front.id].teamA;
       const teamBCards = activeFronts[front.id].teamB;
-      const teamAScore = calculateFrontScore(teamACards, activeTrumpSuit, true);
-      const teamBScore = calculateFrontScore(teamBCards, activeTrumpSuit, true);
+      const teamAScore = calculateFrontScore(teamACards, true);
+      const teamBScore = calculateFrontScore(teamBCards, true);
 
       teamARoundScoreSum += teamAScore.total;
       teamBRoundScoreSum += teamBScore.total;
 
-      const resolution = resolveFrontWinner(teamACards, teamBCards, activeTrumpSuit, language);
+      const resolution = resolveFrontWinner(teamACards, teamBCards, language);
       if (resolution.winner === 'teamA') teamAFrontWins++;
       if (resolution.winner === 'teamB') teamBFrontWins++;
     });
@@ -685,18 +680,17 @@ export default function App() {
 
     const winnerTeam = infringingTeam === 'teamA' ? 'teamB' : 'teamA';
     const activeFronts = stateRef.current.fronts || fronts;
-    const activeTrumpSuit = stateRef.current.trumpCard?.suit || trumpCard?.suit;
 
     // 1. Conservación de Puntos Acumulados: Se voltean las cartas jugadas hasta ese instante en la mesa
-    // y se suman los valores base, sinergias y triunfos ya colocados por ambos bandos.
+    // y se suman los valores base y sinergias ya colocados por ambos bandos.
     let teamARoundScoreSum = 0;
     let teamBRoundScoreSum = 0;
 
     FRONTS.forEach(front => {
       const teamACards = activeFronts[front.id].teamA;
       const teamBCards = activeFronts[front.id].teamB;
-      const teamAScore = calculateFrontScore(teamACards, activeTrumpSuit, true);
-      const teamBScore = calculateFrontScore(teamBCards, activeTrumpSuit, true);
+      const teamAScore = calculateFrontScore(teamACards, true);
+      const teamBScore = calculateFrontScore(teamBCards, true);
 
       teamARoundScoreSum += teamAScore.total;
       teamBRoundScoreSum += teamBScore.total;
@@ -918,16 +912,13 @@ export default function App() {
     let pool = [...currentDrawPool];
     let discards = [...currentDiscardPool];
 
-    const cardsNeeded = 1 + cfg.totalPlayers * cfg.handSize;
+    const cardsNeeded = cfg.totalPlayers * cfg.handSize;
     if (pool.length < cardsNeeded) {
       pool = shuffleDeck([...pool, ...discards]);
       discards = [];
     }
 
-    // 1. Palo de triunfo
-    const trump = pool.pop();
-
-    // 2. Jugadores (usar customSlots o los guardados en multiplayerSlots)
+    // 1. Jugadores (usar customSlots o los guardados en multiplayerSlots)
     const effectiveSlots = customSlots || multiplayerSlots;
     const playerList = createPlayerList(cfg, newInitiativeTeam, effectiveSlots);
 
@@ -947,7 +938,6 @@ export default function App() {
 
     setDrawDeck(pool);
     setDiscardDeck(discards);
-    setTrumpCard(trump);
     setPlayers(playerList);
     setCurrentTurnPlayerId(playerList[0].id);
     setFronts(initialFronts);
@@ -990,7 +980,6 @@ export default function App() {
       initiativeNotice: noticeObj,
       drawDeck: pool,
       discardDeck: discards,
-      trumpCard: trump,
       players: playerList,
       currentTurnPlayerId: playerList[0].id,
       fronts: initialFronts,
@@ -1107,13 +1096,11 @@ export default function App() {
     }
 
     const currentFronts = stateRef.current.fronts || fronts;
-    const currentTrumpCard = stateRef.current.trumpCard || trumpCard;
     const currentDiscardDeck = stateRef.current.discardDeck || discardDeck;
     const currentDrawDeck = stateRef.current.drawDeck || drawDeck;
     const currentInitiative = stateRef.current.initiativeTeam || initiativeTeam;
 
     const cardsToDiscard = [
-      currentTrumpCard,
       ...currentFronts.left.teamA,
       ...currentFronts.left.teamB,
       ...currentFronts.center.teamA,
@@ -1367,14 +1354,12 @@ export default function App() {
       const delay = setTimeout(() => {
         const freshList = stateRef.current.players || players;
         const freshFronts = stateRef.current.fronts || fronts;
-        const freshTrump = stateRef.current.trumpCard || trumpCard;
         const freshBot = freshList.find(p => p.id === activePlayer.id) || activePlayer;
 
         const move = chooseBotMove({
           botHand: freshBot.hand,
           botTeam: freshBot.team,
           fronts: freshFronts,
-          trumpSuit: freshTrump?.suit,
           botShadowsLeft: freshBot.shadowsLeft,
           maxFrontCards: modeConfig.maxFrontCards,
         });
@@ -1497,7 +1482,6 @@ export default function App() {
         teamBRoundPoints={teamBRoundPoints}
         teamACumulativePoints={teamACumulativePoints}
         teamBCumulativePoints={teamBCumulativePoints}
-        trumpCard={trumpCard}
         initiativeTeam={initiativeTeam}
         drawDeckCount={drawDeck.length}
         discardDeckCount={discardDeck.length}
@@ -1618,7 +1602,6 @@ export default function App() {
               frontInfo={front}
               teamACards={fronts[front.id].teamA}
               teamBCards={fronts[front.id].teamB}
-              trumpSuit={trumpCard?.suit}
               isRoundOver={phase === 'roundOver'}
               selectedCard={selectedCard}
               draggingCard={localPlayer?.hand?.find(c => c.id === draggingCardId) || null}
@@ -1707,14 +1690,11 @@ export default function App() {
             ) : (
               localPlayer.hand.map(card => {
                 const isSelected = card.id === selectedCardId;
-                const isTrump = card.suit === trumpCard?.suit;
-
                 return (
                   <div key={card.id} className="relative group">
                     <Card
                       card={card}
                       isSelected={isSelected}
-                      isTrump={isTrump}
                       isPlayable={isMyTurn}
                       onClick={() => {
                         if (isMyTurn) {
@@ -1747,7 +1727,6 @@ export default function App() {
         round={round}
         totalRounds={totalMatchRounds}
         fronts={fronts}
-        trumpSuit={trumpCard?.suit}
         modeId={selectedMode}
         onNextRound={handleNextRound}
         isMultiplayer={isMultiplayer}

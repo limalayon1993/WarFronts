@@ -13,6 +13,8 @@ import {
   AlertTriangle,
   Award,
   Trophy,
+  Users,
+  TrendingUp,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LanguageToggle } from './LanguageToggle';
@@ -227,16 +229,16 @@ export function FullManualModal({ isOpen, onClose }) {
                   </h4>
                   <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
                     <li className="bg-slate-900/60 p-3 rounded border border-slate-800">
-                      <strong className="text-slate-100">{isEn ? 'Draw Deck (Main Deck):' : 'Mazo Principal (Mazo de Robo):'}</strong> {isEn ? 'The face-down pile from which cards are dealt to players and the Trump Suit is revealed.' : 'Es la pila boca abajo de donde se reparten las cartas a los jugadores y se revela el Palo Triunfo.'}
+                      <strong className="text-slate-100">{isEn ? 'Draw Deck (Main Deck):' : 'Mazo Principal (Mazo de Robo):'}</strong> {isEn ? 'The face-down pile from which cards are dealt to players.' : 'Es la pila boca abajo de donde se reparten las cartas a los jugadores.'}
                     </li>
                     <li className="bg-slate-900/60 p-3 rounded border border-slate-800">
-                      <strong className="text-slate-100">{isEn ? 'Discard Pile:' : 'Pozo de Descartes:'}</strong> {isEn ? 'Face-up pile at the table edge where all cards played on fronts are placed at round end, along with the revealed Trump card.' : 'Pila boca arriba a un lado de la mesa donde se colocan todas las cartas jugadas en los frentes al terminar una ronda, así como la carta revelada del Palo Triunfo.'}
+                      <strong className="text-slate-100">{isEn ? 'Discard Pile:' : 'Pozo de Descartes:'}</strong> {isEn ? 'Face-up pile at the table edge where all cards played on fronts are placed at round end.' : 'Pila boca arriba a un lado de la mesa donde se colocan todas las cartas jugadas en los frentes al terminar una ronda.'}
                     </li>
                     <li className="bg-slate-900/60 p-3 rounded border border-slate-800">
-                      <strong className="text-amber-300">{isEn ? 'Continuity Rule & Card Counting:' : 'Regla de Continuidad y Conteo de Cartas:'}</strong> {isEn ? 'Cards played during a round are NOT reshuffled at round end; they remain in the discard pile. This enables players to perform strategic card counting of high cards and trumps.' : 'Las cartas jugadas en una ronda NO se rebarajan al finalizar dicha ronda; permanecen en el pozo de descartes. Esto permite a los jugadores realizar un conteo estratégico de cartas altas y triunfos que ya han salido.'}
+                      <strong className="text-amber-300">{isEn ? 'Continuity Rule & Card Counting:' : 'Regla de Continuidad y Conteo de Cartas:'}</strong> {isEn ? 'Cards played during a round are NOT reshuffled at round end; they remain in the discard pile. This enables players to perform strategic card counting of high cards and possible combinations.' : 'Las cartas jugadas en una ronda NO se rebarajan al finalizar dicha ronda; permanecen en el pozo de descartes. Esto permite a los jugadores realizar un conteo estratégico de cartas altas y posibles combinaciones.'}
                     </li>
                     <li className="bg-slate-900/60 p-3 rounded border border-slate-800">
-                      <strong className="text-rose-300">{isEn ? 'Reshuffle on Depletion:' : 'Rebarajado por Agotamiento:'}</strong> {isEn ? 'Whenever the Draw Deck lacks sufficient cards to reveal the Trump Suit or deal hands to each player at the start of a round, the entire Discard Pile is gathered, thoroughly shuffled, and forms a new Draw Deck.' : 'Cuando el Mazo Principal no tenga suficientes cartas para revelar el Palo Triunfo o repartir las cartas a cada jugador al inicio de una ronda, se toma todo el Pozo de Descartes, se baraja minuciosamente y se forma un nuevo Mazo Principal.'}
+                      <strong className="text-rose-300">{isEn ? 'Reshuffle on Depletion:' : 'Rebarajado por Agotamiento:'}</strong> {isEn ? 'Whenever the Draw Deck lacks sufficient cards to deal hands to each player at the start of a round, the entire Discard Pile is gathered, thoroughly shuffled, and forms a new Draw Deck.' : 'Cuando el Mazo Principal no tenga suficientes cartas para repartir a cada jugador al inicio de una ronda, se toma todo el Pozo de Descartes, se baraja minuciosamente y se forma un nuevo Mazo Principal.'}
                     </li>
                   </ul>
                 </div>
@@ -393,22 +395,63 @@ export function FullManualModal({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                {/* Palo Triunfo */}
-                <div className="bg-amber-950/30 border border-amber-800/60 p-4 rounded-xl space-y-2">
-                  <h4 className="font-bold text-amber-300 flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-amber-400" />
-                    {isEn ? 'The Trump Suit (+2 Points per card)' : 'El Palo Triunfo (+2 Puntos por carta)'}
-                  </h4>
-                  <p className="text-xs sm:text-sm">
-                    {isEn ? (
-                      <>At the start of each round, the top card of the Draw Deck is revealed to define the "Trump Suit". Any card of that suit played on the table receives <strong className="text-amber-300">2 additional points</strong> over its base value.</>
-                    ) : (
-                      <>Al inicio de cada ronda, se revela la carta superior del Mazo Principal para definir el "Palo Triunfo". Toda carta de ese palo jugada en la mesa obtiene <strong className="text-amber-300">2 puntos adicionales</strong> sobre su valor base.</>
-                    )}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    • <strong>{isEn ? 'Location:' : 'Ubicación:'}</strong> {isEn ? 'The revealed card is placed visibly beside the deck as a reminder. It belongs to no player, cannot be played on fronts, and is sent to the discard pile at round end.' : 'La carta revelada se coloca visible al lado del mazo como indicador visual. No pertenece a ningún jugador, no puede jugarse en ningún frente y al finalizar la ronda se envía al pozo de descarte.'}
-                  </p>
+                {/* Formaciones por Sinergia: Pareja, Escalera Corta, Trío */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {/* Pareja */}
+                  <div className="bg-sky-950/30 border border-sky-800/60 p-4 rounded-xl space-y-2">
+                    <h4 className="font-bold text-sky-300 flex items-center gap-2">
+                      <Users className="w-4 h-4 text-sky-400" />
+                      {isEn ? 'Pair (+10 Points)' : 'Pareja (+10 Puntos)'}
+                    </h4>
+                    <p className="text-xs sm:text-sm">
+                      {isEn ? (
+                        <>2 cards of the <strong className="text-sky-300">same numerical value</strong> on the Front.</>
+                      ) : (
+                        <>2 cartas del <strong className="text-sky-300">mismo valor numérico</strong> en el Frente.</>
+                      )}
+                    </p>
+                    <div className="bg-slate-950/80 p-2.5 rounded border border-slate-800 text-[11px] text-slate-300">
+                      <strong>{isEn ? 'Official Example:' : 'Ejemplo Oficial:'}</strong> {isEn ? 'Two 7s = 14 base + 10 pair = ' : 'Dos 7s = 14 base + 10 pareja = '}<strong className="text-sky-400">24 pts</strong>.
+                    </div>
+                  </div>
+
+                  {/* Escalera Corta */}
+                  <div className="bg-emerald-950/30 border border-emerald-800/60 p-4 rounded-xl space-y-2">
+                    <h4 className="font-bold text-emerald-300 flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-emerald-400" />
+                      {isEn ? 'Short Straight (+15 Points)' : 'Escalera Corta (+15 Puntos)'}
+                    </h4>
+                    <p className="text-xs sm:text-sm">
+                      {isEn ? (
+                        <>3 cards of <strong className="text-emerald-300">consecutive numerical values</strong> on the Front.</>
+                      ) : (
+                        <>3 cartas de <strong className="text-emerald-300">valores numéricos consecutivos</strong> en el Frente.</>
+                      )}
+                    </p>
+                    <div className="bg-slate-950/80 p-2.5 rounded border border-slate-800 text-[11px] text-slate-300">
+                      <strong>{isEn ? 'Official Example:' : 'Ejemplo Oficial:'}</strong> 8-9-10 = 27 base + 15 = <strong className="text-emerald-400">42 pts</strong>. {isEn ? '(Q-K-A = 54 pts)' : '(Q-K-A = 54 pts)'}.
+                    </div>
+                  </div>
+
+                  {/* Trío */}
+                  <div className="bg-rose-950/30 border border-rose-800/60 p-4 rounded-xl space-y-2">
+                    <h4 className="font-bold text-rose-300 flex items-center gap-2">
+                      <Flame className="w-4 h-4 text-rose-400" />
+                      {isEn ? 'Trio (+20 Points)' : 'Trío (+20 Puntos)'}
+                    </h4>
+                    <p className="text-xs sm:text-sm">
+                      {isEn ? (
+                        <>3 cards of the <strong className="text-rose-300">same numerical value</strong> on the Front.</>
+                      ) : (
+                        <>3 cartas del <strong className="text-rose-300">mismo valor numérico</strong> en el Frente.</>
+                      )}
+                    </p>
+                    <p className="text-[11px] text-rose-300/90 bg-rose-950/40 p-2 rounded border border-rose-900/50">
+                      {isEn
+                        ? 'Clarification: Forming a Trio automatically annuls the Pair bonus; you cannot sum the +20 of the Trio and the +10 of the Pair for the same cards.'
+                        : 'Aclaración: Formar un Trío anula automáticamente la bonificación de la Pareja; no se pueden sumar los +20 del Trío y los +10 de la Pareja por las mismas cartas.'}
+                    </p>
+                  </div>
                 </div>
 
                 {/* Carta y Marcador de Sombra */}
@@ -470,13 +513,13 @@ export function FullManualModal({ isOpen, onClose }) {
                   {/* FASE 1 */}
                   <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-bold text-amber-400">{isEn ? 'PHASE 1: Trump Suit & Initiative' : 'FASE 1: Palo Triunfo e Iniciativa'}</h4>
+                      <h4 className="font-bold text-amber-400">{isEn ? 'PHASE 1: Preparation & Initiative' : 'FASE 1: Preparación e Iniciativa'}</h4>
                       <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase">Setup</span>
                     </div>
                     <ol className="list-decimal list-inside text-xs sm:text-sm space-y-1 text-slate-300">
                       <li>{isEn ? 'If the Draw Deck lacks cards, reshuffle the Discard Pile to form a new deck.' : 'Si el Mazo Principal no tiene suficientes cartas, se rebaraja el Pozo de Descartes para formar el nuevo mazo.'}</li>
-                      <li>{isEn ? 'Reveal the top card of the Draw Deck and place it beside the deck as the Trump Suit indicator.' : 'Se revela la carta superior del Mazo Principal y se coloca a un lado como indicador del Palo Triunfo.'}</li>
                       <li>{isEn ? 'All players set their Shadow Marker in active state in front of them.' : 'Todos los jugadores colocan su Marcador de Sombra en estado activo frente a ellos.'}</li>
+                      <li>{isEn ? 'The Initiative token rotates clockwise to the opposing team (or is drawn randomly in Round 1).' : 'La Ficha de Iniciativa rota al equipo rival (o se sortea aleatoriamente en la Ronda 1).'}</li>
                     </ol>
                   </div>
 
@@ -488,7 +531,7 @@ export function FullManualModal({ isOpen, onClose }) {
                     </div>
                     <ul className="text-xs sm:text-sm space-y-1.5 text-slate-300">
                       <li>• <strong>{isEn ? 'Total Free Communication:' : 'Comunicación Total Libre:'}</strong> {isEn ? 'Teams have 30 seconds to talk and coordinate macro strategy before cards are dealt.' : 'Los equipos disponen de un tiempo de 30 segundos para hablar y coordinar su estrategia general antes de recibir sus cartas.'}</li>
-                      <li>• <strong>{isEn ? 'Macro Strategy:' : 'Estrategia Macro:'}</strong> {isEn ? 'Plan priority fronts ("Attack Center and Left", "Reinforce if you draw trumps").' : 'Se planifica la distribución de las zonas ("Ataquemos fuerte Centro e Izquierda", "Si alguien recibe triunfos que refuerce el flanco"), roles o señas.'}</li>
+                      <li>• <strong>{isEn ? 'Macro Strategy:' : 'Estrategia Macro:'}</strong> {isEn ? 'Plan priority fronts ("Attack Center and Left", "Let\'s build a straight or trio in Center").' : 'Se planifica la distribución de las zonas ("Ataquemos fuerte Centro e Izquierda", "Intentemos armar una escalera o trío en el centro"), roles o señas.'}</li>
                       <li>• <strong>{isEn ? 'Time Budget:' : 'Presupuesto Temporal:'}</strong> {isEn ? 'Teams can agree on clock distribution (e.g. initial players play in 3-5 seconds to save time for endgame calculations).' : 'Los equipos pueden pactar la distribución de su reloj compartido (ejemplo: acordar que los jugadores iniciales jueguen en 3–5 segundos para reservar tiempo de cálculo al cierre de la ronda).'}</li>
                       <li className="text-emerald-300 font-semibold">• <strong>{isEn ? 'Anti-Alpha Player Guarantee:' : 'Garantía Anti-Jugador Alfa:'}</strong> {isEn ? 'Having no cards in hand prevents any single player from dictating teammate actions.' : 'Al no tener aún las cartas en mano, es imposible que un jugador ordene las jugadas exactas a sus compañeros.'}</li>
                     </ul>
@@ -524,7 +567,7 @@ export function FullManualModal({ isOpen, onClose }) {
                         <div className="mt-1 pl-2 space-y-0.5 font-normal text-slate-300 text-xs">
                           <div>- {isEn ? 'The round ends instantaneously.' : 'La ronda finaliza de manera instantánea.'}</div>
                           <div>- {isEn ? 'The offending team automatically loses the round and the opponent scores +1 Round Point.' : 'El equipo infractor pierde la ronda automáticamente y el equipo rival suma el +1 Punto de Ronda de forma directa.'}</div>
-                          <div>- <strong>{isEn ? 'Cumulative Score Conservation:' : 'Conservación de Puntos Acumulados:'}</strong> {isEn ? 'Cards played on fronts up to flag fall are revealed and tallied (base + synergies + trumps) for overall match tiebreakers.' : 'Se voltean las cartas jugadas hasta ese instante en la mesa y se suman los valores base, sinergias y triunfos ya colocados por ambos bandos. Esos puntos se registran obligatoriamente en la Hoja de Anotación para el criterio de desempate final de la partida.'}</div>
+                          <div>- <strong>{isEn ? 'Cumulative Score Conservation:' : 'Conservación de Puntos Acumulados:'}</strong> {isEn ? 'Cards played on fronts up to flag fall are revealed and tallied (base value + synergy bonuses) for overall match tiebreakers.' : 'Se voltean las cartas jugadas hasta ese instante en la mesa y se suman los valores base y bonificaciones por sinergia ya colocadas por ambos bandos. Esos puntos se registran obligatoriamente en la Hoja de Anotación para el criterio de desempate final de la partida.'}</div>
                         </div>
                       </li>
                       <li>• <strong>{isEn ? 'Automatic Deployment Closure:' : 'Cierre Automático de la Fase de Despliegue:'}</strong> {isEn ? 'Deployment ends automatically when all players have deployed all 5 cards. Clock stops and scoring begins across all 3 Fronts.' : 'La Fase de Despliegue concluye de manera instantánea y automática en el segundo exacto en que todos los jugadores de ambos equipos hayan colocado las 5 cartas de su mano en la mesa.'}</li>
@@ -535,7 +578,7 @@ export function FullManualModal({ isOpen, onClose }) {
                 <div className="bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-1 text-xs sm:text-sm">
                   <h4 className="font-bold text-amber-400 mb-2">{isEn ? 'UPON COMPLETING DEPLOYMENT:' : 'TRAS COMPLETAR EL DESPLIEGUE:'}</h4>
                   <div>1. <strong>{isEn ? 'Revelation:' : 'Revelación:'}</strong> {isEn ? 'Flip all Shadow Cards.' : 'Voltear todas las Cartas Sombra.'}</div>
-                  <div>2. <strong>{isEn ? 'Sum:' : 'Suma:'}</strong> {isEn ? 'Base Value + Synergies (+5) + Trumps (+2).' : 'Valor Base + Sinergias (+5) + Triunfos (+2).'}</div>
+                  <div>2. <strong>{isEn ? 'Sum:' : 'Suma:'}</strong> {isEn ? 'Base Value + Synergy Bonuses (Suit +5, Pair +10, Straight +15, Trio +20).' : 'Valor Base + Bonificaciones por Sinergia (Palo +5, Pareja +10, Escalera +15, Trío +20).'}</div>
                   <div>3. <strong>{isEn ? 'Winner:' : 'Ganador:'}</strong> {isEn ? 'Winning 2 of 3 Fronts = +1 Round Point. Record cumulative front points.' : 'Ganar 2 de 3 Frentes = +1 Pt de Ronda. Registra también los puntos numéricos acumulados en la Hoja de Anotación.'}</div>
                 </div>
               </div>
@@ -738,11 +781,11 @@ export function FullManualModal({ isOpen, onClose }) {
                   <div className="space-y-2 text-xs sm:text-sm text-slate-300">
                     <div className="bg-slate-950 p-3 rounded border border-slate-800">
                       <div className="flex items-center justify-between mb-1">
-                        <strong className="text-slate-100 font-bold">{isEn ? 'PHASE 1: Trump Suit & Initiative' : 'FASE 1: Palo Triunfo e Iniciativa'}</strong>
+                        <strong className="text-slate-100 font-bold">{isEn ? 'PHASE 1: Preparation & Initiative' : 'FASE 1: Preparación e Iniciativa'}</strong>
                         <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded uppercase">Setup</span>
                       </div>
                       <p className="text-slate-400">
-                        {isEn ? 'Reveal top card of Draw Deck for Trump Suit (+2 pts). Activate 2 Shadow Markers. Initiative rotates.' : 'Se revela la carta superior del Mazo Principal para fijar el Palo Triunfo (+2 pts por carta de ese palo) y cada duelista coloca sus 2 Marcadores de Sombra activos. La Iniciativa rota automáticamente al rival respecto a la ronda previa (o se determina por sorteo aleatorio en Ronda 1).'}
+                        {isEn ? 'Each duelist activates their 2 Shadow Markers. Initiative rotates automatically to the opponent (or is drawn randomly in Round 1). The Trump Card mechanic has been completely eliminated to remove arbitrary luck.' : 'Cada duelista coloca sus 2 Marcadores de Sombra en estado activo. La Iniciativa rota automáticamente al rival respecto a la ronda previa (o se determina por sorteo aleatorio en Ronda 1). La mecánica de la carta de sinergia/triunfo ha sido completamente eliminada para mitigar el factor suerte.'}
                       </p>
                     </div>
 

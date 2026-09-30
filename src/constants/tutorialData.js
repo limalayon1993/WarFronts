@@ -112,30 +112,30 @@ export function getTutorialSteps(lang = 'es') {
       buttonText: isEn ? 'Begin Instruction' : 'Comenzar Instrucción',
     },
 
-    // PASO 1: LECTURA DEL PALO DE TRIUNFO E INICIATIVA (QUIÉN EMPIEZA ATACANDO)
+    // PASO 1: SISTEMA OFICIAL DE PUNTUACIÓN, SINERGIAS E INICIATIVA
     {
       stepId: 1,
       type: 'dialog',
       stage: 'trump_reveal',
       title: isEn
-        ? 'Phase 1: Trump Suit and Initial Initiative'
-        : 'Fase 1: Palo de Triunfo e Iniciativa Inicial',
+        ? 'Phase 1: Preparation, Synergies & Initiative'
+        : 'Fase 1: Preparación, Sinergias e Iniciativa',
       subtitle: isEn
-        ? 'Round Trump and Draw for Opening Attack'
-        : 'Triunfo de Ronda y Sorteo de Quién Empieza Atacando',
+        ? 'Official Scoring System and Opening Attack'
+        : 'Sistema Oficial de Puntuación y Sorteo de Ataque',
       instructor: isEn ? 'Instructor Commander' : 'Comandante Instructor',
       content: isEn
         ? [
-            'Look at the top area: the revealed trump card is the 7 of Hearts (♥). Every Hearts card played on any front will automatically add +2 BONUS POINTS on top of its base rank value (from 2 to 10, J=11, Q=12, K=13, A=14).',
-            'Who attacks first? The choice of which team opens the game is 100% RANDOM in Round 1. In tabletop play, a cut of the deck is performed (each team drawing a card, highest card wins), whereas in this digital version the system performs the random draw automatically via code.',
-            'Initiative rotation: From Round 2 onward, initiative rotates automatically to the opposing team at the start of each round, alternating who opens hostilities.',
-            'For this guided drill, the draw awarded initiative to your team (Team A) and you (A1) will execute the opening attack!',
+            'Official Rule Update: The luck-based Trump Card mechanic has been completely eliminated to maximize pure tactical depth and strategic mastery.',
+            'Base card values run from 2 to 10 at face value, J=11, Q=12, K=13, and Ace (A) = 14 points (the highest single card in the deck!).',
+            'Four powerful formation bonuses decide battles: Suit Synergy (+5 pts per additional card of the same suit in the front), Pair (+10 pts for 2 cards of same rank), Short Straight (+15 pts for 3 consecutive ranks), and Trio (+20 pts for 3 cards of same rank, which supersedes Pair).',
+            'Who attacks first? The choice of which team opens Round 1 is 100% RANDOM (a deck cut on tabletop, automated digitally). From Round 2 onward, initiative rotates automatically to the opposing team. For this drill, your team (Team A) holds the initiative and you (A1) will execute the opening attack!',
           ]
         : [
-            'Observa la parte superior: la carta de triunfo revelada es el 7 de Corazones (♥). Toda carta de Corazones que se juegue en cualquier frente sumará automáticamente +2 PUNTOS EXTRA además de su valor numérico base (del 2 al 10, J=11, Q=12, K=13, A=14).',
-            '¿Quién empieza atacando? La selección de qué equipo abre el juego es 100% ALEATORIA en la Ronda 1. En el juego presencial de mesa se realiza un corte de baraja (robando una carta cada equipo y ganando la más alta), mientras que en esta versión digital el sistema realiza el sorteo aleatorio automáticamente por código sin necesidad de cortar cartas.',
-            'Rotación de iniciativa: A partir de la Ronda 2, la iniciativa rota automáticamente al equipo rival al comenzar cada ronda, alternando quién abre las hostilidades.',
-            'Para esta instrucción guiada, ¡el sorteo ha otorgado la iniciativa a tu equipo (Equipo A) y serás tú (A1) quien realice el primer ataque!',
+            'Actualización Oficial del Reglamento: Se ha eliminado por completo la mecánica de la carta de sinergia/triunfo para mitigar el factor suerte y potenciar la estrategia táctica pura.',
+            'Los valores base de las cartas van del 2 al 10 según su valor nominal, J=11, Q=12, K=13 y el As (A) = 14 puntos (¡la carta individual más alta de la baraja!).',
+            'Se incorporan cuatro formaciones estratégicas por sinergia: Sinergia de Palo (+5 pts por cada carta adicional del mismo palo en el frente), Pareja (+10 pts por 2 cartas de igual valor), Escalera Corta (+15 pts por 3 cartas consecutivas) y Trío (+20 pts por 3 cartas de igual valor, anulando la pareja de esas cartas).',
+            '¿Quién empieza atacando? La iniciativa en la Ronda 1 es 100% ALEATORIA (mediante corte de baraja en mesa o sorteo digital automático). A partir de la Ronda 2, rota al equipo rival. Para esta instrucción, ¡tu equipo (Equipo A) tiene la iniciativa y serás tú (A1) quien abra el combate!',
           ],
       buttonText: isEn ? 'View Planning Phase' : 'Ver Fase de Planificación',
     },
@@ -214,8 +214,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Select your King of Hearts (K♥) and deploy it to the Center Front.'
         : 'Selecciona tu Rey de Corazones (K♥) y despliégalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'Having won the round initiative, your team attacks first and you open the match. The King of Hearts has a base value of 13 + 2 points for being trump suit = 15 total points! Opening with authority in the Center establishes immediate territorial control and signals to your ally A2 that we have Hearts to coordinate synergies.'
-        : 'Al haber ganado la iniciativa de la ronda, tu equipo empieza atacando y abres la partida. El Rey de Corazones tiene valor base 13 + 2 puntos por ser palo de triunfo = ¡15 puntos totales! Abrir con un golpe de autoridad en el Centro establece control territorial inmediato y le indica a tu aliado A2 que tenemos cartas de Corazones para cooperar.',
+        ? 'Having won the round initiative, your team attacks first and you open the match. The King of Hearts has a strong base value of 13 points. Opening with authority in the Center establishes immediate territorial control and signals to your ally A2 that we hold Hearts to coordinate suit synergies.'
+        : 'Al haber ganado la iniciativa de la ronda, tu equipo empieza atacando y abres la partida. El Rey de Corazones tiene un poderoso valor base de 13 puntos. Abrir con un golpe de autoridad en el Centro establece control territorial inmediato y le indica a tu aliado A2 que tenemos cartas de Corazones para coordinar sinergias de palo.',
       whyNotOthers: isEn
         ? [
             {
@@ -224,15 +224,15 @@ export function getTutorialSteps(lang = 'es') {
             },
             {
               cardLabel: 'Ace of Diamonds (A♦)',
-              reason: 'The Ace is the highest non-trump card (14 pts). We must save it to answer threats or secure another front later.',
+              reason: 'The Ace is the highest card in the deck (14 pts). We must save it to answer threats or secure another front later.',
             },
             {
               cardLabel: 'Ten of Spades (10♠)',
-              reason: 'Above-average card without trump bonus. It lacks the deterrent punch we need in the center.',
+              reason: 'Above-average card (10 pts). It lacks the deterrent punch we need to seize the center immediately.',
             },
             {
               cardLabel: '8 of Hearts (8♥)',
-              reason: 'It is trump (10 pts), but holding it enables subsequent synergies or playing it concealed as a Shadow.',
+              reason: 'Provides 8 pts. Holding it enables subsequent suit synergies or playing it concealed as a Shadow.',
             },
           ]
         : [
@@ -242,15 +242,15 @@ export function getTutorialSteps(lang = 'es') {
             },
             {
               cardLabel: 'As de Diamantes (A♦)',
-              reason: 'El As es la carta más alta de la baraja (14 pts), pero NO es triunfo. Es un recurso supremo que debemos reservar para contestar amenazas o asegurar otro frente más adelante.',
+              reason: 'El As es la carta más alta de la baraja (14 pts). Es un recurso supremo que debemos reservar para contestar amenazas o asegurar otro frente más adelante.',
             },
             {
               cardLabel: 'Diez de Picas (10♠)',
-              reason: 'Es una carta media-alta sin bonificación de triunfo. No causa el impacto inicial disuasorio que buscamos en el centro.',
+              reason: 'Es una carta media-alta (10 pts). No causa el impacto inicial disuasorio que buscamos en el centro.',
             },
             {
               cardLabel: '8 de Corazones (8♥)',
-              reason: 'Es triunfo (10 pts), pero guardarlo nos servirá para encadenar sinergias posteriores o jugarlo como carta oculta (Sombra).',
+              reason: 'Aporta 8 pts. Guardarlo nos servirá para encadenar sinergias de palo posteriores o jugarlo como carta oculta (Sombra).',
             },
           ],
     },
@@ -271,14 +271,14 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Rival B1 plays the Queen of Diamonds (Q♦, 12 pts) on the Center Front.'
         : 'Rival B1 juega la Reina de Diamantes (Q♦, 12 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'Seeing your King (15 pts) in the Center, B1 refuses to concede without a fight. B1 plays Queen (12 pts) to contest closely (15 vs 12).'
-        : 'Al ver tu Rey (15 pts) en el Centro, B1 no quiere ceder la zona central sin luchar. Coloca su Reina (12 pts) para mantener el frente reñido (15 vs 12).',
+        ? 'Seeing your King (13 pts) in the Center, B1 refuses to concede without a fight. B1 plays Queen (12 pts) to contest closely (13 vs 12).'
+        : 'Al ver tu Rey (13 pts) en el Centro, B1 no quiere ceder la zona central sin luchar. Coloca su Reina (12 pts) para mantener el frente reñido (13 vs 12).',
       whyNotOthers: isEn
-        ? 'B1 opted not to play Jack of Hearts (trump), preferring to see if partner B2 can support or saving it for another front.'
-        : 'B1 decidió no jugar su Jota de Corazones (triunfo) porque prefiere esperar a ver si su compañero B2 puede apoyarle o reservarla para disputar otro frente.',
+        ? 'B1 opted not to play Jack of Hearts, preferring to see if partner B2 can support or saving it for another front.'
+        : 'B1 decidió no jugar su Jota de Corazones porque prefiere esperar a ver si su compañero B2 puede apoyarle o reservarla para disputar otro frente.',
       tacticalInsight: isEn
-        ? 'Notice the center score: you are leading 15 to 12. Your opening blow forced the opponent to spend one of their highest cards!'
-        : 'Fíjate en el marcador del centro: estás liderando 15 a 12. ¡Tu golpe inicial ha forzado al rival a gastar una de sus cartas más altas!',
+        ? 'Notice the center score: you are leading 13 to 12. Your opening blow forced the opponent to spend one of their highest cards!'
+        : 'Fíjate en el marcador del centro: estás liderando 13 a 12. ¡Tu golpe inicial ha forzado al rival a gastar una de sus cartas más altas!',
     },
 
     // PASO 5: TURNO 3 - ALIADO A2
@@ -303,8 +303,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'A2 did not play Jack of Diamonds or spades because triggering the synergy bonus in the Center provides an overwhelming advantage.'
         : 'A2 no jugó su Jota de Diamantes ni cartas de picas porque activar la bonificación de sinergia en el Centro da una ventaja matemática descomunal.',
       tacticalInsight: isEn
-        ? 'KEY 2v2 RULE: SUIT SYNERGY! Each additional card of the same suit grants +5 BONUS POINTS. Your team totals: 15 (K♥) + 14 (Q♥) + 5 (Synergy) = 34 points in the Center against opponent\'s 12!'
-        : '¡REGLA CLAVE DE 2v2: SINERGIA DE PALO! Cada carta adicional del mismo palo otorga +5 PUNTOS EXTRA. Vuestro equipo suma: 15 (K♥) + 14 (Q♥) + 5 (Sinergia) = ¡34 puntos en el Centro frente a los 12 del rival!',
+        ? 'KEY RULE: SUIT SYNERGY! Each additional card of the same suit grants +5 BONUS POINTS. Your team totals: 13 (K♥) + 12 (Q♥) + 5 (Synergy) = 30 points in the Center against opponent\'s 12!'
+        : '¡REGLA CLAVE: SINERGIA DE PALO! Cada carta adicional del mismo palo otorga +5 PUNTOS EXTRA. Vuestro equipo suma: 13 (K♥) + 12 (Q♥) + 5 (Sinergia) = ¡30 puntos en el Centro frente a los 12 del rival!',
     },
 
     // PASO 6: TURNO 4 - RIVAL B2
@@ -323,8 +323,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Rival B2 plays the King of Spades (K♠, 13 pts) on the Right Front.'
         : 'Rival B2 juega el Rey de Picas (K♠, 13 pts) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'Rival B2 sees the Center dominated by your Hearts combo (34 vs 12). Spending troops there would be futile, so B2 opens Right Front with their top card (King = 13 pts) to secure that sector.'
-        : 'Rival B2 ve que el Centro está dominado por vuestro combo de Corazones (34 vs 12). Sabe que gastar tropas en el centro ahora sería inútil, así que abre el Frente Derecho con su carta más poderosa (Rey = 13 pts) para intentar asegurar esa zona.',
+        ? 'Rival B2 sees the Center dominated by your Hearts combo (30 vs 12). Spending troops there would be futile, so B2 opens Right Front with their top card (King = 13 pts) to secure that sector.'
+        : 'Rival B2 ve que el Centro está dominado por vuestro combo de Corazones (30 vs 12). Sabe que gastar tropas en el centro ahora sería inútil, así que abre el Frente Derecho con su carta más poderosa (Rey = 13 pts) para intentar asegurar esa zona.',
       whyNotOthers: isEn
         ? 'B2 did not play left, preferring to concentrate on an uncontested sector.'
         : 'No jugó en la izquierda porque prefiere concentrar a su equipo en un frente específico donde no haya oposición aliada.',
@@ -351,7 +351,7 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Select your Ten of Spades (10♠) and deploy it to the Right Front.'
         : 'Selecciona tu Diez de Picas (10♠) y despliégalo en el Frente Derecho.',
       whyThisCard: isEn
-        ? 'Rival B2 just deployed King of Spades (13 pts) on the right. If we surrender that sector for free, they only need one more to claim the round. Playing your 10♠ (10 pts) contests the front closely (13 vs 10) without burning your trump or Ace.'
+        ? 'Rival B2 just deployed King of Spades (13 pts) on the right. If we surrender that sector for free, they only need one more to claim the round. Playing your 10♠ (10 pts) contests the front closely (13 vs 10) without burning your Ace.'
         : 'El rival B2 acaba de poner su Rey de Picas (13 pts) en la derecha. Si dejamos que se lleven ese frente gratis, solo necesitarán ganar uno más para ganar la ronda. Jugando tu 10♠ (10 pts), disputas el frente quedando a tiro de piedra (13 vs 10) sin gastar tus cartas clave.',
       whyNotOthers: isEn
         ? [
@@ -361,7 +361,7 @@ export function getTutorialSteps(lang = 'es') {
             },
             {
               cardLabel: '8 of Hearts (8♥)',
-              reason: 'It is a Trump card. Spending it on the right without hearts synergy wastes its potential in the center or its surprise value.',
+              reason: 'It is an 8 of Hearts (8 pts). Spending it on the right without hearts synergy wastes its potential in the center or its surprise value.',
             },
             {
               cardLabel: '4 of Clubs (4♣)',
@@ -375,7 +375,7 @@ export function getTutorialSteps(lang = 'es') {
             },
             {
               cardLabel: '8 de Corazones (8♥)',
-              reason: 'Es carta de Triunfo. Gastarla en la derecha sin sinergia de corazones desaprovecha su potencial en el centro o su factor sorpresa.',
+              reason: 'Es carta de Corazones (8 pts). Gastarla en la derecha sin sinergia de corazones desaprovecha su potencial en el centro o su factor sorpresa.',
             },
             {
               cardLabel: '4 de Tréboles (4♣)',
@@ -397,17 +397,17 @@ export function getTutorialSteps(lang = 'es') {
       asShadow: false,
       title: isEn ? "Rival B1's Turn: Reinforcing the Center" : 'Turno de Rival B1: Refuerzo del Centro',
       actionSummary: isEn
-        ? 'Rival B1 plays the Jack of Hearts (J♥, 13 pts) on the Center Front.'
-        : 'Rival B1 juega la Jota de Corazones (J♥, 13 pts) en el Frente Central.',
+        ? 'Rival B1 plays the Jack of Hearts (J♥, 11 pts) on the Center Front.'
+        : 'Rival B1 juega la Jota de Corazones (J♥, 11 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'B1 attempts to stay alive in the center and plays Jack of Hearts (11 base + 2 trump = 13 pts). Team B now has 25 points in the center (12 + 13).'
-        : 'B1 intenta no perder el centro definitivamente y juega su Jota de Corazones (11 base + 2 de triunfo = 13 pts). Ahora el equipo B suma 25 puntos en el centro (12 + 13).',
+        ? 'B1 attempts to stay alive in the center and plays Jack of Hearts (11 pts base). Team B now has 23 points in the center (12 + 11).'
+        : 'B1 intenta no perder el centro definitivamente y juega su Jota de Corazones (11 pts base). Ahora el equipo B suma 23 puntos en el centro (12 + 11).',
       whyNotOthers: isEn
-        ? 'B1 did not play 2♣ (pointless discard) nor 5♦ (lacks trump bonus in a trailing sector).'
-        : 'No jugó su 2♣ porque sería un descarte inútil, ni su 5♦ porque no sumaba bono de triunfo en un frente donde van perdiendo.',
+        ? 'B1 did not play 2♣ or 5♦ because they would be weak discards in a trailing sector.'
+        : 'No jugó su 2♣ ni su 5♦ porque serían descartes débiles en un frente donde van perdiendo.',
       tacticalInsight: isEn
-        ? 'Even though B1 added 13 points, you still dominate the Center with 34 points thanks to your earlier synergy.'
-        : 'Aunque B1 sumó 13 puntos, vosotros seguís dominando el Centro con 34 puntos gracias a vuestra sinergia previa.',
+        ? 'Even though B1 added 11 points, you still dominate the Center with 30 points thanks to your earlier synergy.'
+        : 'Aunque B1 sumó 11 puntos, vosotros seguís dominando el Centro con 30 puntos gracias a vuestra sinergia previa.',
     },
 
     // PASO 9: TURNO 7 - ALIADO A2
@@ -426,8 +426,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Ally A2 plays the Jack of Diamonds (J♦, 11 pts) on the Left Front.'
         : 'Aliado A2 juega la Jota de Diamantes (J♦, 11 pts) en el Frente Izquierdo.',
       whyPlayed: isEn
-        ? 'Your team leads Center (34 vs 25) and contests Right (10 vs 13). Ally A2 takes advantage of the empty Left Front to plant their Jack (11 pts) and take a 11-0 lead.'
-        : 'Vuestro equipo lidera el Centro (34 a 25) y disputa la Derecha (10 a 13). Aliado A2 aprovecha que el Frente Izquierdo está totalmente vacío para colocar su Jota (11 pts) y tomar ventaja libre (11 a 0).',
+        ? 'Your team leads Center (30 vs 23) and contests Right (10 vs 13). Ally A2 takes advantage of the empty Left Front to plant their Jack (11 pts) and take a 11-0 lead.'
+        : 'Vuestro equipo lidera el Centro (30 a 23) y disputa la Derecha (10 a 13). Aliado A2 aprovecha que el Frente Izquierdo está totalmente vacío para colocar su Jota (11 pts) y tomar ventaja libre (11 a 0).',
       whyNotOthers: isEn
         ? 'A2 refrained from center (already comfortable lead) and right to force opponents to stretch thin across all 3 fronts.'
         : 'No jugó en el centro porque ya tenéis ventaja suficiente, ni en la derecha porque prefiere obligar a los rivales a dividirse entre los 3 frentes.',
@@ -480,8 +480,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Activate the "Play as Shadow" button, select your 8 of Hearts (8♥), and deploy it to the Center Front.'
         : 'Activa el botón "Jugar como Sombra", selecciona tu 8 de Corazones (8♥) y colócalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'In 2v2 each player has 1 Shadow Token. Playing a card as shadow deploys it FACE DOWN: neither opponents nor your ally know its rank or suit until round resolution. Placing 8♥ (8 base + 2 trump = 10 pts) in the center as shadow adds a third Hearts card, elevating your team synergy to +10 points! Being concealed, opponents cannot tell if it is a bluff or an Ace, completely intimidating them.'
-        : 'En 2v2 cada jugador tiene 1 Ficha de Sombra. Jugar una carta como sombra la coloca BOCA ABAJO: ni los rivales ni tu aliado conocen su valor ni su palo hasta el final de la ronda. Al poner el 8♥ (8 base + 2 triunfo = 10 pts) en el centro como sombra, ¡añades una tercera carta de corazones a vuestro equipo, elevando la sinergia de vuestro equipo a +10 puntos! Además, al estar oculta, los rivales no saben si es un farol o un As, intimidándolos por completo.',
+        ? 'In 2v2 each player has 1 Shadow Token. Playing a card as shadow deploys it FACE DOWN: neither opponents nor your ally know its rank or suit until round resolution. Placing 8♥ (8 base pts) in the center as shadow adds a third Hearts card, elevating your team synergy to +10 points! Being concealed, opponents cannot tell if it is a bluff or an Ace, completely intimidating them.'
+        : 'En 2v2 cada jugador tiene 1 Ficha de Sombra. Jugar una carta como sombra la coloca BOCA ABAJO: ni los rivales ni tu aliado conocen su valor ni su palo hasta el final de la ronda. Al poner el 8♥ (8 pts base) en el centro como sombra, ¡añades una tercera carta de corazones a vuestro equipo, elevando la sinergia de vuestro equipo a +10 puntos! Además, al estar oculta, los rivales no saben si es un farol o un As, intimidándolos por completo.',
       whyNotOthers: isEn
         ? [
             {
@@ -544,11 +544,11 @@ export function getTutorialSteps(lang = 'es') {
       asShadow: false,
       title: isEn ? "Ally A2's Turn: Fortifying the Center" : 'Turno de Aliado A2: Blindaje Definitivo del Centro',
       actionSummary: isEn
-        ? 'Ally A2 plays the 9 of Hearts (9♥, 11 pts) on the Center Front.'
-        : 'Aliado A2 juega el 9 de Corazones (9♥, 11 pts) en el Frente Central.',
+        ? 'Ally A2 plays the 9 of Hearts (9♥, 9 pts) on the Center Front.'
+        : 'Aliado A2 juega el 9 de Corazones (9♥, 9 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'A2 follows the master plan: adding another trump card to Center. The Center is now fortified with 4 Team A Hearts cards.'
-        : 'A2 sigue vuestro plan maestro: añade otra carta de triunfo al Frente Central. Con esto, el Centro queda completamente blindado con 4 cartas de Corazones del Equipo A.',
+        ? 'A2 follows the master plan: adding another Hearts card to Center. The Center is now fortified with 4 Team A Hearts cards (+15 pts suit synergy).'
+        : 'A2 sigue vuestro plan maestro: añade otra carta de corazones al Frente Central. Con esto, el Centro queda completamente blindado con 4 cartas de Corazones del Equipo A (+15 pts de sinergia de palo).',
       whyNotOthers: isEn
         ? 'A2 holds 3♦ and 6♠ for the final turns on the flanks.'
         : 'A2 se guarda su 3♦ y 6♠ para los compases finales según convenga en los flancos.',
@@ -601,8 +601,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Select your Ace of Diamonds (A♦) and deploy it to the Left Front.'
         : 'Selecciona tu As de Diamantes (A♦) y despliégalo en el Frente Izquierdo.',
       whyThisCard: isEn
-        ? 'Crucial match turning point! Look at the strategic picture: Center is locked down by your trump combo. Right belongs to the rival. Therefore: THE ROUND IS DECIDED ON THE LEFT FRONT! Rival B2 placed a shadow card. Playing your Ace of Diamonds (14 base points, the highest card in the deck) delivers overwhelming power and triggers Diamond Synergy with Ally A2\'s J♦ (+5 bonus pts). This move seals the round!'
-        : '¡Momento crucial de la partida! Analicemos el panorama global: el Centro está ganado con creces por vuestro combo de triunfo. La Derecha está en manos del rival. Por tanto: ¡LA PARTIDA SE DECIDE EN EL FRENTE IZQUIERDO! El rival B2 ha puesto una carta sombra. Al jugar tu As de Diamantes (14 puntos base, la carta más alta de la baraja), sumas una ventaja arrolladora en la izquierda y activas la Sinergia de Diamantes con la J♦ de tu aliado A2 (+5 pts adicionales). ¡Este movimiento sentencia la ronda!',
+        ? 'Crucial match turning point! Look at the strategic picture: Center is locked down by your Hearts combo. Right belongs to the rival. Therefore: THE ROUND IS DECIDED ON THE LEFT FRONT! Rival B2 placed a shadow card. Playing your Ace of Diamonds (14 base points, the highest card in the deck) delivers overwhelming power and triggers Diamond Synergy with Ally A2\'s J♦ (+5 bonus pts). This move seals the round!'
+        : '¡Momento crucial de la partida! Analicemos el panorama global: el Centro está ganado con creces por vuestro combo de corazones. La Derecha está en manos del rival. Por tanto: ¡LA PARTIDA SE DECIDE EN EL FRENTE IZQUIERDO! El rival B2 ha puesto una carta sombra. Al jugar tu As de Diamantes (14 puntos base, la carta más alta de la baraja), sumas una ventaja arrolladora en la izquierda y activas la Sinergia de Diamantes con la J♦ de tu aliado A2 (+5 pts adicionales). ¡Este movimiento sentencia la ronda!',
       whyNotOthers: isEn
         ? [
             {
@@ -689,8 +689,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'B2 desperately tries to close the gap on the left with 4♦, combining synergy with B1\'s 5♦. But your Ace and Jack maintain an insurmountable advantage.'
         : 'B2 intenta desesperadamente recortar distancias en la izquierda con su 4♦, sumando sinergia con el 5♦ de B1. Pero vuestro As y Jota mantienen una ventaja inalcanzable.',
       whyNotOthers: isEn
-        ? 'Only holds a low trump card in hand.'
-        : 'Solo le queda una carta de triunfo baja en mano.',
+        ? 'Only holds a low card (5♥) in hand.'
+        : 'Solo le queda una carta baja (5♥) en mano.',
       tacticalInsight: isEn
         ? 'We reached the final turn of the round! You hold a single card in hand.'
         : '¡Llegamos al último turno de la ronda! Tienes una sola carta en mano.',

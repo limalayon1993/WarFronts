@@ -1,7 +1,7 @@
 import React from 'react';
 import { SUITS, getLocalizedSuits, getLocalizedModes, getLocalizedDurations } from '../constants/rules';
 import { Card } from './Card';
-import { Volume2, VolumeX, BookOpen, RotateCcw, Swords, Flame, Layers, Home, Zap, Wifi } from 'lucide-react';
+import { Volume2, VolumeX, BookOpen, RotateCcw, Swords, Layers, Home, Zap, Wifi } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LanguageToggle } from './LanguageToggle';
 
@@ -12,7 +12,6 @@ export function ScoreBoard({
   teamBRoundPoints,
   teamACumulativePoints,
   teamBCumulativePoints,
-  trumpCard,
   initiativeTeam,
   drawDeckCount,
   discardDeckCount,
@@ -35,7 +34,6 @@ export function ScoreBoard({
   const localizedModes = getLocalizedModes(language);
   const localizedDurations = getLocalizedDurations(language);
 
-  const trumpSuit = trumpCard ? localizedSuits[trumpCard.suit] : null;
   const is1v1 = modeConfig?.id === '1v1';
   const effectiveMode = localizedModes[modeConfig?.id] || modeConfig;
   const rawDuration = durationConfig || rhythmConfig;
@@ -113,22 +111,7 @@ export function ScoreBoard({
           </div>
         </div>
 
-        {/* Palo Triunfo */}
-        {trumpCard && (
-          <div className="flex items-center gap-2.5 bg-gradient-to-r from-amber-950/30 via-black/50 to-black/60 border border-amber-500/30 rounded-2xl px-3 py-1 shadow-lg">
-            <div className="scale-75 origin-left -mr-4">
-              <Card card={trumpCard} isTrump compact />
-            </div>
-            <div>
-              <div className="text-[9px] font-serif font-black text-amber-400 uppercase tracking-widest">
-                {isEn ? 'Trump Suit' : 'Triunfo'}
-              </div>
-              <div className="text-xs font-serif font-bold text-slate-200">
-                {trumpSuit?.name} <span className="text-amber-400 text-[11px]">(+2 pts)</span>
-              </div>
-            </div>
-          </div>
-        )}
+
 
         {/* Mazos e Iniciativa */}
         <div className="hidden lg:flex items-center gap-3 text-xs text-slate-400 font-serif">

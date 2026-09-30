@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Shield, Swords, Sparkles, EyeOff, Trophy } from 'lucide-react';
+import { X, Shield, Swords, Sparkles, EyeOff, Trophy, Users, TrendingUp, Flame } from 'lucide-react';
 
 export function RulesModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('summary');
@@ -99,7 +99,7 @@ export function RulesModal({ isOpen, onClose }) {
                 </h3>
                 <p>
                   Las cartas jugadas NO se rebarajan al terminar cada ronda; van al pozo de descarte. 
-                  Esto permite memorizar y contar cartas altas y triunfos que ya han salido.
+                  Esto permite memorizar y contar cartas clave, figuras y palos que ya han salido.
                 </p>
               </div>
             </div>
@@ -126,17 +126,44 @@ export function RulesModal({ isOpen, onClose }) {
                   Por cada carta adicional del mismo palo que coloques en un mismo Frente, sumas un bono de <strong className="text-indigo-400">+5 puntos</strong>.
                 </p>
                 <div className="mt-2 text-xs bg-slate-900 p-2 rounded border border-slate-800 text-slate-400">
-                  <em>Ejemplo:</em> Un 10 de Corazones y un Rey de Corazones en el centro: 10 + 13 = 23 base + 5 de sinergia = <strong>28 puntos</strong>.
+                  <em>Ejemplo:</em> 10♥ y K♥ en el centro: 10 + 13 = 23 base + 5 de sinergia = <strong>28 puntos</strong>. Con 3 cartas del mismo palo sumas +10 pts, etc.
+                </div>
+              </div>
+
+              <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
+                <h3 className="font-bold text-slate-100 flex items-center gap-2 mb-2 text-emerald-400">
+                  <Users className="w-4 h-4" /> Pareja (+10 Puntos)
+                </h3>
+                <p className="text-xs">
+                  Dos cartas del mismo valor numérico en el mismo frente suman un bono de <strong className="text-emerald-400">+10 puntos</strong>.
+                </p>
+                <div className="mt-2 text-xs bg-slate-900 p-2 rounded border border-slate-800 text-slate-400">
+                  <em>Ejemplo:</em> 8♠ y 8♦: 8 + 8 = 16 base + 10 = <strong>26 puntos</strong>.
                 </div>
               </div>
 
               <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
                 <h3 className="font-bold text-slate-100 flex items-center gap-2 mb-2 text-amber-400">
-                  <Sparkles className="w-4 h-4" /> Palo Triunfo (+2 Puntos por carta)
+                  <TrendingUp className="w-4 h-4" /> Escalera Corta (+15 Puntos)
                 </h3>
                 <p className="text-xs">
-                  Al inicio de la ronda se revela una carta que define el Palo Triunfo. Toda carta de ese palo jugada en cualquier frente recibe <strong className="text-amber-400">+2 puntos</strong> adicionales.
+                  Tres cartas de valores consecutivos en el mismo frente otorgan un bono de <strong className="text-amber-400">+15 puntos</strong>.
                 </p>
+                <div className="mt-2 text-xs bg-slate-900 p-2 rounded border border-slate-800 text-slate-400">
+                  <em>Ejemplo:</em> 4, 5 y 6 (o J, Q, K, o A, 2, 3): suma los valores base + <strong>15 puntos</strong>.
+                </div>
+              </div>
+
+              <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
+                <h3 className="font-bold text-slate-100 flex items-center gap-2 mb-2 text-rose-400">
+                  <Flame className="w-4 h-4" /> Trío (+20 Puntos)
+                </h3>
+                <p className="text-xs">
+                  Tres cartas del mismo valor numérico en el mismo frente suman un bono de <strong className="text-rose-400">+20 puntos</strong>.
+                </p>
+                <div className="mt-2 text-xs bg-slate-900 p-2 rounded border border-slate-800 text-amber-300/90 font-medium">
+                  <em>Aclaración Oficial:</em> Formar un Trío anula automáticamente la bonificación de la Pareja para esas cartas (se aplican los +20 del Trío, no se acumulan +20 y +10 por las mismas cartas).
+                </div>
               </div>
             </div>
           )}

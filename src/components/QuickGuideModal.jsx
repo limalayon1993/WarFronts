@@ -13,6 +13,7 @@ import {
   Trophy,
   BookOpen,
   Check,
+  TrendingUp,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LanguageToggle } from './LanguageToggle';
@@ -334,7 +335,7 @@ export function QuickGuideModal({ isOpen, onClose }) {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/25">
-                    <div className="flex items-center gap-1 text-[10px] font-serif font-bold text-amber-300 uppercase mb-1">
+                    <div className="flex items-center gap-1 text-[10px] font-serif font-bold text-amber-300 uppercase mb-0.5">
                       <Sparkles className="w-3 h-3 text-amber-400" /> {guideT.block4.synergyTitle}
                     </div>
                     <strong className="text-sm font-serif text-amber-200 block">{guideT.block4.synergyBonus}</strong>
@@ -344,12 +345,32 @@ export function QuickGuideModal({ isOpen, onClose }) {
                   </div>
 
                   <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/25">
-                    <div className="flex items-center gap-1 text-[10px] font-serif font-bold text-amber-300 uppercase mb-1">
-                      <Flame className="w-3 h-3 text-amber-400" /> {guideT.block4.trumpTitle}
+                    <div className="flex items-center gap-1 text-[10px] font-serif font-bold text-sky-300 uppercase mb-0.5">
+                      <Users className="w-3 h-3 text-sky-400" /> {guideT.block4.pairTitle}
                     </div>
-                    <strong className="text-sm font-serif text-amber-200 block">{guideT.block4.trumpBonus}</strong>
+                    <strong className="text-sm font-serif text-sky-200 block">{guideT.block4.pairBonus}</strong>
                     <p className="text-[10px] text-slate-300 font-serif mt-0.5">
-                      {guideT.block4.trumpDesc}
+                      {guideT.block4.pairDesc}
+                    </p>
+                  </div>
+
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/25">
+                    <div className="flex items-center gap-1 text-[10px] font-serif font-bold text-emerald-300 uppercase mb-0.5">
+                      <TrendingUp className="w-3 h-3 text-emerald-400" /> {guideT.block4.straightTitle}
+                    </div>
+                    <strong className="text-sm font-serif text-emerald-200 block">{guideT.block4.straightBonus}</strong>
+                    <p className="text-[10px] text-slate-300 font-serif mt-0.5">
+                      {guideT.block4.straightDesc}
+                    </p>
+                  </div>
+
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/25">
+                    <div className="flex items-center gap-1 text-[10px] font-serif font-bold text-rose-300 uppercase mb-0.5">
+                      <Flame className="w-3 h-3 text-rose-400" /> {guideT.block4.trioTitle}
+                    </div>
+                    <strong className="text-sm font-serif text-rose-200 block">{guideT.block4.trioBonus}</strong>
+                    <p className="text-[10px] text-slate-300 font-serif mt-0.5">
+                      {guideT.block4.trioDesc}
                     </p>
                   </div>
                 </div>

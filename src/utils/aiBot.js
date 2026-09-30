@@ -8,7 +8,6 @@ export function chooseBotMove({
   botHand,
   botTeam, // 'teamA' o 'teamB'
   fronts, // { left: { teamA: [], teamB: [] }, center: ..., right: ... }
-  trumpSuit,
   botShadowsLeft,
   maxFrontCards = 8,
 }) {
@@ -30,8 +29,8 @@ export function chooseBotMove({
     const myTeamCards = fronts[frontKey][botTeam];
     const enemyTeamCards = fronts[frontKey][enemyTeam];
 
-    const myScore = calculateFrontScore(myTeamCards, trumpSuit, true);
-    const enemyScore = calculateFrontScore(enemyTeamCards, trumpSuit, false);
+    const myScore = calculateFrontScore(myTeamCards, true);
+    const enemyScore = calculateFrontScore(enemyTeamCards, false);
     const currentDiff = myScore.total - enemyScore.total;
     const remainingSlots = maxFrontCards - (myTeamCards.length + enemyTeamCards.length);
 
@@ -41,6 +40,7 @@ export function chooseBotMove({
       diff: currentDiff,
       remainingSlots,
       myTeamSuits: myTeamCards.map(c => c.suit),
+      myTeamRanks: myTeamCards.map(c => c.base),
     };
   });
 
@@ -55,20 +55,24 @@ export function chooseBotMove({
 
       // Puntos que ganaría el equipo colocando esta carta
       const hypoCards = [...myTeamCards, card];
-      const newScore = calculateFrontScore(hypoCards, trumpSuit, true);
-      const currentScore = calculateFrontScore(myTeamCards, trumpSuit, true);
+      const newScore = calculateFrontScore(hypoCards, true);
+      const currentScore = calculateFrontScore(myTeamCards, true);
       const pointsGained = newScore.total - currentScore.total;
 
       let rating = pointsGained * 1.5;
 
-      // Sinergia cooperativa con el equipo (+5 pts y combo)
+      // Sinergia cooperativa de palo (+5 pts)
       if (analysis.myTeamSuits.includes(card.suit)) {
-        rating += 9;
+        rating += 8;
       }
 
-      // Bono por carta de palo triunfo
-      if (card.suit === trumpSuit) {
-        rating += 4.5;
+      // Sinergia de formación: Pareja (+10), Trío (+20) o Escalera (+15)
+      if (newScore.trioTotal > currentScore.trioTotal) {
+        rating += 12; // Formar un trío es un hito de +20 pts
+      } else if (newScore.straightTotal > currentScore.straightTotal) {
+        rating += 10; // Formar una escalera corta es +15 pts
+      } else if (newScore.pairTotal > currentScore.pairTotal) {
+        rating += 7; // Formar una pareja es +10 pts
       }
 
       // Situación táctica del frente:
@@ -107,7 +111,7 @@ export function chooseBotMove({
 
   // Decisión de usar Marcador de Sombra
   if (bestMove && botShadowsLeft > 0) {
-    const isHighCard = bestMove.card.base >= 11 || bestMove.card.suit === trumpSuit;
+    const isHighCard = bestMove.card.base >= 12; // As (14), Rey (13), Reina (12)
     if (isHighCard && Math.random() < 0.6) {
       bestMove.asShadow = true;
     } else if (botHand.length <= 1 && Math.random() < 0.75) {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
 import {
-  TUTORIAL_TRUMP_CARD,
   TUTORIAL_INITIAL_HANDS,
   getTutorialSteps,
 } from '../constants/tutorialData';
@@ -53,7 +52,6 @@ export function InteractiveTutorial({ onBackToMenu }) {
   const [warningMessage, setWarningMessage] = useState(null);
 
   const currentStep = tutorialSteps[stepIndex] || tutorialSteps[0];
-  const trumpSuit = localizedSuits[TUTORIAL_TRUMP_CARD.suit];
   const processedBotStepsRef = useRef(new Set());
 
   // Lanzar confeti al llegar a la graduación
@@ -276,12 +274,12 @@ export function InteractiveTutorial({ onBackToMenu }) {
 
   // Puntuaciones actuales de los frentes (calculadas sin contar sombras hasta la resolución)
   const isResolutionPhase = currentStep.type === 'resolution' || currentStep.type === 'conclusion';
-  const leftScoreA = calculateFrontScore(fronts.left.teamA, TUTORIAL_TRUMP_CARD.suit, isResolutionPhase);
-  const leftScoreB = calculateFrontScore(fronts.left.teamB, TUTORIAL_TRUMP_CARD.suit, isResolutionPhase);
-  const centerScoreA = calculateFrontScore(fronts.center.teamA, TUTORIAL_TRUMP_CARD.suit, isResolutionPhase);
-  const centerScoreB = calculateFrontScore(fronts.center.teamB, TUTORIAL_TRUMP_CARD.suit, isResolutionPhase);
-  const rightScoreA = calculateFrontScore(fronts.right.teamA, TUTORIAL_TRUMP_CARD.suit, isResolutionPhase);
-  const rightScoreB = calculateFrontScore(fronts.right.teamB, TUTORIAL_TRUMP_CARD.suit, isResolutionPhase);
+  const leftScoreA = calculateFrontScore(fronts.left.teamA, null, isResolutionPhase);
+  const leftScoreB = calculateFrontScore(fronts.left.teamB, null, isResolutionPhase);
+  const centerScoreA = calculateFrontScore(fronts.center.teamA, null, isResolutionPhase);
+  const centerScoreB = calculateFrontScore(fronts.center.teamB, null, isResolutionPhase);
+  const rightScoreA = calculateFrontScore(fronts.right.teamA, null, isResolutionPhase);
+  const rightScoreB = calculateFrontScore(fronts.right.teamB, null, isResolutionPhase);
 
   const frontScores = {
     left: { a: leftScoreA, b: leftScoreB },
@@ -330,17 +328,23 @@ export function InteractiveTutorial({ onBackToMenu }) {
             </div>
           </div>
 
-          {/* Palo de Triunfo Revelado */}
-          <div className="flex items-center gap-2 bg-gradient-to-r from-amber-950/40 to-slate-900 border border-amber-600/40 rounded-xl px-3 py-1 shadow-md">
-            <div className="scale-75 origin-left -mr-4">
-              <Card card={TUTORIAL_TRUMP_CARD} isTrump compact />
+          {/* Bonificaciones por Sinergia Oficiales */}
+          <div className="hidden sm:flex items-center gap-2.5 bg-slate-900/90 border border-amber-500/40 rounded-xl px-3 py-1.5 shadow-md">
+            <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+              <Sparkles className="w-3.5 h-3.5" />
             </div>
             <div>
               <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
-                <Flame className="w-3 h-3 text-amber-400" /> {isEn ? 'Trump Suit' : 'Palo Triunfo'}
+                {isEn ? 'Official Scoring & Formations' : 'Sinergias Oficiales'}
               </div>
-              <div className="text-xs font-semibold text-slate-200">
-                {trumpSuit.name} <span className="text-amber-400 font-bold">(+2 pts)</span>
+              <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+                <span className="text-indigo-300 font-mono">+5 {isEn ? 'Suit' : 'Palo'}</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-emerald-300 font-mono">+10 {isEn ? 'Pair' : 'Pareja'}</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-amber-300 font-mono">+15 {isEn ? 'Straight' : 'Escalera'}</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-rose-300 font-mono">+20 {isEn ? 'Trio' : 'Trío'}</span>
               </div>
             </div>
           </div>
@@ -665,7 +669,6 @@ export function InteractiveTutorial({ onBackToMenu }) {
                                 isShadow={c.isShadow}
                                 isRevealed={isResolutionPhase}
                                 isOwner={false}
-                                isTrump={c.suit === TUTORIAL_TRUMP_CARD.suit}
                                 compact
                               />
                             </div>
@@ -736,7 +739,6 @@ export function InteractiveTutorial({ onBackToMenu }) {
                                 isShadow={c.isShadow}
                                 isRevealed={isResolutionPhase}
                                 isOwner={c.isOwner}
-                                isTrump={c.suit === TUTORIAL_TRUMP_CARD.suit}
                                 compact
                               />
                             </div>
@@ -865,7 +867,6 @@ export function InteractiveTutorial({ onBackToMenu }) {
               playerHand.map(card => {
                 const isRequired = currentStep.type === 'player_turn' && card.id === currentStep.requiredCardId;
                 const isSelected = card.id === selectedCardId;
-                const isTrump = card.suit === TUTORIAL_TRUMP_CARD.suit;
 
                 return (
                   <div key={card.id} className="relative group">
@@ -887,7 +888,6 @@ export function InteractiveTutorial({ onBackToMenu }) {
                       <Card
                         card={card}
                         isSelected={isSelected}
-                        isTrump={isTrump}
                         isPlayable={isRequired}
                         onClick={() => handleSelectPlayerCard(card)}
                         onDragStart={(e) => {
@@ -1060,9 +1060,9 @@ export function InteractiveTutorial({ onBackToMenu }) {
 
                     <div className="my-3 text-center">
                       <div className="text-2xl font-black font-mono">
-                        <span className="text-emerald-400">65</span>
+                        <span className="text-emerald-400">57</span>
                         <span className="text-slate-600 text-sm mx-2">vs</span>
-                        <span className="text-rose-400">37</span>
+                        <span className="text-rose-400">33</span>
                       </div>
                       <div className="text-[10px] text-slate-400 mt-0.5">
                         {isEn ? 'Higher total score' : 'Mayor puntuación total'}
@@ -1073,16 +1073,16 @@ export function InteractiveTutorial({ onBackToMenu }) {
                       <div>
                         <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
                         {isEn
-                          ? 'K♥ (15) + Q♥ (14) + revealed shadow 8♥ (10) + 9♥ (11) + 4-Hearts Synergy (+15 pts) = '
-                          : 'K♥ (15) + Q♥ (14) + 8♥ sombra revelada (10) + 9♥ (11) + Sinergia de 4 Corazones (+15 pts) = '}
-                        <strong>65 pts</strong>.
+                          ? 'K♥ (13) + Q♥ (12) + revealed shadow 8♥ (8) + 9♥ (9) + 4-Hearts Synergy (+15 pts) = '
+                          : 'K♥ (13) + Q♥ (12) + 8♥ sombra revelada (8) + 9♥ (9) + Sinergia de 4 Corazones (+15 pts) = '}
+                        <strong>57 pts</strong>.
                       </div>
                       <div>
                         <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
                         {isEn
-                          ? 'Q♦ (12) + J♥ (13) + 5♥ (7) + 2-Hearts Synergy (+5 pts) = '
-                          : 'Q♦ (12) + J♥ (13) + 5♥ (7) + Sinergia 2 Corazones (+5 pts) = '}
-                        <strong>37 pts</strong>.
+                          ? 'Q♦ (12) + J♥ (11) + 5♥ (5) + 2-Hearts Synergy (+5 pts) = '
+                          : 'Q♦ (12) + J♥ (11) + 5♥ (5) + Sinergia 2 Corazones (+5 pts) = '}
+                        <strong>33 pts</strong>.
                       </div>
                     </div>
                   </div>
@@ -1186,9 +1186,9 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   </span>
                 </div>
                 <div className="font-mono font-bold text-base text-right shrink-0">
-                  <span className="text-emerald-400">{isEn ? 'Team A: 128 pts' : 'Equipo A: 128 pts'}</span>
+                  <span className="text-emerald-400">{isEn ? 'Team A: 120 pts' : 'Equipo A: 120 pts'}</span>
                   <span className="text-slate-600 mx-2">/</span>
-                  <span className="text-rose-400">{isEn ? 'Team B: 107 pts' : 'Equipo B: 107 pts'}</span>
+                  <span className="text-rose-400">{isEn ? 'Team B: 103 pts' : 'Equipo B: 103 pts'}</span>
                 </div>
               </div>
             </div>
@@ -1248,10 +1248,10 @@ export function InteractiveTutorial({ onBackToMenu }) {
               <div className="flex items-center gap-2 text-slate-200">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
-                  <strong>{isEn ? 'Trump Suit:' : 'Palo de Triunfo:'}</strong>{' '}
+                  <strong>{isEn ? 'Formations & Synergies:' : 'Formaciones y Sinergias:'}</strong>{' '}
                   {isEn
-                    ? 'Grants +2 bonus points to every card played of that suit.'
-                    : 'Otorga +2 puntos de bonificación en cada carta de ese palo.'}
+                    ? 'Suit (+5), Pair (+10), Short Straight (+15), and Trio (+20) deepen strategic play.'
+                    : 'Palo (+5), Pareja (+10), Escalera Corta (+15) y Trío (+20) aportan máxima profundidad estratégica.'}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-slate-200">
