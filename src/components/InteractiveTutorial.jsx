@@ -670,7 +670,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                               />
                             </div>
                             {c.playedBy && (
-                              <span className="absolute -bottom-1 -right-1 bg-slate-900 text-[8px] font-bold px-1 rounded border border-rose-900/50 text-rose-400">
+                              <span className="absolute -bottom-1 -right-1 z-30 bg-slate-900 text-[8px] font-bold px-1.5 py-0.5 rounded border border-rose-900/50 text-rose-400 shadow-md">
                                 {c.playedBy}
                               </span>
                             )}
@@ -741,7 +741,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                               />
                             </div>
                             {c.playedBy && (
-                              <span className="absolute -bottom-1 -right-1 bg-slate-900 text-[8px] font-bold px-1 rounded border border-emerald-900/50 text-emerald-400">
+                              <span className="absolute -bottom-1 -right-1 z-30 bg-slate-900 text-[8px] font-bold px-1.5 py-0.5 rounded border border-emerald-900/50 text-emerald-400 shadow-md">
                                 {c.playedBy}
                               </span>
                             )}

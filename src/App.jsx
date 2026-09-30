@@ -1361,21 +1361,8 @@ export default function App() {
     if (activePlayer.isBot && activePlayer.hand.length > 0) {
       setIsBotThinking(true);
 
-      const currentTeamClock = activePlayer.team === 'teamA'
-        ? (stateRef.current.teamAClock ?? 100)
-        : (stateRef.current.teamBClock ?? 100);
-
-      // Tiempo de cálculo adaptativo al ritmo de tiempo y jugada de emergencia si el reloj está bajo
-      let botDelay = 2000;
-      if (currentTeamClock <= 8) {
-        botDelay = 600; // Despliegue de emergencia para evitar caída de bandera
-      } else if (selectedTimeSpeed === 'rapido') {
-        botDelay = 1200;
-      } else if (selectedTimeSpeed === 'lento') {
-        botDelay = 2800;
-      } else {
-        botDelay = 2000; // medio
-      }
+      // Tiempo fijo de 3 segundos solicitado por el usuario para una partida legible y no vertiginosa
+      const botDelay = 3000;
 
       const delay = setTimeout(() => {
         const freshList = stateRef.current.players || players;

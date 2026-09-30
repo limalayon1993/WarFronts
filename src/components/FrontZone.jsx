@@ -148,7 +148,7 @@ export function FrontZone({
                     compact
                   />
                   {card.playedBy && (
-                    <span className={`absolute -bottom-1 -right-1 bg-black/90 text-[8px] font-serif font-bold px-1.5 py-0.2 rounded border ${enemyBorder}`}>
+                    <span className={`absolute -bottom-1 -right-1 z-30 bg-black text-[9px] font-serif font-bold px-1.5 py-0.5 rounded shadow-lg border ${enemyBorder}`}>
                       {card.playedBy}
                     </span>
                   )}
@@ -210,7 +210,7 @@ export function FrontZone({
                     compact
                   />
                   {card.playedBy && (
-                    <span className={`absolute -bottom-1 -right-1 bg-black/90 text-[8px] font-serif font-bold px-1.5 py-0.2 rounded border ${allyBorder}`}>
+                    <span className={`absolute -bottom-1 -right-1 z-30 bg-black text-[9px] font-serif font-bold px-1.5 py-0.5 rounded shadow-lg border ${allyBorder}`}>
                       {card.playedBy}
                     </span>
                   )}

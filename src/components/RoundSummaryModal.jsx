@@ -226,7 +226,7 @@ export function RoundSummaryModal({
                         <div key={i} className="relative">
                           <Card card={c} isShadow={c.isShadow} isRevealed={true} compact />
                           {c.playedBy && (
-                            <span className="absolute -bottom-1 -right-1 bg-slate-950 text-rose-300 text-[7px] font-bold px-0.5 rounded">
+                            <span className="absolute -bottom-1 -right-1 z-30 bg-slate-950 text-rose-300 text-[8px] font-bold px-1 py-0.2 rounded shadow-md border border-rose-900/50">
                               {c.playedBy}
                             </span>
                           )}
@@ -245,7 +245,7 @@ export function RoundSummaryModal({
                         <div key={i} className="relative">
                           <Card card={c} isShadow={c.isShadow} isRevealed={true} compact />
                           {c.playedBy && (
-                            <span className="absolute -bottom-1 -right-1 bg-slate-950 text-emerald-300 text-[7px] font-bold px-0.5 rounded">
+                            <span className="absolute -bottom-1 -right-1 z-30 bg-slate-950 text-emerald-300 text-[8px] font-bold px-1 py-0.2 rounded shadow-md border border-emerald-900/50">
                               {c.playedBy}
                             </span>
                           )}
