@@ -27,23 +27,23 @@ export function FullManualModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md animate-fadeIn text-slate-100">
-      <div className="bg-slate-950 border border-slate-700 w-full max-w-5xl rounded-2xl shadow-2xl flex flex-col h-[94vh] overflow-hidden">
+      <div className="bg-[#07090e] border border-amber-500/30 w-full max-w-5xl rounded-3xl shadow-2xl flex flex-col h-[94vh] overflow-hidden">
         {/* Cabecera del Manual Completo */}
-        <div className="px-6 py-4 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
+        <div className="px-6 py-4 bg-gradient-to-r from-black via-[#111622] to-black border-b border-amber-500/20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(212,175,55,0.15)]">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black tracking-wider uppercase text-slate-100">
+                <h2 className="text-base sm:text-lg font-serif font-black tracking-widest uppercase text-gold-gradient">
                   {manualT.headerTitle}
                 </h2>
-                <span className="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-2 py-0.5 rounded font-black uppercase">
+                <span className="text-[9px] bg-black/60 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-serif font-black uppercase tracking-wider">
                   {manualT.headerVersion}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs font-serif text-slate-400">
                 {manualT.headerSubtitle}
               </p>
             </div>
@@ -53,7 +53,7 @@ export function FullManualModal({ isOpen, onClose }) {
             <LanguageToggle compact />
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-black/60 border border-transparent hover:border-amber-500/30 transition cursor-pointer"
               title={manualT.closeBtn}
             >
               <X className="w-5 h-5" />
@@ -520,7 +520,7 @@ export function FullManualModal({ isOpen, onClose }) {
                       <li>• {isEn ? 'If choosing to play face-down (Shadow Card), the player must flip their Shadow Marker.' : 'Si decide jugarla boca abajo (Carta de Sombra), debe voltear/entregar su Marcador de Sombra.'}</li>
                       <li>• <strong>{isEn ? 'Territorial Front Limit:' : 'Restricción del Límite Territorial Compartido:'}</strong> {isEn ? 'Cards cannot be played on fronts where total cards have reached the limit (8 in 1v1/2v2; 12 in 3v3; 16 in 4v4).' : 'No se puede colocar una carta en un Frente donde la suma total de cartas de ambos equipos ya haya alcanzado el límite permitido (8 cartas en 1v1 y 2v2; 12 cartas en 3v3; 16 cartas en 4v4).'}</li>
                       <li className="text-rose-300 font-semibold bg-rose-950/30 p-2.5 rounded border border-rose-900/60">
-                        ⏱️ <strong>{isEn ? 'Loss on Time (Flag Fall):' : 'Derrota por Tiempo (Caída de Bandera):'}</strong> {isEn ? 'If a team clock reaches 00:00 before completing turns:' : 'Si el reloj de un equipo llega a 00:00 antes de completar sus turnos:'}
+                        <strong>{isEn ? 'Loss on Time (Flag Fall):' : 'Derrota por Tiempo (Caída de Bandera):'}</strong> {isEn ? 'If a team clock reaches 00:00 before completing turns:' : 'Si el reloj de un equipo llega a 00:00 antes de completar sus turnos:'}
                         <div className="mt-1 pl-2 space-y-0.5 font-normal text-slate-300 text-xs">
                           <div>- {isEn ? 'The round ends instantaneously.' : 'La ronda finaliza de manera instantánea.'}</div>
                           <div>- {isEn ? 'The offending team automatically loses the round and the opponent scores +1 Round Point.' : 'El equipo infractor pierde la ronda automáticamente y el equipo rival suma el +1 Punto de Ronda de forma directa.'}</div>

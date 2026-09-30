@@ -1499,9 +1499,9 @@ export default function App() {
     );
   }
 
-  // PANTALLA 3: PANTALLA DE JUEGO (BATALLA)
+  // PANTALLA 3: PANTALLA DE JUEGO (BATALLA DE SALÓN)
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[#07090e] text-[#e6e9ee] flex flex-col font-sans select-none">
       {/* Barra Superior / Marcador */}
       <ScoreBoard
         round={round}
@@ -1543,14 +1543,14 @@ export default function App() {
 
       {/* Aviso de Sorteo / Iniciativa (Quién empieza atacando) */}
       {initiativeNotice && (
-        <div className="bg-gradient-to-r from-amber-950/95 via-indigo-950/95 to-slate-900 border-b border-amber-500/50 text-amber-200 px-4 py-2 text-xs flex items-center justify-between shadow-lg animate-fadeIn">
+        <div className="casino-panel border-b border-amber-500/40 text-amber-200 px-4 py-2.5 text-xs font-serif flex items-center justify-between shadow-xl animate-fadeIn">
           <div className="flex items-center gap-2.5">
-            <Dices className="w-4 h-4 text-amber-400 shrink-0 animate-bounce" />
+            <Dices className="w-4 h-4 text-amber-400 shrink-0" />
             <span className="font-semibold text-slate-100">{getInitiativeNoticeText(initiativeNotice)}</span>
           </div>
           <button
             onClick={() => setInitiativeNotice(null)}
-            className="text-[10px] uppercase font-bold text-amber-400 hover:text-white px-2.5 py-0.5 rounded bg-slate-900/60 border border-amber-500/30 hover:border-amber-400 transition"
+            className="text-[10px] uppercase font-serif font-bold text-amber-300 hover:text-white px-3 py-1 rounded-lg bg-black/60 border border-amber-500/30 hover:border-amber-400 transition cursor-pointer"
           >
             {ui.common?.ok || (isEn ? 'Understood' : 'Entendido')}
           </button>
@@ -1559,7 +1559,7 @@ export default function App() {
 
       {/* Aviso de Penalización por Tiempo */}
       {penaltyNotice && (
-        <div className="bg-rose-950/95 border-b border-rose-700 text-rose-200 px-4 py-2 text-xs flex items-center gap-2 shadow-lg animate-bounce">
+        <div className="bg-[#260a12]/95 border-b border-rose-800 text-rose-200 px-4 py-2.5 text-xs font-serif flex items-center gap-2 shadow-xl animate-bounce">
           <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
           <span className="font-semibold">{getPenaltyNoticeText(penaltyNotice)}</span>
         </div>
@@ -1567,17 +1567,17 @@ export default function App() {
 
       {/* Alerta de Fase de Planificación / Táctica */}
       {phase === 'planning' && (
-        <div className="bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-slate-950 px-4 py-2.5 shadow-md flex items-center justify-between text-xs sm:text-sm font-bold">
+        <div className="bg-gradient-to-r from-[#1a140b] via-[#261d0f] to-[#1a140b] border-b border-amber-500/30 text-amber-100 px-4 py-2.5 shadow-xl flex items-center justify-between text-xs sm:text-sm font-serif font-bold">
           <div className="flex items-center gap-2 max-w-2xl">
-            <Clock className="w-4 h-4 shrink-0 animate-spin" />
+            <Clock className="w-4 h-4 shrink-0 text-amber-400 animate-spin" />
             <span>
               {selectedMode === '1v1' ? ui.game.planning.banner1v1 : ui.game.planning.bannerTeam}
             </span>
           </div>
 
           <div className="flex items-center gap-3">
-            <span className="font-mono bg-amber-950/20 px-2.5 py-1 rounded text-slate-950 font-black flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5" />
+            <span className="font-mono bg-black/60 border border-amber-500/30 px-3 py-1 rounded-xl text-amber-300 font-black flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5 text-amber-400" />
               <span>{planningTimer}s</span>
             </span>
 
@@ -1585,7 +1585,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={beginDeploymentPhase}
-                className="bg-slate-950 hover:bg-slate-900 text-amber-400 px-3.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 shadow transition cursor-pointer"
+                className="bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:brightness-110 text-stone-950 px-4 py-1.5 rounded-xl text-xs font-serif font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition cursor-pointer"
               >
                 <Play className="w-3 h-3 fill-current" />
                 <span>{selectedMode === '1v1' ? ui.game.planning.startDuelBtn : ui.game.planning.startNowBtn}</span>
@@ -1600,10 +1600,10 @@ export default function App() {
                     handleClientToggleReady();
                   }
                 }}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-black flex items-center gap-1.5 shadow transition cursor-pointer ${
+                className={`px-4 py-1.5 rounded-xl text-xs font-serif font-black uppercase tracking-wider flex items-center gap-1.5 shadow transition cursor-pointer ${
                   readyPlayers.includes(mySlotId)
                     ? 'bg-emerald-600 hover:bg-emerald-500 text-white ring-2 ring-emerald-300 shadow-emerald-900/40'
-                    : 'bg-slate-950 hover:bg-slate-900 text-amber-400 border border-amber-500/40 hover:border-amber-400'
+                    : 'bg-black/80 hover:bg-black text-amber-300 border border-amber-500/40 hover:border-amber-400'
                 }`}
               >
                 <Check className={`w-3.5 h-3.5 ${readyPlayers.includes(mySlotId) ? 'stroke-[3]' : ''}`} />
@@ -1622,7 +1622,7 @@ export default function App() {
 
       {/* ZONA DE JUEGO PRINCIPAL */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-4 flex flex-col justify-between gap-3">
-        {/* LOS 3 FRENTES DE GUERRA (SIN CONTADOR DE PUNTOS AUTOMÁTICO) */}
+        {/* LOS 3 FRENTES DE GUERRA */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 my-auto">
           {localizedFronts.map(front => (
             <FrontZone
@@ -1647,22 +1647,22 @@ export default function App() {
 
         {/* CONTROLES Y MANO DEL JUGADOR LOCAL */}
         <div
-          className={`rounded-2xl p-3 sm:p-4 shadow-2xl flex flex-col gap-2 transition-all duration-300 ${
+          className={`rounded-2xl p-3.5 sm:p-4 shadow-2xl flex flex-col gap-2.5 transition-all duration-300 ${
             isMyTurn
-              ? 'glowing-green-hand bg-gradient-to-b from-emerald-950/40 via-slate-900/90 to-slate-900 border-2 border-emerald-400'
-              : 'bg-slate-900/80 border border-slate-800'
+              ? 'glowing-green-hand casino-panel'
+              : 'casino-panel-subtle'
           }`}
         >
           {/* Barra superior de la mano */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/15 pb-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-200">
+              <span className="text-xs font-serif font-black tracking-wider uppercase text-slate-200">
                 {ui.game.hand.yourHandTitle(localPlayer?.name || (isEn ? 'Commander' : 'Comandante'), localPlayer?.hand?.length || 0)}
               </span>
 
               {isMyTurn && (
-                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 text-[10px] uppercase font-black px-2 py-0.5 rounded-full flex items-center gap-1.5 animate-pulse shadow-sm">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="bg-amber-500/20 text-amber-300 border border-amber-400/50 text-[10px] font-serif font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                   {ui.game.hand.yourTurnBadge}
                 </span>
               )}
@@ -1672,19 +1672,18 @@ export default function App() {
                 type="button"
                 disabled={!localPlayer || localPlayer.shadowsLeft <= 0 || !isMyTurn}
                 onClick={() => setIsShadowMode(prev => !prev)}
-                className={`text-xs px-3 py-1.5 rounded-lg border font-semibold flex items-center gap-1.5 transition ${
+                className={`text-xs px-3.5 py-1.5 rounded-xl border font-serif font-bold tracking-wider uppercase flex items-center gap-1.5 transition cursor-pointer ${
                   isShadowMode
-                    ? 'bg-purple-600 text-white border-purple-400 shadow-purple-500/30 shadow-md ring-2 ring-purple-400'
+                    ? 'bg-gradient-to-r from-purple-900 to-indigo-950 text-purple-200 border-purple-400/80 shadow-[0_0_15px_rgba(168,85,247,0.35)] ring-1 ring-purple-400'
                     : localPlayer && localPlayer.shadowsLeft > 0
-                    ? 'bg-slate-800 text-purple-300 border-purple-800 hover:bg-slate-700'
-                    : 'bg-slate-900 text-slate-600 border-slate-800 cursor-not-allowed'
+                    ? 'bg-[#141220] text-purple-300 border-purple-800/80 hover:bg-[#1d1a30]'
+                    : 'bg-black/40 text-stone-600 border-stone-800 cursor-not-allowed'
                 }`}
               >
-                <EyeOff className="w-3.5 h-3.5" />
                 <span>
                   {isShadowMode ? ui.game.hand.shadowActiveBtn : ui.game.hand.playShadowBtn}
                 </span>
-                <span className="bg-purple-950/80 px-1.5 py-0.2 rounded text-[10px] font-mono">
+                <span className="bg-purple-950/90 text-purple-300 border border-purple-800/60 px-1.5 py-0.2 rounded text-[10px] font-mono">
                   {ui.game.hand.shadowsRemaining(localPlayer?.shadowsLeft || 0)}
                 </span>
               </button>
@@ -1693,17 +1692,17 @@ export default function App() {
             {/* Aviso de turno del jugador con contador de tiempo */}
             <div>
               {isMyTurn ? (
-                <span className="text-xs text-amber-400 font-bold animate-pulse">
+                <span className="text-xs font-serif text-amber-300 font-bold tracking-wide animate-pulse">
                   {selectedCardId
                     ? ui.game.hand.actionInstructionDrag(formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock))
                     : ui.game.hand.actionInstructionPick(formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock))}
                 </span>
               ) : phase === 'planning' ? (
-                <span className="text-xs text-amber-300">
+                <span className="text-xs font-serif text-amber-300/80 tracking-wide">
                   {selectedMode === '1v1' ? ui.game.hand.planningInstruction1v1 : ui.game.hand.planningInstructionTeam}
                 </span>
               ) : (
-                <span className="text-xs text-slate-500">
+                <span className="text-xs font-serif text-slate-400 tracking-wide">
                   {ui.game.hand.waitingForTurn(players.find(p => p.id === currentTurnPlayerId)?.name || (isEn ? 'another player' : 'otro jugador'))}
                 </span>
               )}
@@ -1713,7 +1712,7 @@ export default function App() {
           {/* Cartas en mano del jugador local */}
           <div className="flex items-center justify-center gap-1.5 sm:gap-3 flex-wrap min-h-[110px] sm:min-h-[140px] py-1">
             {!localPlayer || !localPlayer.hand || localPlayer.hand.length === 0 ? (
-              <span className="text-sm text-slate-500 italic">
+              <span className="text-sm font-serif text-slate-500 italic">
                 {phase === 'planning'
                   ? ui.game.hand.emptyHandPlanning(modeConfig.handSize)
                   : ui.game.hand.emptyHandPlayed}

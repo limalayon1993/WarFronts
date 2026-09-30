@@ -17,6 +17,9 @@ import {
   Wifi,
   WifiOff,
   Timer,
+  Crown,
+  AlertCircle,
+  X,
 } from 'lucide-react';
 import {
   GAME_MODES,
@@ -754,8 +757,10 @@ export function MultiplayerLobby({
           <LanguageToggle compact />
           <div className="text-right">
             <span className="text-[10px] uppercase font-bold text-slate-400 block">{isEn ? 'Your Role' : 'Tu Rol'}</span>
-            <span className="text-xs font-black text-emerald-400 font-mono">
-              {isHost ? (isEn ? '★ Host' : '★ Anfitrión') : (isEn ? 'Guest Commander' : 'Comandante Invitado')} ({mySlotId})
+            <span className="text-xs font-black text-amber-400 font-serif flex items-center justify-end gap-1">
+              {isHost && <Crown className="w-3.5 h-3.5 text-amber-400" />}
+              <span>{isHost ? (isEn ? 'Host Commander' : 'Comandante Anfitrión') : (isEn ? 'Guest Commander' : 'Comandante Invitado')}</span>
+              <span className="font-mono text-emerald-400">({mySlotId})</span>
             </span>
           </div>
 
@@ -786,14 +791,14 @@ export function MultiplayerLobby({
       {errorMessage && (
         <div className="max-w-5xl w-full mx-auto mt-3 p-3 bg-amber-950/70 border border-amber-600/70 rounded-xl text-xs text-amber-200 font-medium flex items-center justify-between shadow-lg">
           <div className="flex items-center gap-2">
-            <span>⚠️</span>
+            <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
             <span>{errorMessage}</span>
           </div>
           <button
             onClick={() => setErrorMessage(null)}
-            className="text-amber-400 hover:text-white font-bold ml-2 text-sm px-1.5 py-0.5 rounded hover:bg-amber-900/40"
+            className="text-amber-400 hover:text-white p-1 rounded hover:bg-amber-900/40"
           >
-            ✕
+            <X className="w-4 h-4" />
           </button>
         </div>
       )}

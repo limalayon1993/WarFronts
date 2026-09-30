@@ -69,26 +69,26 @@ export function RoundSummaryModal({
   const isFinalRound = round >= totalRounds;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-      <div className="bg-slate-900 border border-slate-700 w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-fadeIn">
+      <div className="bg-[#07090e] border border-amber-500/30 w-full max-w-3xl rounded-3xl shadow-2xl flex flex-col max-h-[95vh] overflow-hidden">
         {/* Cabecera del resultado */}
-        <div className={`px-6 py-5 border-b border-slate-800 text-center ${
+        <div className={`px-6 py-5 border-b border-amber-500/20 text-center ${
           roundOutcome === 'teamA'
-            ? 'bg-gradient-to-r from-emerald-950/80 via-slate-900 to-emerald-950/80'
+            ? 'bg-gradient-to-r from-emerald-950/60 via-[#0e141f] to-emerald-950/60'
             : roundOutcome === 'teamB'
-            ? 'bg-gradient-to-r from-rose-950/80 via-slate-900 to-rose-950/80'
-            : 'bg-gradient-to-r from-amber-950/80 via-slate-900 to-amber-950/80'
+            ? 'bg-gradient-to-r from-rose-950/60 via-[#0e141f] to-rose-950/60'
+            : 'bg-gradient-to-r from-amber-950/60 via-[#0e141f] to-amber-950/60'
         }`}>
-          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border ${
+          <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-serif font-bold uppercase tracking-widest mb-2 border ${
             flagFallTeam
               ? (roundOutcome === 'teamA'
-                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                  : 'bg-rose-500/20 text-rose-400 border-rose-500/40')
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                  : 'bg-rose-500/20 text-rose-300 border-rose-500/40')
               : (roundOutcome === 'teamA'
-                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
                   : roundOutcome === 'teamB'
-                  ? 'bg-rose-500/20 text-rose-400 border-rose-500/40'
-                  : 'bg-amber-500/20 text-amber-400 border-amber-500/40')
+                  ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                  : 'bg-amber-500/20 text-amber-300 border-amber-500/40')
           }`}>
             {flagFallTeam ? (
               <>
@@ -97,13 +97,13 @@ export function RoundSummaryModal({
               </>
             ) : (
               <>
-                <Award className="w-4 h-4" />
+                <Award className="w-4 h-4 text-amber-400" />
                 {ui.summary.resolutionTitle(round)}
               </>
             )}
           </div>
 
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-100 uppercase tracking-wide">
+          <h2 className="text-2xl sm:text-3xl font-serif font-black text-gold-gradient uppercase tracking-wide">
             {flagFallTeam ? (
               roundOutcome === 'teamA'
                 ? (is1v1 ? (isEn ? 'You Won the Round on Time!' : '¡Has Ganado la Ronda por Tiempo!') : (isEn ? 'Round Victory for Allied Team (A)!' : '¡Victoria de Ronda para el Equipo Aliado (A)!'))
@@ -320,10 +320,10 @@ export function RoundSummaryModal({
             {isMultiplayer ? (
               <button
                 onClick={onToggleReady}
-                className={`px-6 py-2.5 rounded-xl font-black text-sm flex items-center gap-2 shadow-lg transition active:scale-95 ${
+                className={`px-6 py-2.5 rounded-xl font-serif font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition active:scale-95 cursor-pointer ${
                   isMeReady
                     ? 'bg-emerald-600 hover:bg-emerald-500 text-white border border-emerald-400/50 shadow-emerald-900/30'
-                    : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-amber-900/30 ring-2 ring-amber-400/30'
+                    : 'bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:brightness-110 text-stone-950 shadow-[0_4px_20px_rgba(212,175,55,0.35)]'
                 }`}
               >
                 {isMeReady ? (
@@ -341,7 +341,7 @@ export function RoundSummaryModal({
             ) : (
               <button
                 onClick={onNextRound}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm flex items-center gap-2 shadow-lg transition"
+                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:brightness-110 text-stone-950 font-serif font-black text-xs uppercase tracking-widest flex items-center gap-2 shadow-[0_4px_20px_rgba(212,175,55,0.35)] transition cursor-pointer"
               >
                 <span>{isFinalRound ? ui.summary.viewGameOverBtn : (isEn ? `Start Round ${round + 1}` : `Comenzar Ronda ${round + 1}`)}</span>
                 <ArrowRight className="w-4 h-4" />

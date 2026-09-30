@@ -184,14 +184,14 @@ export function getTutorialSteps(lang = 'es') {
             'Joint time pool: Each team has a total time pool per round (e.g. in 2v2: Fast = 1m 40s, Medium = 3m 20s, Slow = 5m 00s). Seconds consumed by each player during their turn are deducted from their team\'s global clock.',
             'Clock switching: Your team\'s clock ticks while you or your ally think and make a play. The exact instant you place your card on a front, your clock stops and the opposing team\'s clock activates immediately.',
             'Per-round reset: The team clock resets to full value at the start of each new round. Unused time from a round does not carry over to subsequent ones.',
-            '⚠️ Flag Fall Rule (00:00): If a team\'s clock reaches 00:00 before completing its turns, it automatically loses the round (+1 Round Point to opponent)! However, cards already deployed on the table are revealed and their points are preserved for the final tie-breaker tally.',
+            'Flag Fall Rule (00:00): If a team\'s clock reaches 00:00 before completing its turns, it automatically loses the round (+1 Round Point to opponent)! However, cards already deployed on the table are revealed and their points are preserved for the final tie-breaker tally.',
           ]
         : [
             'En Frentes de Guerra el tiempo NO es individual por turno (no dispones de 15 segundos aislados por jugada). Ahora el reloj es COMPARTIDO para todo el equipo.',
             'Bolsa de tiempo conjunta: Cada equipo dispone de un tiempo total por ronda (ejemplo en 2v2: Rápido = 1m 40s, Medio = 3m 20s, Lento = 5m 00s). Los segundos que consuma cada jugador durante su turno se restan al reloj global de su equipo.',
             'Conmutación del reloj: El reloj de tu equipo corre mientras tú o tu aliado pensáis y realizáis la jugada. En el instante exacto en que colocáis la carta en el frente, vuestro reloj se detiene y se activa de inmediato el reloj del equipo rival.',
             'Reseteo por ronda: El reloj de equipo se reinicia al valor completo al inicio de cada nueva ronda. El tiempo sobrante de una ronda no se acumula para las siguientes.',
-            '⚠️ Regla de Caída de Bandera (00:00): Si el reloj de un equipo llega a 00:00 antes de completar sus turnos, ¡pierde automáticamente la ronda (+1 Punto al rival)! Sin embargo, las cartas ya colocadas en la mesa se revelan y sus puntos se conservan para el cómputo de desempate final.',
+            'Regla de Caída de Bandera (00:00): Si el reloj de un equipo llega a 00:00 antes de completar sus turnos, ¡pierde automáticamente la ronda (+1 Punto al rival)! Sin embargo, las cartas ya colocadas en la mesa se revelan y sus puntos se conservan para el cómputo de desempate final.',
           ],
       buttonText: isEn ? 'Understood! Start Card Deployment' : '¡Entendido! Iniciar Despliegue de Cartas',
     },

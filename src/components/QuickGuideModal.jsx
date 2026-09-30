@@ -21,46 +21,46 @@ export function QuickGuideModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md animate-fadeIn">
-      <div className="bg-slate-950 border border-slate-700 w-full max-w-6xl rounded-2xl shadow-2xl flex flex-col max-h-[96vh] overflow-hidden text-slate-100">
+      <div className="bg-[#07090e] border border-amber-500/30 w-full max-w-6xl rounded-3xl shadow-2xl flex flex-col max-h-[96vh] overflow-hidden text-slate-100">
         {/* Cabecera de la Guía Rápida de Mesa */}
-        <div className="px-5 py-3.5 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 border-b border-slate-800 flex items-center justify-between">
+        <div className="px-6 py-4 bg-gradient-to-r from-black via-[#111622] to-black border-b border-amber-500/20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400">
-              <Zap className="w-5 h-5" />
+            <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(212,175,55,0.15)]">
+              <BookOpen className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-black tracking-wider uppercase text-slate-100">
+                <h2 className="text-base sm:text-lg font-serif font-black tracking-widest uppercase text-gold-gradient">
                   {guideT.title}
                 </h2>
-                <span className="text-[10px] bg-amber-500 text-slate-950 px-2 py-0.5 rounded font-black uppercase">
+                <span className="text-[9px] bg-black/60 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-serif font-black uppercase tracking-wider">
                   {guideT.badge}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs font-serif text-slate-400">
                 {guideT.subtitle}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-3 text-xs text-slate-400 font-medium">
-              <span className="flex items-center gap-1 text-slate-300">
+            <div className="hidden md:flex items-center gap-3 text-xs text-slate-300 font-serif">
+              <span className="flex items-center gap-1.5 text-slate-300">
                 <Swords className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.fronts}
               </span>
-              <span>•</span>
-              <span className="flex items-center gap-1 text-slate-300">
+              <span className="text-amber-500/30">•</span>
+              <span className="flex items-center gap-1.5 text-slate-300">
                 <Trophy className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.rounds}
               </span>
-              <span>•</span>
-              <span className="flex items-center gap-1 text-slate-300">
+              <span className="text-amber-500/30">•</span>
+              <span className="flex items-center gap-1.5 text-slate-300">
                 <Clock className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.clocks}
               </span>
             </div>
             <LanguageToggle compact />
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
+              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-black/60 border border-transparent hover:border-amber-500/30 transition cursor-pointer"
               title={guideT.closeBtn}
             >
               <X className="w-5 h-5" />
@@ -73,10 +73,10 @@ export function QuickGuideModal({ isOpen, onClose }) {
           {/* Fila 1: Especificaciones por Modo y Resolución de Empates */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* BLOQUE 1: ESPECIFICACIONES Y LÍMITES POR MODO */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
+            <div className="casino-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
-                  <h3 className="text-xs sm:text-sm font-black text-amber-400 uppercase tracking-wide flex items-center gap-2">
+                <div className="flex items-center justify-between border-b border-amber-500/15 pb-2 mb-3">
+                  <h3 className="text-xs sm:text-sm font-serif font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
                     <Users className="w-4 h-4" /> {guideT.block1.title}
                   </h3>
                   <span className="text-[10px] text-slate-400 font-mono">{guideT.block1.formatTag}</span>
@@ -84,17 +84,17 @@ export function QuickGuideModal({ isOpen, onClose }) {
 
                 <div className="grid grid-cols-3 gap-2 mb-3 text-center">
                   {/* Modo 2v2 */}
-                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                    <div className="text-[10px] uppercase font-bold text-amber-400 flex items-center justify-center gap-1">
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20">
+                    <div className="text-[10px] uppercase font-serif font-bold text-amber-300 flex items-center justify-center gap-1">
                       <span>{guideT.block1.mode2v2.title}</span>
-                      <span className="text-slate-500 font-normal">{guideT.block1.mode2v2.players}</span>
+                      <span className="text-slate-400 font-normal">{guideT.block1.mode2v2.players}</span>
                     </div>
-                    <div className="text-lg font-black text-slate-100 my-0.5">{guideT.block1.mode2v2.limit}</div>
-                    <div className="text-[10px] text-rose-400 font-semibold">{guideT.block1.mode2v2.limitLabel}</div>
-                    <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
+                    <div className="text-lg font-serif font-black text-slate-100 my-0.5">{guideT.block1.mode2v2.limit}</div>
+                    <div className="text-[10px] text-rose-400 font-serif font-semibold">{guideT.block1.mode2v2.limitLabel}</div>
+                    <div className="text-[10px] text-slate-300 mt-1 pt-1 border-t border-amber-500/15 font-serif">
                       {guideT.block1.mode2v2.detail}
                     </div>
-                    <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-slate-900 py-0.5 px-1 rounded">
+                    <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-black/70 py-0.5 px-1 rounded border border-emerald-900/40">
                       {guideT.block1.mode2v2.clock}
                     </div>
                   </div>

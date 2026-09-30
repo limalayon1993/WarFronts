@@ -962,7 +962,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                       03:20
                     </span>
                     <div className="text-[9px] text-emerald-400/90 mt-0.5 animate-pulse font-medium">
-                      {isEn ? '⏱️ Counts down on your turn' : '⏱️ Descuenta en tu turno'}
+                      {isEn ? 'Counts down on your turn' : 'Descuenta en tu turno'}
                     </div>
                   </div>
 

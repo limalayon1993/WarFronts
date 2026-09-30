@@ -42,41 +42,41 @@ export function ScoreBoard({
   const effectiveDuration = localizedDurations.find(d => d.rounds === rawDuration?.rounds) || rawDuration;
 
   return (
-    <header className="bg-slate-950/90 border-b border-slate-800 px-4 py-2.5 backdrop-blur shadow-md">
+    <header className="bg-[#07090e]/95 border-b border-amber-500/20 px-4 py-2.5 backdrop-blur-md shadow-xl">
       <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
         {/* Logo, Modo y Ronda */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <button
               onClick={onBackToMenu}
-              className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-amber-400 transition"
+              className="p-2 rounded-xl bg-[#0d121c] hover:bg-[#151c2b] border border-amber-500/20 hover:border-amber-400/60 text-slate-400 hover:text-amber-300 transition shadow-sm"
               title={ui.common.backToMenu}
             >
               <Home className="w-4 h-4" />
             </button>
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_12px_rgba(212,175,55,0.15)]">
               <Swords className="w-4 h-4" />
             </div>
             <div>
-              <h1 className="text-sm sm:text-base font-black tracking-wider text-slate-100 uppercase flex items-center gap-1.5 flex-wrap">
-                <span>{ui.common.gameTitle}</span>
-                <span className="text-[10px] bg-slate-800 text-amber-400 px-1.5 py-0.2 rounded border border-slate-700">
+              <h1 className="text-sm sm:text-base font-serif font-black tracking-widest uppercase flex items-center gap-1.5 flex-wrap">
+                <span className="text-gold-gradient">{ui.common.gameTitle}</span>
+                <span className="text-[9px] bg-black/60 text-amber-300/90 font-serif px-2 py-0.5 rounded border border-amber-500/30 tracking-wider">
                   {effectiveMode?.name}
                 </span>
                 {isMultiplayer && (
-                  <span className="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-700/60 px-1.5 py-0.2 rounded font-mono font-bold flex items-center gap-1">
-                    <Wifi className="w-2.5 h-2.5 text-indigo-400" />
+                  <span className="text-[9px] bg-black/60 text-amber-200 border border-amber-500/30 px-2 py-0.5 rounded font-mono font-bold flex items-center gap-1">
+                    <Wifi className="w-2.5 h-2.5 text-amber-400" />
                     <span>{roomCode}</span>
                     <span className="text-emerald-400">({mySlotId})</span>
                   </span>
                 )}
               </h1>
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-                <span className="text-amber-400">{ui.common.round} {round}</span> {ui.common.of} {totalRounds} ({ui.common.duration} {effectiveDuration?.name})
+              <div className="flex items-center gap-2 text-xs font-serif text-slate-400">
+                <span className="text-amber-400/90 font-bold">{ui.common.round} {round}</span> {ui.common.of} {totalRounds} ({effectiveDuration?.name})
                 {timeConfig && (
                   <>
-                    <span className="text-slate-600">•</span>
-                    <span className="text-slate-300">{timeConfig.label}</span>
+                    <span className="text-amber-500/40">•</span>
+                    <span className="text-slate-300 font-mono text-[11px]">{timeConfig.label}</span>
                   </>
                 )}
               </div>
@@ -85,29 +85,29 @@ export function ScoreBoard({
         </div>
 
         {/* Marcador Principal de Rondas y Puntos Acumulados */}
-        <div className="flex items-center gap-4 bg-slate-900 border border-slate-800 rounded-xl px-4 py-1.5">
+        <div className="flex items-center gap-4 bg-black/60 border border-amber-500/25 rounded-2xl px-4 py-1.5 shadow-inner">
           {/* Rondas Ganadas */}
           <div className="text-center">
-            <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">
+            <span className="text-[9px] uppercase font-serif font-bold text-amber-200/60 tracking-wider">
               {is1v1 ? ui.game.scoreboard.youVsRival : ui.game.scoreboard.teamAVsTeamB}
             </span>
-            <div className="text-base sm:text-lg font-black font-mono leading-none mt-0.5">
+            <div className="text-base sm:text-lg font-serif font-black leading-none mt-0.5">
               <span className="text-emerald-400">{teamARoundPoints}</span>
-              <span className="text-slate-600 mx-1.5">-</span>
+              <span className="text-amber-500/40 mx-1.5">-</span>
               <span className="text-rose-400">{teamBRoundPoints}</span>
             </div>
           </div>
 
-          <div className="h-7 w-px bg-slate-800" />
+          <div className="h-7 w-px bg-amber-500/20" />
 
           {/* Puntos Acumulados */}
           <div className="text-center">
-            <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider">
+            <span className="text-[9px] uppercase font-serif font-bold text-amber-200/60 tracking-wider">
               {ui.game.scoreboard.accumulated}
             </span>
-            <div className="text-xs sm:text-sm font-bold font-mono text-slate-300 leading-none mt-0.5">
+            <div className="text-xs sm:text-sm font-serif font-bold text-slate-300 leading-none mt-0.5">
               <span className="text-emerald-300">{teamACumulativePoints}</span>
-              <span className="text-slate-600 mx-1">/</span>
+              <span className="text-amber-500/40 mx-1">/</span>
               <span className="text-rose-300">{teamBCumulativePoints}</span>
             </div>
           </div>
@@ -115,31 +115,31 @@ export function ScoreBoard({
 
         {/* Palo Triunfo */}
         {trumpCard && (
-          <div className="flex items-center gap-2.5 bg-gradient-to-r from-amber-950/40 to-slate-900 border border-amber-600/40 rounded-xl px-3 py-1 shadow-lg">
+          <div className="flex items-center gap-2.5 bg-gradient-to-r from-amber-950/30 via-black/50 to-black/60 border border-amber-500/30 rounded-2xl px-3 py-1 shadow-lg">
             <div className="scale-75 origin-left -mr-4">
               <Card card={trumpCard} isTrump compact />
             </div>
             <div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
-                <Flame className="w-3 h-3 text-amber-400" /> {isEn ? 'Trump Suit' : 'Triunfo'}
+              <div className="text-[9px] font-serif font-black text-amber-400 uppercase tracking-widest">
+                {isEn ? 'Trump Suit' : 'Triunfo'}
               </div>
-              <div className="text-xs font-semibold text-slate-200">
-                {trumpSuit?.name} <span className="text-amber-400 font-bold">(+2 pts)</span>
+              <div className="text-xs font-serif font-bold text-slate-200">
+                {trumpSuit?.name} <span className="text-amber-400 text-[11px]">(+2 pts)</span>
               </div>
             </div>
           </div>
         )}
 
         {/* Mazos e Iniciativa */}
-        <div className="hidden lg:flex items-center gap-3 text-xs text-slate-400">
-          <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1">
-            <Layers className="w-3.5 h-3.5 text-slate-400" />
-            <span>{ui.game.scoreboard.drawDeck} <strong className="text-slate-200 font-mono">{drawDeckCount}</strong></span>
-            <span className="text-slate-700">|</span>
-            <span>{ui.game.scoreboard.discardDeck} <strong className="text-slate-200 font-mono">{discardDeckCount}</strong></span>
+        <div className="hidden lg:flex items-center gap-3 text-xs text-slate-400 font-serif">
+          <div className="flex items-center gap-1.5 bg-black/40 border border-amber-500/20 rounded-xl px-2.5 py-1">
+            <Layers className="w-3.5 h-3.5 text-amber-400/70" />
+            <span>{ui.game.scoreboard.drawDeck} <strong className="text-slate-200 font-mono text-[11px]">{drawDeckCount}</strong></span>
+            <span className="text-amber-500/30">|</span>
+            <span>{ui.game.scoreboard.discardDeck} <strong className="text-slate-200 font-mono text-[11px]">{discardDeckCount}</strong></span>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1" title={isEn ? "Team starting the attack in this round (Initiative)" : "Equipo que empieza atacando en esta ronda (Iniciativa)"}>
+          <div className="bg-black/40 border border-amber-500/20 rounded-xl px-2.5 py-1" title={isEn ? "Team starting the attack in this round (Initiative)" : "Equipo que empieza atacando en esta ronda (Iniciativa)"}>
             <span>{ui.game.scoreboard.initiative} </span>
             <strong className={initiativeTeam === 'teamA' ? 'text-emerald-400' : 'text-rose-400'}>
               {initiativeTeam === 'teamA'
@@ -153,7 +153,7 @@ export function ScoreBoard({
         <div className="flex items-center gap-1.5">
           <button
             onClick={onToggleMute}
-            className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition"
+            className="p-2 rounded-xl bg-[#0d121c] hover:bg-[#151c2b] border border-amber-500/20 hover:border-amber-400/60 text-slate-300 hover:text-white transition shadow-sm"
             title={isMuted ? ui.common.unmute : ui.common.mute}
           >
             {isMuted ? <VolumeX className="w-4 h-4 text-slate-500" /> : <Volume2 className="w-4 h-4 text-amber-400" />}
@@ -162,20 +162,20 @@ export function ScoreBoard({
           {/* Guía Rápida */}
           <button
             onClick={onOpenQuickGuide}
-            className="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 transition flex items-center gap-1 text-xs font-bold"
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/15 to-amber-600/15 hover:from-amber-500/25 hover:to-amber-600/25 border border-amber-500/35 text-amber-300 transition flex items-center gap-1 text-xs font-serif font-bold tracking-wider uppercase shadow-sm"
             title={ui.common.quickGuide}
           >
-            <Zap className="w-3.5 h-3.5 text-amber-400" />
+            <BookOpen className="w-3.5 h-3.5 text-amber-400" />
             <span className="hidden sm:inline">{ui.common.quickGuide}</span>
           </button>
 
           {/* Manual Completo */}
           <button
             onClick={onOpenFullManual}
-            className="px-2.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white transition flex items-center gap-1 text-xs font-semibold"
+            className="px-3 py-1.5 rounded-xl bg-[#0d121c] hover:bg-[#151c2b] border border-amber-500/20 hover:border-amber-400/40 text-slate-300 hover:text-white transition flex items-center gap-1 text-xs font-serif font-semibold tracking-wider uppercase shadow-sm"
             title={ui.common.fullManual}
           >
-            <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
+            <BookOpen className="w-3.5 h-3.5 text-slate-400" />
             <span className="hidden sm:inline">{isEn ? 'Manual' : 'Manual'}</span>
           </button>
 
@@ -184,7 +184,7 @@ export function ScoreBoard({
 
           <button
             onClick={onRestartGame}
-            className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-rose-400 transition"
+            className="p-2 rounded-xl bg-[#0d121c] hover:bg-[#151c2b] border border-amber-500/20 hover:border-rose-500/50 text-slate-400 hover:text-rose-400 transition shadow-sm"
             title={isEn ? 'Restart Match' : 'Reiniciar Partida'}
           >
             <RotateCcw className="w-3.5 h-3.5" />

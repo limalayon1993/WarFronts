@@ -1,18 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color-scheme: dark;
+  --font-serif: 'Cinzel', Georgia, 'Times New Roman', serif;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #0b0f17;
-  color: #f3f4f6;
+  background-color: #07090e;
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.04) 0%, transparent 60%),
+    radial-gradient(circle at 85% 100%, rgba(13, 40, 30, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 15% 100%, rgba(30, 15, 20, 0.06) 0%, transparent 50%);
+  color: #e6e9ee;
   min-height: 100vh;
   overflow-x: hidden;
   user-select: none;
+  letter-spacing: -0.01em;
 }
 
 #root {
@@ -22,46 +28,137 @@ body {
   flex-direction: column;
 }
 
-/* Custom card shadow and 3D feel */
+/* Tipografías de Prestigio */
+.font-serif, .font-display {
+  font-family: 'Cinzel', Georgia, serif;
+  letter-spacing: 0.04em;
+}
+
+/* Gradientes Metálicos de Casino (Oro y Platino) */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #fff2cc 0%, #e6ca65 30%, #c5a059 65%, #997833 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gold-light {
+  background: linear-gradient(135deg, #ffffff 0%, #fae8b4 50%, #d4af37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-platinum-gradient {
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 50%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Paneles de Cuero y Laca de Casino */
+.casino-panel {
+  background: radial-gradient(circle at top left, #11151f 0%, #090c13 85%);
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.casino-panel-subtle {
+  background: rgba(13, 17, 26, 0.85);
+  border: 1px solid rgba(197, 160, 89, 0.16);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* Tapete Verde Esmeralda de Salón Privado */
+.casino-felt-table {
+  background: radial-gradient(ellipse at 50% 35%, #0f2c20 0%, #081a14 55%, #050f0c 100%);
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.75), 0 15px 35px rgba(0, 0, 0, 0.6);
+}
+
+/* Reverso de Baraja de Casino Selecto (Guilloché Geométrico y Doble Filete Dorado) */
+.casino-card-back {
+  background-color: #0b0e14;
+  background-image: 
+    radial-gradient(rgba(197, 160, 89, 0.5) 0.65px, transparent 0.65px),
+    radial-gradient(rgba(197, 160, 89, 0.3) 0.65px, #0b0e14 0.65px);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+  border: 1px solid rgba(197, 160, 89, 0.45);
+  box-shadow: 
+    inset 0 0 0 2px #0b0e14, 
+    inset 0 0 0 3px rgba(197, 160, 89, 0.4),
+    0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+/* Reverso de Carta Sombra (Obsidiana Profunda y Toques Púrpura Imperial) */
+.casino-shadow-back {
+  background-color: #08060d;
+  background-image: 
+    radial-gradient(rgba(168, 85, 247, 0.4) 0.65px, transparent 0.65px),
+    radial-gradient(rgba(197, 160, 89, 0.3) 0.65px, #08060d 0.65px);
+  background-size: 8px 8px;
+  background-position: 0 0, 4px 4px;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 
+    inset 0 0 0 2px #08060d, 
+    inset 0 0 0 3px rgba(168, 85, 247, 0.4),
+    0 4px 12px rgba(0, 0, 0, 0.7);
+}
+
+/* Cara de Carta de Casino (Marfil/Lino Cálido con Filete Dorado Interior) */
+.casino-card-face {
+  background-color: #fbf9f4;
+  box-shadow: 
+    inset 0 0 0 1px rgba(197, 160, 89, 0.25),
+    0 3px 8px rgba(0, 0, 0, 0.45);
+}
+
+.casino-card-face-trump {
+  background-color: #fffdf5;
+  box-shadow: 
+    inset 0 0 0 1.5px rgba(212, 175, 55, 0.65),
+    0 4px 14px rgba(212, 175, 55, 0.25);
+}
+
+/* Sombra y Elevación Táctil */
 .card-shadow {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .card-hover:hover {
   transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6), 0 0 12px rgba(245, 158, 11, 0.3);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7), 0 0 16px rgba(197, 160, 89, 0.3);
 }
 
-/* Custom scrollbars */
+/* Scrollbars de Salón VIP */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #111827;
+  background: #07090e;
 }
 ::-webkit-scrollbar-thumb {
-  background: #374151;
+  background: #1e2430;
   border-radius: 3px;
+  border: 1px solid rgba(197, 160, 89, 0.15);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #4b5563;
+  background: #c5a059;
 }
 
-/* Brillo verde vibrante para la caja contenedora de la mano cuando te toca tirar */
-@keyframes glowing-border-green {
+/* Aura de Turno Activo (Resplandor de Oro Bruñido y Esmeralda) */
+@keyframes casino-turn-pulse {
   0%, 100% {
-    border-color: #34d399;
-    box-shadow: 0 0 16px rgba(52, 211, 153, 0.45), 0 0 35px rgba(16, 185, 129, 0.25), inset 0 0 14px rgba(52, 211, 153, 0.15);
+    border-color: rgba(197, 160, 89, 0.75);
+    box-shadow: 0 0 20px rgba(197, 160, 89, 0.25), inset 0 0 16px rgba(16, 185, 129, 0.1);
   }
   50% {
-    border-color: #10b981;
-    box-shadow: 0 0 28px rgba(52, 211, 153, 0.85), 0 0 55px rgba(16, 185, 129, 0.5), inset 0 0 25px rgba(52, 211, 153, 0.3);
+    border-color: rgba(245, 215, 127, 0.95);
+    box-shadow: 0 0 35px rgba(197, 160, 89, 0.45), 0 0 55px rgba(16, 185, 129, 0.2), inset 0 0 24px rgba(16, 185, 129, 0.18);
   }
 }
 
 .glowing-green-hand {
-  animation: glowing-border-green 1.7s ease-in-out infinite;
+  animation: casino-turn-pulse 2.2s ease-in-out infinite;
   border-width: 2px !important;
   border-style: solid !important;
 }
