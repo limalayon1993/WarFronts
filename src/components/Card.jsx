@@ -108,17 +108,15 @@ export function Card({
             </span>
           </div>
 
-          {/* Esquina inferior derecha (invertida, solo en cartas no compactas para evitar solapamiento con el nombre) */}
-          {!compact && (
-            <div className={`flex flex-col items-center leading-none self-end rotate-180 z-10 ${isRed ? 'text-rose-700' : 'text-stone-900'}`}>
-              <span className="font-serif font-black tracking-tight leading-none text-sm sm:text-base md:text-lg">
-                {card.rank}
-              </span>
-              <span className="leading-none mt-0.5 text-xs sm:text-sm md:text-base">
-                {suitInfo?.symbol}
-              </span>
-            </div>
-          )}
+          {/* Esquina inferior derecha (invertida, tal como en las barajas reales) */}
+          <div className={`flex flex-col items-center leading-none self-end rotate-180 z-10 ${isRed ? 'text-rose-700' : 'text-stone-900'}`}>
+            <span className={`font-serif font-black tracking-tight leading-none ${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-base md:text-lg'}`}>
+              {card.rank}
+            </span>
+            <span className={`leading-none mt-0.5 ${compact ? 'text-[10px] sm:text-xs' : 'text-xs sm:text-sm md:text-base'}`}>
+              {suitInfo?.symbol}
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -247,17 +245,15 @@ export function Card({
           </span>
         </div>
 
-        {/* Esquina inferior derecha (invertida, solo en cartas grandes para no estorbar en el tablero) */}
-        {!compact && (
-          <div className={`flex flex-col items-center leading-none self-end rotate-180 z-10 ${isRed ? 'text-rose-700' : 'text-stone-900'}`}>
-            <span className="font-serif font-black tracking-tight leading-none text-sm sm:text-base md:text-lg">
-              {card.rank}
-            </span>
-            <span className="leading-none mt-0.5 text-xs sm:text-sm md:text-base">
-              {suitInfo?.symbol}
-            </span>
-          </div>
-        )}
+        {/* Esquina inferior derecha (invertida, tal como en las barajas reales) */}
+        <div className={`flex flex-col items-center leading-none self-end rotate-180 z-10 ${isRed ? 'text-rose-700' : 'text-stone-900'}`}>
+          <span className={`font-serif font-black tracking-tight leading-none ${compact ? 'text-xs sm:text-sm' : 'text-sm sm:text-base md:text-lg'}`}>
+            {card.rank}
+          </span>
+          <span className={`leading-none mt-0.5 ${compact ? 'text-[10px] sm:text-xs' : 'text-xs sm:text-sm md:text-base'}`}>
+            {suitInfo?.symbol}
+          </span>
+        </div>
       </div>
     </div>
   );
