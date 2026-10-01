@@ -1359,6 +1359,8 @@ export default function App() {
         const move = chooseBotMove({
           botHand: freshBot.hand,
           botTeam: freshBot.team,
+          botPlayerId: freshBot.id,
+          allPlayers: freshList,
           fronts: freshFronts,
           botShadowsLeft: freshBot.shadowsLeft,
           maxFrontCards: modeConfig.maxFrontCards,
