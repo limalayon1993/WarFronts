@@ -133,7 +133,7 @@ export function MultiplayerLobby({
             return {
               ...s,
               peerId: null,
-              playerName: 'Vacío',
+              playerName: isEn ? 'Empty' : 'Vacío',
               isHuman: false,
               isBot: false,
             };
@@ -275,7 +275,7 @@ export function MultiplayerLobby({
       // Transmitir estado de lobby a todos
       broadcastLobbyState(updated, selectedMode, selectedRhythm, autoFillBots);
 
-      mp.sendChat(`¡${clientName} se ha unido a la sala en el puesto ${updated[targetIndex].label}!`);
+      mp.sendChat(ui.multiplayer.systemJoin(clientName, updated[targetIndex].label));
       return updated;
     });
   };
@@ -296,7 +296,7 @@ export function MultiplayerLobby({
       updated[currentIdx] = {
         ...updated[currentIdx],
         peerId: null,
-        playerName: autoFillBots ? `Bot ${updated[currentIdx].slotId}` : 'Vacío',
+        playerName: autoFillBots ? `Bot ${updated[currentIdx].slotId}` : (isEn ? 'Empty' : 'Vacío'),
         isHuman: false,
         isBot: autoFillBots,
       };

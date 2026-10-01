@@ -4,6 +4,7 @@ import { Lock, Swords } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import {
   getLocalizedFronts,
+  getLocalizedSuits,
   sortFrontCards,
   analyzeCardSynergies,
   SUITS,
@@ -184,7 +185,7 @@ export function FrontZone({
                 ? 'bg-stone-800 text-amber-200 border-amber-300 scale-105 shadow-md ring-1 ring-amber-300'
                 : 'bg-black/60 text-slate-300 border-amber-500/25 hover:border-amber-400/50'
             }`}
-            title={`${SUITS[suit]?.name} x${data.count}`}
+            title={`${getLocalizedSuits(language)[suit]?.name || SUITS[suit]?.name || suit} x${data.count}`}
           >
             <span className={isRed ? 'text-rose-400' : 'text-slate-200'}>{suitSymbol}x{data.count}</span>
           </span>

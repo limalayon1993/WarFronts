@@ -59,11 +59,11 @@ export const GUIDE_TRANSLATIONS = {
       phase1: {
         badge: 'FASE 1',
         tag: 'Setup',
-        title: 'Preparación & Triunfo',
-        p1: 'Palo Triunfo: Revelar 1ª carta del mazo (+2 pts por carta de este palo).',
-        p2: 'Marcador Sombra: Colocar en estado activo frente a cada jugador.',
-        p3: 'Iniciativa: Rota al equipo rival cada ronda.',
-        footer: 'La carta de triunfo va al descarte al terminar la ronda.',
+        title: 'Preparación e Iniciativa',
+        p1: 'Mazo y Descartes: Rebarajar descarte solo si se agota el mazo principal.',
+        p2: 'Marcador Sombra: Activo frente a cada jugador (máx 1 carta oculta por ronda).',
+        p3: 'Iniciativa: Rota al equipo rival cada ronda (sorteo aleatorio en Ronda 1).',
+        footer: 'Sin palo de triunfo en v1.6. Regla de mazo continuo.',
       },
       phase2: {
         badge: 'FASE 2',
@@ -206,11 +206,11 @@ export const GUIDE_TRANSLATIONS = {
       phase1: {
         badge: 'PHASE 1',
         tag: 'Setup',
-        title: 'Preparation & Trump',
-        p1: 'Trump Suit: Reveal 1st card of the deck (+2 pts per card of this suit).',
-        p2: 'Shadow Marker: Place in active state in front of each player.',
-        p3: 'Initiative: Rotates to the rival team each round.',
-        footer: 'The revealed trump card goes to the discard pile at round end.',
+        title: 'Preparation & Initiative',
+        p1: 'Deck & Discard: Reshuffle discard pile only if draw deck depletes.',
+        p2: 'Shadow Marker: Active in front of each player (max 1 face-down card per round).',
+        p3: 'Initiative: Rotates to rival team each round (random draw in Round 1).',
+        footer: 'No trump suit in v1.6. Continuous deck rule applies.',
       },
       phase2: {
         badge: 'PHASE 2',

@@ -1,6 +1,6 @@
 import React from 'react';
 import { EyeOff } from 'lucide-react';
-import { SUITS } from '../constants/rules';
+import { SUITS, getLocalizedSuits } from '../constants/rules';
 import { useLanguage } from '../context/LanguageContext';
 
 export function Card({
@@ -22,7 +22,8 @@ export function Card({
   onMouseLeave,
 }) {
   const { isEn, ui } = useLanguage();
-  const suitInfo = card ? SUITS[card.suit] : null;
+  const localizedSuits = React.useMemo(() => getLocalizedSuits(isEn ? 'en' : 'es'), [isEn]);
+  const suitInfo = card ? (localizedSuits[card.suit] || SUITS[card.suit]) : null;
   const isRed = card?.suit === 'hearts' || card?.suit === 'diamonds';
 
   // Tooltip explicativo con desglose táctico de sinergias activas

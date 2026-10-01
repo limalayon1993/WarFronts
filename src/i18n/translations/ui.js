@@ -39,7 +39,7 @@ export const UI_TRANSLATIONS = {
         tutorial: {
           badge: 'Paso a Paso',
           title: 'Tutorial',
-          desc: 'Aprende las mecánicas clave en 2v2: cálculo de frentes, sinergias (+5 pts), triunfos (+2 pts) y cartas de sombra.',
+          desc: 'Aprende las mecánicas clave en 2v2: cálculo de frentes, sinergias de palo (+5 pts), formaciones (+10/+15/+20 pts) y cartas de sombra.',
           tag: '100% Guiado',
           btn: 'Iniciar Tutorial',
         },
@@ -279,7 +279,7 @@ export const UI_TRANSLATIONS = {
         tutorial: {
           badge: 'Step by Step',
           title: 'Tutorial',
-          desc: 'Learn core mechanics in 2v2: front calculations, synergies (+5 pts), trump suit (+2 pts), and shadow cards.',
+          desc: 'Learn core mechanics in 2v2: front calculations, suit synergies (+5 pts), formations (+10/+15/+20 pts), and shadow cards.',
           tag: '100% Guided',
           btn: 'Start Tutorial',
         },

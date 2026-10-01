@@ -540,7 +540,8 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
     if (data.count >= 2) {
       const suitCards = activeCards.filter(c => c.suit === suit);
       const suitCardIds = suitCards.map(c => c.id);
-      const suitName = SUITS[suit]?.name || suit;
+      const localizedSuits = getLocalizedSuits(lang);
+      const suitName = localizedSuits[suit]?.name || SUITS[suit]?.name || suit;
       suitCards.forEach(c => {
         const item = cardSynergies[c.id];
         if (item) {
