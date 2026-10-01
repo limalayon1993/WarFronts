@@ -64,22 +64,60 @@ export function Card({
     }
 
     // Si SÍ es visible para el equipo propio (dueño o compañero de equipo):
-    // Todo el equipo propio ve la carta con el marco/borde morado característico
+    // Todo el equipo propio ve la carta con el marco/borde morado característico y sus símbolos de sinergia
     return (
       <div
+        draggable={isPlayable}
+        onDragStart={isPlayable ? onDragStart : undefined}
+        onDragEnd={isPlayable ? onDragEnd : undefined}
         onClick={isPlayable ? onClick : undefined}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        title={synergyTooltip || undefined}
         className={`
           relative rounded-lg transition-all duration-150 select-none
           ${isTrump ? 'casino-card-face-trump border-2 border-purple-600/80 ring-1 ring-amber-400/50' : 'casino-card-face border-2 border-purple-600/70 shadow-[0_0_10px_rgba(168,85,247,0.3)]'}
           ${compact ? 'w-12 h-16 sm:w-14 sm:h-20' : 'w-16 h-24 sm:w-20 sm:h-28 md:w-24 md:h-34'}
           ${isSelected ? 'ring-2 ring-amber-400 scale-105 shadow-xl -translate-y-2' : ''}
           ${isPlayable ? 'cursor-pointer hover:-translate-y-1.5 hover:shadow-lg' : ''}
+          ${isHighlighted ? '!ring-2 !ring-amber-300 shadow-[0_0_16px_rgba(251,191,36,0.7)] -translate-y-1.5 z-30 scale-[1.03]' : ''}
+          ${isDimmed ? 'opacity-35 grayscale-[25%] transition-all duration-200' : ''}
         `}
       >
         {/* Insignia de Palo Triunfo */}
         {isTrump && (
           <div className="absolute -top-2 -right-1.5 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-stone-950 text-[8px] font-serif font-black px-1.5 py-0.5 rounded shadow-md z-20 pointer-events-none tracking-tight">
             +2
+          </div>
+        )}
+
+        {/* Insignia de Sinergia / Formación Táctica (esquina superior derecha) */}
+        {!isTrump && synergy && synergy.primarySynergy && (
+          <div className="absolute top-1 right-1 z-20 pointer-events-none flex items-center justify-end">
+            {synergy.isMultiCombo ? (
+              <span
+                className="w-4 h-4 rounded-full bg-gradient-to-br from-amber-400 via-yellow-300 to-amber-500 text-stone-950 font-black text-[9px] sm:text-[10px] flex items-center justify-center shadow-md ring-1 ring-amber-300/80 uppercase leading-none select-none"
+                title="Multi-Combo"
+              >
+                ★
+              </span>
+            ) : synergy.inTrio ? (
+              <span className="h-4 px-1 rounded bg-purple-900/90 text-purple-200 border border-purple-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase flex items-center justify-center leading-none">
+                {isEn ? 'Trio' : 'Trío'}
+              </span>
+            ) : synergy.inStraight ? (
+              <span className="h-4 px-1 rounded bg-sky-950/90 text-cyan-300 border border-cyan-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase flex items-center justify-center leading-none">
+                {isEn ? 'Str' : 'Esc'}
+              </span>
+            ) : synergy.inPair ? (
+              <span className="h-4 px-1 rounded bg-amber-950/90 text-amber-300 border border-amber-500/70 text-[7px] sm:text-[8px] font-serif font-black shadow-sm tracking-tight uppercase flex items-center justify-center leading-none">
+                {isEn ? 'Pair' : 'Par'}
+              </span>
+            ) : (
+              <span className="h-4 px-1 rounded bg-stone-900/90 border border-stone-600/70 text-amber-300 font-serif font-bold text-[7px] sm:text-[8px] shadow-sm tracking-tight flex items-center justify-center gap-0.5 leading-none">
+                <span>{suitInfo?.symbol}</span><span>x{synergy.suitCount}</span>
+              </span>
+            )}
           </div>
         )}
 

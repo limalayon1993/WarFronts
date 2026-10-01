@@ -55,13 +55,21 @@ export function FrontZone({
   );
 
   // 2. Análisis táctico de sinergias y formaciones activas
+  // Para las tropas del propio equipo, las sombras son visibles tácticamente entre compañeros
+  // Por tanto, sus sinergias se calculan siempre (isRevealed = true)
   const { frontScore: allyScore, cardSynergies: allySynergies } = React.useMemo(
-    () => analyzeCardSynergies(allyCards, isRoundOver, language),
-    [allyCards, isRoundOver, language]
+    () => analyzeCardSynergies(allyCards, true, language),
+    [allyCards, language]
   );
   const { frontScore: enemyScore, cardSynergies: enemySynergies } = React.useMemo(
     () => analyzeCardSynergies(enemyCards, isRoundOver, language),
     [enemyCards, isRoundOver, language]
+  );
+
+  // Conteo de cartas sombra aliadas activas en el frente (visibles para el equipo pero con distintivo de sombra)
+  const allyShadowCount = React.useMemo(
+    () => allyCards.filter(c => c.isShadow && !isRoundOver).length,
+    [allyCards, isRoundOver]
   );
 
   const allyLabel = isTeamMode 
@@ -419,12 +427,12 @@ export function FrontZone({
             </span>
           </div>
 
-          {allyScore.hiddenCount > 0 && (
+          {allyShadowCount > 0 && (
             <span
               className="bg-purple-950/70 border border-purple-500/40 text-purple-300 px-1.5 py-0.5 rounded text-[9px] font-serif font-bold tracking-wider uppercase flex items-center gap-0.5"
-              title={isEn ? "Hidden shadow cards" : "Cartas sombras ocultas"}
+              title={isEn ? "Team shadow cards" : "Cartas sombras del equipo"}
             >
-              <span>+{allyScore.hiddenCount}</span>
+              <span>+{allyShadowCount}</span>
               <span className="text-[8px]">{ui.game.card.shadowBadge}</span>
             </span>
           )}
