@@ -159,6 +159,8 @@ export const UI_TRANSLATIONS = {
         hiddenBadge: 'Oculta',
         revealedBadge: 'REVELADA',
         trumpBonus: '+2',
+        ownShadowTooltip: 'Tu Carta Sombra (Oculta para rivales)',
+        allyShadowTooltip: 'Carta Sombra de compañero (Oculta para rivales)',
       },
       hand: {
         yourHandTitle: (name, count) => `Tu Mano: ${name} (${count} cartas)`,
@@ -399,6 +401,8 @@ export const UI_TRANSLATIONS = {
         hiddenBadge: 'Hidden',
         revealedBadge: 'REVEALED',
         trumpBonus: '+2',
+        ownShadowTooltip: 'Your Shadow Card (Hidden from enemies)',
+        allyShadowTooltip: "Teammate's Shadow Card (Hidden from enemies)",
       },
       hand: {
         yourHandTitle: (name, count) => `Your Hand: ${name} (${count} cards)`,

@@ -480,8 +480,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Activate the "Play as Shadow" button, select your 8 of Hearts (8♥), and deploy it to the Center Front.'
         : 'Activa el botón "Jugar como Sombra", selecciona tu 8 de Corazones (8♥) y colócalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'In 2v2 each player has 1 Shadow Token. Playing a card as shadow deploys it FACE DOWN: neither opponents nor your ally know its rank or suit until round resolution. Placing 8♥ (8 base pts) in the center as shadow adds a third Hearts card, elevating your team synergy to +10 points! Being concealed, opponents cannot tell if it is a bluff or an Ace, completely intimidating them.'
-        : 'En 2v2 cada jugador tiene 1 Ficha de Sombra. Jugar una carta como sombra la coloca BOCA ABAJO: ni los rivales ni tu aliado conocen su valor ni su palo hasta el final de la ronda. Al poner el 8♥ (8 pts base) en el centro como sombra, ¡añades una tercera carta de corazones a vuestro equipo, elevando la sinergia de vuestro equipo a +10 puntos! Además, al estar oculta, los rivales no saben si es un farol o un As, intimidándolos por completo.',
+        ? 'In 2v2 each player has 1 Shadow Token per round. Playing a card as a shadow deploys it FACE DOWN solely for the opposing team, but it remains fully VISIBLE to your entire team (highlighted with a purple border and shadow icon). This allows your ally A2 to see your 8♥ to coordinate strategy and calculate team synergies (+10 pts for 3 hearts), while opponents only see the dark shadow back without knowing whether it is an Ace or a bluff, completely intimidating them.'
+        : 'En 2v2 cada jugador tiene 1 Ficha de Sombra por ronda. Al jugar una carta como sombra, esta se coloca BOCA ABAJO únicamente para el equipo rival, pero permanece VISIBLE para todo tu equipo (rodeada con un borde morado y el icono de sombra). De este modo, tu aliado A2 puede ver perfectamente tu 8♥ para coordinar la estrategia y calcular las sinergias de equipo (+10 pts por 3 corazones), mientras que los rivales solo ven el reverso oscuro sin saber si es un As o un farol, intimidándolos por completo.',
       whyNotOthers: isEn
         ? [
             {
@@ -573,8 +573,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Rival B2 plays a SHADOW CARD (Concealed) on the Left Front.'
         : 'Rival B2 juega una CARTA SOMBRA (Oculta) en el Frente Izquierdo.',
       whyPlayed: isEn
-        ? 'B2 spends their shadow token to conceal their left flank deployment against your Ally A2, creating uncertainty on the Left Front.'
-        : 'B2 gasta su ficha de sombra para ocultar su jugada en la izquierda frente a vuestro Aliado A2. Nadie sabe qué carta es, creando incertidumbre en el Frente Izquierdo.',
+        ? 'B2 spends their shadow token to conceal their left flank deployment against your Ally A2. Their teammate B1 can see the card, but for our team it remains face-down with the dark shadow back, creating total uncertainty regarding its rank and suit on the Left Front.'
+        : 'B2 gasta su ficha de sombra para ocultar su jugada en la izquierda frente a vuestro Aliado A2. Su compañero B1 puede ver su carta en su equipo, pero para nosotros permanece boca abajo con el reverso oscuro de sombra, creando total incertidumbre sobre su valor y palo en el Frente Izquierdo.',
       whyNotOthers: isEn
         ? 'B2 abandoned the center as lost and already holds a solid lead on the right.'
         : 'B2 no jugó en el centro porque lo da por perdido, ni en la derecha porque ya lideran cómodamente allí.',

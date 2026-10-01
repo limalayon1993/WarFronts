@@ -8,6 +8,7 @@ export function Card({
   isShadow = false,
   isRevealed = false,
   isOwner = false,
+  isTeammate = false,
   isSelected = false,
   isTrump = false,
   isPlayable = false,
@@ -29,16 +30,18 @@ export function Card({
   // Tooltip explicativo con desglose táctico de sinergias activas
   const synergyTooltip = React.useMemo(() => {
     if (!card || !synergy || !synergy.synergyDescriptions || synergy.synergyDescriptions.length === 0) return null;
-    if (isShadow && !isRevealed) return null;
+    if (isShadow && !isRevealed && !isOwner && !isTeammate) return null;
     const suitName = suitInfo?.name || card.suit;
     return `${card.rank}${suitInfo?.symbol || ''} (${suitName})\n• ${synergy.synergyDescriptions.join('\n• ')}`;
-  }, [card, synergy, suitInfo, isShadow, isRevealed]);
+  }, [card, synergy, suitInfo, isShadow, isRevealed, isOwner, isTeammate]);
 
   // Si es una carta de sombra no revelada:
   if (isShadow && !isRevealed) {
-    // Si NO es la persona que la lanzó (rivales Y compañeros de equipo):
+    const isVisibleToTeam = isOwner || isTeammate;
+
+    // Si NO es visible para el equipo (equipo rival):
     // Solo ven el reverso oscuro y solemne de la carta sombra de alta gama
-    if (!isOwner) {
+    if (!isVisibleToTeam) {
       return (
         <div
           onClick={isPlayable ? onClick : undefined}
@@ -60,14 +63,14 @@ export function Card({
       );
     }
 
-    // Si SÍ es la persona que la lanzó (isOwner === true):
-    // La persona que la lanza SÍ puede ver su propia carta con el sello de Sombra Privada
+    // Si SÍ es visible para el equipo propio (dueño o compañero de equipo):
+    // Todo el equipo propio ve la carta con el marco/borde morado característico
     return (
       <div
         onClick={isPlayable ? onClick : undefined}
         className={`
           relative rounded-lg transition-all duration-150 select-none
-          ${isTrump ? 'casino-card-face-trump border-2 border-purple-600/80 ring-1 ring-amber-400/50' : 'casino-card-face border-2 border-purple-600/70'}
+          ${isTrump ? 'casino-card-face-trump border-2 border-purple-600/80 ring-1 ring-amber-400/50' : 'casino-card-face border-2 border-purple-600/70 shadow-[0_0_10px_rgba(168,85,247,0.3)]'}
           ${compact ? 'w-12 h-16 sm:w-14 sm:h-20' : 'w-16 h-24 sm:w-20 sm:h-28 md:w-24 md:h-34'}
           ${isSelected ? 'ring-2 ring-amber-400 scale-105 shadow-xl -translate-y-2' : ''}
           ${isPlayable ? 'cursor-pointer hover:-translate-y-1.5 hover:shadow-lg' : ''}
@@ -80,10 +83,14 @@ export function Card({
           </div>
         )}
 
-        {/* Sello de Sombra propia */}
+        {/* Sello de Sombra de equipo */}
         <div
           className="absolute bottom-1 left-1 z-20 pointer-events-none"
-          title={isEn ? "Your Shadow Card (Hidden from enemies)" : "Tu Carta Sombra (Oculta para rivales)"}
+          title={
+            isOwner
+              ? (ui.game.card?.ownShadowTooltip || (isEn ? "Your Shadow Card (Hidden from enemies)" : "Tu Carta Sombra (Oculta para rivales)"))
+              : (ui.game.card?.allyShadowTooltip || (isEn ? "Teammate's Shadow Card (Hidden from enemies)" : "Carta Sombra de compañero (Oculta para rivales)"))
+          }
         >
           <span className="w-4 h-4 rounded-full bg-purple-950/95 text-purple-300 border border-purple-500/80 flex items-center justify-center shadow">
             <EyeOff className="w-2.5 h-2.5" />

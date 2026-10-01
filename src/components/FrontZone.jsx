@@ -319,6 +319,7 @@ export function FrontZone({
                     isShadow={card.isShadow}
                     isRevealed={isRoundOver}
                     isOwner={isOwner}
+                    isTeammate={false}
                     compact
                     synergy={cardSynergy}
                     isHighlighted={isHighlighted}
@@ -391,14 +392,13 @@ export function FrontZone({
                     isShadow={card.isShadow}
                     isRevealed={isRoundOver}
                     isOwner={isOwner}
+                    isTeammate={true}
                     compact
                     synergy={cardSynergy}
                     isHighlighted={isHighlighted}
                     isDimmed={isDimmed}
                     onMouseEnter={() => {
-                      if (!card.isShadow || isRoundOver) {
-                        setHoveredCardId(card.id);
-                      }
+                      setHoveredCardId(card.id);
                     }}
                     onMouseLeave={() => setHoveredCardId(null)}
                   />

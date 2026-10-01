@@ -61,19 +61,7 @@ export function chooseBotMove({
         return { ...c };
       }),
       [botTeam]: rawMyCards.map(c => {
-        // Si es una sombra del compañero de equipo y no está revelada, el bot tampoco la ve
-        if (c.isShadow && !c.isRevealed && botPlayerId && c.playedById !== botPlayerId) {
-          return {
-            id: c.id,
-            isShadow: true,
-            isRevealed: false,
-            rank: '?',
-            suit: null,
-            base: 0,
-            playedById: c.playedById,
-            team: botTeam,
-          };
-        }
+        // En la nueva mecánica oficial, todo el equipo propio puede ver las cartas sombras de los integrantes
         return { ...c };
       }),
     };

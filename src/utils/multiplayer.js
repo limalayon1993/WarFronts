@@ -390,14 +390,16 @@ export const mp = new MultiplayerManager();
  */
 export function sanitizeGameStateForPlayer(fullGameState, targetSlotId) {
   const isRoundOver = fullGameState.phase === 'roundOver' || fullGameState.phase === 'gameOver';
+  const targetPlayer = fullGameState.players?.find(p => p.id === targetSlotId);
+  const targetTeam = targetPlayer?.team;
 
   // Sanitizar frentes
   const sanitizedFronts = {};
   ['left', 'center', 'right'].forEach(frontKey => {
     const front = fullGameState.fronts[frontKey];
     sanitizedFronts[frontKey] = {
-      teamA: front.teamA.map(card => sanitizeCard(card, targetSlotId, isRoundOver)),
-      teamB: front.teamB.map(card => sanitizeCard(card, targetSlotId, isRoundOver)),
+      teamA: front.teamA.map(card => sanitizeCard(card, targetSlotId, isRoundOver, targetTeam)),
+      teamB: front.teamB.map(card => sanitizeCard(card, targetSlotId, isRoundOver, targetTeam)),
     };
   });
 
@@ -420,25 +422,37 @@ export function sanitizeGameStateForPlayer(fullGameState, targetSlotId) {
   };
 }
 
-function sanitizeCard(card, targetSlotId, isRoundOver) {
+function sanitizeCard(card, targetSlotId, isRoundOver, targetTeam) {
   if (!card.isShadow || isRoundOver) {
     return card;
   }
 
   const isOwner = card.playedById === targetSlotId;
   if (isOwner) {
-    // El dueño que la lanzó sí la ve, con flag isOwner: true
+    // El dueño que la lanzó sí la ve, con flags isOwner: true y isTeammate: true
     return {
       ...card,
       isOwner: true,
+      isTeammate: true,
     };
   }
 
-  // Ni los rivales ni los compañeros de equipo pueden verla: datos completamente redactados
+  // NUEVA MECÁNICA OFICIAL: Los compañeros del equipo propio SÍ pueden ver la carta sombra
+  const isTeammate = Boolean(targetTeam && card.team === targetTeam);
+  if (isTeammate) {
+    return {
+      ...card,
+      isOwner: false,
+      isTeammate: true,
+    };
+  }
+
+  // El equipo rival no puede verla: datos completamente censurados para prevenir trampas por red o DOM
   return {
     id: card.id,
     isShadow: true,
     isOwner: false,
+    isTeammate: false,
     playedBy: card.playedBy,
     playedById: card.playedById,
     team: card.team,

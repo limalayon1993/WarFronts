@@ -215,9 +215,9 @@ export function RulesModal({ isOpen, onClose }) {
                 </h3>
                 <p className="text-xs">
                   {isEn ? (
-                    <>In 1v1 mode you have <strong className="text-purple-400">2 Shadow Markers</strong> per round (1 in team modes). You can play cards face-down. Opponents will not know their rank or score until the round concludes.</>
+                    <>In 1v1 mode you have <strong className="text-purple-400">2 Shadow Markers</strong> per round (1 in team modes). You can play cards face-down: they remain concealed from opponents, but are <strong className="text-purple-300">visible to your own team</strong> (highlighted with a purple border). Opponents will not know their rank or score until the round concludes.</>
                   ) : (
-                    <>En el modo 1v1 dispones de <strong className="text-purple-400">2 Marcadores de Sombra</strong> por ronda. Puedes jugar hasta 2 cartas boca abajo. Tu rival no sabrá qué carta es ni qué puntuación aporta hasta que concluya el despliegue de la ronda.</>
+                    <>En el modo 1v1 dispones de <strong className="text-purple-400">2 Marcadores de Sombra</strong> por ronda (1 en modos por equipos). Puedes jugar cartas boca abajo: permanecen ocultas para el rival, pero son <strong className="text-purple-300">visibles para todo tu equipo</strong> (rodeadas con un distintivo borde morado). Tu rival no sabrá qué carta es ni qué puntuación aporta hasta que concluya el despliegue de la ronda.</>
                   )}
                 </p>
               </div>

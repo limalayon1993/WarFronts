@@ -669,6 +669,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                                 isShadow={c.isShadow}
                                 isRevealed={isResolutionPhase}
                                 isOwner={false}
+                                isTeammate={false}
                                 compact
                               />
                             </div>
@@ -734,6 +735,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                                 isShadow={c.isShadow}
                                 isRevealed={isResolutionPhase}
                                 isOwner={c.isOwner}
+                                isTeammate={true}
                                 compact
                               />
                             </div>
@@ -1258,8 +1260,8 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 <span>
                   <strong>{isEn ? 'Shadow Marker:' : 'Marcador de Sombra:'}</strong>{' '}
                   {isEn
-                    ? 'Concealed deployment to bluff and safeguard decisive cards.'
-                    : 'Despliegue oculto para engañar y proteger bazas clave.'}
+                    ? 'Concealed deployment from rivals (visible to your own team with a purple border), bluffing opponents and coordinating team plays.'
+                    : 'Despliegue oculto para rivales (visible para tu equipo con borde morado), engañando al enemigo y coordinando jugadas aliadas.'}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-slate-200">
