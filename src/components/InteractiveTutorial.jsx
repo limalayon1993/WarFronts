@@ -47,7 +47,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
   const [draggingCardId, setDraggingCardId] = useState(null);
   const [dragOverFrontKey, setDragOverFrontKey] = useState(null);
   const [isShadowActive, setIsShadowActive] = useState(false);
-  const [shadowsLeft, setShadowsLeft] = useState(1);
+  const [shadowsLeft, setShadowsLeft] = useState(2);
   const [isMuted, setIsMuted] = useState(false);
   const [warningMessage, setWarningMessage] = useState(null);
 
@@ -812,7 +812,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                     : isEn ? 'Play as Shadow' : 'Jugar como Sombra'}
                 </span>
                 <span className="bg-purple-950 px-1.5 py-0.2 rounded text-[10px] font-mono">
-                  {shadowsLeft} {isEn ? 'left' : 'restante'}
+                  {shadowsLeft} {isEn ? (shadowsLeft === 1 ? 'team shadow left' : 'team shadows left') : (shadowsLeft === 1 ? 'de equipo restante' : 'de equipo restantes')}
                 </span>
               </button>
             </div>

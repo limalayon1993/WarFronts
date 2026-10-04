@@ -26,17 +26,17 @@ export const RULES_TRANSLATIONS = {
       '2v2': {
         name: '2 contra 2',
         subtitle: 'Escuadrón Táctico por Parejas',
-        description: '1 baraja (52 cartas). 4 jugadores, 5 cartas c/u, 1 sombra, límite de 8 cartas por frente.',
+        description: '1 baraja (52 cartas). 4 jugadores, 5 cartas c/u, 2 sombras por equipo, límite de 8 cartas por frente.',
       },
       '3v3': {
         name: '3 contra 3',
         subtitle: 'Batalla de Frente Ampliado',
-        description: '2 barajas combinadas (104 cartas). 6 jugadores, 5 cartas c/u, límite de 12 cartas por frente.',
+        description: '2 barajas combinadas (104 cartas). 6 jugadores, 5 cartas c/u, 3 sombras por equipo, límite de 12 cartas por frente.',
       },
       '4v4': {
         name: '4 contra 4',
         subtitle: 'Guerra Total de Ejércitos',
-        description: '2 barajas combinadas (104 cartas). 8 jugadores, 5 cartas c/u, límite de 16 cartas por frente.',
+        description: '2 barajas combinadas (104 cartas). 8 jugadores, 5 cartas c/u, 4 sombras por equipo, límite de 16 cartas por frente.',
       },
     },
     durations: {
@@ -82,17 +82,17 @@ export const RULES_TRANSLATIONS = {
       '2v2': {
         name: '2 vs 2',
         subtitle: 'Tactical Squads by Pairs',
-        description: '1 deck (52 cards). 4 players, 5 cards each, 1 shadow, limit of 8 cards per front.',
+        description: '1 deck (52 cards). 4 players, 5 cards each, 2 team shadows, limit of 8 cards per front.',
       },
       '3v3': {
         name: '3 vs 3',
         subtitle: 'Extended Front Battle',
-        description: '2 combined decks (104 cards). 6 players, 5 cards each, limit of 12 cards per front.',
+        description: '2 combined decks (104 cards). 6 players, 5 cards each, 3 team shadows, limit of 12 cards per front.',
       },
       '4v4': {
         name: '4 vs 4',
         subtitle: 'Total Army Warfare',
-        description: '2 combined decks (104 cards). 8 players, 5 cards each, limit of 16 cards per front.',
+        description: '2 combined decks (104 cards). 8 players, 5 cards each, 4 team shadows, limit of 16 cards per front.',
       },
     },
     durations: {

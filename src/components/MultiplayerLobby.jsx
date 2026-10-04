@@ -645,7 +645,7 @@ export function MultiplayerLobby({
                         {/* Resumen táctico inferior */}
                         <div className="mt-4 pt-3 border-t border-amber-500/15 flex items-center justify-between text-[11px] text-slate-400 font-serif">
                           <span>{isEn ? 'Front Cap:' : 'Límite Frente:'} <strong className="text-slate-200">{mode.maxFrontCards}</strong></span>
-                          <span>{isEn ? 'Shadows:' : 'Sombras:'} <strong className="text-purple-400">{mode.shadowsPerPlayer}</strong></span>
+                          <span>{isEn ? 'Team Shadows:' : 'Sombras Equipo:'} <strong className="text-purple-400">{mode.teamShadows || (mode.id === '1v1' ? 2 : mode.teamSize)}</strong></span>
                         </div>
                       </button>
                     );

@@ -140,6 +140,7 @@ export const UI_TRANSLATIONS = {
         turnLabel: 'Turno:',
         yourTurnPrompt: '— ¡Elige tu carta y frente!',
         botThinking: 'pensando jugada táctica...',
+        teamShadowsTitle: (team, n) => `Marcadores Sombra ${team}: ${n} disponibles`,
       },
       front: {
         saturated: 'SATURADO',
@@ -168,6 +169,7 @@ export const UI_TRANSLATIONS = {
         shadowActiveBtn: 'Modo Sombra ACTIVO',
         playShadowBtn: 'Jugar como Sombra',
         shadowsRemaining: (n) => `${n} restantes`,
+        teamShadowsRemaining: (n, is1v1) => is1v1 ? `${n} restantes` : `Equipo: ${n}`,
         actionInstructionDrag: (clock) => `Haz clic o arrastra al frente para desplegar (Reloj: ${clock})`,
         actionInstructionPick: (clock) => `Es tu turno: arrastra o elige una carta (Reloj: ${clock})`,
         planningInstruction1v1: 'Fase táctica: prepara tu estrategia mentalmente...',
@@ -382,6 +384,7 @@ export const UI_TRANSLATIONS = {
         turnLabel: 'Turn:',
         yourTurnPrompt: '— Pick your card and front!',
         botThinking: 'thinking tactical move...',
+        teamShadowsTitle: (team, n) => `${team} Shadow Markers: ${n} available`,
       },
       front: {
         saturated: 'SATURATED',
@@ -410,6 +413,7 @@ export const UI_TRANSLATIONS = {
         shadowActiveBtn: 'Shadow Mode ACTIVE',
         playShadowBtn: 'Play as Shadow',
         shadowsRemaining: (n) => `${n} left`,
+        teamShadowsRemaining: (n, is1v1) => is1v1 ? `${n} left` : `Team: ${n}`,
         actionInstructionDrag: (clock) => `Click or drag to front to deploy (Clock: ${clock})`,
         actionInstructionPick: (clock) => `Your turn: drag or select a card (Clock: ${clock})`,
         planningInstruction1v1: 'Tactical phase: prepare your strategy mentally...',

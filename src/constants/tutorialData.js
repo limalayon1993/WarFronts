@@ -48,7 +48,7 @@ export function getTutorialPlayersConfig(lang = 'es') {
       team: 'teamA',
       isHuman: true,
       isBot: false,
-      shadowsLeft: 1,
+      shadowsLeft: 2,
     },
     {
       id: 'B1',
@@ -56,7 +56,7 @@ export function getTutorialPlayersConfig(lang = 'es') {
       team: 'teamB',
       isHuman: false,
       isBot: true,
-      shadowsLeft: 1,
+      shadowsLeft: 2,
     },
     {
       id: 'A2',
@@ -64,7 +64,7 @@ export function getTutorialPlayersConfig(lang = 'es') {
       team: 'teamA',
       isHuman: false,
       isBot: true,
-      shadowsLeft: 1,
+      shadowsLeft: 2,
     },
     {
       id: 'B2',
@@ -72,7 +72,7 @@ export function getTutorialPlayersConfig(lang = 'es') {
       team: 'teamB',
       isHuman: false,
       isBot: true,
-      shadowsLeft: 1,
+      shadowsLeft: 2,
     },
   ];
 }
@@ -480,13 +480,13 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Activate the "Play as Shadow" button, select your 8 of Hearts (8♥), and deploy it to the Center Front.'
         : 'Activa el botón "Jugar como Sombra", selecciona tu 8 de Corazones (8♥) y colócalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'In 2v2 each player has 1 Shadow Token per round. Playing a card as a shadow deploys it FACE DOWN solely for the opposing team, but it remains fully VISIBLE to your entire team (highlighted with a purple border and shadow icon). This allows your ally A2 to see your 8♥ to coordinate strategy and calculate team synergies (+10 pts for 3 hearts), while opponents only see the dark shadow back without knowing whether it is an Ace or a bluff, completely intimidating them.'
-        : 'En 2v2 cada jugador tiene 1 Ficha de Sombra por ronda. Al jugar una carta como sombra, esta se coloca BOCA ABAJO únicamente para el equipo rival, pero permanece VISIBLE para todo tu equipo (rodeada con un borde morado y el icono de sombra). De este modo, tu aliado A2 puede ver perfectamente tu 8♥ para coordinar la estrategia y calcular las sinergias de equipo (+10 pts por 3 corazones), mientras que los rivales solo ven el reverso oscuro sin saber si es un As o un farol, intimidándolos por completo.',
+        ? 'In 2v2 the shadow cards belong to the team, which has a Shared Pool of 2 Shadow Tokens per round (equal to the number of teammates). Playing a card as a shadow deploys it FACE DOWN solely for the opposing team, but it remains fully VISIBLE to your entire team (highlighted with a purple border and shadow icon). Teammates can distribute these markers freely according to strategy. This allows your ally A2 to see your 8♥ to coordinate strategy and calculate team synergies (+10 pts for 3 hearts), while opponents only see the dark shadow back without knowing whether it is an Ace or a bluff, completely intimidating them.'
+        : 'En 2v2 las cartas sombra pertenecen al equipo, que cuenta con un Fondo de 2 Fichas de Sombra por ronda (igual al número de integrantes del equipo). Al jugar una carta como sombra, esta se coloca BOCA ABAJO únicamente para el equipo rival, pero permanece VISIBLE para todo tu equipo (rodeada con un borde morado y el icono de sombra). El equipo reparte estos marcadores libremente según su estrategia. De este modo, tu aliado A2 puede ver perfectamente tu 8♥ para coordinar la estrategia y calcular las sinergias de equipo (+10 pts por 3 corazones), mientras que los rivales solo ven el reverso oscuro sin saber si es un As o un farol, intimidándolos por completo.',
       whyNotOthers: isEn
         ? [
             {
               cardLabel: '4 of Clubs (4♣)',
-              reason: 'Burning your sole shadow token on a weak 4 with no synergy squanders your most potent tactical asset.',
+              reason: 'Burning a team shadow token on a weak 4 with no synergy squanders your most potent tactical asset.',
             },
             {
               cardLabel: 'Ace of Diamonds (A♦)',
@@ -496,7 +496,7 @@ export function getTutorialSteps(lang = 'es') {
         : [
             {
               cardLabel: '4 de Tréboles (4♣)',
-              reason: 'Gastar tu única sombra en un 4 débil que no tiene sinergia sería un desperdicio del recurso táctico más valioso.',
+              reason: 'Gastar una sombra de equipo en un 4 débil que no tiene sinergia sería un desperdicio del recurso táctico más valioso.',
             },
             {
               cardLabel: 'As de Diamantes (A♦)',
@@ -573,8 +573,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Rival B2 plays a SHADOW CARD (Concealed) on the Left Front.'
         : 'Rival B2 juega una CARTA SOMBRA (Oculta) en el Frente Izquierdo.',
       whyPlayed: isEn
-        ? 'B2 spends their shadow token to conceal their left flank deployment against your Ally A2. Their teammate B1 can see the card, but for our team it remains face-down with the dark shadow back, creating total uncertainty regarding its rank and suit on the Left Front.'
-        : 'B2 gasta su ficha de sombra para ocultar su jugada en la izquierda frente a vuestro Aliado A2. Su compañero B1 puede ver su carta en su equipo, pero para nosotros permanece boca abajo con el reverso oscuro de sombra, creando total incertidumbre sobre su valor y palo en el Frente Izquierdo.',
+        ? 'B2 spends one of their team\'s 2 shadow tokens to conceal their left flank deployment against your Ally A2. Their teammate B1 can see the card, but for our team it remains face-down with the dark shadow back, creating total uncertainty regarding its rank and suit on the Left Front.'
+        : 'B2 gasta uno de los 2 marcadores de sombra de su equipo para ocultar su jugada en la izquierda frente a vuestro Aliado A2. Su compañero B1 puede ver su carta en su equipo, pero para nosotros permanece boca abajo con el reverso oscuro de sombra, creando total incertidumbre sobre su valor y palo en el Frente Izquierdo.',
       whyNotOthers: isEn
         ? 'B2 abandoned the center as lost and already holds a solid lead on the right.'
         : 'B2 no jugó en el centro porque lo da por perdido, ni en la derecha porque ya lideran cómodamente allí.',

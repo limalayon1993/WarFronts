@@ -10,6 +10,8 @@ export function TurnStrip({
   isBotThinking,
   teamAClock = 200,
   teamBClock = 200,
+  teamAShadowsLeft = 2,
+  teamBShadowsLeft = 2,
   modeId = '2v2',
 }) {
   const { language, isEn, ui } = useLanguage();
@@ -44,6 +46,14 @@ export function TurnStrip({
                 {formatClockTime(teamAClock)}
               </span>
             </div>
+            {/* Fondo de Sombras del Equipo A */}
+            <div
+              className="flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-purple-500/40 bg-purple-950/60 text-purple-300 ml-0.5"
+              title={ui.game.turnStrip.teamShadowsTitle ? ui.game.turnStrip.teamShadowsTitle(is1v1 ? (isEn ? 'Your' : 'Tu') : (isEn ? 'Team A' : 'Equipo A'), teamAShadowsLeft) : `${teamAShadowsLeft}`}
+            >
+              <EyeOff className="w-2.5 h-2.5 text-purple-400" />
+              <span className="font-mono text-[10px] font-bold">{teamAShadowsLeft}</span>
+            </div>
             {activeTeam === 'teamA' && (
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
             )}
@@ -67,6 +77,14 @@ export function TurnStrip({
             {activeTeam === 'teamB' && (
               <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
             )}
+            {/* Fondo de Sombras del Equipo B */}
+            <div
+              className="flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-purple-500/40 bg-purple-950/60 text-purple-300 mr-0.5"
+              title={ui.game.turnStrip.teamShadowsTitle ? ui.game.turnStrip.teamShadowsTitle(is1v1 ? (isEn ? 'Rival' : 'Rival') : (isEn ? 'Team B' : 'Equipo B'), teamBShadowsLeft) : `${teamBShadowsLeft}`}
+            >
+              <EyeOff className="w-2.5 h-2.5 text-purple-400" />
+              <span className="font-mono text-[10px] font-bold">{teamBShadowsLeft}</span>
+            </div>
             <div className="flex flex-col text-right">
               <span className="text-[8px] font-serif uppercase font-bold tracking-widest opacity-80 leading-none">
                 {is1v1 ? ui.game.turnStrip.rivalB : ui.game.turnStrip.teamB}
@@ -138,9 +156,6 @@ export function TurnStrip({
                 <span className="font-mono text-[10px] text-amber-500/60 font-semibold">
                   ({player.hand.length})
                 </span>
-                {player.shadowsLeft > 0 && (
-                  <EyeOff className="w-2.5 h-2.5 text-purple-400" title={isEn ? "Shadows left" : "Sombras restantes"} />
-                )}
               </div>
               {idx < players.length - 1 && (
                 <ChevronRight className="w-3 h-3 text-amber-500/30 shrink-0" />

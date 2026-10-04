@@ -140,6 +140,10 @@ export default function App() {
   const [draggingCardId, setDraggingCardId] = useState(null);
   const [isShadowMode, setIsShadowMode] = useState(false);
 
+  // Fondos de Marcadores de Sombra por Equipo (2 en 1v1 y 2v2, 3 en 3v3, 4 en 4v4)
+  const [teamAShadowsLeft, setTeamAShadowsLeft] = useState(modeConfig.teamShadows || 2);
+  const [teamBShadowsLeft, setTeamBShadowsLeft] = useState(modeConfig.teamShadows || 2);
+
   // Jugador local y perspectiva de equipo
   const localPlayer = players.find(p => p.id === mySlotId) || (!isMultiplayer ? players.find(p => p.isHuman) : null);
   const viewerTeam = localPlayer?.team || (mySlotId?.startsWith('B') ? 'teamB' : 'teamA');
@@ -229,6 +233,8 @@ export default function App() {
       roundOverReadyPlayers: base.roundOverReadyPlayers || [],
       roundOverTimer: base.roundOverTimer ?? 60,
       flagFallTeam: base.flagFallTeam ?? null,
+      teamAShadowsLeft: base.teamAShadowsLeft ?? teamAShadowsLeft,
+      teamBShadowsLeft: base.teamBShadowsLeft ?? teamBShadowsLeft,
     };
 
     mp.connections.forEach((conn, peerId) => {
@@ -315,6 +321,8 @@ export default function App() {
     if (syncData.flagFallTeam !== undefined) {
       setFlagFallTeam(syncData.flagFallTeam);
     }
+    if (syncData.teamAShadowsLeft !== undefined) setTeamAShadowsLeft(syncData.teamAShadowsLeft);
+    if (syncData.teamBShadowsLeft !== undefined) setTeamBShadowsLeft(syncData.teamBShadowsLeft);
 
     if (syncData.phase === 'roundOver' && prevPhase !== 'roundOver') {
       sound.playReveal();
@@ -340,6 +348,8 @@ export default function App() {
       roundOverReadyPlayers: syncData.roundOverReadyPlayers ?? stateRef.current.roundOverReadyPlayers ?? [],
       roundOverTimer: syncData.roundOverTimer ?? stateRef.current.roundOverTimer ?? 60,
       flagFallTeam: syncData.flagFallTeam ?? stateRef.current.flagFallTeam ?? null,
+      teamAShadowsLeft: syncData.teamAShadowsLeft ?? stateRef.current.teamAShadowsLeft,
+      teamBShadowsLeft: syncData.teamBShadowsLeft ?? stateRef.current.teamBShadowsLeft,
     };
   }
 
@@ -417,6 +427,8 @@ export default function App() {
 
   // Generar lista de jugadores según el modo e iniciativa
   function createPlayerList(mode, initTeam, customSlots = null) {
+    const teamShadowCount = mode.teamShadows || (mode.id === '1v1' ? 2 : mode.teamSize);
+
     if (customSlots && customSlots.length > 0) {
       // Usar los slots configurados en el lobby multijugador, ordenados intercalando turnos
       const teamAPlayers = customSlots.filter(s => s.team === 'teamA');
@@ -440,7 +452,7 @@ export default function App() {
         isBot: s.isBot,
         peerId: s.peerId,
         hand: [],
-        shadowsLeft: mode.shadowsPerPlayer,
+        shadowsLeft: teamShadowCount,
       }));
     }
 
@@ -457,7 +469,7 @@ export default function App() {
           isBot: i !== 1,
           peerId: null,
           hand: [],
-          shadowsLeft: mode.shadowsPerPlayer,
+          shadowsLeft: teamShadowCount,
         });
         list.push({
           id: `B${i}`,
@@ -467,7 +479,7 @@ export default function App() {
           isBot: true,
           peerId: null,
           hand: [],
-          shadowsLeft: mode.shadowsPerPlayer,
+          shadowsLeft: teamShadowCount,
         });
       }
     } else {
@@ -480,7 +492,7 @@ export default function App() {
           isBot: true,
           peerId: null,
           hand: [],
-          shadowsLeft: mode.shadowsPerPlayer,
+          shadowsLeft: teamShadowCount,
         });
         list.push({
           id: `A${i}`,
@@ -490,7 +502,7 @@ export default function App() {
           isBot: i !== 1,
           peerId: null,
           hand: [],
-          shadowsLeft: mode.shadowsPerPlayer,
+          shadowsLeft: teamShadowCount,
         });
       }
     }
@@ -614,9 +626,26 @@ export default function App() {
     const player = currentList.find(p => p.id === playerId);
     if (!player) return;
 
+    // Comprobar disponibilidad en el Fondo de Sombras del Equipo
+    const currentTeamAShadows = stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft;
+    const currentTeamBShadows = stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft;
+    const currentTeamShadows = player.team === 'teamA' ? currentTeamAShadows : currentTeamBShadows;
+
+    const validAsShadow = Boolean(asShadow && currentTeamShadows > 0);
+
+    const newTeamAShadows = player.team === 'teamA'
+      ? (validAsShadow ? Math.max(0, currentTeamAShadows - 1) : currentTeamAShadows)
+      : currentTeamAShadows;
+    const newTeamBShadows = player.team === 'teamB'
+      ? (validAsShadow ? Math.max(0, currentTeamBShadows - 1) : currentTeamBShadows)
+      : currentTeamBShadows;
+
+    setTeamAShadowsLeft(newTeamAShadows);
+    setTeamBShadowsLeft(newTeamBShadows);
+
     const deployedCard = {
       ...card,
-      isShadow: asShadow,
+      isShadow: validAsShadow,
       playedBy: player.name,
       playedById: player.id,
       team: player.team,
@@ -633,16 +662,20 @@ export default function App() {
     };
     setFronts(updatedFronts);
 
-    // Actualizar jugador (remover carta de mano y restar ficha de sombra)
+    // Actualizar jugador (remover carta de mano y sincronizar sombras de equipo restantes)
     const updatedPlayers = currentList.map(p => {
+      const remainingTeamShadows = p.team === 'teamA' ? newTeamAShadows : newTeamBShadows;
       if (p.id === playerId) {
         return {
           ...p,
           hand: p.hand.filter(c => c.id !== card.id),
-          shadowsLeft: asShadow ? Math.max(0, p.shadowsLeft - 1) : p.shadowsLeft,
+          shadowsLeft: remainingTeamShadows,
         };
       }
-      return p;
+      return {
+        ...p,
+        shadowsLeft: remainingTeamShadows,
+      };
     });
     setPlayers(updatedPlayers);
 
@@ -650,9 +683,11 @@ export default function App() {
       ...stateRef.current,
       fronts: updatedFronts,
       players: updatedPlayers,
+      teamAShadowsLeft: newTeamAShadows,
+      teamBShadowsLeft: newTeamBShadows,
     };
 
-    if (asShadow) {
+    if (validAsShadow) {
       sound.playShadow();
     } else {
       sound.playCard();
@@ -945,6 +980,9 @@ export default function App() {
     setInitiativeTeam(newInitiativeTeam);
     setSelectedCardId(null);
     setIsShadowMode(false);
+    const teamShadowCount = cfg.teamShadows || (cfg.id === '1v1' ? 2 : cfg.teamSize);
+    setTeamAShadowsLeft(teamShadowCount);
+    setTeamBShadowsLeft(teamShadowCount);
     setPlanningTimer(30);
     setTeamAClock(initialClock);
     setTeamBClock(initialClock);
@@ -992,6 +1030,8 @@ export default function App() {
       roundOverTimer: 60,
       roundOverReadyPlayers: [],
       flagFallTeam: null,
+      teamAShadowsLeft: teamShadowCount,
+      teamBShadowsLeft: teamShadowCount,
       isMultiplayer: isMultiplayerActive,
       isHost: isHostActive,
     };
@@ -1171,7 +1211,10 @@ export default function App() {
     const totalInFront = fronts[frontKey].teamA.length + fronts[frontKey].teamB.length;
     if (totalInFront >= modeConfig.maxFrontCards) return;
 
-    const useShadow = isShadowMode && me.shadowsLeft > 0;
+    const myTeamShadows = me.team === 'teamA'
+      ? (stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft)
+      : (stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft);
+    const useShadow = isShadowMode && myTeamShadows > 0;
 
     if (isMultiplayer && !isHost) {
       if (useShadow) {
@@ -1355,6 +1398,9 @@ export default function App() {
         const freshList = stateRef.current.players || players;
         const freshFronts = stateRef.current.fronts || fronts;
         const freshBot = freshList.find(p => p.id === activePlayer.id) || activePlayer;
+        const botTeamShadows = freshBot.team === 'teamA'
+          ? (stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft)
+          : (stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft);
 
         const move = chooseBotMove({
           botHand: freshBot.hand,
@@ -1362,7 +1408,7 @@ export default function App() {
           botPlayerId: freshBot.id,
           allPlayers: freshList,
           fronts: freshFronts,
-          botShadowsLeft: freshBot.shadowsLeft,
+          botShadowsLeft: botTeamShadows,
           maxFrontCards: modeConfig.maxFrontCards,
         });
 
@@ -1510,6 +1556,8 @@ export default function App() {
           isBotThinking={isBotThinking}
           teamAClock={teamAClock}
           teamBClock={teamBClock}
+          teamAShadowsLeft={teamAShadowsLeft}
+          teamBShadowsLeft={teamBShadowsLeft}
           modeId={selectedMode}
         />
       )}
@@ -1640,25 +1688,32 @@ export default function App() {
               )}
 
               {/* Botón de Modo Sombra */}
-              <button
-                type="button"
-                disabled={!localPlayer || localPlayer.shadowsLeft <= 0 || !isMyTurn}
-                onClick={() => setIsShadowMode(prev => !prev)}
-                className={`text-xs px-3.5 py-1.5 rounded-xl border font-serif font-bold tracking-wider uppercase flex items-center gap-1.5 transition cursor-pointer ${
-                  isShadowMode
-                    ? 'bg-gradient-to-r from-purple-900 to-indigo-950 text-purple-200 border-purple-400/80 shadow-[0_0_15px_rgba(168,85,247,0.35)] ring-1 ring-purple-400'
-                    : localPlayer && localPlayer.shadowsLeft > 0
-                    ? 'bg-[#141220] text-purple-300 border-purple-800/80 hover:bg-[#1d1a30]'
-                    : 'bg-black/40 text-stone-600 border-stone-800 cursor-not-allowed'
-                }`}
-              >
-                <span>
-                  {isShadowMode ? ui.game.hand.shadowActiveBtn : ui.game.hand.playShadowBtn}
-                </span>
-                <span className="bg-purple-950/90 text-purple-300 border border-purple-800/60 px-1.5 py-0.2 rounded text-[10px] font-mono">
-                  {ui.game.hand.shadowsRemaining(localPlayer?.shadowsLeft || 0)}
-                </span>
-              </button>
+              {(() => {
+                const currentMyTeamShadows = (localPlayer?.team === 'teamA' ? teamAShadowsLeft : teamBShadowsLeft) ?? 0;
+                return (
+                  <button
+                    type="button"
+                    disabled={!localPlayer || currentMyTeamShadows <= 0 || !isMyTurn}
+                    onClick={() => setIsShadowMode(prev => !prev)}
+                    className={`text-xs px-3.5 py-1.5 rounded-xl border font-serif font-bold tracking-wider uppercase flex items-center gap-1.5 transition cursor-pointer ${
+                      isShadowMode
+                        ? 'bg-gradient-to-r from-purple-900 to-indigo-950 text-purple-200 border-purple-400/80 shadow-[0_0_15px_rgba(168,85,247,0.35)] ring-1 ring-purple-400'
+                        : currentMyTeamShadows > 0
+                        ? 'bg-[#141220] text-purple-300 border-purple-800/80 hover:bg-[#1d1a30]'
+                        : 'bg-black/40 text-stone-600 border-stone-800 cursor-not-allowed'
+                    }`}
+                  >
+                    <span>
+                      {isShadowMode ? ui.game.hand.shadowActiveBtn : ui.game.hand.playShadowBtn}
+                    </span>
+                    <span className="bg-purple-950/90 text-purple-300 border border-purple-800/60 px-1.5 py-0.2 rounded text-[10px] font-mono">
+                      {ui.game.hand.teamShadowsRemaining
+                        ? ui.game.hand.teamShadowsRemaining(currentMyTeamShadows, selectedMode === '1v1')
+                        : ui.game.hand.shadowsRemaining(currentMyTeamShadows)}
+                    </span>
+                  </button>
+                );
+              })()}
             </div>
 
             {/* Aviso de turno del jugador con contador de tiempo */}
