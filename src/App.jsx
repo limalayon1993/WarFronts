@@ -188,6 +188,11 @@ export default function App() {
     roundOverReadyPlayers,
     penaltyNotice,
     flagFallTeam,
+    teamAShadowsLeft,
+    teamBShadowsLeft,
+    teamALossStreak,
+    teamBLossStreak,
+    lastRoundEconomy,
   };
 
   // Detectar parámetro ?room=WF-XXXX en la URL
@@ -514,7 +519,7 @@ export default function App() {
           isBot: i !== 1,
           peerId: null,
           hand: [],
-          shadowsLeft: teamShadowCount,
+          shadowsLeft: teamAShadows,
         });
       }
     }
@@ -1523,6 +1528,9 @@ export default function App() {
           ? (stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft)
           : (stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft);
 
+        const currentRoundNum = stateRef.current.round ?? round;
+        const totalRoundsNum = stateRef.current.totalMatchRounds ?? totalMatchRounds;
+
         const move = chooseBotMove({
           botHand: freshBot.hand,
           botTeam: freshBot.team,
@@ -1531,9 +1539,9 @@ export default function App() {
           fronts: freshFronts,
           botShadowsLeft: botTeamShadows,
           maxFrontCards: modeConfig.maxFrontCards,
-          currentRound,
-          totalRounds,
-          isFinalRound: currentRound >= totalRounds,
+          currentRound: currentRoundNum,
+          totalRounds: totalRoundsNum,
+          isFinalRound: currentRoundNum >= totalRoundsNum,
           teamLossStreak: freshBot.team === 'teamA'
             ? (stateRef.current.teamALossStreak ?? teamALossStreak)
             : (stateRef.current.teamBLossStreak ?? teamBLossStreak),
