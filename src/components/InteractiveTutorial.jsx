@@ -1183,6 +1183,36 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   <span className="text-rose-400">{isEn ? 'Team B: 103 pts' : 'Equipo B: 103 pts'}</span>
                 </div>
               </div>
+
+              {/* Ingresos de Economía: Sombras (Reglamento Oficial) */}
+              <div className="bg-purple-950/30 border border-purple-500/40 p-4 rounded-xl space-y-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-purple-200 text-sm flex items-center gap-2">
+                    <EyeOff className="w-4 h-4 text-purple-400" />
+                    {isEn ? 'Shadow Economy Income (Official Rulebook):' : 'Ingresos de Economía: Sombras (Reglamento Oficial):'}
+                  </span>
+                  <span className="text-[10px] bg-purple-900/50 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded font-mono font-bold uppercase">
+                    {isEn ? 'Continuous Savings' : 'Ahorro Continuo'}
+                  </span>
+                </div>
+                <p className="text-slate-300 leading-relaxed">
+                  {isEn
+                    ? 'In competitive matches, teams begin Round 1 with 0 Shadow Markers and earn markers at the conclusion of each round according to performance. Unspent markers carry over and accumulate into future rounds!'
+                    : 'En partidas oficiales, los equipos inician la Ronda 1 con 0 Marcadores de Sombra y reciben nuevos marcadores al concluir cada ronda según su resultado. ¡Los marcadores no gastados se conservan y acumulan para las siguientes rondas!'}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-center">
+                  <div className="bg-black/60 p-2.5 rounded-lg border border-emerald-500/30">
+                    <span className="text-emerald-400 font-bold block">{isEn ? 'Team A (Round Winner):' : 'Equipo A (Ganador de Ronda):'}</span>
+                    <span className="text-lg font-black font-mono text-emerald-300">+1 {isEn ? 'Shadow Marker' : 'Marcador de Sombra'}</span>
+                    <div className="text-[10px] text-slate-400 mt-0.5">{isEn ? 'Added to team pool for Round 2' : 'Sumado a la reserva para la Ronda 2'}</div>
+                  </div>
+                  <div className="bg-black/60 p-2.5 rounded-lg border border-purple-500/30">
+                    <span className="text-rose-400 font-bold block">{isEn ? 'Team B (Round Loser):' : 'Equipo B (Perdedor de Ronda):'}</span>
+                    <span className="text-lg font-black font-mono text-purple-300">+2 {isEn ? 'Shadow Markers' : 'Marcadores de Sombra'}</span>
+                    <div className="text-[10px] text-slate-400 mt-0.5">{isEn ? 'Comeback boost for Round 2 (+3 if 2+ defeat streak)' : 'Impulso de remontada para R2 (+3 si encadena 2+ derrotas)'}</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="px-6 py-4 border-t border-slate-800 bg-slate-950 flex justify-end">
@@ -1262,6 +1292,15 @@ export function InteractiveTutorial({ onBackToMenu }) {
                   {isEn
                     ? 'Concealed deployment from rivals (visible to your own team with a purple border), bluffing opponents and coordinating team plays.'
                     : 'Despliegue oculto para rivales (visible para tu equipo con borde morado), engañando al enemigo y coordinando jugadas aliadas.'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-200">
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>
+                  <strong>{isEn ? 'Shadow Economy:' : 'Economía de Sombras:'}</strong>{' '}
+                  {isEn
+                    ? 'Start with 0 markers in R1. Earn +1 on win, +2 on loss (+3 on 2+ loss streak), and +1 on tie in 2v2. Continuous saving across rounds.'
+                    : 'Inician con 0 marcadores en R1. Cobran +1 al ganar, +2 al perder (+3 en racha de 2+ derrotas) y +1 en empate en 2v2. Ahorro acumulativo continuo.'}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-slate-200">

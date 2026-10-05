@@ -139,8 +139,9 @@ export const UI_TRANSLATIONS = {
         teamB: 'Equipo B',
         turnLabel: 'Turno:',
         yourTurnPrompt: '— ¡Elige tu carta y frente!',
-        botThinking: 'pensando jugada táctica...',
-        teamShadowsTitle: (team, n) => `Marcadores Sombra ${team}: ${n} disponibles`,
+        teamShadowsTitle: (team, n) => n === 0
+          ? `Fondo de Sombras ${team}: 0 disponibles (inician en 0 y se cobran al final de la ronda)`
+          : `Fondo de Sombras ${team}: ${n} disponibles (ahorro continuo)`,
       },
       front: {
         saturated: 'SATURADO',
@@ -383,8 +384,9 @@ export const UI_TRANSLATIONS = {
         teamB: 'Team B',
         turnLabel: 'Turn:',
         yourTurnPrompt: '— Pick your card and front!',
-        botThinking: 'thinking tactical move...',
-        teamShadowsTitle: (team, n) => `${team} Shadow Markers: ${n} available`,
+        teamShadowsTitle: (team, n) => n === 0
+          ? `${team} Shadow Pool: 0 available (starts at 0, earned at round end)`
+          : `${team} Shadow Pool: ${n} available (continuous savings)`,
       },
       front: {
         saturated: 'SATURATED',

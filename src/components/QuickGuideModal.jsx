@@ -14,6 +14,7 @@ import {
   BookOpen,
   Check,
   TrendingUp,
+  EyeOff,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { LanguageToggle } from './LanguageToggle';
@@ -52,12 +53,8 @@ export function QuickGuideModal({ isOpen, onClose }) {
                 <Swords className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.fronts}
               </span>
               <span className="text-amber-500/30">•</span>
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <Trophy className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.rounds}
-              </span>
-              <span className="text-amber-500/30">•</span>
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <Clock className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.clocks}
+              <span className="flex items-center gap-1.5 text-purple-300">
+                <EyeOff className="w-3.5 h-3.5 text-purple-400" /> {guideT.headerSummary.shadows}
               </span>
             </div>
             <LanguageToggle compact />
@@ -87,15 +84,29 @@ export function QuickGuideModal({ isOpen, onClose }) {
 
                 <div className="grid grid-cols-3 gap-2 mb-3 text-center">
                   {/* Modo 2v2 */}
-                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20">
-                    <div className="text-[10px] uppercase font-serif font-bold text-amber-300 flex items-center justify-center gap-1">
-                      <span>{guideT.block1.mode2v2.title}</span>
-                      <span className="text-slate-400 font-normal">{guideT.block1.mode2v2.players}</span>
-                    </div>
-                    <div className="text-lg font-serif font-black text-slate-100 my-0.5">{guideT.block1.mode2v2.limit}</div>
-                    <div className="text-[10px] text-rose-400 font-serif font-semibold">{guideT.block1.mode2v2.limitLabel}</div>
-                    <div className="text-[10px] text-slate-300 mt-1 pt-1 border-t border-amber-500/15 font-serif">
-                      {guideT.block1.mode2v2.detail}
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20 flex flex-col justify-between">
+                    <div>
+                      <div className="text-[10px] uppercase font-serif font-bold text-amber-300 flex items-center justify-center gap-1">
+                        <span>{guideT.block1.mode2v2.title}</span>
+                        <span className="text-slate-400 font-normal">{guideT.block1.mode2v2.players}</span>
+                      </div>
+                      <div className="text-lg font-serif font-black text-slate-100 my-0.5">{guideT.block1.mode2v2.limit}</div>
+                      <div className="text-[10px] text-rose-400 font-serif font-semibold">{guideT.block1.mode2v2.limitLabel}</div>
+                      <div className="text-[10px] text-slate-300 mt-1 pt-1 border-t border-amber-500/15 font-serif">
+                        {guideT.block1.mode2v2.detail}
+                      </div>
+                      {guideT.block1.mode2v2.economy && (
+                        <div className="my-1.5 bg-purple-950/50 p-1.5 rounded-lg border border-purple-500/30 text-[10px] font-serif">
+                          <div className="flex items-center justify-between text-purple-200 font-bold">
+                            <span>{guideT.block1.mode2v2.economy.win}</span>
+                            <span>{guideT.block1.mode2v2.economy.loss}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-amber-300 font-semibold mt-0.5">
+                            <span>{guideT.block1.mode2v2.economy.streak}</span>
+                            <span>{guideT.block1.mode2v2.economy.tie}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-black/70 py-0.5 px-1 rounded border border-emerald-900/40">
                       {guideT.block1.mode2v2.clock}
@@ -103,15 +114,29 @@ export function QuickGuideModal({ isOpen, onClose }) {
                   </div>
 
                   {/* Modo 3v3 */}
-                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                    <div className="text-[10px] uppercase font-bold text-amber-400 flex items-center justify-center gap-1">
-                      <span>{guideT.block1.mode3v3.title}</span>
-                      <span className="text-slate-500 font-normal">{guideT.block1.mode3v3.players}</span>
-                    </div>
-                    <div className="text-lg font-black text-slate-100 my-0.5">{guideT.block1.mode3v3.limit}</div>
-                    <div className="text-[10px] text-rose-400 font-semibold">{guideT.block1.mode3v3.limitLabel}</div>
-                    <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
-                      {guideT.block1.mode3v3.detail}
+                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex flex-col justify-between">
+                    <div>
+                      <div className="text-[10px] uppercase font-bold text-amber-400 flex items-center justify-center gap-1">
+                        <span>{guideT.block1.mode3v3.title}</span>
+                        <span className="text-slate-500 font-normal">{guideT.block1.mode3v3.players}</span>
+                      </div>
+                      <div className="text-lg font-black text-slate-100 my-0.5">{guideT.block1.mode3v3.limit}</div>
+                      <div className="text-[10px] text-rose-400 font-semibold">{guideT.block1.mode3v3.limitLabel}</div>
+                      <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
+                        {guideT.block1.mode3v3.detail}
+                      </div>
+                      {guideT.block1.mode3v3.economy && (
+                        <div className="my-1.5 bg-purple-950/50 p-1.5 rounded-lg border border-purple-500/30 text-[10px] font-serif">
+                          <div className="flex items-center justify-between text-purple-200 font-bold">
+                            <span>{guideT.block1.mode3v3.economy.win}</span>
+                            <span>{guideT.block1.mode3v3.economy.loss}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-amber-300 font-semibold mt-0.5">
+                            <span>{guideT.block1.mode3v3.economy.streak}</span>
+                            <span>{guideT.block1.mode3v3.economy.tie}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-slate-900 py-0.5 px-1 rounded">
                       {guideT.block1.mode3v3.clock}
@@ -119,15 +144,29 @@ export function QuickGuideModal({ isOpen, onClose }) {
                   </div>
 
                   {/* Modo 4v4 */}
-                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
-                    <div className="text-[10px] uppercase font-bold text-amber-400 flex items-center justify-center gap-1">
-                      <span>{guideT.block1.mode4v4.title}</span>
-                      <span className="text-slate-500 font-normal">{guideT.block1.mode4v4.players}</span>
-                    </div>
-                    <div className="text-lg font-black text-slate-100 my-0.5">{guideT.block1.mode4v4.limit}</div>
-                    <div className="text-[10px] text-rose-400 font-semibold">{guideT.block1.mode4v4.limitLabel}</div>
-                    <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
-                      {guideT.block1.mode4v4.detail}
+                  <div className="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex flex-col justify-between">
+                    <div>
+                      <div className="text-[10px] uppercase font-bold text-amber-400 flex items-center justify-center gap-1">
+                        <span>{guideT.block1.mode4v4.title}</span>
+                        <span className="text-slate-500 font-normal">{guideT.block1.mode4v4.players}</span>
+                      </div>
+                      <div className="text-lg font-black text-slate-100 my-0.5">{guideT.block1.mode4v4.limit}</div>
+                      <div className="text-[10px] text-rose-400 font-semibold">{guideT.block1.mode4v4.limitLabel}</div>
+                      <div className="text-[10px] text-slate-400 mt-1 pt-1 border-t border-slate-850">
+                        {guideT.block1.mode4v4.detail}
+                      </div>
+                      {guideT.block1.mode4v4.economy && (
+                        <div className="my-1.5 bg-purple-950/50 p-1.5 rounded-lg border border-purple-500/30 text-[10px] font-serif">
+                          <div className="flex items-center justify-between text-purple-200 font-bold">
+                            <span>{guideT.block1.mode4v4.economy.win}</span>
+                            <span>{guideT.block1.mode4v4.economy.loss}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-amber-300 font-semibold mt-0.5">
+                            <span>{guideT.block1.mode4v4.economy.streak}</span>
+                            <span>{guideT.block1.mode4v4.economy.tie}</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     <div className="text-[9px] font-mono text-emerald-400 font-bold mt-1 bg-slate-900 py-0.5 px-1 rounded">
                       {guideT.block1.mode4v4.clock}
@@ -136,6 +175,12 @@ export function QuickGuideModal({ isOpen, onClose }) {
                 </div>
 
                 <div className="space-y-1.5 text-xs text-slate-300">
+                  {guideT.block1.economyNotice && (
+                    <div className="flex items-start gap-2 bg-purple-950/40 p-2 rounded-xl border border-purple-500/30 text-purple-200 font-serif">
+                      <EyeOff className="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5" />
+                      <span>{guideT.block1.economyNotice}</span>
+                    </div>
+                  )}
                   <div className="flex items-start gap-2 bg-slate-950/60 p-2 rounded border border-slate-800/80">
                     <ShieldAlert className="w-3.5 h-3.5 text-rose-400 shrink-0 mt-0.5" />
                     <span>
@@ -298,6 +343,9 @@ export function QuickGuideModal({ isOpen, onClose }) {
               <span>{guideT.block3.postDeploy.s1}</span>
               <span>{guideT.block3.postDeploy.s2}</span>
               <span className="text-emerald-400 font-bold">{guideT.block3.postDeploy.s3}</span>
+              {guideT.block3.postDeploy.s4 && (
+                <span className="text-purple-300 font-bold">{guideT.block3.postDeploy.s4}</span>
+              )}
             </div>
           </div>
 

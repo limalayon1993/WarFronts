@@ -46,7 +46,74 @@ export function getLocalizedFronts(lang = 'es') {
   ];
 }
 
-// Modos de juego oficiales según el reglamento v1.6
+// Economía de Cartas de Sombra según Reglamento Oficial v1.6 y Guía Rápida v2.0
+// Ambos equipos inician la Ronda 1 con 0 sombras en su Fondo de Equipo.
+// Al final de la ronda se cobran marcadores según el resultado:
+// - Gana: +1 (1v1, 2v2) / +2 (3v3, 4v4)
+// - Pierde: +2 (1v1, 2v2) / +3 (3v3) / +4 (4v4)
+// - Racha de Derrotas (2 o más consecutivas): +3 (1v1, 2v2) / +4 (3v3) / +5 (4v4)
+// - Ronda Nula / Empate: +1 a ambos (1v1, 2v2) / +2 a ambos (3v3, 4v4)
+// Los marcadores no utilizados se conservan entre rondas (ahorro continuo).
+// La racha de derrotas se reinicia a 0 si se gana o empata (Ronda Nula).
+export const SHADOW_ECONOMY = {
+  '1v1': { win: 1, loss: 2, streak: 3, tie: 1 },
+  '2v2': { win: 1, loss: 2, streak: 3, tie: 1 },
+  '3v3': { win: 2, loss: 3, streak: 4, tie: 2 },
+  '4v4': { win: 2, loss: 4, streak: 5, tie: 2 },
+};
+
+/**
+ * Calcula los ingresos de economía (Marcadores de Sombra) al finalizar una ronda
+ * según el reglamento oficial (Capítulo 5 y Quick Guide v2.0):
+ * - 1v1 y 2v2: Ganador (+1), Perdedor (+2), Perdedor en racha de 2+ derrotas (+3), Ronda Nula (+1 a ambos).
+ * - 3v3: Ganador (+2), Perdedor (+3), Perdedor en racha de 2+ derrotas (+4), Ronda Nula (+2 a ambos).
+ * - 4v4: Ganador (+2), Perdedor (+4), Perdedor en racha de 2+ derrotas (+5), Ronda Nula (+2 a ambos).
+ * - Reinicio de Racha: Si un equipo que está cobrando el bono máximo de sombras por racha de derrotas
+ *   logra ganar una ronda o empatarla (Ronda Nula), su racha se reinicia instantáneamente a 0.
+ */
+export function calculateRoundEconomy(modeId = '2v2', roundWinner = 'tie', teamALossStreak = 0, teamBLossStreak = 0) {
+  const econ = SHADOW_ECONOMY[modeId] || SHADOW_ECONOMY['2v2'];
+
+  if (roundWinner === 'teamA') {
+    const nextBLossStreak = teamBLossStreak + 1;
+    const isBStreak = nextBLossStreak >= 2;
+    const teamBEarned = isBStreak ? econ.streak : econ.loss;
+    return {
+      teamAEarned: econ.win,
+      teamBEarned,
+      teamANewStreak: 0,
+      teamBNewStreak: nextBLossStreak,
+      teamAReason: 'win',
+      teamBReason: isBStreak ? 'streak' : 'loss',
+    };
+  }
+
+  if (roundWinner === 'teamB') {
+    const nextALossStreak = teamALossStreak + 1;
+    const isAStreak = nextALossStreak >= 2;
+    const teamAEarned = isAStreak ? econ.streak : econ.loss;
+    return {
+      teamAEarned,
+      teamBEarned: econ.win,
+      teamANewStreak: nextALossStreak,
+      teamBNewStreak: 0,
+      teamAReason: isAStreak ? 'streak' : 'loss',
+      teamBReason: 'win',
+    };
+  }
+
+  // Ronda Nula / Empate: se reinicia la racha para ambos
+  return {
+    teamAEarned: econ.tie,
+    teamBEarned: econ.tie,
+    teamANewStreak: 0,
+    teamBNewStreak: 0,
+    teamAReason: 'tie',
+    teamBReason: 'tie',
+  };
+}
+
+// Modos de juego oficiales según el reglamento v1.6 / v2.0
 export const GAME_MODES = {
   '1v1': {
     id: '1v1',
@@ -56,10 +123,12 @@ export const GAME_MODES = {
     handSize: 10,
     decks: 1,
     maxFrontCards: 8,
-    teamShadows: 2,
-    shadowsPerPlayer: 2,
+    startShadows: 0,
+    teamShadows: 0,
+    shadowsPerPlayer: 0,
     totalPlayers: 2,
-    description: '1 baraja (52 cartas). 10 cartas por duelista, 2 sombras, límite de 8 cartas por frente.',
+    economy: SHADOW_ECONOMY['1v1'],
+    description: '1 baraja (52 cartas). 10 cartas por duelista. Economía de sombras continua (inician en 0). Límite de 8 cartas por frente.',
   },
   '2v2': {
     id: '2v2',
@@ -69,10 +138,12 @@ export const GAME_MODES = {
     handSize: 5,
     decks: 1,
     maxFrontCards: 8,
-    teamShadows: 2,
-    shadowsPerPlayer: 2,
+    startShadows: 0,
+    teamShadows: 0,
+    shadowsPerPlayer: 0,
     totalPlayers: 4,
-    description: '1 baraja (52 cartas). 4 jugadores, 5 cartas c/u, 2 sombras por equipo, límite de 8 cartas por frente.',
+    economy: SHADOW_ECONOMY['2v2'],
+    description: '1 baraja (52 cartas). 4 jugadores, 5 cartas c/u. Economía de sombras continua (inician en 0). Límite de 8 cartas por frente.',
   },
   '3v3': {
     id: '3v3',
@@ -82,10 +153,12 @@ export const GAME_MODES = {
     handSize: 5,
     decks: 2,
     maxFrontCards: 12,
-    teamShadows: 3,
-    shadowsPerPlayer: 3,
+    startShadows: 0,
+    teamShadows: 0,
+    shadowsPerPlayer: 0,
     totalPlayers: 6,
-    description: '2 barajas combinadas (104 cartas). 6 jugadores, 5 cartas c/u, 3 sombras por equipo, límite de 12 cartas por frente.',
+    economy: SHADOW_ECONOMY['3v3'],
+    description: '2 barajas combinadas (104 cartas). 6 jugadores, 5 cartas c/u. Economía de sombras continua (inician en 0). Límite de 12 cartas por frente.',
   },
   '4v4': {
     id: '4v4',
@@ -95,10 +168,12 @@ export const GAME_MODES = {
     handSize: 5,
     decks: 2,
     maxFrontCards: 16,
-    teamShadows: 4,
-    shadowsPerPlayer: 4,
+    startShadows: 0,
+    teamShadows: 0,
+    shadowsPerPlayer: 0,
     totalPlayers: 8,
-    description: '2 barajas combinadas (104 cartas). 8 jugadores, 5 cartas c/u, 4 sombras por equipo, límite de 16 cartas por frente.',
+    economy: SHADOW_ECONOMY['4v4'],
+    description: '2 barajas combinadas (104 cartas). 8 jugadores, 5 cartas c/u. Economía de sombras continua (inician en 0). Límite de 16 cartas por frente.',
   },
 };
 
@@ -126,25 +201,25 @@ export function getLocalizedModes(lang = 'es') {
       ...GAME_MODES['1v1'],
       name: isEn ? '1 vs 1' : '1 contra 1',
       subtitle: isEn ? 'Tactical Commanders Duel' : 'Duelo Táctico de Comandantes',
-      description: isEn ? '1 deck (52 cards). 10 cards per player, 2 shadows, limit of 8 cards per front.' : GAME_MODES['1v1'].description,
+      description: isEn ? '1 deck (52 cards). 10 cards per player. Continuous shadow economy (start at 0). Limit of 8 cards per front.' : GAME_MODES['1v1'].description,
     },
     '2v2': {
       ...GAME_MODES['2v2'],
       name: isEn ? '2 vs 2' : '2 contra 2',
       subtitle: isEn ? 'Tactical Squads by Pairs' : 'Escuadrón Táctico por Parejas',
-      description: isEn ? '1 deck (52 cards). 4 players, 5 cards each, 2 team shadows, limit of 8 cards per front.' : GAME_MODES['2v2'].description,
+      description: isEn ? '1 deck (52 cards). 4 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 8 cards per front.' : GAME_MODES['2v2'].description,
     },
     '3v3': {
       ...GAME_MODES['3v3'],
       name: isEn ? '3 vs 3' : '3 contra 3',
       subtitle: isEn ? 'Extended Front Battle' : 'Batalla de Frente Ampliado',
-      description: isEn ? '2 combined decks (104 cards). 6 players, 5 cards each, 3 team shadows, limit of 12 cards per front.' : GAME_MODES['3v3'].description,
+      description: isEn ? '2 combined decks (104 cards). 6 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 12 cards per front.' : GAME_MODES['3v3'].description,
     },
     '4v4': {
       ...GAME_MODES['4v4'],
       name: isEn ? '4 vs 4' : '4 contra 4',
       subtitle: isEn ? 'Total Army Warfare' : 'Guerra Total de Ejércitos',
-      description: isEn ? '2 combined decks (104 cards). 8 players, 5 cards each, 4 team shadows, limit of 16 cards per front.' : GAME_MODES['4v4'].description,
+      description: isEn ? '2 combined decks (104 cards). 8 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 16 cards per front.' : GAME_MODES['4v4'].description,
     },
   };
 }

@@ -14,6 +14,8 @@ import {
   calculateFrontScore,
   resolveFrontWinner,
   getLocalizedFronts,
+  SHADOW_ECONOMY,
+  calculateRoundEconomy,
 } from './constants/rules';
 import { useLanguage } from './context/LanguageContext';
 import { chooseBotMove } from './utils/aiBot';
@@ -140,9 +142,12 @@ export default function App() {
   const [draggingCardId, setDraggingCardId] = useState(null);
   const [isShadowMode, setIsShadowMode] = useState(false);
 
-  // Fondos de Marcadores de Sombra por Equipo (2 en 1v1 y 2v2, 3 en 3v3, 4 en 4v4)
-  const [teamAShadowsLeft, setTeamAShadowsLeft] = useState(modeConfig.teamShadows || 2);
-  const [teamBShadowsLeft, setTeamBShadowsLeft] = useState(modeConfig.teamShadows || 2);
+  // Fondos de Marcadores de Sombra por Equipo (Reglamento Oficial: Inician en 0 y operan por Economía)
+  const [teamAShadowsLeft, setTeamAShadowsLeft] = useState(0);
+  const [teamBShadowsLeft, setTeamBShadowsLeft] = useState(0);
+  const [teamALossStreak, setTeamALossStreak] = useState(0);
+  const [teamBLossStreak, setTeamBLossStreak] = useState(0);
+  const [lastRoundEconomy, setLastRoundEconomy] = useState(null);
 
   // Jugador local y perspectiva de equipo
   const localPlayer = players.find(p => p.id === mySlotId) || (!isMultiplayer ? players.find(p => p.isHuman) : null);
@@ -235,6 +240,9 @@ export default function App() {
       flagFallTeam: base.flagFallTeam ?? null,
       teamAShadowsLeft: base.teamAShadowsLeft ?? teamAShadowsLeft,
       teamBShadowsLeft: base.teamBShadowsLeft ?? teamBShadowsLeft,
+      teamALossStreak: base.teamALossStreak ?? teamALossStreak,
+      teamBLossStreak: base.teamBLossStreak ?? teamBLossStreak,
+      lastRoundEconomy: base.lastRoundEconomy ?? lastRoundEconomy,
     };
 
     mp.connections.forEach((conn, peerId) => {
@@ -323,6 +331,9 @@ export default function App() {
     }
     if (syncData.teamAShadowsLeft !== undefined) setTeamAShadowsLeft(syncData.teamAShadowsLeft);
     if (syncData.teamBShadowsLeft !== undefined) setTeamBShadowsLeft(syncData.teamBShadowsLeft);
+    if (syncData.teamALossStreak !== undefined) setTeamALossStreak(syncData.teamALossStreak);
+    if (syncData.teamBLossStreak !== undefined) setTeamBLossStreak(syncData.teamBLossStreak);
+    if (syncData.lastRoundEconomy !== undefined) setLastRoundEconomy(syncData.lastRoundEconomy);
 
     if (syncData.phase === 'roundOver' && prevPhase !== 'roundOver') {
       sound.playReveal();
@@ -350,6 +361,9 @@ export default function App() {
       flagFallTeam: syncData.flagFallTeam ?? stateRef.current.flagFallTeam ?? null,
       teamAShadowsLeft: syncData.teamAShadowsLeft ?? stateRef.current.teamAShadowsLeft,
       teamBShadowsLeft: syncData.teamBShadowsLeft ?? stateRef.current.teamBShadowsLeft,
+      teamALossStreak: syncData.teamALossStreak ?? stateRef.current.teamALossStreak,
+      teamBLossStreak: syncData.teamBLossStreak ?? stateRef.current.teamBLossStreak,
+      lastRoundEconomy: syncData.lastRoundEconomy ?? stateRef.current.lastRoundEconomy,
     };
   }
 
@@ -426,9 +440,7 @@ export default function App() {
   }, []);
 
   // Generar lista de jugadores según el modo e iniciativa
-  function createPlayerList(mode, initTeam, customSlots = null) {
-    const teamShadowCount = mode.teamShadows || (mode.id === '1v1' ? 2 : mode.teamSize);
-
+  function createPlayerList(mode, initTeam, customSlots = null, teamAShadows = 0, teamBShadows = 0) {
     if (customSlots && customSlots.length > 0) {
       // Usar los slots configurados en el lobby multijugador, ordenados intercalando turnos
       const teamAPlayers = customSlots.filter(s => s.team === 'teamA');
@@ -452,7 +464,7 @@ export default function App() {
         isBot: s.isBot,
         peerId: s.peerId,
         hand: [],
-        shadowsLeft: teamShadowCount,
+        shadowsLeft: s.team === 'teamA' ? teamAShadows : teamBShadows,
       }));
     }
 
@@ -469,7 +481,7 @@ export default function App() {
           isBot: i !== 1,
           peerId: null,
           hand: [],
-          shadowsLeft: teamShadowCount,
+          shadowsLeft: teamAShadows,
         });
         list.push({
           id: `B${i}`,
@@ -479,7 +491,7 @@ export default function App() {
           isBot: true,
           peerId: null,
           hand: [],
-          shadowsLeft: teamShadowCount,
+          shadowsLeft: teamBShadows,
         });
       }
     } else {
@@ -492,7 +504,7 @@ export default function App() {
           isBot: true,
           peerId: null,
           hand: [],
-          shadowsLeft: teamShadowCount,
+          shadowsLeft: teamBShadows,
         });
         list.push({
           id: `A${i}`,
@@ -549,16 +561,50 @@ export default function App() {
     const newTeamBCumulative = prevTeamBCumulative + teamBRoundScoreSum;
 
     // Sumar puntos de ronda si gana al menos 2 frentes
+    let roundWinner = 'tie';
     if (teamAFrontWins >= 2) {
       prevTeamARoundPts += 1;
+      roundWinner = 'teamA';
     } else if (teamBFrontWins >= 2) {
       prevTeamBRoundPts += 1;
+      roundWinner = 'teamB';
     }
+
+    // Cobro oficial de economía de Marcadores de Sombra (Capítulo 5 y Guía Rápida v2.0)
+    const activeModeId = stateRef.current.selectedMode || selectedMode || '2v2';
+    const currentAStreak = stateRef.current.teamALossStreak ?? teamALossStreak;
+    const currentBStreak = stateRef.current.teamBLossStreak ?? teamBLossStreak;
+    const econResult = calculateRoundEconomy(activeModeId, roundWinner, currentAStreak, currentBStreak);
+
+    const prevTeamAShadows = stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft;
+    const prevTeamBShadows = stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft;
+    const updatedTeamAShadows = prevTeamAShadows + econResult.teamAEarned;
+    const updatedTeamBShadows = prevTeamBShadows + econResult.teamBEarned;
+
+    const roundEconomyData = {
+      modeId: activeModeId,
+      roundWinner,
+      teamAEarned: econResult.teamAEarned,
+      teamBEarned: econResult.teamBEarned,
+      teamAReason: econResult.teamAReason,
+      teamBReason: econResult.teamBReason,
+      teamAPrevBank: prevTeamAShadows,
+      teamBPrevBank: prevTeamBShadows,
+      teamATotalBank: updatedTeamAShadows,
+      teamBTotalBank: updatedTeamBShadows,
+      teamANewStreak: econResult.teamANewStreak,
+      teamBNewStreak: econResult.teamBNewStreak,
+    };
 
     setTeamARoundPoints(prevTeamARoundPts);
     setTeamBRoundPoints(prevTeamBRoundPts);
     setTeamACumulativePoints(newTeamACumulative);
     setTeamBCumulativePoints(newTeamBCumulative);
+    setTeamAShadowsLeft(updatedTeamAShadows);
+    setTeamBShadowsLeft(updatedTeamBShadows);
+    setTeamALossStreak(econResult.teamANewStreak);
+    setTeamBLossStreak(econResult.teamBNewStreak);
+    setLastRoundEconomy(roundEconomyData);
     setPhase('roundOver');
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -576,6 +622,11 @@ export default function App() {
       roundOverTimer: 60,
       roundOverReadyPlayers: [],
       flagFallTeam: null,
+      teamAShadowsLeft: updatedTeamAShadows,
+      teamBShadowsLeft: updatedTeamBShadows,
+      teamALossStreak: econResult.teamANewStreak,
+      teamBLossStreak: econResult.teamBNewStreak,
+      lastRoundEconomy: roundEconomyData,
     };
 
     const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
@@ -746,10 +797,41 @@ export default function App() {
       prevTeamBRoundPts += 1;
     }
 
+    // Cobro oficial de economía de Marcadores de Sombra tras caída de bandera
+    const activeModeId = stateRef.current.selectedMode || selectedMode || '2v2';
+    const currentAStreak = stateRef.current.teamALossStreak ?? teamALossStreak;
+    const currentBStreak = stateRef.current.teamBLossStreak ?? teamBLossStreak;
+    const econResult = calculateRoundEconomy(activeModeId, winnerTeam, currentAStreak, currentBStreak);
+
+    const prevTeamAShadows = stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft;
+    const prevTeamBShadows = stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft;
+    const updatedTeamAShadows = prevTeamAShadows + econResult.teamAEarned;
+    const updatedTeamBShadows = prevTeamBShadows + econResult.teamBEarned;
+
+    const roundEconomyData = {
+      modeId: activeModeId,
+      roundWinner: winnerTeam,
+      teamAEarned: econResult.teamAEarned,
+      teamBEarned: econResult.teamBEarned,
+      teamAReason: econResult.teamAReason,
+      teamBReason: econResult.teamBReason,
+      teamAPrevBank: prevTeamAShadows,
+      teamBPrevBank: prevTeamBShadows,
+      teamATotalBank: updatedTeamAShadows,
+      teamBTotalBank: updatedTeamBShadows,
+      teamANewStreak: econResult.teamANewStreak,
+      teamBNewStreak: econResult.teamBNewStreak,
+    };
+
     setTeamARoundPoints(prevTeamARoundPts);
     setTeamBRoundPoints(prevTeamBRoundPts);
     setTeamACumulativePoints(newTeamACumulative);
     setTeamBCumulativePoints(newTeamBCumulative);
+    setTeamAShadowsLeft(updatedTeamAShadows);
+    setTeamBShadowsLeft(updatedTeamBShadows);
+    setTeamALossStreak(econResult.teamANewStreak);
+    setTeamBLossStreak(econResult.teamBNewStreak);
+    setLastRoundEconomy(roundEconomyData);
     setPhase('roundOver');
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -772,6 +854,11 @@ export default function App() {
       roundOverReadyPlayers: [],
       penaltyNotice: penaltyNoticeObj,
       flagFallTeam: infringingTeam,
+      teamAShadowsLeft: updatedTeamAShadows,
+      teamBShadowsLeft: updatedTeamBShadows,
+      teamALossStreak: econResult.teamANewStreak,
+      teamBLossStreak: econResult.teamBNewStreak,
+      lastRoundEconomy: roundEconomyData,
     };
 
     const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
@@ -953,9 +1040,26 @@ export default function App() {
       discards = [];
     }
 
-    // 1. Jugadores (usar customSlots o los guardados en multiplayerSlots)
+    // 1. Fondo de Sombras oficial: Ronda 1 inicia estrictamente con 0.
+    // En rondas posteriores se conserva el fondo acumulado (ahorro continuo).
+    let teamAShadowsForRound = 0;
+    let teamBShadowsForRound = 0;
+    if (roundNumber === 1) {
+      teamAShadowsForRound = 0;
+      teamBShadowsForRound = 0;
+      setTeamAShadowsLeft(0);
+      setTeamBShadowsLeft(0);
+      setTeamALossStreak(0);
+      setTeamBLossStreak(0);
+      setLastRoundEconomy(null);
+    } else {
+      teamAShadowsForRound = stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft;
+      teamBShadowsForRound = stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft;
+    }
+
+    // 2. Jugadores (usar customSlots o los guardados en multiplayerSlots)
     const effectiveSlots = customSlots || multiplayerSlots;
-    const playerList = createPlayerList(cfg, newInitiativeTeam, effectiveSlots);
+    const playerList = createPlayerList(cfg, newInitiativeTeam, effectiveSlots, teamAShadowsForRound, teamBShadowsForRound);
 
     // En todos los modos (1v1 y equipos), la Fase 2 es sin cartas en mano (se reparten en Fase 3)
     playerList.forEach(player => {
@@ -980,9 +1084,8 @@ export default function App() {
     setInitiativeTeam(newInitiativeTeam);
     setSelectedCardId(null);
     setIsShadowMode(false);
-    const teamShadowCount = cfg.teamShadows || (cfg.id === '1v1' ? 2 : cfg.teamSize);
-    setTeamAShadowsLeft(teamShadowCount);
-    setTeamBShadowsLeft(teamShadowCount);
+    setTeamAShadowsLeft(teamAShadowsForRound);
+    setTeamBShadowsLeft(teamBShadowsForRound);
     setPlanningTimer(30);
     setTeamAClock(initialClock);
     setTeamBClock(initialClock);
@@ -1030,8 +1133,11 @@ export default function App() {
       roundOverTimer: 60,
       roundOverReadyPlayers: [],
       flagFallTeam: null,
-      teamAShadowsLeft: teamShadowCount,
-      teamBShadowsLeft: teamShadowCount,
+      teamAShadowsLeft: teamAShadowsForRound,
+      teamBShadowsLeft: teamBShadowsForRound,
+      teamALossStreak: roundNumber === 1 ? 0 : (stateRef.current.teamALossStreak ?? teamALossStreak),
+      teamBLossStreak: roundNumber === 1 ? 0 : (stateRef.current.teamBLossStreak ?? teamBLossStreak),
+      lastRoundEconomy: roundNumber === 1 ? null : (stateRef.current.lastRoundEconomy ?? lastRoundEconomy),
       isMultiplayer: isMultiplayerActive,
       isHost: isHostActive,
     };
@@ -1050,6 +1156,11 @@ export default function App() {
     setTeamBRoundPoints(0);
     setTeamACumulativePoints(0);
     setTeamBCumulativePoints(0);
+    setTeamAShadowsLeft(0);
+    setTeamBShadowsLeft(0);
+    setTeamALossStreak(0);
+    setTeamBLossStreak(0);
+    setLastRoundEconomy(null);
     setTotalMatchRounds(durationConfig.rounds);
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -1090,6 +1201,11 @@ export default function App() {
     setTeamBRoundPoints(0);
     setTeamACumulativePoints(0);
     setTeamBCumulativePoints(0);
+    setTeamAShadowsLeft(0);
+    setTeamBShadowsLeft(0);
+    setTeamALossStreak(0);
+    setTeamBLossStreak(0);
+    setLastRoundEconomy(null);
 
     if (isHostUser) {
       const initialDeck = createDeck(activeConfig.decks);
@@ -1185,6 +1301,11 @@ export default function App() {
     setTeamBRoundPoints(0);
     setTeamACumulativePoints(0);
     setTeamBCumulativePoints(0);
+    setTeamAShadowsLeft(0);
+    setTeamBShadowsLeft(0);
+    setTeamALossStreak(0);
+    setTeamBLossStreak(0);
+    setLastRoundEconomy(null);
     setTotalMatchRounds(durationConfig.rounds);
 
     const newDeck = createDeck(modeConfig.decks);
@@ -1410,6 +1531,12 @@ export default function App() {
           fronts: freshFronts,
           botShadowsLeft: botTeamShadows,
           maxFrontCards: modeConfig.maxFrontCards,
+          currentRound,
+          totalRounds,
+          isFinalRound: currentRound >= totalRounds,
+          teamLossStreak: freshBot.team === 'teamA'
+            ? (stateRef.current.teamALossStreak ?? teamALossStreak)
+            : (stateRef.current.teamBLossStreak ?? teamBLossStreak),
         });
 
         if (move) {
@@ -1695,6 +1822,13 @@ export default function App() {
                     type="button"
                     disabled={!localPlayer || currentMyTeamShadows <= 0 || !isMyTurn}
                     onClick={() => setIsShadowMode(prev => !prev)}
+                    title={
+                      currentMyTeamShadows <= 0
+                        ? (round === 1
+                          ? (isEn ? 'Ronda 1 inicia con 0 sombras en el Fondo de Equipo. Se cobrarán al finalizar la ronda según el resultado.' : 'La Ronda 1 inicia con 0 sombras en el Fondo de Equipo. Se cobrarán al finalizar la ronda según el resultado.')
+                          : (isEn ? 'Your team has exhausted its shadow marker pool for this round.' : 'Tu equipo ha agotado su fondo de marcadores de sombra para esta ronda.'))
+                        : (isEn ? 'Activate to deploy next card concealed as a Shadow' : 'Activar para jugar la siguiente carta oculta como Sombra')
+                    }
                     className={`text-xs px-3.5 py-1.5 rounded-xl border font-serif font-bold tracking-wider uppercase flex items-center gap-1.5 transition cursor-pointer ${
                       isShadowMode
                         ? 'bg-gradient-to-r from-purple-900 to-indigo-950 text-purple-200 border-purple-400/80 shadow-[0_0_15px_rgba(168,85,247,0.35)] ring-1 ring-purple-400'
@@ -1793,6 +1927,9 @@ export default function App() {
         countdown={roundOverTimer}
         onToggleReady={handleToggleRoundReady}
         flagFallTeam={flagFallTeam}
+        lastRoundEconomy={lastRoundEconomy}
+        teamAShadowsLeft={teamAShadowsLeft}
+        teamBShadowsLeft={teamBShadowsLeft}
       />
 
       {/* MODAL DE FIN DE PARTIDA CON PRÓRROGA REGLAMENTARIA */}

@@ -129,12 +129,14 @@ export function getTutorialSteps(lang = 'es') {
             'Official Rule Update: The luck-based Trump Card mechanic has been completely eliminated to maximize pure tactical depth and strategic mastery.',
             'Base card values run from 2 to 10 at face value, J=11, Q=12, K=13, and Ace (A) = 14 points (the highest single card in the deck!).',
             'Four powerful formation bonuses decide battles: Suit Synergy (+5 pts per additional card of the same suit in the front), Pair (+10 pts for 2 cards of same rank), Short Straight (+15 pts for 3 consecutive ranks), and Trio (+20 pts for 3 cards of same rank, which supersedes Pair).',
+            'Shadow Economy (Official v1.6 / v2.0): Teams start Round 1 with strictly 0 Shadow Markers. At round end, teams earn markers based on performance (+1 win, +2 loss, +3 loss streak, +1 tie in 2v2) which carry over and accumulate across rounds. For this training drill, we simulate an active pool of 2 markers so you can learn how to play shadow cards.',
             'Who attacks first? The choice of which team opens Round 1 is 100% RANDOM (a deck cut on tabletop, automated digitally). From Round 2 onward, initiative rotates automatically to the opposing team. For this drill, your team (Team A) holds the initiative and you (A1) will execute the opening attack!',
           ]
         : [
             'Actualización Oficial del Reglamento: Se ha eliminado por completo la mecánica de la carta de sinergia/triunfo para mitigar el factor suerte y potenciar la estrategia táctica pura.',
             'Los valores base de las cartas van del 2 al 10 según su valor nominal, J=11, Q=12, K=13 y el As (A) = 14 puntos (¡la carta individual más alta de la baraja!).',
             'Se incorporan cuatro formaciones estratégicas por sinergia: Sinergia de Palo (+5 pts por cada carta adicional del mismo palo en el frente), Pareja (+10 pts por 2 cartas de igual valor), Escalera Corta (+15 pts por 3 cartas consecutivas) y Trío (+20 pts por 3 cartas de igual valor, anulando la pareja de esas cartas).',
+            'Economía de Sombras (Reglamento Oficial): Los equipos inician la Ronda 1 con estrictamente 0 Marcadores de Sombra. Al final de la ronda, ganan marcadores según el resultado (+1 victoria, +2 derrota, +3 racha de derrotas, +1 nulo en 2v2) que se acumulan y ahorran entre rondas. En este tutorial simulamos una reserva de 2 marcadores para que aprendas su uso práctico.',
             '¿Quién empieza atacando? La iniciativa en la Ronda 1 es 100% ALEATORIA (mediante corte de baraja en mesa o sorteo digital automático). A partir de la Ronda 2, rota al equipo rival. Para esta instrucción, ¡tu equipo (Equipo A) tiene la iniciativa y serás tú (A1) quien abra el combate!',
           ],
       buttonText: isEn ? 'View Planning Phase' : 'Ver Fase de Planificación',
@@ -156,12 +158,12 @@ export function getTutorialSteps(lang = 'es') {
         ? [
             'In official rules, before receiving cards there is a 30-second tactical phase where players plan with NO CARDS in hand.',
             'Why without cards? Because in cooperative games a dominant player often dictates what others should do. By having no cards yet, the team must agree on macro-strategy: for instance, "let us secure the Center and a Flank, and if they push hard on the other, avoid wasting troops".',
-            'Additionally, during this phase teams agree on clock management so they do not run out of time at the round close.',
+            'Shadow Economy & Clock Budget: During these 30 seconds, the team decides how many shadow markers from their accumulated reserve to invest this round or save for future rounds, and coordinates team clock pacing.',
           ]
         : [
             'En el reglamento oficial, antes de recibir cartas hay una fase táctica de 30 segundos donde los jugadores planifican SIN CARTAS en mano.',
             '¿Por qué sin cartas? Porque en los juegos cooperativos a menudo un jugador dominante le dice a los demás qué hacer. Al no tener cartas aún, el equipo debe acordar la macro-estrategia: por ejemplo, "aseguremos con fuerza el Centro y un Flanco, y si presionan mucho el otro, no malgastemos tropas".',
-            'Además, en esta fase los equipos pactan la gestión del reloj de equipo para no quedarse sin tiempo en el cierre de la ronda.',
+            'Economía de Sombras y Presupuesto de Reloj: Durante estos 30 segundos, el equipo decide cuántos marcadores de sombra de su reserva acumulada invertirá en la ronda o ahorrará para rondas posteriores, y pacta el ritmo de juego del reloj compartido.',
           ],
       buttonText: isEn ? 'View Shared Team Clock' : 'Ver Reloj de Equipo Compartido',
     },
@@ -480,8 +482,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Activate the "Play as Shadow" button, select your 8 of Hearts (8♥), and deploy it to the Center Front.'
         : 'Activa el botón "Jugar como Sombra", selecciona tu 8 de Corazones (8♥) y colócalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'In 2v2 the shadow cards belong to the team, which has a Shared Pool of 2 Shadow Tokens per round (equal to the number of teammates). Playing a card as a shadow deploys it FACE DOWN solely for the opposing team, but it remains fully VISIBLE to your entire team (highlighted with a purple border and shadow icon). Teammates can distribute these markers freely according to strategy. This allows your ally A2 to see your 8♥ to coordinate strategy and calculate team synergies (+10 pts for 3 hearts), while opponents only see the dark shadow back without knowing whether it is an Ace or a bluff, completely intimidating them.'
-        : 'En 2v2 las cartas sombra pertenecen al equipo, que cuenta con un Fondo de 2 Fichas de Sombra por ronda (igual al número de integrantes del equipo). Al jugar una carta como sombra, esta se coloca BOCA ABAJO únicamente para el equipo rival, pero permanece VISIBLE para todo tu equipo (rodeada con un borde morado y el icono de sombra). El equipo reparte estos marcadores libremente según su estrategia. De este modo, tu aliado A2 puede ver perfectamente tu 8♥ para coordinar la estrategia y calcular las sinergias de equipo (+10 pts por 3 corazones), mientras que los rivales solo ven el reverso oscuro sin saber si es un As o un farol, intimidándolos por completo.',
+        ? 'In official WarFronts rules, shadow cards are part of a continuous team economy: teams start Round 1 with 0 markers and earn them at round end (+1 win, +2 loss, +3 streak of 2+ losses, +1 tie in 2v2), saving them across rounds. In this drill, we provide 2 simulated markers so you can master their use. Playing a card as shadow deploys it FACE DOWN solely for opponents, but it remains fully VISIBLE to your entire team (highlighted with a purple border). Teammates can distribute available markers freely. Your ally A2 sees your 8♥ clearly to coordinate and build suit synergy (+10 pts for 3 hearts), while opponents only see the dark back, completely intimidating them.'
+        : 'En el reglamento oficial, las cartas sombra forman parte de una economía continua de equipo: los equipos inician la Ronda 1 con 0 marcadores y los ganan al final de la ronda (+1 por ganar, +2 por perder, +3 si llevas 2+ derrotas seguidas o +1 si hay empate en 2v2), ahorrándolos entre rondas. En este tutorial te proporcionamos 2 marcadores simulados para aprender su uso. Al jugar una carta como sombra, esta se coloca BOCA ABAJO únicamente para los rivales, pero permanece VISIBLE para todo tu equipo (con borde morado). El equipo reparte sus marcadores libremente. Tu aliado A2 ve perfectamente tu 8♥ para coordinar la estrategia y calcular las sinergias (+10 pts por 3 corazones), mientras que los rivales solo ven el reverso oscuro, intimidándolos por completo.',
       whyNotOthers: isEn
         ? [
             {

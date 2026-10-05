@@ -21,22 +21,22 @@ export const RULES_TRANSLATIONS = {
       '1v1': {
         name: '1 contra 1',
         subtitle: 'Duelo Táctico de Comandantes',
-        description: '1 baraja (52 cartas). 10 cartas por duelista, 2 sombras, límite de 8 cartas por frente.',
+        description: '1 baraja (52 cartas). 10 cartas por duelista. Economía de sombras continua (inician en 0). Límite de 8 cartas por frente.',
       },
       '2v2': {
         name: '2 contra 2',
         subtitle: 'Escuadrón Táctico por Parejas',
-        description: '1 baraja (52 cartas). 4 jugadores, 5 cartas c/u, 2 sombras por equipo, límite de 8 cartas por frente.',
+        description: '1 baraja (52 cartas). 4 jugadores, 5 cartas c/u. Economía de sombras continua (inician en 0). Límite de 8 cartas por frente.',
       },
       '3v3': {
         name: '3 contra 3',
         subtitle: 'Batalla de Frente Ampliado',
-        description: '2 barajas combinadas (104 cartas). 6 jugadores, 5 cartas c/u, 3 sombras por equipo, límite de 12 cartas por frente.',
+        description: '2 barajas combinadas (104 cartas). 6 jugadores, 5 cartas c/u. Economía de sombras continua (inician en 0). Límite de 12 cartas por frente.',
       },
       '4v4': {
         name: '4 contra 4',
         subtitle: 'Guerra Total de Ejércitos',
-        description: '2 barajas combinadas (104 cartas). 8 jugadores, 5 cartas c/u, 4 sombras por equipo, límite de 16 cartas por frente.',
+        description: '2 barajas combinadas (104 cartas). 8 jugadores, 5 cartas c/u. Economía de sombras continua (inician en 0). Límite de 16 cartas por frente.',
       },
     },
     durations: {
@@ -77,22 +77,22 @@ export const RULES_TRANSLATIONS = {
       '1v1': {
         name: '1 vs 1',
         subtitle: 'Tactical Commanders Duel',
-        description: '1 deck (52 cards). 10 cards per player, 2 shadows, limit of 8 cards per front.',
+        description: '1 deck (52 cards). 10 cards per player. Continuous shadow economy (start at 0). Limit of 8 cards per front.',
       },
       '2v2': {
         name: '2 vs 2',
         subtitle: 'Tactical Squads by Pairs',
-        description: '1 deck (52 cards). 4 players, 5 cards each, 2 team shadows, limit of 8 cards per front.',
+        description: '1 deck (52 cards). 4 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 8 cards per front.',
       },
       '3v3': {
         name: '3 vs 3',
         subtitle: 'Extended Front Battle',
-        description: '2 combined decks (104 cards). 6 players, 5 cards each, 3 team shadows, limit of 12 cards per front.',
+        description: '2 combined decks (104 cards). 6 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 12 cards per front.',
       },
       '4v4': {
         name: '4 vs 4',
         subtitle: 'Total Army Warfare',
-        description: '2 combined decks (104 cards). 8 players, 5 cards each, 4 team shadows, limit of 16 cards per front.',
+        description: '2 combined decks (104 cards). 8 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 16 cards per front.',
       },
     },
     durations: {

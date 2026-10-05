@@ -6,9 +6,10 @@ import {
   getLocalizedFronts,
   sortFrontCards,
   analyzeCardSynergies,
+  calculateRoundEconomy,
 } from '../constants/rules';
 import { Card } from './Card';
-import { ArrowRight, Award, Clock, CheckCircle2, Users, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Award, Clock, CheckCircle2, Users, AlertTriangle, EyeOff, Flame, Sparkles } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
 export function RoundSummaryModal({
@@ -25,6 +26,9 @@ export function RoundSummaryModal({
   countdown = 60,
   onToggleReady,
   flagFallTeam = null,
+  lastRoundEconomy = null,
+  teamAShadowsLeft = 0,
+  teamBShadowsLeft = 0,
 }) {
   const { language, isEn, ui } = useLanguage();
   if (!isOpen || !fronts || !fronts.left || !fronts.center || !fronts.right) return null;
@@ -391,6 +395,109 @@ export function RoundSummaryModal({
               <span className="text-amber-400">+{roundPointsTeamB} {ui.common.pts}</span>
             </div>
           </div>
+
+          {/* 4. Ingresos de Economía (Sombras) — Capítulo 5 y Guía Rápida v2.0 */}
+          {(() => {
+            const effectiveEcon = lastRoundEconomy || calculateRoundEconomy(modeId, roundOutcome, 0, 0);
+            const teamAEarned = effectiveEcon.teamAEarned ?? 1;
+            const teamBEarned = effectiveEcon.teamBEarned ?? 1;
+            const teamAReason = effectiveEcon.teamAReason ?? 'win';
+            const teamBReason = effectiveEcon.teamBReason ?? 'loss';
+            const teamATotal = effectiveEcon.teamATotalBank ?? teamAShadowsLeft;
+            const teamBTotal = effectiveEcon.teamBTotalBank ?? teamBShadowsLeft;
+
+            function getReasonBadge(reason, earned) {
+              if (reason === 'win') {
+                return (
+                  <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-emerald-400" />
+                    <span>{isEn ? `Victory (+${earned})` : `Victoria (+${earned})`}</span>
+                  </span>
+                );
+              }
+              if (reason === 'streak') {
+                return (
+                  <span className="bg-rose-500/20 text-rose-300 border border-rose-500/40 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <Flame className="w-3 h-3 text-rose-400 animate-pulse" />
+                    <span>{isEn ? `Loss Streak 2+ (+${earned})` : `Racha de Derrotas 2+ (+${earned})`}</span>
+                  </span>
+                );
+              }
+              if (reason === 'loss') {
+                return (
+                  <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                    <span>{isEn ? `Defeat (+${earned})` : `Derrota (+${earned})`}</span>
+                  </span>
+                );
+              }
+              return (
+                <span className="bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span>{isEn ? `Tied Round (+${earned})` : `Ronda Nula (+${earned})`}</span>
+                </span>
+              );
+            }
+
+            return (
+              <div className="bg-[#100d1c] border border-purple-500/35 rounded-2xl p-4 shadow-xl text-xs space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-purple-500/20 pb-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-lg bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-300">
+                      <EyeOff className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <span className="font-serif font-black text-purple-200 text-xs sm:text-sm tracking-wide block uppercase">
+                        {isEn ? '4. Shadow Economy Income (Official Rules)' : '4. Ingresos de Economía: Sombras (Reglamento Oficial)'}
+                      </span>
+                      <span className="text-[11px] text-purple-300/70">
+                        {isEn
+                          ? 'Unspent markers are preserved across rounds (continuous savings). Streaks reset on win or tie.'
+                          : 'Los marcadores no utilizados se conservan entre rondas (ahorro continuo). La racha se reinicia al ganar o empatar.'}
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold bg-purple-950/80 border border-purple-700/60 px-2.5 py-1 rounded-full text-purple-300">
+                    {isEn ? 'Format Economy:' : 'Economía Formato:'} {modeId}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Bando A (Aliados / Tú) */}
+                  <div className="bg-[#0b1320] border border-sky-600/35 rounded-xl p-3 flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-bold text-sky-300 text-xs">
+                        {is1v1 ? (isEn ? 'Your Reserve' : 'Tu Fondo') : (isEn ? 'Team A Reserve' : 'Fondo Equipo A')}
+                      </span>
+                      {getReasonBadge(teamAReason, teamAEarned)}
+                    </div>
+                    <div className="flex items-center justify-between text-slate-300 font-mono text-[11px]">
+                      <span>{isEn ? 'Income this round:' : 'Ingreso esta ronda:'} <strong className="text-purple-300 font-bold">+{teamAEarned} 🌑</strong></span>
+                      <span>
+                        {isEn ? 'Next Round Bank:' : 'Fondo Siguiente Ronda:'}{' '}
+                        <strong className="text-emerald-400 font-bold text-xs">{teamATotal} 🌑</strong>
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Bando B (Rival) */}
+                  <div className="bg-[#16120c] border border-amber-600/35 rounded-xl p-3 flex flex-col justify-between">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-bold text-amber-300 text-xs">
+                        {is1v1 ? (isEn ? 'Rival Reserve' : 'Fondo Rival') : (isEn ? 'Team B Reserve' : 'Fondo Equipo B')}
+                      </span>
+                      {getReasonBadge(teamBReason, teamBEarned)}
+                    </div>
+                    <div className="flex items-center justify-between text-slate-300 font-mono text-[11px]">
+                      <span>{isEn ? 'Income this round:' : 'Ingreso esta ronda:'} <strong className="text-purple-300 font-bold">+{teamBEarned} 🌑</strong></span>
+                      <span>
+                        {isEn ? 'Next Round Bank:' : 'Fondo Siguiente Ronda:'}{' '}
+                        <strong className="text-amber-400 font-bold text-xs">{teamBTotal} 🌑</strong>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Barra inferior de estado y acción */}

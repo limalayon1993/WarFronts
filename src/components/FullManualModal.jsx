@@ -214,7 +214,7 @@ export function FullManualModal({ isOpen, onClose }) {
                       <strong>{isEn ? 'Additional Components:' : 'Componentes Adicionales:'}</strong>
                       <div className="mt-1 text-slate-400 space-y-0.5">
                         <div>• <strong>{isEn ? '1 Initiative Token.' : '1 Ficha de Iniciativa.'}</strong></div>
-                        <div>• <strong>{isEn ? 'Shadow Marker per player:' : 'Marcador de Sombra por jugador:'}</strong> {isEn ? 'These markers are not used exclusively individually, but are pooled to form the Team Shadow Pool (e.g., in 4v4 matches, the team has 4 markers in total to allocate freely). Can be coins, stones, dice, counters, or paper. They do not have to be held by the players who will use them; they can remain off the table and be placed each time the team uses one.' : 'Estos marcadores no son de uso exclusivamente individual, sino que se agrupan para formar el Fondo de Sombras del Equipo (Ej: En partidas 4v4, el equipo dispone de 4 marcadores en total para repartir libremente). Pueden ser monedas, piedras, dados, fichas o papel. No tienen porque tenerlos los jugadores que van a usarlos, pueden estar fuera de la mesa y colocarse cada vez que el equipo hace uso de uno de ellos.'}</div>
+                        <div>• <strong>{isEn ? 'Shadow Markers:' : 'Marcadores de Sombra:'}</strong> {isEn ? 'These markers form the Team Shadow Pool, managed as a continuous economic resource. They can be coins, stones, dice, counters, or paper. They do not have to be held by the players who will use them; they can remain off the table and be placed each time the team uses one.' : 'Estos marcadores forman el Fondo de Sombras del Equipo, el cual se gestiona como un recurso económico continuo. Pueden ser monedas, piedras, dados, fichas o papel. No tienen por qué tenerlos los jugadores que van a usarlos, pueden estar fuera de la mesa y colocarse cada vez que el equipo hace uso de uno de ellos.'}</div>
                         <div>• <strong>{isEn ? '1 Stopwatch / Dual Chess Clock:' : '1 Cronómetro / Reloj de Ajedrez Dual:'}</strong> {isEn ? 'Switched clock timing shared team time during the round.' : 'Reloj conmutado para medir el tiempo global compartido de cada equipo en la ronda.'}</div>
                         <div>• <strong>{isEn ? 'Score Sheet / Scoreboard:' : 'Hoja de Anotación / Marcador:'}</strong> {isEn ? 'Notepad or digital interface to tally round points and cumulative front points.' : '1 bloc de papel o marcador digital para registrar tanto los puntos de ronda como la suma de puntos numéricos de cada frente por ronda.'}</div>
                       </div>
@@ -462,13 +462,13 @@ export function FullManualModal({ isOpen, onClose }) {
                   </h4>
                   <p className="text-xs sm:text-sm">
                     {isEn ? (
-                      <>Each team has a <strong className="text-purple-300">Team Shadow Pool</strong> equal to its number of members (e.g., 4 markers in 4v4, 3 in 3v3, 2 in 2v2). During the Tactics Phase, the team distributes these markers freely among its players according to strategy. <strong className="text-purple-300">A player may receive multiple markers</strong> (allowing them to play multiple cards face-down in that round) or receive none. Cards played as Shadows remain concealed solely from the opposing team. Any teammate can secretly inspect the rank and suit of Shadow Cards played by their allies (visible with a purple border). If team strategy dictates playing all cards face-up, they may do so.</>
+                      <>Both teams begin the first round of the match with <strong className="text-purple-300">zero (0) markers</strong> in their Team Shadow Pool. During the Tactics Phase, the team decides how many markers from its accumulated reserve to spend and distributes them freely among its players according to strategy. <strong className="text-purple-300">Unused markers are preserved for future rounds</strong>. A player may receive multiple markers (being able to play multiple face-down cards in that round) or receive none. Cards played as Shadows remain concealed solely from the opposing team. Any player may secretly inspect the value and suit of Shadow Cards played by their teammates (visible with a purple border).</>
                     ) : (
-                      <>Cada equipo cuenta con un <strong className="text-purple-300">Fondo de Sombras</strong> igual a su número de integrantes (ej. 4 marcadores en 4v4, 3 en 3v3, 2 en 2v2). Durante la Fase de Táctica, el equipo reparte estos marcadores libremente entre sus jugadores según su estrategia. <strong className="text-purple-300">Un jugador puede recibir múltiples marcadores</strong> (pudiendo jugar varias cartas boca abajo en esa ronda) o no recibir ninguno. Las cartas jugadas como Sombra permanecerán ocultas únicamente para el equipo rival. Cualquier jugador podrá consultar en secreto el valor y palo de las Cartas Sombra jugadas por sus compañeros de equipo (visibles con borde morado). Si la estrategia del equipo requiere jugar todas sus cartas boca arriba, pueden prescindir de usar marcadores de sombra.</>
+                      <>Ambos equipos inician la primera ronda de la partida con <strong className="text-purple-300">cero (0) marcadores</strong> en su Fondo de Sombras. Durante la Fase de Táctica, el equipo decide cuántos marcadores de su reserva acumulada desea gastar y los reparte libremente entre sus jugadores según su estrategia. <strong className="text-purple-300">Los marcadores no utilizados se conservan para rondas futuras</strong>. Un jugador puede recibir múltiples marcadores (pudiendo jugar varias cartas boca abajo en esa ronda) o no recibir ninguno. Las cartas jugadas como Sombra permanecerán ocultas únicamente para el equipo rival. Cualquier jugador podrá consultar en secreto el valor y palo de las Cartas Sombra jugadas por sus compañeros de equipo (visibles con borde morado).</>
                     )}
                   </p>
                   <div className="bg-slate-950/80 p-3 rounded border border-slate-800 text-xs text-slate-300 mt-2">
-                    <strong>{isEn ? 'Use of Shadow Marker (Anti-Cheat Control):' : 'Uso del Marcador de Sombra (Control Anti-trampas):'}</strong> {isEn ? 'The moment a player decides to play a card face-down, one of the Shadow Markers belonging to the team must be placed on the table/flipped. This guarantees total transparency regarding how many concealed cards remain available for each team.' : 'En el momento en que un jugador decide jugar una carta boca abajo, debe colocarse en la mesa uno de los Marcadores de Sombra que se le asignaron al equipo previamente. Esto garantiza transparencia total sobre cuántas cartas ocultas le quedan por jugar a cada miembro del equipo.'}
+                    <strong>{isEn ? 'Use of Shadow Marker (Anti-Cheat Control):' : 'Uso del Marcador de Sombra (Control Anti-trampas):'}</strong> {isEn ? 'The moment a player decides to play a card face-down, one of the Shadow Markers previously assigned to the team must be placed on the table. This guarantees total transparency regarding how many concealed cards remain available for each team member.' : 'En el momento en que un jugador decide jugar una carta boca abajo, debe colocarse en la mesa uno de los Marcadores de Sombra que se le asignaron al equipo previamente. Esto garantiza transparencia total sobre cuántas cartas ocultas le quedan por jugar a cada miembro del equipo.'}
                   </div>
                 </div>
 
@@ -518,7 +518,7 @@ export function FullManualModal({ isOpen, onClose }) {
                     </div>
                     <ol className="list-decimal list-inside text-xs sm:text-sm space-y-1 text-slate-300">
                       <li>{isEn ? 'If the Draw Deck lacks cards, reshuffle the Discard Pile to form a new deck.' : 'Si el Mazo Principal no tiene suficientes cartas, se rebaraja el Pozo de Descartes para formar el nuevo mazo.'}</li>
-                      <li>{isEn ? 'Shadow Markers belonging to each team are gathered to form their active Team Shadow Pool before tactical planning.' : 'Se reúnen los Marcadores de Sombra correspondientes a cada equipo para formar su Fondo de Sombras activo antes de la fase de planificación.'}</li>
+                      <li>{isEn ? 'Teams review their accumulated Shadow Pool. In Round 1, this pool is strictly zero (0) for both sides.' : 'Los equipos revisan su Fondo de Sombras acumulado. En la Ronda 1, este fondo es estrictamente cero (0) para ambos bandos.'}</li>
                       <li>{isEn ? 'The Initiative token rotates clockwise to the opposing team (or is drawn randomly in Round 1).' : 'La Ficha de Iniciativa rota al equipo rival (o se sortea aleatoriamente en la Ronda 1).'}</li>
                     </ol>
                   </div>
@@ -531,7 +531,7 @@ export function FullManualModal({ isOpen, onClose }) {
                     </div>
                     <ul className="text-xs sm:text-sm space-y-1.5 text-slate-300">
                       <li>• <strong>{isEn ? 'Total Free Communication:' : 'Comunicación Total Libre:'}</strong> {isEn ? 'Teams have 30 seconds to talk and coordinate macro strategy before cards are dealt.' : 'Los equipos disponen de un tiempo de 30 segundos para hablar y coordinar su estrategia general antes de recibir sus cartas.'}</li>
-                      <li>• <strong>{isEn ? 'Macro Strategy:' : 'Estrategia Macro:'}</strong> {isEn ? 'Plan sector distribution ("Attack Center and Left", "Let\'s build a straight in Center", "You will use two of the team shadow markers"), roles, or signals.' : 'Se planifica la distribución de las zonas ("Ataquemos fuerte Centro e Izquierda", "Intentemos armar una escalera en el centro", "Tú usarás dos de los marcadores sombra"), roles o señas.'}</li>
+                      <li>• <strong>{isEn ? 'Macro Strategy:' : 'Estrategia Macro:'}</strong> {isEn ? 'Plan sector distribution ("Attack Center and Left", "Let\'s build a straight in Center") and decide how many shadow markers from the accumulated pool will be invested this round or saved for future rounds.' : 'Se planifica la distribución de las zonas ("Ataquemos fuerte Centro e Izquierda", "Intentemos armar una escalera en el centro") y se decide cuántos marcadores de sombra del fondo acumulado se invertirán en esta ronda o cuántos se ahorrarán para futuras rondas.'}</li>
                       <li>• <strong>{isEn ? 'Time Budget:' : 'Presupuesto Temporal:'}</strong> {isEn ? 'Teams can agree on clock distribution (e.g. initial players play in 3-5 seconds to save time for endgame calculations).' : 'Los equipos pueden pactar la distribución de su reloj compartido (ejemplo: acordar que los jugadores iniciales jueguen en 3–5 segundos para reservar tiempo de cálculo al cierre de la ronda).'}</li>
                       <li className="text-emerald-300 font-semibold">• <strong>{isEn ? 'Anti-Alpha Player Guarantee:' : 'Garantía Anti-Jugador Alfa:'}</strong> {isEn ? 'Having no cards in hand prevents any single player from dictating teammate actions.' : 'Al no tener aún las cartas en mano, es imposible que un jugador ordene las jugadas exactas a sus compañeros.'}</li>
                     </ul>
@@ -575,11 +575,19 @@ export function FullManualModal({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                <div className="bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-1 text-xs sm:text-sm">
+                <div className="bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-2 text-xs sm:text-sm">
                   <h4 className="font-bold text-amber-400 mb-2">{isEn ? 'UPON COMPLETING DEPLOYMENT:' : 'TRAS COMPLETAR EL DESPLIEGUE:'}</h4>
                   <div>1. <strong>{isEn ? 'Revelation:' : 'Revelación:'}</strong> {isEn ? 'Flip all Shadow Cards (making them publicly visible to the rival team and spectators).' : 'Voltear todas las Cartas Sombra (haciéndolas visibles al equipo rival y espectadores).'}</div>
                   <div>2. <strong>{isEn ? 'Sum:' : 'Suma:'}</strong> {isEn ? 'Base Value + Synergy Bonuses (Suit +5, Pair +10, Straight +15, Trio +20).' : 'Valor Base + Bonificaciones por Sinergia (Palo +5, Pareja +10, Escalera +15, Trío +20).'}</div>
                   <div>3. <strong>{isEn ? 'Winner:' : 'Ganador:'}</strong> {isEn ? 'Winning 2 of 3 Fronts = +1 Round Point. Record cumulative front points.' : 'Ganar 2 de 3 Frentes = +1 Pt de Ronda. Registra también los puntos numéricos acumulados en la Hoja de Anotación.'}</div>
+                  <div className="pt-2 border-t border-slate-800">
+                    4. <strong className="text-purple-300">{isEn ? 'Economy Income (Shadows):' : 'Ingresos de Economía (Sombras):'}</strong> {isEn ? 'After determining the round winner, each team receives new Shadow Markers added immediately to their Team Pool for subsequent rounds. The amount depends on format and round outcome:' : 'Tras determinar al ganador de la ronda, cada equipo recibe nuevos Marcadores de Sombra que se añaden inmediatamente a su Fondo de Equipo para las siguientes rondas. La cantidad depende del formato y del resultado de la ronda:'}
+                    <div className="mt-1.5 pl-3 space-y-1 text-slate-300">
+                      <div>• <strong>{isEn ? '1v1 & 2v2 Format:' : 'Formato 1v1 y 2v2:'}</strong> {isEn ? 'Winning Team (+1), Losing Team (+2), Loser on streak of 2+ consecutive losses (+3). Void Round (+1 to both).' : 'Equipo Ganador (+1), Equipo Perdedor (+2), Perdedor en racha de 2 o más derrotas consecutivas (+3). Ronda Nula (+1 a ambos).'}</div>
+                      <div>• <strong>{isEn ? '3v3 Format:' : 'Formato 3v3:'}</strong> {isEn ? 'Winning Team (+2), Losing Team (+3), Loser on streak of 2+ consecutive losses (+4). Void Round (+2 to both).' : 'Equipo Ganador (+2), Equipo Perdedor (+3), Perdedor en racha de 2 o más derrotas consecutivas (+4). Ronda Nula (+2 a ambos).'}</div>
+                      <div>• <strong>{isEn ? '4v4 Format:' : 'Formato 4v4:'}</strong> {isEn ? 'Winning Team (+2), Losing Team (+4), Loser on streak of 2+ consecutive losses (+5). Void Round (+2 to both).' : 'Equipo Ganador (+2), Equipo Perdedor (+4), Perdedor en racha de 2 o más derrotas consecutivas (+5). Ronda Nula (+2 a ambos).'}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -649,6 +657,20 @@ export function FullManualModal({ isOpen, onClose }) {
                         <>A player cannot press the clock before completely releasing the card on the designated front. If attempted, the clock continues running until the card is properly placed.</>
                       ) : (
                         <>Un jugador no puede pulsar el cronómetro antes de haber soltado la carta de forma definitiva en el frente elegido. Si lo hace, el rival o el árbitro pueden exigir que retire la mano del reloj; el tiempo seguirá corriendo para su equipo hasta que la carta esté correctamente depositada en la mesa.</>
+                      )}
+                    </p>
+                  </div>
+
+                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-1.5">
+                    <h4 className="font-bold text-amber-400 flex items-center gap-2">
+                      <Flame className="w-4 h-4 text-amber-400" />
+                      {isEn ? 'Loss Streak Reset' : 'Reinicio de Racha de Derrotas'}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-slate-300">
+                      {isEn ? (
+                        <>If a team collecting the maximum shadow bonus from a loss streak manages to win a round or tie it (Void Round), its streak resets instantaneously. Their subsequent defeat will count as the first.</>
+                      ) : (
+                        <>Si un equipo que está cobrando el bono máximo de sombras por racha de derrotas logra ganar una ronda o empatarla (Ronda Nula), su racha se reinicia instantáneamente. Su siguiente derrota contará como la primera.</>
                       )}
                     </p>
                   </div>
@@ -756,7 +778,7 @@ export function FullManualModal({ isOpen, onClose }) {
                       <strong>{isEn ? 'Shared Front Limit:' : 'Límite Territorial Compartido:'}</strong> {isEn ? 'Max 8 cards total per Front summing both duelists.' : 'Máximo 8 cartas en total por Frente sumando las cartas de ambos jugadores.'}
                     </li>
                     <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                      <strong>{isEn ? 'Shadow Cards:' : 'Cartas Sombra:'}</strong> {isEn ? 'Each player receives ' : 'Cada jugador recibe '}<strong className="text-purple-400">{isEn ? '2 Shadow Markers' : '2 Marcadores de Sombra'}</strong> {isEn ? '(up to 2 face-down cards per round).' : '(puede jugar hasta 2 cartas boca abajo durante la ronda).'}
+                      <strong>{isEn ? 'Shadow Economy:' : 'Economía de Sombras:'}</strong> {isEn ? 'Starts at 0. Win (+1), Loss (+2), Loss Streak 2+ (+3), Void Round (+1). Continuous saving across rounds.' : 'Inician con 0. Gana (+1), Pierde (+2), Racha 2+ (+3), Ronda Nula (+1). Ahorro continuo entre rondas.'}
                     </li>
                     <li className="bg-slate-950 p-2.5 rounded border border-slate-800 sm:col-span-2">
                       <strong>{isEn ? 'Clock Management in 1v1:' : 'Gestión del Reloj en 1v1:'}</strong> {isEn ? 'The solo player assumes all 10 turns, having the full 10-turn clock pool (e.g. 3m 20s in Medium speed), switching the clock after each card.' : 'El jugador individual asume los 10 turnos de su equipo, disponiendo de la bolsa de tiempo completa de 10 turnos (ej. 3 min 20 s en Ritmo Medio) para alternar sus jugadas frente al rival, pulsando el reloj tras cada una de sus 10 cartas colocadas.'}
@@ -785,7 +807,7 @@ export function FullManualModal({ isOpen, onClose }) {
                         <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded uppercase">Setup</span>
                       </div>
                       <p className="text-slate-400">
-                        {isEn ? 'Each duelist activates their 2 Shadow Markers. Initiative rotates automatically to the opponent (or is drawn randomly in Round 1). The Trump Card mechanic has been completely eliminated to remove arbitrary luck.' : 'Cada duelista coloca sus 2 Marcadores de Sombra en estado activo. La Iniciativa rota automáticamente al rival respecto a la ronda previa (o se determina por sorteo aleatorio en Ronda 1). La mecánica de la carta de sinergia/triunfo ha sido completamente eliminada para mitigar el factor suerte.'}
+                        {isEn ? 'Round 1 starts with 0 Shadows. Duelists review their accumulated Shadow Pool. Initiative rotates automatically to the opponent (or is drawn randomly in Round 1). The Trump Card mechanic has been completely eliminated.' : 'Ronda 1 inician con 0 Sombras. Cada duelista revisa su fondo acumulado de Sombras. La Iniciativa rota automáticamente al rival respecto a la ronda previa (o se determina por sorteo aleatorio en Ronda 1). La mecánica de la carta de triunfo ha sido completamente eliminada.'}
                       </p>
                     </div>
 
@@ -795,7 +817,7 @@ export function FullManualModal({ isOpen, onClose }) {
                         <span className="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono">30s</span>
                       </div>
                       <p className="text-slate-400">
-                        <strong className="text-amber-300">{isEn ? 'Individual Tactical Planning:' : 'Planificación Táctica Individual:'}</strong> {isEn ? '30 seconds without cards in hand to reflect, plan front priorities, and anticipate enemy moves.' : 'En lugar de comunicación entre compañeros, cada jugador dispone de 30 segundos sin cartas en mano para reflexionar, planificar mentalmente el enfoque de los 3 frentes y anticipar los contrataques del oponente.'}
+                        <strong className="text-amber-300">{isEn ? 'Individual Tactical Planning:' : 'Planificación Táctica Individual:'}</strong> {isEn ? '30 seconds without cards in hand to reflect, plan front priorities, and decide how many shadow markers to spend or save.' : 'En lugar de comunicación entre compañeros, cada jugador dispone de 30 segundos sin cartas en mano para reflexionar, planificar mentalmente el enfoque de los 3 frentes y decidir cuántas sombras gastar o ahorrar.'}
                       </p>
                     </div>
 
@@ -815,7 +837,7 @@ export function FullManualModal({ isOpen, onClose }) {
                         <span className="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-mono">{isEn ? 'Dual Clock' : 'Reloj Dual'}</span>
                       </div>
                       <p className="text-slate-400">
-                        {isEn ? '1-by-1 alternating turns. 1 card per turn on an unsaturated front (max 8 cards combined). Up to 2 Shadow Cards. Clock matches mode speed (Fast: 1:40, Medium: 3:20, Slow: 5:00). Flag Fall awards round to opponent while conserving table points.' : 'Turnos 1 a 1 alternados (Jugador A ➔ Jugador B ➔ Jugador A...) comenzando por quien tenga la Iniciativa. Se coloca exactamente una carta por turno en un frente no saturado (máximo 8 cartas sumando ambos duelistas). Cada jugador puede jugar hasta 2 Cartas de Sombra durante la ronda volteando sus marcadores. En 1v1 el reloj de equipo equivale al reloj de cada duelista (Rápido: 1m 40s, Medio: 3m 20s, Lento: 5m 00s). La Caída de Bandera a 00:00 otorga automáticamente la ronda (+1 Punto) al contrincante conservando los puntos acumulados en mesa. Concluye al jugar las 10 cartas.'}
+                        {isEn ? '1-by-1 alternating turns. 1 card per turn on an unsaturated front (max 8 cards combined). Play face-down by spending 1 shadow marker from the accumulated pool. Clock matches mode speed (Fast: 1:40, Medium: 3:20, Slow: 5:00). Flag Fall awards round to opponent while conserving table points. Concludes upon playing all 10 cards, followed by economy payout.' : 'Turnos 1 a 1 alternados (Jugador A ➔ Jugador B ➔ Jugador A...) comenzando por quien tenga la Iniciativa. Se coloca exactamente una carta por turno en un frente no saturado (máximo 8 cartas sumando ambos duelistas). Para jugar boca abajo se gasta 1 marcador del fondo acumulado. En 1v1 el reloj de equipo equivale al reloj de cada duelista (Rápido: 1m 40s, Medio: 3m 20s, Lento: 5m 00s). La Caída de Bandera a 00:00 otorga automáticamente la ronda (+1 Punto) al contrincante conservando los puntos acumulados en mesa. Concluye al jugar las 10 cartas y a continuación se cobra la economía.'}
                       </p>
                     </div>
                   </div>

@@ -29,6 +29,10 @@ export function chooseBotMove({
   maxFrontCards = 8,
   botPlayerId = null,
   allPlayers = [],
+  currentRound = 1,
+  totalRounds = 4,
+  isFinalRound = false,
+  teamLossStreak = 0,
 }) {
   if (!botHand || botHand.length === 0) return null;
 
@@ -305,25 +309,66 @@ export function chooseBotMove({
     });
   });
 
-  // 5. DECISIÓN TÁCTICA DEL MARCADOR DE SOMBRA
-  // Solo se usa de forma inteligente para engañar al rival o proteger jugadas clave
+  // 5. DECISIÓN TÁCTICA DEL MARCADOR DE SOMBRA Y AHORRO ECONÓMICO (Reglamento Oficial v1.6 / v2.0)
+  // Ahora las sombras forman parte de una economía continua: ahorrar sombras en rondas ya decididas
+  // permite conservarlas para las siguientes rondas; tener racha de derrotas o gran fondo permite
+  // desplegar ataques sorpresa de remontada.
   if (bestMove && botShadowsLeft > 0) {
     const targetAnalysis = frontAnalysis[bestMove.frontKey];
     const isHighCard = bestMove.card.base >= 11; // J, Q, K, As
+    const isAceOrKing = bestMove.card.base >= 13; // K, As
 
-    // NUNCA gastar sombra en frentes asegurados, ni en frentes perdidos, ni en frentes vacíos sin rival
+    // A. REGLA DE AHORRO MACRO ECONÓMICO:
+    // Si la ronda actual ya está matemáticamente decidida (>=2 frentes ganados o >=2 frentes perdidos)
+    // y NO es la última ronda de la partida, la IA AHORRA estrictamente sus marcadores para la siguiente ronda.
+    const isRoundAlreadyDecided = (securedFrontsCount >= 2 || lostFrontsCount >= 2) && !isFinalRound;
+    if (isRoundAlreadyDecided) {
+      bestMove.asShadow = false;
+      return bestMove;
+    }
+
+    // NUNCA gastar sombra en frentes asegurados, ni en frentes perdidos, ni en frentes donde el rival no compite
     const isWorthyFront = !targetAnalysis.isSecured && !targetAnalysis.isLost && !targetAnalysis.isMineUncontested;
 
     if (isWorthyFront) {
-      if (isHighCard && targetAnalysis.isContested) {
-        // Carta de alto impacto en frente disputado: esconder su puntuación para tender una trampa
-        bestMove.asShadow = Math.random() < 0.85;
-      } else if (botHand.length <= 2 && targetAnalysis.isContested) {
-        // Jugada de cierre de ronda en frente apretado
-        bestMove.asShadow = Math.random() < 0.70;
-      } else if (isHighCard && targetAnalysis.isEmpty && Math.random() < 0.40) {
-        // Apertura misteriosa para forzar al rival a dudar
-        bestMove.asShadow = true;
+      // B. ESCASEZ DE FONDOS (botShadowsLeft === 1):
+      // Si el equipo solo dispone de 1 marcador en su reserva, es altamente selectivo (ahorro para rondas futuras),
+      // a menos que sea la última ronda de la partida.
+      if (botShadowsLeft === 1 && !isFinalRound) {
+        if (isAceOrKing && targetAnalysis.isContested && Math.abs(targetAnalysis.diff) <= 10) {
+          // Carta decisiva en frente reñido
+          bestMove.asShadow = Math.random() < 0.75;
+        } else if (botHand.length <= 2 && targetAnalysis.isContested) {
+          // Cierre de ronda clutch
+          bestMove.asShadow = Math.random() < 0.65;
+        } else {
+          // Ahorro estratégico: no se gasta en aperturas ni en cartas medias
+          bestMove.asShadow = false;
+        }
+      } 
+      // C. ABUNDANCIA DE FONDOS O IMPULSO DE REMONTADA (botShadowsLeft >= 3 o teamLossStreak >= 2 o Última Ronda):
+      // El equipo cuenta con un banco acumulado o bono de racha (+3, +4, +5) para forzar la remontada.
+      else if (botShadowsLeft >= 3 || teamLossStreak >= 2 || isFinalRound) {
+        if (isHighCard && targetAnalysis.isContested) {
+          bestMove.asShadow = Math.random() < 0.90;
+        } else if (botHand.length <= 3 && targetAnalysis.isContested) {
+          bestMove.asShadow = Math.random() < 0.80;
+        } else if (isHighCard && targetAnalysis.isEmpty) {
+          // Apertura psicológica agresiva
+          bestMove.asShadow = Math.random() < 0.50;
+        } else if (targetAnalysis.isContested) {
+          bestMove.asShadow = Math.random() < 0.40;
+        }
+      }
+      // D. ECONOMÍA ESTÁNDAR (botShadowsLeft === 2):
+      else {
+        if (isHighCard && targetAnalysis.isContested) {
+          bestMove.asShadow = Math.random() < 0.85;
+        } else if (botHand.length <= 2 && targetAnalysis.isContested) {
+          bestMove.asShadow = Math.random() < 0.70;
+        } else if (isHighCard && targetAnalysis.isEmpty && Math.random() < 0.30) {
+          bestMove.asShadow = true;
+        }
       }
     }
   }
