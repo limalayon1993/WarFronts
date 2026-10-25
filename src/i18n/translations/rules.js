@@ -58,7 +58,29 @@ export const RULES_TRANSLATIONS = {
       casual: {
         name: 'Modo Casual (Party / Amigos)',
         badge: 'Conteo Rápido y Puntos en Vivo',
-        subtitle: 'Escala Comprimida (1-4) • Marcador en Vivo • 1 Sombra/Jug • 20s/Turno',
+        subtitle: 'Escala Comprimida (1-4) • Sinergias +1/+3/+4/+6 • 1 Sombra/Jug • 20s/Turno',
+      },
+    },
+    casualSynergies: {
+      color: {
+        label: 'Color',
+        bonus: '+1 / +3 pts',
+        desc: 'Color (Mismo palo): +1 pto al juntar exactamente 2 cartas del mismo palo, y +3 pts totales (bonificación máxima) al alcanzar 3 o más cartas del mismo palo en el frente.',
+      },
+      pair: {
+        label: 'Pareja',
+        bonus: '+3 pts',
+        desc: 'Pareja: +3 pts por 2 cartas del mismo rango nominal.',
+      },
+      straight: {
+        label: 'Escalera Corta',
+        bonus: '+4 pts',
+        desc: 'Escalera Corta (3 cartas): +4 pts por 3 cartas de rango nominal consecutivo.',
+      },
+      threeOfAKind: {
+        label: 'Trío',
+        bonus: '+6 pts',
+        desc: 'Trío: +6 pts por 3 cartas del mismo rango nominal (anula la bonificación de Pareja de esas cartas).',
       },
     },
     reasons: {
@@ -126,7 +148,29 @@ export const RULES_TRANSLATIONS = {
       casual: {
         name: 'Casual Mode (Party / Friends)',
         badge: 'Fast Count & Live Score',
-        subtitle: 'Compressed Scale (1-4) • Live Front Score • 1 Shadow/Player • 20s/Turn',
+        subtitle: 'Compressed Scale (1-4) • Synergies +1/+3/+4/+6 • 1 Shadow/Player • 20s/Turn',
+      },
+    },
+    casualSynergies: {
+      color: {
+        label: 'Color',
+        bonus: '+1 / +3 pts',
+        desc: 'Color (Same suit): +1 pt when gathering exactly 2 cards of the same suit, and +3 total pts (max bonus) upon reaching 3 or more cards of the same suit on the front.',
+      },
+      pair: {
+        label: 'Pair',
+        bonus: '+3 pts',
+        desc: 'Pair: +3 pts for 2 cards of the same nominal rank.',
+      },
+      straight: {
+        label: 'Short Straight',
+        bonus: '+4 pts',
+        desc: 'Short Straight (3 cards): +4 pts for 3 cards of consecutive nominal rank.',
+      },
+      threeOfAKind: {
+        label: 'Three of a Kind (Trio)',
+        bonus: '+6 pts',
+        desc: 'Three of a Kind (Trio): +6 pts for 3 cards of the same nominal rank (cancels the Pair bonus for those cards).',
       },
     },
     reasons: {

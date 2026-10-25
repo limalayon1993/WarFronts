@@ -99,15 +99,15 @@ export function getCasualTutorialSteps(lang = 'es') {
       content: isEn
         ? [
             'Welcome to Casual Mode (Party / Friends) — Official Rulebook v2.0 (Chapter 9). This mode keeps the full tactical essence of WarFronts (3 fronts, 1v1 to 4v4, continuous deck, and 1/2/3 Round Points) while eliminating mental math and complex resource tracking!',
-            '1. Compressed Scale (1 to 4 pts): Cards 2–6 = 1 pt, Cards 7–10 = 2 pts, Face Cards (J, Q, K) = 3 pts, and Ace (A) = 4 pts.',
-            '2. Simplified Synergies: Color (3+ cards of the same suit in the same front) = +2 pts total, Pair = +2 pts, Short Straight (3 consecutive cards) = +3 pts, and Trio = +4 pts (cancels Pair).',
+            '1. Rebalanced Compressed Scale (1 to 4 pts): Cards 2–6 = 1 pt, Cards 7–10 = 2 pts, Face Cards (J, Q, K) = 3 pts, and Ace (A) = 4 pts.',
+            '2. Rebalanced Synergies: Color (same suit) = +1 pt for 2 cards and +3 total pts (max) for 3+ cards, Pair = +3 pts, Short Straight (3 consecutive cards) = +4 pts, and Trio = +6 pts (cancels Pair).',
             '3. Real-Time Live Score on Fronts: Each front displays the live score of both teams automatically so you never have to do mental math.',
             '4. 1 Fixed Shadow per Player & 20s Turn Clock: Every player receives 1 personal Shadow Marker per round, and each turn has a fixed 20-second timer with automatic deployment if time runs out.',
           ]
         : [
             'Bienvenido al Modo Casual (Party / Amigos) — Reglamento Oficial v2.0 (Capítulo 9). Este modo conserva toda la esencia táctica de Frentes de Guerra (3 frentes, 1v1 a 4v4, mazo continuo y escala de 1/2/3 Puntos de Ronda), eliminando el cálculo mental pesado y la gestión económica compleja.',
-            '1. Escala Comprimida (1 a 4 pts): Cartas del 2 al 6 = 1 pto, Cartas del 7 al 10 = 2 pts, Figuras (J, Q, K) = 3 pts y As (A) = 4 pts.',
-            '2. Sinergias Simplificadas: Color (3 o más cartas del mismo palo en el mismo frente) = +2 pts totales, Pareja = +2 pts, Escalera Corta (3 consecutivas) = +3 pts y Trío = +4 pts (anula Pareja).',
+            '1. Escala Comprimida Rebalanceada (1 a 4 pts): Cartas del 2 al 6 = 1 pto, Cartas del 7 al 10 = 2 pts, Figuras (J, Q, K) = 3 pts y As (A) = 4 pts.',
+            '2. Sinergias Rebalanceadas: Color (mismo palo) = +1 pto al juntar 2 cartas y +3 pts totales (máximo) al alcanzar 3 o más cartas, Pareja = +3 pts, Escalera Corta (3 consecutivas) = +4 pts y Trío = +6 pts (anula Pareja).',
             '3. Contador de Puntos en Vivo: Cada frente muestra en tiempo real la suma automática de puntos de ambos equipos para evitar cualquier cálculo mental.',
             '4. 1 Sombra Fija por Jugador y Turno de 20s: Cada jugador recibe 1 Marcador de Sombra personal por ronda y dispone de 20 segundos fijos por turno con despliegue automático si se agota el tiempo.',
           ],
@@ -120,23 +120,23 @@ export function getCasualTutorialSteps(lang = 'es') {
       type: 'dialog',
       stage: 'trump_reveal',
       title: isEn
-        ? '1. Compressed Scale & Live Score Counters'
-        : '1. Escala Comprimida y Contador de Puntos en Vivo',
+        ? '1. Rebalanced Synergies & Live Score Counters'
+        : '1. Sinergias Rebalanceadas y Contador de Puntos en Vivo',
       subtitle: isEn
-        ? 'Zero Mental Math & Hidden Information Security'
-        : 'Cero Cálculo Mental y Seguridad de Información Oculta',
+        ? 'Color (+1/+3), Pair (+3), Straight (+4), Trio (+6) & Live Counter'
+        : 'Color (+1/+3), Pareja (+3), Escalera (+4), Trío (+6) y Marcador en Vivo',
       instructor: isEn ? 'Instructor Commander' : 'Comandante Instructor',
       content: isEn
         ? [
             'Base Card Values (1 to 4): Every card displays a green badge (1p, 2p, 3p, 4p) with its Casual base value: 2–6 = 1 pt | 7–10 = 2 pts | J, Q, K = 3 pts | Ace (A) = 4 pts.',
-            'Attention on Color Synergy (+2 pts): Unlike Competitive Mode, in Casual Mode you need 3 OR MORE cards of the same suit in the same front to earn a flat +2 bonus!',
-            'Other Synergies: Pair (2 equal ranks) = +2 pts | Short Straight (3 consecutive ranks) = +3 pts | Trio (3 equal ranks) = +4 pts (replaces Pair).',
+            'Color Synergy (+1 / +3 pts): Gathering exactly 2 cards of the same suit in a front grants +1 pt, and reaching 3 OR MORE cards of the same suit grants +3 total points (maximum flat suit bonus)!',
+            'Formation Synergies: Pair (2 equal ranks) now grants +3 pts (e.g. two 8s = 2p + 2p + 3 Pair = 7 pts on the live counter!) | Short Straight (3 consecutive ranks) = +4 pts | Trio (3 equal ranks) = +6 pts (cancels Pair).',
             'Real-Time Live Score & Shadow Security: Each front shows your team\'s REAL total (including your own team\'s Shadow Cards, which teammates know) and the rival\'s VISIBLE total (counting only face-up rival cards). Enemy Shadow Cards do NOT add points to the public counter until Revelation at the end of the round!',
           ]
         : [
             'Valores Base de las Cartas (1 al 4): Cada carta muestra una insignia verde (1p, 2p, 3p, 4p) con su valor en Modo Casual: 2 al 6 = 1 pto | 7 al 10 = 2 pts | J, Q, K = 3 pts | As (A) = 4 pts.',
-            '¡Ojo con la Sinergia de Color (+2 pts)! A diferencia del modo competitivo, en Modo Casual necesitas 3 O MÁS cartas del mismo palo en un mismo frente para obtener una bonificación única de +2 puntos totales.',
-            'Resto de Sinergias: Pareja (2 iguales) = +2 pts | Escalera Corta (3 consecutivas) = +3 pts | Trío (3 iguales) = +4 pts (anula la Pareja).',
+            'Sinergia de Color (+1 / +3 pts): Juntar exactamente 2 cartas del mismo palo en un frente otorga +1 punto, ¡y alcanzar 3 O MÁS cartas del mismo palo otorga +3 puntos totales (bonificación única y máxima)!',
+            'Sinergias de Formación: Pareja (2 iguales) ahora suma +3 pts en el contador en vivo (ej. dos 8s = 2p + 2p + 3 Pareja = ¡7 pts!) | Escalera Corta (3 consecutivas) = +4 pts | Trío (3 iguales) = +6 pts (anula la Pareja).',
             'Contador en Vivo y Seguridad de Sombras: Cada frente muestra en tiempo real el Total Real Aliado (incluyendo vuestras propias Cartas Sombra, conocidas por el equipo) y los Puntos Visibles del Rival. ¡Las Cartas Sombra enemigas NO suman en el marcador público hasta la Fase de Revelación!',
           ],
       buttonText: isEn ? 'View Personal Shadow Rule' : 'Ver Regla de 1 Sombra Personal',
@@ -212,8 +212,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Select your King of Hearts (K♥ = 3 pts) and deploy it to the Center Front.'
         : 'Selecciona tu Rey de Corazones (K♥ = 3 pts) y despliégalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'In Casual Mode, all Face Cards (J, Q, K) are worth 3 base points (notice the "3p" badge on K♥). Opening in the Center with K♥ puts your team ahead 3 to 0 on the live counter and starts building toward a 3-card Hearts Color bonus (+2 pts).'
-        : 'En el Modo Casual, todas las Figuras (J, Q, K) valen 3 puntos base (fíjate en la insignia "3p" de tu K♥). Abrir en el Centro con K♥ coloca el contador en vivo 3 a 0 a vuestro favor e inicia el camino hacia el Color de 3 Corazones (+2 pts).',
+        ? 'In Casual Mode, all Face Cards (J, Q, K) are worth 3 base points (notice the "3p" badge on K♥). Opening in the Center with K♥ puts your team ahead 3 to 0 on the live counter and starts building toward Hearts Color (+1 pt at 2 Hearts, +3 pts at 3+ Hearts).'
+        : 'En el Modo Casual, todas las Figuras (J, Q, K) valen 3 puntos base (fíjate en la insignia "3p" de tu K♥). Abrir en el Centro con K♥ coloca el contador en vivo 3 a 0 a vuestro favor e inicia el camino hacia el Color de Corazones (+1 pto con 2 cartas y +3 pts con 3 o más).',
       whyNotOthers: isEn
         ? [
             { cardLabel: '4 of Clubs (4♣ = 1p)', reason: 'Cards 2 to 6 are worth only 1 point in Casual Mode.' },
@@ -264,19 +264,19 @@ export function getCasualTutorialSteps(lang = 'es') {
       card: { id: 'card-qh', suit: 'hearts', rank: 'Q', base: 12 },
       frontKey: 'center',
       asShadow: false,
-      title: isEn ? "Ally A2's Turn: Preparing the 3-Card Color!" : 'Turno de Aliado A2: ¡Preparando el Color de 3 Cartas!',
+      title: isEn ? "Ally A2's Turn: 2-Card Color (+1 pt) & Preparing +3!" : 'Turno de Aliado A2: ¡Color de 2 Cartas (+1 pto) y Camino al +3!',
       actionSummary: isEn
         ? 'Ally A2 plays Queen of Hearts (Q♥ = 3 pts) on the Center Front.'
         : 'Aliado A2 juega la Reina de Corazones (Q♥ = 3 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'A2 adds Q♥ (3 pts) to your K♥ (3 pts). Notice a key Casual Mode difference: with 2 Hearts, your total is 3 + 3 = 6 pts (no bonus yet!). In Casual Mode, Color (+2 pts) activates when you reach 3 OR MORE cards of the same suit!'
-        : 'A2 suma su Q♥ (3 pts) a tu K♥ (3 pts). ¡Fíjate en esta diferencia clave del Modo Casual! Con 2 Corazones vuestro marcador en vivo suma 3 + 3 = 6 pts (aún sin bono). ¡En Modo Casual el bono de Color (+2 pts) se activa al reunir 3 O MÁS cartas del mismo palo!',
+        ? 'A2 adds Q♥ (3 pts) to your K♥ (3 pts). With 2 Hearts on the front, your team activates the first tier of Casual Color (+1 pt), bringing the live counter to 3 + 3 + 1 = 7 pts vs 3! And when you add a 3rd Heart, Color will jump to +3 total points!'
+        : 'A2 suma su Q♥ (3 pts) a tu K♥ (3 pts). ¡Al juntar exactamente 2 Corazones en el frente, activáis el primer escalón de Color (+1 pto), subiendo el marcador en vivo a 3 + 3 + 1 = 7 pts vs 3! Y al añadir el 3er Corazón, ¡el Color subirá al máximo de +3 puntos totales!',
       whyNotOthers: isEn
-        ? 'Having 2 Hearts on the table sets up your next turn to complete the 3rd Heart and trigger the +2 Color bonus.'
-        : 'Tener 2 Corazones en mesa deja listo el frente para que en tu próximo turno pongas el 3er Corazón y actives el +2 de Color.',
+        ? 'Having 2 Hearts on the table already grants +1 pt and sets up your next turn to complete the 3rd Heart (+3 pts total).'
+        : 'Tener 2 Corazones en mesa ya os da +1 pto de Color y deja listo el frente para que en tu próximo turno pongas el 3er Corazón (+3 pts totales).',
       tacticalInsight: isEn
-        ? 'Casual Color Rule: 3 or more cards of the same suit in a front = flat +2 bonus points!'
-        : 'Regla de Color en Modo Casual: 3 o más cartas del mismo palo en un mismo frente = ¡+2 puntos totales de bonificación!',
+        ? 'Rebalanced Casual Color Rule: 2 cards of the same suit = +1 pt | 3 or more cards of the same suit = +3 total bonus points (max)!'
+        : 'Regla Rebalanceada de Color en Modo Casual: 2 cartas del mismo palo = +1 pto | 3 o más cartas del mismo palo = ¡+3 puntos totales (bonificación máxima)!',
     },
 
     // PASO 6: TURNO 4 - RIVAL B2
@@ -295,8 +295,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Rival B2 plays King of Spades (K♠ = 3 pts) on the Right Front.'
         : 'Rival B2 juega el Rey de Picas (K♠ = 3 pts) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'Seeing your team leading 6 vs 3 in the Center, B2 opens the Right Front with K♠ (3 pts).'
-        : 'Al ver que domináis el Centro 6 a 3, B2 abre el Frente Derecho con su K♠ (3 pts).',
+        ? 'Seeing your team leading 7 vs 3 in the Center, B2 opens the Right Front with K♠ (3 pts).'
+        : 'Al ver que domináis el Centro 7 a 3, B2 abre el Frente Derecho con su K♠ (3 pts).',
       whyNotOthers: isEn
         ? 'Remember: winning 2 fronts awards +2 Round Points, and sweeping all 3 fronts awards +3 Round Points.'
         : 'Recuerda: ganar 2 frentes otorga +2 Puntos de Ronda y ganar los 3 frentes (Pleno) otorga +3 Puntos de Ronda.',
@@ -319,16 +319,16 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Select your Ten of Spades (10♠ = 2 pts) and deploy it to the Right Front.'
         : 'Selecciona tu Diez de Picas (10♠ = 2 pts) y despliégalo en el Frente Derecho.',
       whyThisCard: isEn
-        ? 'Cards from 7 to 10 are worth 2 base points ("2p") in Casual Mode. Playing 10♠ on the Right Front puts you right behind the rival (2 vs 3 pts) while keeping your 8♥ for the Center Color combo and your A♦ (4p) for the Left Front!'
-        : 'Las cartas del 7 al 10 valen 2 puntos base ("2p") en Modo Casual. Jugar el 10♠ en el Frente Derecho te deja muy cerca del rival (2 vs 3 pts), reservando tu 8♥ para completar el Color en el Centro y tu A♦ (4p) para la Izquierda.',
+        ? 'Cards from 7 to 10 are worth 2 base points ("2p") in Casual Mode. Playing 10♠ on the Right Front puts you right behind the rival (2 vs 3 pts) while keeping your 8♥ for the Center Color combo (+3 pts) and your A♦ (4p) for the Left Front!'
+        : 'Las cartas del 7 al 10 valen 2 puntos base ("2p") en Modo Casual. Jugar el 10♠ en el Frente Derecho te deja muy cerca del rival (2 vs 3 pts), reservando tu 8♥ para alcanzar el Color máximo (+3 pts) en el Centro y tu A♦ (4p) para la Izquierda.',
       whyNotOthers: isEn
         ? [
             { cardLabel: 'Ace of Diamonds (A♦ = 4p)', reason: 'Save your 4-point Ace to dominate the Left Front!' },
-            { cardLabel: '8 of Hearts (8♥ = 2p)', reason: 'We need 8♥ in the Center to reach 3 Hearts and trigger Color (+2 pts)!' },
+            { cardLabel: '8 of Hearts (8♥ = 2p)', reason: 'We need 8♥ in the Center to reach 3 Hearts and trigger the +3 max Color bonus!' },
           ]
         : [
             { cardLabel: 'As de Diamantes (A♦ = 4p)', reason: '¡Guarda tu As de 4 puntos para dominar el Frente Izquierdo!' },
-            { cardLabel: '8 de Corazones (8♥ = 2p)', reason: '¡Necesitamos el 8♥ en el Centro para llegar a 3 Corazones y activar el Color (+2 pts)!' },
+            { cardLabel: '8 de Corazones (8♥ = 2p)', reason: '¡Necesitamos el 8♥ en el Centro para llegar a 3 Corazones y activar el Color máximo (+3 pts)!' },
           ],
     },
 
@@ -348,14 +348,14 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Rival B1 plays Jack of Hearts (J♥ = 3 pts) on the Center Front.'
         : 'Rival B1 juega la Jota de Corazones (J♥ = 3 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'B1 adds J♥ (3 pts) to Q♦ (3 pts), tying the Center live counter at 6 vs 6!'
-        : 'B1 suma su J♥ (3 pts) a la Q♦ (3 pts), ¡empatando el contador en vivo del Centro 6 a 6!',
+        ? 'B1 adds J♥ (3 pts) to Q♦ (3 pts), bringing the Center live counter to 7 vs 6 (you still lead thanks to your +1 Color bonus!).'
+        : 'B1 suma su J♥ (3 pts) a la Q♦ (3 pts), dejando el contador en vivo del Centro 7 a 6 (¡seguís por delante gracias a vuestro +1 de Color!).',
       whyNotOthers: isEn
-        ? 'Even tied 6 vs 6, your K♥ is higher in nominal hierarchy than Q♦.'
-        : 'Incluso empatados 6 a 6, tu K♥ tiene mayor jerarquía nominal que su Q♦.',
+        ? 'B1 has two different suits (Q♦ and J♥), so they do not get the +1 Color bonus yet.'
+        : 'B1 tiene dos palos distintos (Q♦ y J♥), por lo que no suma el +1 de Color.',
       tacticalInsight: isEn
-        ? 'Now it is time to break the Center wide open with your personal Shadow Card and 3-Heart Color!'
-        : '¡Ahora romperemos el empate en el Centro con tu Carta Sombra personal y el Color de 3 Corazones!',
+        ? 'Now it is time to break the Center wide open with your personal Shadow Card and 3-Heart Color (+3 pts)!'
+        : '¡Ahora ampliaremos la ventaja en el Centro con tu Carta Sombra personal y el Color de 3 Corazones (+3 pts)!',
     },
 
     // PASO 9: TURNO 7 - ALIADO A2
@@ -377,11 +377,11 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'A2 opens the Left Front with J♦ (3 pts), giving your team a 3 vs 0 lead on the Left live counter.'
         : 'A2 abre el Frente Izquierdo con su J♦ (3 pts), poniendo el contador en vivo de la Izquierda 3 a 0 a vuestro favor.',
       whyNotOthers: isEn
-        ? 'Opening Diamonds on the Left prepares a future 3-Diamond Color combo with your Ace of Diamonds!'
-        : 'Abrir con Diamantes en la Izquierda prepara una futura sinergia de Color de 3 Diamantes con tu As de Diamantes.',
+        ? 'Opening Diamonds on the Left prepares a future Diamond Color combo (+1 / +3 pts) with your Ace of Diamonds!'
+        : 'Abrir con Diamantes en la Izquierda prepara una futura sinergia de Color de Diamantes (+1 / +3 pts) con tu As de Diamantes.',
       tacticalInsight: isEn
-        ? 'Look at all 3 live counters: Left (3 vs 0), Center (6 vs 6), Right (2 vs 3).'
-        : 'Mira los 3 contadores en vivo: Izquierdo (3 vs 0), Central (6 vs 6), Derecho (2 vs 3).',
+        ? 'Look at all 3 live counters: Left (3 vs 0), Center (7 vs 6), Right (2 vs 3).'
+        : 'Mira los 3 contadores en vivo: Izquierdo (3 vs 0), Central (7 vs 6), Derecho (2 vs 3).',
     },
 
     // PASO 10: TURNO 8 - RIVAL B2
@@ -395,22 +395,22 @@ export function getCasualTutorialSteps(lang = 'es') {
       card: { id: 'card-7s', suit: 'spades', rank: '7', base: 7 },
       frontKey: 'right',
       asShadow: false,
-      title: isEn ? "Rival B2's Turn: Adding Spades on the Right" : 'Turno de Rival B2: Refuerzo de Picas en la Derecha',
+      title: isEn ? "Rival B2's Turn: 2-Spade Color (+1 pt) on the Right" : 'Turno de Rival B2: Color de 2 Picas (+1 pto) en la Derecha',
       actionSummary: isEn
         ? 'Rival B2 plays 7 of Spades (7♠ = 2 pts) on the Right Front.'
         : 'Rival B2 juega el 7 de Picas (7♠ = 2 pts) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'B2 adds 7♠ (2 pts) to K♠ (3 pts) on the Right. Notice they have 2 Spades (3 + 2 = 5 pts), which does NOT trigger Color yet because Casual Mode requires 3+ cards of the same suit!'
-        : 'B2 añade el 7♠ (2 pts) a su K♠ (3 pts) en la Derecha. Fíjate que con 2 Picas suman 3 + 2 = 5 pts, ¡porque en Modo Casual aún no activan Color hasta reunir 3 cartas del mismo palo!',
+        ? 'B2 adds 7♠ (2 pts) to K♠ (3 pts) on the Right. With 2 Spades, Team B activates the 2-card Color bonus (+1 pt), bringing the Right live counter to 2 vs 6 pts (3 + 2 + 1 Color)!'
+        : 'B2 añade el 7♠ (2 pts) a su K♠ (3 pts) en la Derecha. ¡Al juntar 2 Picas, el Equipo B activa el bono de Color de 2 cartas (+1 pto), subiendo el marcador de la Derecha a 2 vs 6 pts (3 + 2 + 1 Color)!',
       whyNotOthers: isEn
-        ? 'B2 is preparing to add a 3rd Spade later to claim the +2 Color bonus on the Right.'
-        : 'B2 busca añadir una 3ª Pica más adelante para cobrar el +2 de Color en la Derecha.',
+        ? 'B2 is preparing to add a 3rd Spade later to upgrade their Color bonus from +1 to +3 pts on the Right.'
+        : 'B2 busca añadir una 3ª Pica más adelante para subir su bono de Color de +1 a +3 pts en la Derecha.',
       tacticalInsight: isEn
         ? 'Your turn is next: let\'s use your 1 personal Shadow Marker of the round!'
         : 'Te toca tirar: ¡vamos a usar tu Marcador de Sombra personal de esta ronda!',
     },
 
-    // PASO 11: TURNO 9 - HUMANO (A1) -> 1 SOMBRA PERSONAL FIJA + COLOR (+2)
+    // PASO 11: TURNO 9 - HUMANO (A1) -> 1 SOMBRA PERSONAL FIJA + COLOR 3+ (+3)
     {
       stepId: 11,
       type: 'player_turn',
@@ -419,20 +419,20 @@ export function getCasualTutorialSteps(lang = 'es') {
       requiredCardId: 'card-8h',
       requiredFrontKey: 'center',
       requireShadow: true,
-      title: isEn ? 'Turn 3: YOUR 1 PERSONAL SHADOW & COLOR (+2 PTS)!' : 'Tu Turno 3: ¡TU SOMBRA PERSONAL Y COLOR (+2 PTS)!',
+      title: isEn ? 'Turn 3: YOUR 1 PERSONAL SHADOW & MAX COLOR (+3 PTS)!' : 'Tu Turno 3: ¡TU SOMBRA PERSONAL Y COLOR MÁXIMO (+3 PTS)!',
       actionPrompt: isEn
         ? 'Activate "Play as Shadow (1/1)", select your 8 of Hearts (8♥ = 2 pts), and deploy it to the Center Front.'
         : 'Activa el botón "Jugar como Sombra (1/1)", selecciona tu 8 de Corazones (8♥ = 2 pts) y colócalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'In Casual Mode, every player gets 1 personal Shadow Marker per round. By playing 8♥ (2 pts) as a Shadow in the Center, your team reaches 3 Hearts (K♥, Q♥, 8♥) and activates COLOR (+2 pts)! Notice how your Allied Real Total on the Center counter immediately jumps to 10 pts (3 + 3 + 2 + 2 Color) because teammates know your Shadow, while rivals only see 6 visible pts + 1 hidden Shadow!'
-        : 'En Modo Casual, cada jugador recibe 1 Marcador de Sombra personal fijo por ronda. Al jugar tu 8♥ (2 pts) como Sombra en el Centro, vuestro equipo reúne 3 Corazones (K♥, Q♥, 8♥) y activa ¡COLOR (+2 pts)! Observa cómo vuestro Total Real Aliado en el contador del Centro sube al instante a 10 pts (3 + 3 + 2 + 2 Color) porque tu equipo conoce tu Sombra, ¡mientras que los rivales solo ven 6 pts visibles + 1 Sombra oculta!',
+        ? 'In Casual Mode, every player gets 1 personal Shadow Marker per round. By playing 8♥ (2 pts) as a Shadow in the Center, your team reaches 3 Hearts (K♥, Q♥, 8♥) and upgrades COLOR to its +3 pts maximum! Notice how your Allied Real Total on the Center counter immediately jumps to 11 pts (3 + 3 + 2 + 3 Color) because teammates know your Shadow, while rivals only see 7 visible pts + 1 hidden Shadow!'
+        : 'En Modo Casual, cada jugador recibe 1 Marcador de Sombra personal fijo por ronda. Al jugar tu 8♥ (2 pts) como Sombra en el Centro, vuestro equipo reúne 3 Corazones (K♥, Q♥, 8♥) y sube el bono de ¡COLOR al máximo (+3 pts)! Observa cómo vuestro Total Real Aliado en el contador del Centro sube al instante a 11 pts (3 + 3 + 2 + 3 Color) porque tu equipo conoce tu Sombra, ¡mientras que los rivales solo ven 7 pts visibles + 1 Sombra oculta!',
       whyNotOthers: isEn
         ? [
-            { cardLabel: '4 of Clubs (4♣ = 1p)', reason: 'Does not complete the 3-Heart Color bonus in the Center.' },
+            { cardLabel: '4 of Clubs (4♣ = 1p)', reason: 'Does not complete the 3-Heart Color bonus (+3 pts) in the Center.' },
             { cardLabel: 'Ace of Diamonds (A♦ = 4p)', reason: 'Reserved to win the Left Front!' },
           ]
         : [
-            { cardLabel: '4 de Tréboles (4♣ = 1p)', reason: 'No completaría los 3 Corazones para el bono de Color (+2) en el Centro.' },
+            { cardLabel: '4 de Tréboles (4♣ = 1p)', reason: 'No completaría los 3 Corazones para el bono máximo de Color (+3) en el Centro.' },
             { cardLabel: 'As de Diamantes (A♦ = 4p)', reason: 'Reservado para ganar el Frente Izquierdo.' },
           ],
     },
@@ -479,14 +479,14 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Ally A2 plays 9 of Hearts (9♥ = 2 pts) on the Center Front.'
         : 'Aliado A2 juega el 9 de Corazones (9♥ = 2 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'A2 adds 9♥ (2 pts) to the Center. Notice the Casual Mode rule: Color (+2 pts) is a single flat bonus for having 3 or more cards of the same suit, so 4 Hearts gives Base (3+3+2+2 = 10) + Color (+2) = 12 real allied points!'
-        : 'A2 añade el 9♥ (2 pts) al Centro. ¡Fíjate en la regla del Modo Casual! El Color (+2 pts) es una bonificación única por tener 3 o más cartas del mismo palo, así que con 4 Corazones sumáis Base (3+3+2+2 = 10) + Color (+2) = ¡12 puntos reales aliados!',
+        ? 'A2 adds 9♥ (2 pts) to the Center. Notice the Casual Mode rule: Color (+3 pts) is the maximum flat bonus upon reaching 3 or more cards of the same suit, so 4 Hearts gives Base (3+3+2+2 = 10) + Color (+3) = 13 real allied points!'
+        : 'A2 añade el 9♥ (2 pts) al Centro. ¡Fíjate en la regla del Modo Casual! El Color de 3+ cartas (+3 pts) es la bonificación única y máxima por palo, así que con 4 Corazones sumáis Base (3+3+2+2 = 10) + Color (+3) = ¡13 puntos reales aliados!',
       whyNotOthers: isEn
-        ? '12 points in Casual Mode is an almost unbeatable fortress in the Center.'
-        : '12 puntos en la Escala Comprimida del Modo Casual es una fortaleza casi inexpugnable en el Centro.',
+        ? '13 points in Casual Mode is an almost unbeatable fortress in the Center.'
+        : '13 puntos en la Escala Comprimida del Modo Casual es una fortaleza casi inexpugnable en el Centro.',
       tacticalInsight: isEn
-        ? 'Center Live Counter: 12 Allied Real Pts (incl. Shadow) vs 6 Rival Visible Pts.'
-        : 'Contador en Vivo del Centro: 12 Pts Reales Aliados (incl. Sombra) vs 6 Pts Visibles del Rival.',
+        ? 'Center Live Counter: 13 Allied Real Pts (incl. Shadow) vs 6 Rival Visible Pts.'
+        : 'Contador en Vivo del Centro: 13 Pts Reales Aliados (incl. Sombra) vs 6 Pts Visibles del Rival.',
     },
 
     // PASO 14: TURNO 12 - RIVAL B2 -> SOMBRA RIVAL (SEGURIDAD DE INFORMACIÓN OCULTA)
@@ -529,8 +529,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Select your Ace of Diamonds (A♦ = 4 pts) and deploy it to the Left Front.'
         : 'Selecciona tu As de Diamantes (A♦ = 4 pts) y despliégalo en el Frente Izquierdo.',
       whyThisCard: isEn
-        ? 'In Casual Mode, the Ace (A) is worth 4 base points ("4p") — the highest single card value! Placing A♦ on the Left Front alongside A2\'s J♦ (3p) brings your Left live counter to 7 pts and prepares a 3-Diamond Color bonus (+2 pts) when A2 plays their last Diamond!'
-        : 'En el Modo Casual, el As (A) vale 4 puntos base ("4p"), ¡el valor individual más alto del juego! Colocar tu A♦ en el Frente Izquierdo junto a la J♦ (3p) de A2 sube vuestro contador en vivo a 7 pts y deja preparado el Color de 3 Diamantes (+2 pts) para el último turno de A2.',
+        ? 'In Casual Mode, the Ace (A) is worth 4 base points ("4p") — the highest single card value! Placing A♦ on the Left Front alongside A2\'s J♦ (3p) activates 2-Diamond Color (+1 pt), bringing your Left live counter to 8 pts (3 + 4 + 1 Color) and preparing the +3 max Color bonus when A2 plays their 3rd Diamond!'
+        : 'En el Modo Casual, el As (A) vale 4 puntos base ("4p"), ¡el valor individual más alto del juego! Colocar tu A♦ en el Frente Izquierdo junto a la J♦ (3p) de A2 activa el Color de 2 Diamantes (+1 pto), subiendo vuestro contador en vivo a 8 pts (3 + 4 + 1 Color) y dejando preparado el Color máximo de 3 Diamantes (+3 pts) para el último turno de A2.',
       whyNotOthers: isEn
         ? [
             { cardLabel: '4 of Clubs (4♣ = 1p)', reason: 'Only 1 point and does not help build Diamond Color on the Left.' },
@@ -556,8 +556,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Rival B1 plays Two of Clubs (2♣ = 1 pt) on the Right Front.'
         : 'Rival B1 juega el Dos de Tréboles (2♣ = 1 pto) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'B1 adds 1 point to the Right Front (live counter: 2 vs 6 pts).'
-        : 'B1 suma 1 punto en el Frente Derecho (contador en vivo: 2 vs 6 pts).',
+        ? 'B1 adds 1 point to the Right Front (live counter: 2 vs 7 pts).'
+        : 'B1 suma 1 punto en el Frente Derecho (contador en vivo: 2 vs 7 pts).',
       whyNotOthers: isEn
         ? 'Note: In Casual Mode, there are NO cumulative points across rounds! Only Round Points (+1, +2, +3) matter.'
         : 'Nota clave: ¡En Modo Casual NO existen los puntos acumulados entre rondas! Solo importan los Puntos de Ronda (+1, +2, +3).',
@@ -582,11 +582,11 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Ally A2 plays Six of Spades (6♠ = 1 pt) on the Right Front.'
         : 'Aliado A2 juega el Seis de Picas (6♠ = 1 pto) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'A2 plays 6♠ (1 pt) on the Right, saving 3♦ for the final turn on the Left to complete your 3-Diamond Color (+2 pts)!'
-        : 'A2 juega su 6♠ (1 pto) en la Derecha, reservando su 3♦ para el último turno en la Izquierda con el que completará vuestro Color de 3 Diamantes (+2 pts).',
+        ? 'A2 plays 6♠ (1 pt) on the Right, saving 3♦ for the final turn on the Left to complete your 3-Diamond Color (+3 pts)!'
+        : 'A2 juega su 6♠ (1 pto) en la Derecha, reservando su 3♦ para el último turno en la Izquierda con el que completará vuestro Color de 3 Diamantes (+3 pts).',
       whyNotOthers: isEn
-        ? 'Notice that on the Right you have 10♠ (2p) and 6♠ (1p) = 3 pts (2 Spades do not give Color in Casual Mode).'
-        : 'Observa que en la Derecha tenéis 10♠ (2p) y 6♠ (1p) = 3 pts (2 Picas no dan Color en Modo Casual).',
+        ? 'Notice that on the Right you now have 10♠ (2p) + 6♠ (1p) + 2-Spade Color (+1) = 4 pts.'
+        : 'Observa que en la Derecha tenéis ahora 10♠ (2p) + 6♠ (1p) + Color de 2 Picas (+1) = 4 pts.',
       tacticalInsight: isEn
         ? 'One last card in your hand!'
         : '¡Te queda una última carta en la mano!',
@@ -608,11 +608,11 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Rival B2 plays Four of Diamonds (4♦ = 1 pt) on the Left Front.'
         : 'Rival B2 juega el Cuatro de Diamantes (4♦ = 1 pto) en el Frente Izquierdo.',
       whyPlayed: isEn
-        ? 'B2 places 4♦ (1 pt) on the Left. Visible rival score on the Left is now 2 pts (5♦ + 4♦) plus their hidden Shadow Card!'
-        : 'B2 coloca su 4♦ (1 pto) en la Izquierda. La puntuación visible del rival en la Izquierda es ahora de 2 pts (5♦ + 4♦) más su Carta Sombra oculta.',
+        ? 'B2 places 4♦ (1 pt) on the Left. Visible rival score on the Left is now 3 pts (5♦ + 4♦ + 1 Color for 2 visible Diamonds) plus their hidden Shadow Card!'
+        : 'B2 coloca su 4♦ (1 pto) en la Izquierda. La puntuación visible del rival en la Izquierda es ahora de 3 pts (5♦ + 4♦ + 1 de Color por 2 Diamantes visibles) más su Carta Sombra oculta.',
       whyNotOthers: isEn
-        ? 'Even if their hidden card is a Diamond (giving them 3 Diamonds = +2 Color), your J♦ (3p) + A♦ (4p) + A2\'s upcoming 3♦ (1p) + Color (+2) = 10 pts will crush them!'
-        : 'Aunque su carta oculta sea otro Diamante (dándoles 3 Diamantes = +2 Color), vuestra J♦ (3p) + A♦ (4p) + el 3♦ (1p) de A2 + Color (+2) = ¡10 pts os darán la victoria!',
+        ? 'Even if their hidden card is a Diamond (giving them 3 Diamonds = +3 Color), your J♦ (3p) + A♦ (4p) + A2\'s upcoming 3♦ (1p) + Color (+3) = 11 pts will crush them!'
+        : 'Aunque su carta oculta sea otro Diamante (dándoles 3 Diamantes = +3 Color), vuestra J♦ (3p) + A♦ (4p) + el 3♦ (1p) de A2 + Color (+3) = ¡11 pts os darán la victoria!',
       tacticalInsight: isEn
         ? 'Time for your final card of the round!'
         : '¡Hora de jugar tu última carta de la ronda!',
@@ -654,8 +654,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Deployment Complete: Watch the Final Live Counters!'
         : 'Fin del Despliegue: ¡Observa los Contadores en Vivo!',
       actionSummary: isEn
-        ? 'B1 plays 9♠ (2p) on the Right (reaching 3 Spades = +2 Color!), Ally A2 plays 3♦ (1p) on the Left (reaching 3 Diamonds = +2 Color!), and Rival B2 plays 5♥ (1p) in the Center.'
-        : 'B1 juega 9♠ (2p) en la Derecha (¡logrando 3 Picas = +2 Color!), Aliado A2 juega 3♦ (1p) en la Izquierda (¡logrando 3 Diamantes = +2 Color!) y Rival B2 juega 5♥ (1p) en el Centro.',
+        ? 'B1 plays 9♠ (2p) on the Right (reaching 3 Spades = +3 Color!), Ally A2 plays 3♦ (1p) on the Left (reaching 3 Diamonds = +3 Color!), and Rival B2 plays 5♥ (1p) in the Center (reaching 2 Hearts = +1 Color!).'
+        : 'B1 juega 9♠ (2p) en la Derecha (¡logrando 3 Picas = +3 Color!), Aliado A2 juega 3♦ (1p) en la Izquierda (¡logrando 3 Diamantes = +3 Color!) y Rival B2 juega 5♥ (1p) en el Centro (¡2 Corazones = +1 Color!).',
       whyPlayed: isEn
         ? 'All 20 cards are on the table! In the next step, Shadow Cards flip face-up and the live counters update with the final revealed score of both teams.'
         : '¡Las 20 cartas están en mesa! En el siguiente paso se voltean las Cartas Sombra y los contadores de cada frente se actualizan con el total definitivo de ambos equipos.',

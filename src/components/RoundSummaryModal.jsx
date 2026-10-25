@@ -297,22 +297,22 @@ export function RoundSummaryModal({
                           Base: {teamBScore.baseTotal}
                         </span>
                         {teamBScore.suitSynergyTotal > 0 && (
-                          <span className="bg-indigo-950/90 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isCasual ? (isEn ? "Color Synergy (+2 pts for 3+)" : "Color (+2 pts por 3+)") : (isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)")}>
+                          <span className="bg-indigo-950/90 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isCasual ? (isEn ? "Color Synergy (2 cards: +1 pt / 3+ cards: +3 pts)" : "Color (2 cartas: +1 pt / 3+ cartas: +3 pts)") : (isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)")}>
                             {isCasual ? (isEn ? 'Color' : 'Color') : (isEn ? 'Suit' : 'Palo')} +{teamBScore.suitSynergyTotal}
                           </span>
                         )}
                         {teamBScore.pairTotal > 0 && (
-                          <span className="bg-amber-950/90 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isCasual ? (isEn ? "Pair (+2)" : "Pareja (+2)") : (isEn ? "Pair (+10)" : "Pareja (+10)")}>
+                          <span className="bg-amber-950/90 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isCasual ? (isEn ? "Pair (+3)" : "Pareja (+3)") : (isEn ? "Pair (+10)" : "Pareja (+10)")}>
                             {isEn ? 'Pair' : 'Pareja'} +{teamBScore.pairTotal}
                           </span>
                         )}
                         {teamBScore.straightTotal > 0 && (
-                          <span className="bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isCasual ? (isEn ? "Short Straight (+3)" : "Escalera Corta (+3)") : (isEn ? "Short Straight (+15)" : "Escalera Corta (+15)")}>
+                          <span className="bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isCasual ? (isEn ? "Short Straight (+4)" : "Escalera Corta (+4)") : (isEn ? "Short Straight (+15)" : "Escalera Corta (+15)")}>
                             {isEn ? 'Straight' : 'Escalera'} +{teamBScore.straightTotal}
                           </span>
                         )}
                         {teamBScore.trioTotal > 0 && (
-                          <span className="bg-rose-950/90 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isCasual ? (isEn ? "Trio (+4)" : "Trío (+4)") : (isEn ? "Trio (+20)" : "Trío (+20)")}>
+                          <span className="bg-rose-950/90 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isCasual ? (isEn ? "Trio (+6)" : "Trío (+6)") : (isEn ? "Trio (+20)" : "Trío (+20)")}>
                             {isEn ? 'Trio' : 'Trío'} +{teamBScore.trioTotal}
                           </span>
                         )}
@@ -365,22 +365,22 @@ export function RoundSummaryModal({
                           Base: {teamAScore.baseTotal}
                         </span>
                         {teamAScore.suitSynergyTotal > 0 && (
-                          <span className="bg-indigo-950/90 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isCasual ? (isEn ? "Color Synergy (+2 pts for 3+)" : "Color (+2 pts por 3+)") : (isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)")}>
+                          <span className="bg-indigo-950/90 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isCasual ? (isEn ? "Color Synergy (2 cards: +1 pt / 3+ cards: +3 pts)" : "Color (2 cartas: +1 pt / 3+ cartas: +3 pts)") : (isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)")}>
                             {isCasual ? (isEn ? 'Color' : 'Color') : (isEn ? 'Suit' : 'Palo')} +{teamAScore.suitSynergyTotal}
                           </span>
                         )}
                         {teamAScore.pairTotal > 0 && (
-                          <span className="bg-amber-950/90 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isCasual ? (isEn ? "Pair (+2)" : "Pareja (+2)") : (isEn ? "Pair (+10)" : "Pareja (+10)")}>
+                          <span className="bg-amber-950/90 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isCasual ? (isEn ? "Pair (+3)" : "Pareja (+3)") : (isEn ? "Pair (+10)" : "Pareja (+10)")}>
                             {isEn ? 'Pair' : 'Pareja'} +{teamAScore.pairTotal}
                           </span>
                         )}
                         {teamAScore.straightTotal > 0 && (
-                          <span className="bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isCasual ? (isEn ? "Short Straight (+3)" : "Escalera Corta (+3)") : (isEn ? "Short Straight (+15)" : "Escalera Corta (+15)")}>
+                          <span className="bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isCasual ? (isEn ? "Short Straight (+4)" : "Escalera Corta (+4)") : (isEn ? "Short Straight (+15)" : "Escalera Corta (+15)")}>
                             {isEn ? 'Straight' : 'Escalera'} +{teamAScore.straightTotal}
                           </span>
                         )}
                         {teamAScore.trioTotal > 0 && (
-                          <span className="bg-rose-950/90 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isCasual ? (isEn ? "Trio (+4)" : "Trío (+4)") : (isEn ? "Trio (+20)" : "Trío (+20)")}>
+                          <span className="bg-rose-950/90 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isCasual ? (isEn ? "Trio (+6)" : "Trío (+6)") : (isEn ? "Trio (+20)" : "Trío (+20)")}>
                             {isEn ? 'Trio' : 'Trío'} +{teamAScore.trioTotal}
                           </span>
                         )}

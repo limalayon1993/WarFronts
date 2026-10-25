@@ -876,11 +876,11 @@ export function FullManualModal({ isOpen, onClose }) {
                   )}
                 </p>
 
-                {/* 1. Conteo Rápido de Frentes ("Escala Comprimida") */}
+                {/* 1. Conteo Rápido de Frentes ("Escala Comprimida Rebalanceada") */}
                 <div className="bg-slate-900/80 border border-amber-500/30 p-4 rounded-xl space-y-3">
                   <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                     <h4 className="font-bold text-amber-400">
-                      {isEn ? '1. Fast Front Counting ("Compressed Scale")' : '1. Conteo Rápido de Frentes ("Escala Comprimida")'}
+                      {isEn ? '1. Fast Front Counting ("Rebalanced Compressed Scale")' : '1. Conteo Rápido de Frentes ("Escala Comprimida Rebalanceada")'}
                     </h4>
                     <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded font-mono font-bold">
                       {isEn ? 'Scale 1 to 4' : 'Escala 1 al 4'}
@@ -889,9 +889,9 @@ export function FullManualModal({ isOpen, onClose }) {
 
                   <p className="text-xs sm:text-sm text-slate-300">
                     {isEn ? (
-                      <>So that any player can calculate at a glance who dominates each front without doing two-digit additions, Competitive Mode values are replaced by the following simplified scale:</>
+                      <>So that any player can calculate at a glance who dominates each front without doing two-digit additions, while preserving the full strategic weight of team combinations, Competitive Mode values are replaced by the following simplified scale:</>
                     ) : (
-                      <>Para que cualquier jugador pueda calcular de un vistazo quién domina cada frente sin hacer sumas de dos dígitos, se sustituyen los valores del Modo Competitivo por la siguiente escala simplificada:</>
+                      <>Para que cualquier jugador pueda calcular de un vistazo quién domina cada frente sin hacer sumas de dos dígitos, pero manteniendo intacto el peso estratégico de las combinaciones en equipo, se sustituyen los valores del Modo Competitivo por la siguiente escala simplificada:</>
                     )}
                   </p>
 
@@ -921,24 +921,26 @@ export function FullManualModal({ isOpen, onClose }) {
 
                   <div className="space-y-2 pt-1">
                     <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                      {isEn ? 'Simplified Synergy Bonuses:' : 'Bonificaciones por Sinergia Simplificadas:'}
+                      {isEn ? 'Rebalanced Synergy Bonuses:' : 'Bonificaciones por Sinergia Rebalanceadas:'}
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
                       <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-emerald-400">{isEn ? 'Flush / Color (3+ cards of the same suit on the front):' : 'Color (3 o más cartas del mismo palo en el frente):'}</strong>{' '}
-                        {isEn ? '+2 total points (single flat bonus upon reaching at least 3 cards of the same suit).' : '+2 puntos totales (bonificación única al alcanzar al menos 3 cartas del mismo palo).'}
+                        <strong className="text-emerald-400">{isEn ? 'Color (Same suit):' : 'Color (Mismo palo):'}</strong>{' '}
+                        {isEn
+                          ? '+1 point (when gathering exactly 2 cards of the same suit on the front) and +3 total points (single maximum bonus upon reaching 3 or more cards of the same suit).'
+                          : '+1 punto (al juntar exactamente 2 cartas del mismo palo en el frente) y +3 puntos totales (bonificación única y máxima al alcanzar 3 o más cartas del mismo palo).'}
                       </div>
                       <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
                         <strong className="text-sky-400">{isEn ? 'Pair (2 cards of the same rank):' : 'Pareja (2 cartas del mismo número/letra):'}</strong>{' '}
-                        {isEn ? '+2 points.' : '+2 puntos.'}
-                      </div>
-                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-purple-400">{isEn ? 'Short Straight (3 consecutive nominal rank cards):' : 'Escalera Corta (3 cartas de valor nominal consecutivo):'}</strong>{' '}
                         {isEn ? '+3 points.' : '+3 puntos.'}
                       </div>
                       <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
+                        <strong className="text-purple-400">{isEn ? 'Short Straight (3 consecutive nominal rank cards):' : 'Escalera Corta (3 cartas de valor nominal consecutivo):'}</strong>{' '}
+                        {isEn ? '+4 points.' : '+4 puntos.'}
+                      </div>
+                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
                         <strong className="text-rose-400">{isEn ? 'Trio (3 cards of the same rank):' : 'Trío (3 cartas del mismo número/letra):'}</strong>{' '}
-                        {isEn ? '+4 points (cancels the Pair bonus for those same cards).' : '+4 puntos (anula la bonificación de Pareja de esas mismas cartas).'}
+                        {isEn ? '+6 points (cancels the Pair bonus for those same cards).' : '+6 puntos (anula la bonificación de Pareja de esas mismas cartas).'}
                       </div>
                     </div>
                   </div>

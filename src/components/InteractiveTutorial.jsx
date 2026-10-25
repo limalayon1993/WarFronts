@@ -404,13 +404,13 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
               </div>
               {isCasual ? (
                 <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
-                  <span className="text-indigo-300 font-mono">+2 {isEn ? 'Color (3+)' : 'Color (3+)'}</span>
+                  <span className="text-indigo-300 font-mono">+1/+3 {isEn ? 'Color (2/3+)' : 'Color (2/3+)'}</span>
                   <span className="text-slate-600">•</span>
-                  <span className="text-emerald-300 font-mono">+2 {isEn ? 'Pair' : 'Pareja'}</span>
+                  <span className="text-emerald-300 font-mono">+3 {isEn ? 'Pair' : 'Pareja'}</span>
                   <span className="text-slate-600">•</span>
-                  <span className="text-amber-300 font-mono">+3 {isEn ? 'Straight' : 'Escalera'}</span>
+                  <span className="text-amber-300 font-mono">+4 {isEn ? 'Straight' : 'Escalera'}</span>
                   <span className="text-slate-600">•</span>
-                  <span className="text-rose-300 font-mono">+4 {isEn ? 'Trio' : 'Trío'}</span>
+                  <span className="text-rose-300 font-mono">+6 {isEn ? 'Trio' : 'Trío'}</span>
                 </div>
               ) : (
                 <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
@@ -1062,6 +1062,66 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
               ))}
             </div>
 
+            {/* Simulación visual de Sinergias Rebalanceadas y Contador en Vivo (Paso 1 Casual) */}
+            {currentStep.stage === 'trump_reveal' && isCasual && (
+              <div className="bg-slate-950 p-3.5 rounded-xl border border-emerald-500/40 mb-4 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-emerald-400" />
+                    {isEn ? 'Rebalanced Synergies & Live Counter Example' : 'Sinergias Rebalanceadas y Ejemplo en Contador en Vivo'}
+                  </span>
+                  <span className="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-mono font-bold">
+                    {isEn ? 'Live Auto-Sum' : 'Suma en Vivo'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-center text-[10px]">
+                  <div className="bg-slate-900/90 border border-indigo-500/40 p-2 rounded-lg">
+                    <span className="text-indigo-300 font-bold block">{isEn ? 'Color (2 / 3+)' : 'Color (2 / 3+)'}</span>
+                    <strong className="text-sm font-black font-mono text-indigo-200">+1 / +3 pts</strong>
+                  </div>
+                  <div className="bg-slate-900/90 border border-emerald-500/40 p-2 rounded-lg">
+                    <span className="text-emerald-300 font-bold block">{isEn ? 'Pair (2 eq.)' : 'Pareja (2 ig.)'}</span>
+                    <strong className="text-sm font-black font-mono text-emerald-200">+3 pts</strong>
+                  </div>
+                  <div className="bg-slate-900/90 border border-amber-500/40 p-2 rounded-lg">
+                    <span className="text-amber-300 font-bold block">{isEn ? 'Straight (3)' : 'Escalera (3)'}</span>
+                    <strong className="text-sm font-black font-mono text-amber-200">+4 pts</strong>
+                  </div>
+                  <div className="bg-slate-900/90 border border-rose-500/40 p-2 rounded-lg">
+                    <span className="text-rose-300 font-bold block">{isEn ? 'Trio (3 eq.)' : 'Trío (3 ig.)'}</span>
+                    <strong className="text-sm font-black font-mono text-rose-200">+6 pts</strong>
+                  </div>
+                </div>
+
+                {/* Ejemplo visual animado de Pareja (+3) en el contador en vivo */}
+                <div className="bg-emerald-950/50 border border-emerald-500/40 rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-[10px] font-bold uppercase text-emerald-300">
+                      {isEn ? 'Visual Example (Pair):' : 'Ejemplo Visual (Pareja):'}
+                    </span>
+                    <span className="bg-slate-900 text-slate-100 border border-slate-700 px-2 py-0.5 rounded font-mono font-bold text-[11px]">
+                      8♠ (2p)
+                    </span>
+                    <span className="text-slate-400 font-bold">+</span>
+                    <span className="bg-slate-900 text-rose-300 border border-slate-700 px-2 py-0.5 rounded font-mono font-bold text-[11px]">
+                      8♦ (2p)
+                    </span>
+                    <span className="text-slate-400 font-bold">+</span>
+                    <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 px-2 py-0.5 rounded font-mono font-black text-[11px] animate-pulse">
+                      {isEn ? 'Pair +3 pts' : 'Pareja +3 pts'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5 bg-slate-950/90 border border-emerald-400/60 px-2.5 py-1 rounded-lg shadow">
+                    <span className="text-[10px] text-slate-400 uppercase font-bold">
+                      {isEn ? 'Live Counter:' : 'Contador en Vivo:'}
+                    </span>
+                    <span className="text-sm font-black font-mono text-emerald-300">7 pts</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Simulación visual del Reloj (20s Individual en Casual vs Dual en Competitivo) */}
             {currentStep.stage === 'team_clock' && (
               isCasual ? (
@@ -1228,12 +1288,12 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
 
                       <div className="my-3 text-center">
                         <div className="text-2xl font-black font-mono">
-                          <span className="text-emerald-400">12</span>
+                          <span className="text-emerald-400">13</span>
                           <span className="text-slate-600 text-sm mx-2">vs</span>
-                          <span className="text-rose-400">7</span>
+                          <span className="text-rose-400">8</span>
                         </div>
                         <div className="text-[10px] text-slate-400 mt-0.5">
-                          {isEn ? 'Compressed Scale + Color (+2)' : 'Escala Comprimida + Color (+2)'}
+                          {isEn ? 'Compressed Scale + Color (+3 vs +1)' : 'Escala Comprimida + Color (+3 vs +1)'}
                         </div>
                       </div>
 
@@ -1241,16 +1301,16 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                         <div>
                           <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
                           {isEn
-                            ? 'K♥ (3) + Q♥ (3) + shadow 8♥ (2) + 9♥ (2) + Color 3+ Hearts (+2 pts) = '
-                            : 'K♥ (3) + Q♥ (3) + 8♥ sombra (2) + 9♥ (2) + Color 3+ Corazones (+2 pts) = '}
-                          <strong>12 pts</strong>.
+                            ? 'K♥ (3) + Q♥ (3) + shadow 8♥ (2) + 9♥ (2) + Color 3+ Hearts (+3 pts) = '
+                            : 'K♥ (3) + Q♥ (3) + 8♥ sombra (2) + 9♥ (2) + Color 3+ Corazones (+3 pts) = '}
+                          <strong>13 pts</strong>.
                         </div>
                         <div>
                           <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
                           {isEn
-                            ? 'Q♦ (3) + J♥ (3) + 5♥ (1) (only 2 Hearts = no Color) = '
-                            : 'Q♦ (3) + J♥ (3) + 5♥ (1) (solo 2 Corazones = sin Color) = '}
-                          <strong>7 pts</strong>.
+                            ? 'Q♦ (3) + J♥ (3) + 5♥ (1) + Color 2 Hearts (+1 pt) = '
+                            : 'Q♦ (3) + J♥ (3) + 5♥ (1) + Color 2 Corazones (+1 pto) = '}
+                          <strong>8 pts</strong>.
                         </div>
                       </div>
                     </div>
@@ -1270,12 +1330,12 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
 
                       <div className="my-3 text-center">
                         <div className="text-2xl font-black font-mono">
-                          <span className="text-emerald-400">10</span>
+                          <span className="text-emerald-400">11</span>
                           <span className="text-slate-600 text-sm mx-2">vs</span>
-                          <span className="text-rose-400">6</span>
+                          <span className="text-rose-400">7</span>
                         </div>
                         <div className="text-[10px] text-slate-400 mt-0.5">
-                          {isEn ? '4-pt Ace + Diamond Color (+2)' : 'As de 4 pts + Color Diamantes (+2)'}
+                          {isEn ? '4-pt Ace + Diamond Color (+3)' : 'As de 4 pts + Color Diamantes (+3)'}
                         </div>
                       </div>
 
@@ -1283,16 +1343,16 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                         <div>
                           <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
                           {isEn
-                            ? 'J♦ (3) + Your Ace A♦ (4) + 3♦ (1) + Color 3 Diamonds (+2 pts) = '
-                            : 'J♦ (3) + Tu As A♦ (4) + 3♦ (1) + Color 3 Diamantes (+2 pts) = '}
-                          <strong>10 pts</strong>.
+                            ? 'J♦ (3) + Your Ace A♦ (4) + 3♦ (1) + Color 3 Diamonds (+3 pts) = '
+                            : 'J♦ (3) + Tu As A♦ (4) + 3♦ (1) + Color 3 Diamantes (+3 pts) = '}
+                          <strong>11 pts</strong>.
                         </div>
                         <div>
                           <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
                           {isEn
-                            ? '5♦ (1) + Revealed shadow 10♦ (2) + 4♦ (1) + Color 3 Diamonds (+2 pts) = '
-                            : '5♦ (1) + Sombra 10♦ revelada (2) + 4♦ (1) + Color 3 Diamantes (+2 pts) = '}
-                          <strong>6 pts</strong>.
+                            ? '5♦ (1) + Revealed shadow 10♦ (2) + 4♦ (1) + Color 3 Diamonds (+3 pts) = '
+                            : '5♦ (1) + Sombra 10♦ revelada (2) + 4♦ (1) + Color 3 Diamantes (+3 pts) = '}
+                          <strong>7 pts</strong>.
                         </div>
                       </div>
                     </div>
@@ -1312,12 +1372,12 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
 
                       <div className="my-3 text-center">
                         <div className="text-2xl font-black font-mono">
-                          <span className="text-emerald-400">4</span>
+                          <span className="text-emerald-400">5</span>
                           <span className="text-slate-600 text-sm mx-2">vs</span>
-                          <span className="text-rose-400">10</span>
+                          <span className="text-rose-400">11</span>
                         </div>
                         <div className="text-[10px] text-slate-400 mt-0.5">
-                          {isEn ? 'Rival 3-Spade Color (+2)' : 'Color de 3 Picas del rival (+2)'}
+                          {isEn ? 'Rival 3-Spade Color (+3 vs +1)' : 'Color de 3 Picas del rival (+3 vs +1)'}
                         </div>
                       </div>
 
@@ -1325,16 +1385,16 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                         <div>
                           <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
                           {isEn
-                            ? '10♠ (2) + 6♠ (1) + 4♣ (1) (only 2 Spades = no Color) = '
-                            : '10♠ (2) + 6♠ (1) + 4♣ (1) (solo 2 Picas = sin Color) = '}
-                          <strong>4 pts</strong>.
+                            ? '10♠ (2) + 6♠ (1) + 4♣ (1) + Color 2 Spades (+1 pt) = '
+                            : '10♠ (2) + 6♠ (1) + 4♣ (1) + Color 2 Picas (+1 pto) = '}
+                          <strong>5 pts</strong>.
                         </div>
                         <div>
                           <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
                           {isEn
-                            ? 'K♠ (3) + 7♠ (2) + 2♣ (1) + 9♠ (2) + Color 3 Spades (+2 pts) = '
-                            : 'K♠ (3) + 7♠ (2) + 2♣ (1) + 9♠ (2) + Color 3 Picas (+2 pts) = '}
-                          <strong>10 pts</strong>.
+                            ? 'K♠ (3) + 7♠ (2) + 2♣ (1) + 9♠ (2) + Color 3 Spades (+3 pts) = '
+                            : 'K♠ (3) + 7♠ (2) + 2♣ (1) + 9♠ (2) + Color 3 Picas (+3 pts) = '}
+                          <strong>11 pts</strong>.
                         </div>
                       </div>
                     </div>
@@ -1639,10 +1699,10 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                 <div className="flex items-start gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEn ? '1. Compressed Scale (1–4) & Synergies:' : '1. Escala Comprimida (1 al 4) y Sinergias:'}</strong>{' '}
+                    <strong>{isEn ? '1. Rebalanced Compressed Scale (1–4) & Synergies:' : '1. Escala Comprimida Rebalanceada (1 al 4) y Sinergias:'}</strong>{' '}
                     {isEn
-                      ? '2–6 = 1 pt, 7–10 = 2 pts, J–K = 3 pts, Ace = 4 pts. Color (3+ of same suit) = +2 pts total, Pair = +2 pts, Straight = +3 pts, Trio = +4 pts.'
-                      : '2–6 = 1 pto, 7–10 = 2 pts, J–K = 3 pts, As = 4 pts. Color (3+ del mismo palo) = +2 pts totales, Pareja = +2 pts, Escalera = +3 pts, Trío = +4 pts.'}
+                      ? '2–6 = 1 pt, 7–10 = 2 pts, J–K = 3 pts, Ace = 4 pts. Color (same suit): 2 cards = +1 pt / 3+ cards = +3 pts max, Pair = +3 pts, Straight = +4 pts, Trio = +6 pts.'
+                      : '2–6 = 1 pto, 7–10 = 2 pts, J–K = 3 pts, As = 4 pts. Color (mismo palo): 2 cartas = +1 pto / 3+ cartas = +3 pts máx., Pareja = +3 pts, Escalera = +4 pts, Trío = +6 pts.'}
                   </span>
                 </div>
                 <div className="flex items-start gap-2 text-slate-200">

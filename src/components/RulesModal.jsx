@@ -297,10 +297,10 @@ export function RulesModal({ isOpen, onClose }) {
                   <li className="bg-slate-900 p-2 rounded border border-slate-800 text-center"><strong className="text-amber-400">As (A)</strong> = 4 pts</li>
                 </ul>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-emerald-400">{isEn ? 'Color (3+ same suit):' : 'Color (3+ mismo palo):'}</strong> +2 pts {isEn ? 'total' : 'totales'}</li>
-                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-sky-400">{isEn ? 'Pair:' : 'Pareja:'}</strong> +2 pts</li>
-                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-purple-400">{isEn ? 'Short Straight (3):' : 'Escalera Corta (3):'}</strong> +3 pts</li>
-                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-rose-400">{isEn ? 'Trio:' : 'Trío:'}</strong> +4 pts ({isEn ? 'cancels Pair' : 'anula Pareja'})</li>
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-emerald-400">{isEn ? 'Color (2 / 3+ same suit):' : 'Color (2 / 3+ mismo palo):'}</strong> +1 / +3 pts {isEn ? 'max' : 'máx.'}</li>
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-sky-400">{isEn ? 'Pair:' : 'Pareja:'}</strong> +3 pts</li>
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-purple-400">{isEn ? 'Short Straight (3):' : 'Escalera Corta (3):'}</strong> +4 pts</li>
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-rose-400">{isEn ? 'Trio:' : 'Trío:'}</strong> +6 pts ({isEn ? 'cancels Pair' : 'anula Pareja'})</li>
                 </ul>
               </div>
 

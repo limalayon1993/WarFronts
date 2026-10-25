@@ -265,15 +265,15 @@ export function chooseBotMove({
       const shouldRewardSynergies = !fa.isSecured && !(fa.isMineUncontested && fa.myScore >= 16 * scale);
 
       if (shouldRewardSynergies) {
-        // Trío (+20 competitivo / +4 casual)
+        // Trío (+20 competitivo / +6 casual)
         if (newScoreObj.trioTotal > fa.myScoreObj.trioTotal) {
           rating += 16;
         }
-        // Escalera (+15 competitivo / +3 casual)
+        // Escalera (+15 competitivo / +4 casual)
         else if (newScoreObj.straightTotal > fa.myScoreObj.straightTotal) {
           rating += 14;
         }
-        // Pareja (+10 competitivo / +2 casual)
+        // Pareja (+10 competitivo / +3 casual)
         else if (newScoreObj.pairTotal > fa.myScoreObj.pairTotal) {
           rating += 10;
         }

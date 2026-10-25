@@ -125,6 +125,7 @@ export function FrontZone({
     // Tríos
     (score.trios || []).forEach((trio, idx) => {
       const isHovered = hoveredSynergyFilter?.side === side && hoveredSynergyFilter?.type === 'trio' && hoveredSynergyFilter?.value === trio.base;
+      const bonusVal = trio.bonus ?? (isCasual ? 6 : 20);
       chips.push(
         <span
           key={`trio-${trio.base}-${idx}`}
@@ -135,9 +136,9 @@ export function FrontZone({
               ? 'bg-purple-800 text-purple-100 border-purple-400 scale-105 shadow-md shadow-purple-900/60 ring-1 ring-purple-300'
               : 'bg-purple-950/80 text-purple-200 border-purple-700/60 hover:border-purple-400'
           }`}
-          title={isEn ? `Trio of ${trio.rank}s (+${isCasual ? 4 : 20} pts)` : `Trío de ${trio.rank}s (+${isCasual ? 4 : 20} pts)`}
+          title={isEn ? `Trio of ${trio.rank}s (+${bonusVal} pts)` : `Trío de ${trio.rank}s (+${bonusVal} pts)`}
         >
-          <span>✦ {isEn ? 'Trio' : 'Trío'} {trio.rank}{isCasual ? ' (+4)' : ''}</span>
+          <span>✦ {isEn ? 'Trio' : 'Trío'} {trio.rank}{isCasual ? ` (+${bonusVal})` : ''}</span>
         </span>
       );
     });
@@ -145,6 +146,7 @@ export function FrontZone({
     // Parejas
     (score.pairs || []).forEach((pair, idx) => {
       const isHovered = hoveredSynergyFilter?.side === side && hoveredSynergyFilter?.type === 'pair' && hoveredSynergyFilter?.value === pair.base;
+      const bonusVal = pair.bonus ?? (isCasual ? 3 : 10);
       chips.push(
         <span
           key={`pair-${pair.base}-${idx}`}
@@ -155,9 +157,9 @@ export function FrontZone({
               ? 'bg-amber-600 text-stone-950 border-amber-300 scale-105 shadow-md shadow-amber-900/60 ring-1 ring-amber-300'
               : 'bg-amber-950/80 text-amber-200 border-amber-600/60 hover:border-amber-400'
           }`}
-          title={isEn ? `Pair of ${pair.rank}s (+${isCasual ? 2 : 10} pts)` : `Pareja de ${pair.rank}s (+${isCasual ? 2 : 10} pts)`}
+          title={isEn ? `Pair of ${pair.rank}s (+${bonusVal} pts)` : `Pareja de ${pair.rank}s (+${bonusVal} pts)`}
         >
-          <span>👥 {isEn ? 'Pair' : 'Par'} {pair.rank}{isCasual ? ' (+2)' : ''}</span>
+          <span>👥 {isEn ? 'Pair' : 'Par'} {pair.rank}{isCasual ? ` (+${bonusVal})` : ''}</span>
         </span>
       );
     });
@@ -165,6 +167,7 @@ export function FrontZone({
     // Escaleras
     (score.straights || []).forEach((straight, idx) => {
       const isHovered = hoveredSynergyFilter?.side === side && hoveredSynergyFilter?.type === 'straight' && hoveredSynergyFilter?.value === straight.label;
+      const bonusVal = straight.bonus ?? (isCasual ? 4 : 15);
       chips.push(
         <span
           key={`straight-${straight.label}-${idx}`}
@@ -175,20 +178,21 @@ export function FrontZone({
               ? 'bg-cyan-700 text-cyan-100 border-cyan-300 scale-105 shadow-md shadow-cyan-900/60 ring-1 ring-cyan-300'
               : 'bg-cyan-950/80 text-cyan-200 border-cyan-700/60 hover:border-cyan-400'
           }`}
-          title={isEn ? `Straight ${straight.label} (+${isCasual ? 3 : 15} pts)` : `Escalera ${straight.label} (+${isCasual ? 3 : 15} pts)`}
+          title={isEn ? `Straight ${straight.label} (+${bonusVal} pts)` : `Escalera ${straight.label} (+${bonusVal} pts)`}
         >
-          <span>⚡ {isEn ? 'Str' : 'Esc'} {straight.label}{isCasual ? ' (+3)' : ''}</span>
+          <span>⚡ {isEn ? 'Str' : 'Esc'} {straight.label}{isCasual ? ` (+${bonusVal})` : ''}</span>
         </span>
       );
     });
 
     // Sinergias de Palo / Color
-    const minSuitCountForBonus = isCasual ? 3 : 2;
+    const minSuitCountForBonus = 2;
     Object.entries(score.synergiesBySuit || {}).forEach(([suit, data]) => {
       if (data.count >= minSuitCountForBonus) {
         const isRed = suit === 'hearts' || suit === 'diamonds';
         const isHovered = hoveredSynergyFilter?.side === side && hoveredSynergyFilter?.type === 'suit' && hoveredSynergyFilter?.value === suit;
         const suitSymbol = SUITS[suit]?.symbol || suit;
+        const suitBonus = data.bonus ?? (isCasual ? (data.count >= 3 ? 3 : 1) : (data.count - 1) * 5);
         chips.push(
           <span
             key={`suit-${suit}`}
@@ -201,12 +205,12 @@ export function FrontZone({
             }`}
             title={
               isCasual
-                ? `${getLocalizedSuits(language)[suit]?.name || SUITS[suit]?.name || suit} x${data.count} (+2 pts ${isEn ? 'Color' : 'Color'})`
+                ? `${getLocalizedSuits(language)[suit]?.name || SUITS[suit]?.name || suit} x${data.count} (+${suitBonus} pts Color)`
                 : `${getLocalizedSuits(language)[suit]?.name || SUITS[suit]?.name || suit} x${data.count}`
             }
           >
             <span className={isRed ? 'text-rose-400' : 'text-slate-200'}>
-              {suitSymbol}x{data.count}{isCasual ? ' (+2)' : ''}
+              {suitSymbol}x{data.count}{isCasual ? ` (+${suitBonus})` : ''}
             </span>
           </span>
         );
