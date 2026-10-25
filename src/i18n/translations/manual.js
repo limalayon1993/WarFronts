@@ -1,13 +1,13 @@
 export const MANUAL_TRANSLATIONS = {
   es: {
     headerTitle: 'Reglamento Oficial: Frentes de Guerra',
-    headerVersion: 'Versión Oficial 1.6',
-    headerSubtitle: 'Edición Oficial Competitiva y Casual • Texto Íntegro del Reglamento',
+    headerVersion: 'Versión Oficial 2.0',
+    headerSubtitle: 'Edición Oficial Competitiva • Texto Íntegro del Reglamento',
     closeBtn: 'Cerrar Manual',
     tocTitle: 'Índice de Capítulos',
     officialNoteTitle: 'Anotación Oficial:',
     officialNoteText: 'Reglamento compilado para competiciones 1v1, 2v2, 3v3 y 4v4.',
-    footerText: 'Reglamento Oficial Frentes de Guerra v1.6 — Todos los derechos reservados',
+    footerText: 'Reglamento Oficial Frentes de Guerra v2.0 — Todos los derechos reservados',
     footerBackBtn: 'Entendido, Volver',
     sections: [
       { id: 'sec1', num: '1', title: 'Introducción y Objetivo' },
@@ -22,13 +22,13 @@ export const MANUAL_TRANSLATIONS = {
   },
   en: {
     headerTitle: 'Official Rulebook: WarFronts',
-    headerVersion: 'Official Version 1.6',
-    headerSubtitle: 'Official Competitive & Casual Edition • Complete Rulebook Text',
+    headerVersion: 'Official Version 2.0',
+    headerSubtitle: 'Official Competitive Edition • Complete Rulebook Text',
     closeBtn: 'Close Manual',
     tocTitle: 'Table of Contents',
     officialNoteTitle: 'Official Note:',
     officialNoteText: 'Rulebook compiled for 1v1, 2v2, 3v3, and 4v4 competitions.',
-    footerText: 'Official WarFronts Rulebook v1.6 — All rights reserved',
+    footerText: 'Official WarFronts Rulebook v2.0 — All rights reserved',
     footerBackBtn: 'Understood, Return',
     sections: [
       { id: 'sec1', num: '1', title: 'Introduction & Objective' },

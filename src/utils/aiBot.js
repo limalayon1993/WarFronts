@@ -3,9 +3,11 @@ import { calculateFrontScore } from '../constants/rules.js';
 /**
  * Inteligencia Artificial Táctica Avanzada para Bots (soporta 1v1, 2v2, 3v3, 4v4).
  * 
- * Principios estratégicos y mejoras fundamentales:
- * 1. Regla Macro 2-de-3: El objetivo de la ronda es ganar al menos 2 frentes. La IA evalúa
- *    el campo completo y no desperdicia cartas en frentes ya ganados o perdidos.
+ * Principios estratégicos y mejoras fundamentales (Reglamento Competitivo v2.0):
+ * 1. Escala de Puntos de Ronda (1, 2 y 3 Pts): Ganar 2 frentes otorga +2 pts, ganar los 3 frentes
+ *    ("Pleno") otorga +3 pts, y empatar otorga +1 pt a cada equipo. La IA evalúa el campo completo,
+ *    prioriza asegurar 2 frentes y busca el Pleno de 3 frentes o evitar el Pleno rival sin desperdiciar
+ *    recursos en frentes ya decididos.
  * 2. Prevención de Overkill y Ofuscación: Si el rival no está compitiendo en un frente (0 tropas)
  *    o ya se tiene una ventaja segura (>=15 pts), la IA NO sigue acumulando cartas allí.
  *    Reserva sus cartas para frentes disputados.
@@ -318,10 +320,12 @@ export function chooseBotMove({
     const isHighCard = bestMove.card.base >= 11; // J, Q, K, As
     const isAceOrKing = bestMove.card.base >= 13; // K, As
 
-    // A. REGLA DE AHORRO MACRO ECONÓMICO:
-    // Si la ronda actual ya está matemáticamente decidida (>=2 frentes ganados o >=2 frentes perdidos)
-    // y NO es la última ronda de la partida, la IA AHORRA estrictamente sus marcadores para la siguiente ronda.
-    const isRoundAlreadyDecided = (securedFrontsCount >= 2 || lostFrontsCount >= 2) && !isFinalRound;
+    // A. REGLA DE AHORRO MACRO ECONÓMICO (Escala 1/2/3 Puntos):
+    // Si los 3 frentes ya están matemáticamente decididos, o ya hemos perdido 2 frentes y tenemos pocas sombras,
+    // y NO es la última ronda de la partida, la IA AHORRA sus marcadores para la siguiente ronda.
+    const isRoundAlreadyDecided =
+      ((securedFrontsCount + lostFrontsCount >= 3) || (lostFrontsCount >= 2 && botShadowsLeft <= 2)) &&
+      !isFinalRound;
     if (isRoundAlreadyDecided) {
       bestMove.asShadow = false;
       return bestMove;

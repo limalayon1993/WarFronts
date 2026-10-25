@@ -7,6 +7,7 @@ import {
   sortFrontCards,
   analyzeCardSynergies,
   calculateRoundEconomy,
+  calculateRoundPoints,
 } from '../constants/rules';
 import { Card } from './Card';
 import { ArrowRight, Award, Clock, CheckCircle2, Users, AlertTriangle, EyeOff, Flame, Sparkles } from 'lucide-react';
@@ -67,15 +68,13 @@ export function RoundSummaryModal({
   const teamAFrontWins = frontResults.filter(r => r.winner === 'teamA').length;
   const teamBFrontWins = frontResults.filter(r => r.winner === 'teamB').length;
 
-  let roundOutcome = 'tie';
-  if (flagFallTeam) {
-    // Si la ronda acabó por Caída de Bandera (00:00), el ganador es DIRECTAMENTE el rival del equipo infractor
-    roundOutcome = flagFallTeam === 'teamA' ? 'teamB' : 'teamA';
-  } else if (teamAFrontWins >= 2) {
-    roundOutcome = 'teamA';
-  } else if (teamBFrontWins >= 2) {
-    roundOutcome = 'teamB';
-  }
+  const isFlagFallFullSweep = lastRoundEconomy?.winType === 'sweep' && Boolean(flagFallTeam);
+  const roundScoring = calculateRoundPoints(teamAFrontWins, teamBFrontWins, flagFallTeam, isFlagFallFullSweep);
+  const roundOutcome = roundScoring.outcome;
+  const winType = lastRoundEconomy?.winType || roundScoring.winType;
+  const teamAPtsEarned = lastRoundEconomy?.teamAPointsEarned ?? roundScoring.teamAPoints;
+  const teamBPtsEarned = lastRoundEconomy?.teamBPointsEarned ?? roundScoring.teamBPoints;
+  const winnerPtsEarned = roundOutcome === 'teamA' ? teamAPtsEarned : roundOutcome === 'teamB' ? teamBPtsEarned : 1;
 
   const roundPointsTeamA = frontResults.reduce((acc, r) => acc + r.teamAScore.total, 0);
   const roundPointsTeamB = frontResults.reduce((acc, r) => acc + r.teamBScore.total, 0);
@@ -137,17 +136,17 @@ export function RoundSummaryModal({
                 {flagFallTeam === 'teamA' ? (
                   <span>
                     {isEn ? (
-                      <>Team clock for <strong className="text-rose-400">{is1v1 ? 'You' : 'Allied Team (A)'}</strong> ran out at <strong>00:00</strong>. The rival automatically receives <strong className="text-amber-400 font-bold">+1 Round Point</strong>.</>
+                      <>Team clock for <strong className="text-rose-400">{is1v1 ? 'You' : 'Allied Team (A)'}</strong> ran out at <strong>00:00</strong>. The rival automatically receives <strong className="text-amber-400 font-bold">+{winnerPtsEarned} Round Points</strong>.</>
                     ) : (
-                      <>El reloj de equipo del <strong className="text-rose-400">{is1v1 ? 'Tú' : 'Equipo Aliado (A)'}</strong> se agotó a <strong>00:00</strong>. El rival suma automáticamente <strong className="text-amber-400 font-bold">+1 Punto de Ronda</strong>.</>
+                      <>El reloj de equipo del <strong className="text-rose-400">{is1v1 ? 'Tú' : 'Equipo Aliado (A)'}</strong> se agotó a <strong>00:00</strong>. El rival suma automáticamente <strong className="text-amber-400 font-bold">+{winnerPtsEarned} Puntos de Ronda</strong>.</>
                     )}
                   </span>
                 ) : (
                   <span>
                     {isEn ? (
-                      <>Team clock for <strong className="text-rose-400">{is1v1 ? 'Rival' : 'Rival Team (B)'}</strong> ran out at <strong>00:00</strong>. {is1v1 ? 'You' : 'Your team'} automatically receive <strong className="text-amber-400 font-bold">+1 Round Point</strong>!</>
+                      <>Team clock for <strong className="text-rose-400">{is1v1 ? 'Rival' : 'Rival Team (B)'}</strong> ran out at <strong>00:00</strong>. {is1v1 ? 'You' : 'Your team'} automatically receive <strong className="text-amber-400 font-bold">+{winnerPtsEarned} Round Points</strong>!</>
                     ) : (
-                      <>El reloj de equipo del <strong className="text-rose-400">{is1v1 ? 'Rival' : 'Equipo Rival (B)'}</strong> se agotó a <strong>00:00</strong>. ¡{is1v1 ? 'Ganas' : 'Tu equipo gana'} automáticamente <strong className="text-amber-400 font-bold">+1 Punto de Ronda</strong>!</>
+                      <>El reloj de equipo del <strong className="text-rose-400">{is1v1 ? 'Rival' : 'Equipo Rival (B)'}</strong> se agotó a <strong>00:00</strong>. ¡{is1v1 ? 'Ganas' : 'Tu equipo gana'} automáticamente <strong className="text-amber-400 font-bold">+{winnerPtsEarned} Puntos de Ronda</strong>!</>
                     )}
                   </span>
                 )}
@@ -160,10 +159,22 @@ export function RoundSummaryModal({
               </div>
             </div>
           ) : (
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
+            <p className="text-xs sm:text-sm text-slate-300 mt-1">
               {ui.summary.frontsWonLabel} <strong className="text-emerald-400">{teamAFrontWins}</strong> {is1v1 ? (isEn ? 'You' : 'Tú') : (isEn ? 'Team A' : 'Equipo A')} — <strong className="text-rose-400">{teamBFrontWins}</strong> {is1v1 ? (isEn ? 'Rival' : 'Rival') : (isEn ? 'Team B' : 'Equipo B')}
-              {roundOutcome === 'teamA' && (isEn ? ' (+1 Round Point)' : ' (+1 Punto de Ronda)')}
-              {roundOutcome === 'teamB' && (isEn ? ' (+1 Round Point)' : ' (+1 Punto de Ronda)')}
+              <span className="mx-2 text-slate-600">•</span>
+              {roundOutcome === 'tie' ? (
+                <strong className="text-amber-300">
+                  {isEn ? '+1 Round Point for EACH team (Tie)' : '+1 Punto de Ronda para CADA equipo (Empate)'}
+                </strong>
+              ) : winType === 'sweep' ? (
+                <strong className="text-amber-300">
+                  {isEn ? '🔥 3-Front Sweep! (+3 Round Points)' : '🔥 ¡Pleno de 3 Frentes! (+3 Puntos de Ronda)'}
+                </strong>
+              ) : (
+                <strong className="text-emerald-300">
+                  {isEn ? `+${winnerPtsEarned} Round Points (Standard Victory)` : `+${winnerPtsEarned} Puntos de Ronda (Victoria Estándar)`}
+                </strong>
+              )}
             </p>
           )}
 
@@ -379,6 +390,46 @@ export function RoundSummaryModal({
             ))}
           </div>
 
+          {/* 3. Asignación de Puntos de Ronda (Escala 1 / 2 / 3 Puntos) */}
+          <div className="bg-slate-950/90 border border-amber-500/30 p-3.5 rounded-2xl text-xs space-y-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <span className="font-serif font-black text-amber-300 uppercase tracking-wide">
+                {isEn ? '3. Round Points Allocation (1, 2 & 3 Points Scale)' : '3. Asignación de Puntos de Ronda (Escala 1, 2 y 3 Puntos)'}
+              </span>
+              <span className="font-mono font-bold text-xs">
+                <span className="text-sky-400">+{teamAPtsEarned} {isEn ? 'Round Pts' : 'Pts Ronda'} ({is1v1 ? (isEn ? 'You' : 'Tú') : (isEn ? 'Team A' : 'Equipo A')})</span>
+                <span className="text-slate-600 mx-2">•</span>
+                <span className="text-amber-400">+{teamBPtsEarned} {isEn ? 'Round Pts' : 'Pts Ronda'} ({is1v1 ? (isEn ? 'Rival' : 'Rival') : (isEn ? 'Team B' : 'Equipo B')})</span>
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
+              <div className={`p-2 rounded-xl border transition ${
+                roundOutcome === 'tie'
+                  ? 'bg-sky-950/60 border-sky-400/70 text-sky-200 shadow-[0_0_12px_rgba(56,189,248,0.2)]'
+                  : 'bg-slate-900/60 border-slate-800 text-slate-400 opacity-60'
+              }`}>
+                <div className="text-[10px] font-bold uppercase tracking-wider">{isEn ? 'Tie in Fronts' : 'Empate en Frentes'}</div>
+                <div className="text-sm font-black font-mono text-sky-300 mt-0.5">{isEn ? '+1 Point EACH' : '+1 Punto C/U'}</div>
+              </div>
+              <div className={`p-2 rounded-xl border transition ${
+                roundOutcome !== 'tie' && winnerPtsEarned === 2
+                  ? 'bg-emerald-950/60 border-emerald-400/70 text-emerald-200 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+                  : 'bg-slate-900/60 border-slate-800 text-slate-400 opacity-60'
+              }`}>
+                <div className="text-[10px] font-bold uppercase tracking-wider">{isEn ? 'Standard Win (2 Fronts)' : 'Victoria Estándar (2 Frentes)'}</div>
+                <div className="text-sm font-black font-mono text-emerald-300 mt-0.5">{isEn ? '+2 Points Winner' : '+2 Puntos Ganador'}</div>
+              </div>
+              <div className={`p-2 rounded-xl border transition ${
+                roundOutcome !== 'tie' && winnerPtsEarned === 3
+                  ? 'bg-amber-950/60 border-amber-400/70 text-amber-200 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+                  : 'bg-slate-900/60 border-slate-800 text-slate-400 opacity-60'
+              }`}>
+                <div className="text-[10px] font-bold uppercase tracking-wider">{isEn ? 'Full Sweep (All 3 Fronts)' : 'Dominio Total / Pleno (3 Frentes)'}</div>
+                <div className="text-sm font-black font-mono text-amber-300 mt-0.5">{isEn ? '+3 Points Winner' : '+3 Puntos Ganador'}</div>
+              </div>
+            </div>
+          </div>
+
           {/* Suma de puntos acumulados */}
           <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex items-center justify-between text-xs">
             <div>
@@ -432,7 +483,7 @@ export function RoundSummaryModal({
               }
               return (
                 <span className="bg-sky-500/20 text-sky-300 border border-sky-500/40 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
-                  <span>{isEn ? `Tied Round (+${earned})` : `Ronda Nula (+${earned})`}</span>
+                  <span>{isEn ? `Tied Round (+${earned})` : `Empate de Ronda (+${earned})`}</span>
                 </span>
               );
             }

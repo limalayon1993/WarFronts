@@ -48,9 +48,13 @@ export function QuickGuideModal({ isOpen, onClose }) {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-3 text-xs text-slate-300 font-serif">
+            <div className="hidden lg:flex items-center gap-2.5 text-xs text-slate-300 font-serif">
               <span className="flex items-center gap-1.5 text-slate-300">
                 <Swords className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.fronts}
+              </span>
+              <span className="text-amber-500/30">•</span>
+              <span className="flex items-center gap-1.5 text-amber-300 font-bold">
+                <Trophy className="w-3.5 h-3.5 text-amber-400" /> {guideT.headerSummary.scoring}
               </span>
               <span className="text-amber-500/30">•</span>
               <span className="flex items-center gap-1.5 text-purple-300">
@@ -202,54 +206,69 @@ export function QuickGuideModal({ isOpen, onClose }) {
               </div>
             </div>
 
-            {/* BLOQUE 2: RESOLUCIÓN DE EMPATES Y CRITERIO FINAL */}
+            {/* BLOQUE 2: PUNTUACIÓN DE RONDA Y DESEMPATES */}
             <div className="casino-panel rounded-2xl p-4 sm:p-5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between border-b border-amber-500/15 pb-2 mb-3">
                   <h3 className="text-xs sm:text-sm font-serif font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
                     <Scale className="w-4 h-4" /> {guideT.block2.title}
                   </h3>
-                  <span className="text-[10px] text-slate-400 font-mono">{guideT.block2.tag}</span>
+                  <span className="text-[10px] text-amber-300 bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded font-mono font-bold">
+                    {guideT.block2.tag}
+                  </span>
+                </div>
+
+                {/* Escala Visual de Puntos de Ronda (1, 2 y 3 Puntos) */}
+                <div className="grid grid-cols-3 gap-2 mb-3 text-center">
+                  <div className="bg-sky-950/35 p-2.5 rounded-xl border border-sky-500/35 flex flex-col justify-center">
+                    <span className="text-[9px] font-serif font-bold uppercase tracking-wider text-sky-300 bg-sky-500/15 px-1.5 py-0.5 rounded mx-auto mb-1">
+                      {guideT.block2.ptsTieBadge}
+                    </span>
+                    <div className="text-base sm:text-lg font-serif font-black text-sky-200">{guideT.block2.ptsTieVal}</div>
+                    <div className="text-[10px] font-serif font-semibold text-sky-300/90 mt-0.5">{guideT.block2.ptsTieSub}</div>
+                  </div>
+
+                  <div className="bg-emerald-950/35 p-2.5 rounded-xl border border-emerald-500/35 flex flex-col justify-center">
+                    <span className="text-[9px] font-serif font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/15 px-1.5 py-0.5 rounded mx-auto mb-1">
+                      {guideT.block2.ptsStdBadge}
+                    </span>
+                    <div className="text-base sm:text-lg font-serif font-black text-emerald-200">{guideT.block2.ptsStdVal}</div>
+                    <div className="text-[10px] font-serif font-semibold text-emerald-300/90 mt-0.5">{guideT.block2.ptsStdSub}</div>
+                  </div>
+
+                  <div className="bg-amber-950/40 p-2.5 rounded-xl border border-amber-500/45 flex flex-col justify-center shadow-[0_0_15px_rgba(245,158,11,0.12)]">
+                    <span className="text-[9px] font-serif font-bold uppercase tracking-wider text-amber-300 bg-amber-500/20 px-1.5 py-0.5 rounded mx-auto mb-1">
+                      {guideT.block2.ptsSweepBadge}
+                    </span>
+                    <div className="text-base sm:text-lg font-serif font-black text-amber-200">{guideT.block2.ptsSweepVal}</div>
+                    <div className="text-[10px] font-serif font-semibold text-amber-300/90 mt-0.5">{guideT.block2.ptsSweepSub}</div>
+                  </div>
                 </div>
 
                 <div className="space-y-2 text-xs">
-                  {/* Criterio 1 */}
+                  {/* Criterio 1: Desempate en Puntaje de Frente */}
                   <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20 flex items-start gap-2.5">
                     <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-300 font-serif font-black flex items-center justify-center shrink-0 text-xs border border-amber-500/40">
                       1
                     </span>
                     <div>
                       <strong className="text-slate-100 font-serif block">{guideT.block2.crit1Title}</strong>
-                      <span className="text-slate-300 font-serif">
+                      <span className="text-slate-300 font-serif text-[11px]">
                         {guideT.block2.crit1Desc}
                       </span>
                     </div>
                   </div>
 
-                  {/* Criterio 2 */}
+                  {/* Criterio 2: Victoria de Partida y Desempates Finales */}
                   <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20 flex items-start gap-2.5">
                     <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-300 font-serif font-black flex items-center justify-center shrink-0 text-xs border border-amber-500/40">
                       2
                     </span>
                     <div>
                       <strong className="text-slate-100 font-serif block">{guideT.block2.crit2Title}</strong>
-                      <span className="text-slate-300 font-serif">
-                        {guideT.block2.crit2Desc}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Criterio 3 */}
-                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/20 flex items-start gap-2.5">
-                    <span className="w-5 h-5 rounded bg-amber-500/20 text-amber-300 font-serif font-black flex items-center justify-center shrink-0 text-xs border border-amber-500/40">
-                      3
-                    </span>
-                    <div>
-                      <strong className="text-slate-100 font-serif block">{guideT.block2.crit3Title}</strong>
                       <div className="text-[11px] text-slate-300 font-serif space-y-0.5 mt-0.5">
-                        <div>• <strong className="text-emerald-300">{guideT.block2.crit3Sub1}</strong></div>
-                        <div>• <strong className="text-amber-300">{guideT.block2.crit3Sub2}</strong></div>
-                        <div>• <strong className="text-slate-300">{guideT.block2.crit3Sub3}</strong></div>
+                        <div>• <strong className="text-emerald-300">{guideT.block2.crit2Sub1}</strong></div>
+                        <div>• <strong className="text-amber-300">{guideT.block2.crit2Sub2}</strong></div>
                       </div>
                     </div>
                   </div>
@@ -327,9 +346,8 @@ export function QuickGuideModal({ isOpen, onClose }) {
                 <h4 className="text-xs font-serif font-bold text-slate-200 mb-1">{guideT.block3.phase4.title}</h4>
                 <ul className="text-[11px] text-slate-300 font-serif space-y-1">
                   <li>• {guideT.block3.phase4.p1}</li>
-                  <li>• {guideT.block3.phase4.p2}</li>
-                  <li>• {guideT.block3.phase4.p3}</li>
-                  <li className="text-rose-400 font-semibold">• {guideT.block3.phase4.p4}</li>
+                  <li className="text-purple-300 font-semibold">• {guideT.block3.phase4.p2}</li>
+                  <li className="text-rose-400 font-semibold">• {guideT.block3.phase4.p3}</li>
                 </ul>
                 <div className="text-[9px] text-slate-400 font-serif mt-2 italic">{guideT.block3.phase4.footer}</div>
               </div>

@@ -98,15 +98,21 @@ export function getTutorialSteps(lang = 'es') {
       instructor: isEn ? 'Instructor Commander' : 'Comandante Instructor',
       content: isEn
         ? [
-            'You are about to play a guided 2v2 match with bots. Here you will learn exactly how every rule, calculation, and tactical decision works.',
+            'You are about to play a guided 2v2 match with bots. Here you will learn how every rule, calculation, and tactical decision works in Official Competitive Mode v2.0.',
             'In 2v2 you play alongside your partner (Ally A2) against two opponents (B1 and B2). There are 3 battlefronts: Left, Center, and Right.',
-            'Golden Rule: To win the round, your team must conquer at least 2 of the 3 fronts at the end of deployment.',
+            'Official 1, 2 & 3 Round Points System: At the end of deployment, Round Points are awarded based on how many fronts your team conquers:',
+            '• Tie in the Round (e.g. 1 front each and 1 void, or all 3 void): +1 Round Point for EACH team.',
+            '• Standard Victory (winning 2 of the 3 fronts): +2 Round Points for the winning team.',
+            '• Total Dominance / "Full Sweep" (winning all 3 fronts): +3 Round Points for the winning team!',
             'In this tutorial we will guide you step by step: each card to play will be highlighted, we will explain why it is the optimal move and why you should not play other cards, and we will analyze responses from opponents and allies.',
           ]
         : [
-            'Estás a punto de disputar una partida guiada de 2v2 con bots. Aquí aprenderás exactamente cómo funciona cada regla, cada cálculo y cada decisión táctica.',
+            'Estás a punto de disputar una partida guiada de 2v2 con bots. Aquí aprenderás exactamente cómo funciona cada regla, cada cálculo y cada decisión táctica del Modo Competitivo Oficial v2.0.',
             'En 2v2 juegas junto a tu compañero (Aliado A2) frente a dos rivales (B1 y B2). Hay 3 frentes de combate: Izquierdo, Central y Derecho.',
-            'Regla de Oro: Para ganar la ronda, tu equipo debe ganar al menos 2 de los 3 frentes al final del despliegue.',
+            'Sistema Oficial de Puntuación por Ronda (1, 2 y 3 Puntos): Al finalizar el despliegue, los Puntos de Ronda se reparten según vuestro dominio:',
+            '• Empate en la ronda (ej. cada equipo gana 1 frente y el otro es nulo, o todos son nulos): +1 Punto de Ronda para CADA equipo.',
+            '• Victoria estándar (ganar 2 de los 3 frentes): +2 Puntos de Ronda para el equipo ganador.',
+            '• Dominio Total / "Pleno" (ganar los 3 frentes): ¡+3 Puntos de Ronda para el equipo ganador!',
             'En este tutorial te llevaremos de la mano: cada carta a jugar estará indicada, te explicaremos por qué es la jugada ideal y por qué no debes usar las otras cartas, y analizaremos las respuestas de rivales y aliados.',
           ],
       buttonText: isEn ? 'Begin Instruction' : 'Comenzar Instrucción',
@@ -121,22 +127,22 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Phase 1: Preparation, Synergies & Initiative'
         : 'Fase 1: Preparación, Sinergias e Iniciativa',
       subtitle: isEn
-        ? 'Official Scoring System and Opening Attack'
-        : 'Sistema Oficial de Puntuación y Sorteo de Ataque',
+        ? 'Official Scoring System (1/2/3 Pts) and Opening Attack'
+        : 'Sistema Oficial de Puntuación (1/2/3 Pts) y Sorteo de Ataque',
       instructor: isEn ? 'Instructor Commander' : 'Comandante Instructor',
       content: isEn
         ? [
-            'Official Rule Update: The luck-based Trump Card mechanic has been completely eliminated to maximize pure tactical depth and strategic mastery.',
             'Base card values run from 2 to 10 at face value, J=11, Q=12, K=13, and Ace (A) = 14 points (the highest single card in the deck!).',
-            'Four powerful formation bonuses decide battles: Suit Synergy (+5 pts per additional card of the same suit in the front), Pair (+10 pts for 2 cards of same rank), Short Straight (+15 pts for 3 consecutive ranks), and Trio (+20 pts for 3 cards of same rank, which supersedes Pair).',
-            'Shadow Economy (Official v1.6 / v2.0): Teams start Round 1 with strictly 0 Shadow Markers. At round end, teams earn markers based on performance (+1 win, +2 loss, +3 loss streak, +1 tie in 2v2) which carry over and accumulate across rounds. For this training drill, we simulate an active pool of 2 markers so you can learn how to play shadow cards.',
+            'Four powerful formation bonuses decide battles on each front: Suit Synergy (+5 pts per additional card of the same suit in the front), Pair (+10 pts for 2 cards of same rank), Short Straight (+15 pts for 3 consecutive ranks), and Trio (+20 pts for 3 cards of same rank, which supersedes Pair).',
+            'Round Points Scale (1, 2 & 3 Pts): Winning 2 fronts grants +2 Round Points, sweeping all 3 fronts ("Pleno") grants +3 Round Points, and if the round ends tied in fronts, BOTH teams score +1 Round Point each!',
+            'Shadow Economy (Official v2.0): Teams start Round 1 with strictly 0 Shadow Markers. At round end, teams earn markers based on performance (+1 win, +2 loss, +3 loss streak of 2+, +1 tie in 2v2) which carry over and accumulate across rounds. For this training drill, we simulate an active pool of 2 markers so you can learn how to play shadow cards.',
             'Who attacks first? The choice of which team opens Round 1 is 100% RANDOM (a deck cut on tabletop, automated digitally). From Round 2 onward, initiative rotates automatically to the opposing team. For this drill, your team (Team A) holds the initiative and you (A1) will execute the opening attack!',
           ]
         : [
-            'Actualización Oficial del Reglamento: Se ha eliminado por completo la mecánica de la carta de sinergia/triunfo para mitigar el factor suerte y potenciar la estrategia táctica pura.',
             'Los valores base de las cartas van del 2 al 10 según su valor nominal, J=11, Q=12, K=13 y el As (A) = 14 puntos (¡la carta individual más alta de la baraja!).',
-            'Se incorporan cuatro formaciones estratégicas por sinergia: Sinergia de Palo (+5 pts por cada carta adicional del mismo palo en el frente), Pareja (+10 pts por 2 cartas de igual valor), Escalera Corta (+15 pts por 3 cartas consecutivas) y Trío (+20 pts por 3 cartas de igual valor, anulando la pareja de esas cartas).',
-            'Economía de Sombras (Reglamento Oficial): Los equipos inician la Ronda 1 con estrictamente 0 Marcadores de Sombra. Al final de la ronda, ganan marcadores según el resultado (+1 victoria, +2 derrota, +3 racha de derrotas, +1 nulo en 2v2) que se acumulan y ahorran entre rondas. En este tutorial simulamos una reserva de 2 marcadores para que aprendas su uso práctico.',
+            'Cuatro formaciones estratégicas por sinergia deciden cada frente: Sinergia de Palo (+5 pts por cada carta adicional del mismo palo en el frente), Pareja (+10 pts por 2 cartas de igual valor), Escalera Corta (+15 pts por 3 cartas consecutivas) y Trío (+20 pts por 3 cartas de igual valor, anulando la pareja de esas cartas).',
+            'Escala de Puntos de Ronda (1, 2 y 3 Pts): Ganar 2 frentes otorga +2 Puntos de Ronda, ganar los 3 frentes ("Pleno") otorga +3 Puntos de Ronda, ¡y en caso de empate en frentes AMBOS equipos suman +1 Punto de Ronda cada uno!',
+            'Economía de Sombras (Reglamento v2.0): Los equipos inician la Ronda 1 con estrictamente 0 Marcadores de Sombra. Al final de la ronda, ganan marcadores según el resultado (+1 victoria, +2 derrota, +3 racha de 2+ derrotas, +1 empate en 2v2) que se acumulan y ahorran entre rondas. En este tutorial simulamos una reserva de 2 marcadores para que aprendas su uso práctico.',
             '¿Quién empieza atacando? La iniciativa en la Ronda 1 es 100% ALEATORIA (mediante corte de baraja en mesa o sorteo digital automático). A partir de la Ronda 2, rota al equipo rival. Para esta instrucción, ¡tu equipo (Equipo A) tiene la iniciativa y serás tú (A1) quien abra el combate!',
           ],
       buttonText: isEn ? 'View Planning Phase' : 'Ver Fase de Planificación',
@@ -157,12 +163,12 @@ export function getTutorialSteps(lang = 'es') {
       content: isEn
         ? [
             'In official rules, before receiving cards there is a 30-second tactical phase where players plan with NO CARDS in hand.',
-            'Why without cards? Because in cooperative games a dominant player often dictates what others should do. By having no cards yet, the team must agree on macro-strategy: for instance, "let us secure the Center and a Flank, and if they push hard on the other, avoid wasting troops".',
+            'Why without cards? Because in cooperative games a dominant player often dictates what others should do. By having no cards yet, the team must agree on macro-strategy: for instance, "let us secure the Center and a Flank for +2 points, or push for the 3-front Full Sweep (+3 points) if we draw strong hands".',
             'Shadow Economy & Clock Budget: During these 30 seconds, the team decides how many shadow markers from their accumulated reserve to invest this round or save for future rounds, and coordinates team clock pacing.',
           ]
         : [
             'En el reglamento oficial, antes de recibir cartas hay una fase táctica de 30 segundos donde los jugadores planifican SIN CARTAS en mano.',
-            '¿Por qué sin cartas? Porque en los juegos cooperativos a menudo un jugador dominante le dice a los demás qué hacer. Al no tener cartas aún, el equipo debe acordar la macro-estrategia: por ejemplo, "aseguremos con fuerza el Centro y un Flanco, y si presionan mucho el otro, no malgastemos tropas".',
+            '¿Por qué sin cartas? Porque en los juegos cooperativos a menudo un jugador dominante le dice a los demás qué hacer. Al no tener cartas aún, el equipo debe acordar la macro-estrategia: por ejemplo, "aseguremos con fuerza el Centro y un Flanco para sumar +2 puntos, o busquemos el Pleno de 3 frentes (+3 puntos) si robamos buenas manos".',
             'Economía de Sombras y Presupuesto de Reloj: Durante estos 30 segundos, el equipo decide cuántos marcadores de sombra de su reserva acumulada invertirá en la ronda o ahorrará para rondas posteriores, y pacta el ritmo de juego del reloj compartido.',
           ],
       buttonText: isEn ? 'View Shared Team Clock' : 'Ver Reloj de Equipo Compartido',
@@ -182,18 +188,18 @@ export function getTutorialSteps(lang = 'es') {
       instructor: isEn ? 'Instructor Commander' : 'Comandante Instructor',
       content: isEn
         ? [
-            'In WarFronts, time is NOT individual per turn (you do not have 15 isolated seconds per play). The clock is SHARED across the entire team.',
+            'In WarFronts, time is NOT individual per turn. The clock is SHARED across the entire team.',
             'Joint time pool: Each team has a total time pool per round (e.g. in 2v2: Fast = 1m 40s, Medium = 3m 20s, Slow = 5m 00s). Seconds consumed by each player during their turn are deducted from their team\'s global clock.',
             'Clock switching: Your team\'s clock ticks while you or your ally think and make a play. The exact instant you place your card on a front, your clock stops and the opposing team\'s clock activates immediately.',
             'Per-round reset: The team clock resets to full value at the start of each new round. Unused time from a round does not carry over to subsequent ones.',
-            'Flag Fall Rule (00:00): If a team\'s clock reaches 00:00 before completing its turns, it automatically loses the round (+1 Round Point to opponent)! However, cards already deployed on the table are revealed and their points are preserved for the final tie-breaker tally.',
+            'Flag Fall Rule (00:00): If a team\'s clock reaches 00:00 before completing its turns, it automatically loses the round and the opponent scores +2 Round Points directly (or +3 Round Points if at that instant the opponent already led all 3 fronts with all cards played)! Cards already deployed on the table are revealed and their points are preserved for the final tie-breaker tally.',
           ]
         : [
-            'En Frentes de Guerra el tiempo NO es individual por turno (no dispones de 15 segundos aislados por jugada). Ahora el reloj es COMPARTIDO para todo el equipo.',
+            'En Frentes de Guerra el tiempo NO es individual por turno. El reloj es COMPARTIDO para todo el equipo.',
             'Bolsa de tiempo conjunta: Cada equipo dispone de un tiempo total por ronda (ejemplo en 2v2: Rápido = 1m 40s, Medio = 3m 20s, Lento = 5m 00s). Los segundos que consuma cada jugador durante su turno se restan al reloj global de su equipo.',
             'Conmutación del reloj: El reloj de tu equipo corre mientras tú o tu aliado pensáis y realizáis la jugada. En el instante exacto en que colocáis la carta en el frente, vuestro reloj se detiene y se activa de inmediato el reloj del equipo rival.',
             'Reseteo por ronda: El reloj de equipo se reinicia al valor completo al inicio de cada nueva ronda. El tiempo sobrante de una ronda no se acumula para las siguientes.',
-            'Regla de Caída de Bandera (00:00): Si el reloj de un equipo llega a 00:00 antes de completar sus turnos, ¡pierde automáticamente la ronda (+1 Punto al rival)! Sin embargo, las cartas ya colocadas en la mesa se revelan y sus puntos se conservan para el cómputo de desempate final.',
+            'Regla de Caída de Bandera (00:00): Si el reloj de un equipo llega a 00:00 antes de completar sus turnos, ¡pierde automáticamente la ronda y el rival suma +2 Puntos de Ronda directos (o +3 Puntos si en ese instante el rival ya dominaba los 3 frentes habiendo jugado todas sus cartas)! Las cartas ya colocadas en la mesa se revelan y sus puntos se conservan para el cómputo de desempate final.',
           ],
       buttonText: isEn ? 'Understood! Start Card Deployment' : '¡Entendido! Iniciar Despliegue de Cartas',
     },
@@ -331,8 +337,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'B2 did not play left, preferring to concentrate on an uncontested sector.'
         : 'No jugó en la izquierda porque prefiere concentrar a su equipo en un frente específico donde no haya oposición aliada.',
       tacticalInsight: isEn
-        ? 'Tactical lesson: In WarFronts you only need 2 of 3 fronts. If opponents see a lost front, they will pivot to take the other two. Monitor their troop movements!'
-        : 'Lección táctica: En WarFronts necesitas 2 de 3 frentes. Si el rival ve un frente muy adverso, buscará dominar los otros dos. ¡Debes vigilar sus movimientos!',
+        ? 'Tactical lesson: Winning all 3 fronts grants +3 Round Points (Full Sweep), while winning 2 fronts grants +2 Round Points. By opening the Right Front strongly, B2 seeks to deny your 3-front Sweep and fight for their own 2-front victory!'
+        : 'Lección táctica: Ganar los 3 frentes otorga +3 Puntos de Ronda (Pleno), mientras que ganar 2 frentes otorga +2 Puntos. ¡Al abrir fuerte en la Derecha, B2 busca evitar vuestro Pleno de 3 frentes y pelear por ganar 2 frentes!',
     },
 
     // =========================================================================
@@ -460,8 +466,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'B2 did not play left, seizing the chance to lock down a secure front for their team.'
         : 'B2 no jugó en la izquierda porque vio la oportunidad de consolidar un frente seguro para su bando.',
       tacticalInsight: isEn
-        ? 'Opponents also build synergies. They lead the Right now. But remember: you only need 2 fronts to win the entire round!'
-        : 'Los rivales también saben crear sinergias. Ahora ellos lideran la Derecha. Pero recuerda: ¡solo necesitas ganar 2 frentes para llevarte la ronda entera!',
+        ? 'Opponents also build synergies and now lead the Right Front. Since the 3-front Sweep (+3 pts) is contested there, our priority is to lock down Center and Left to secure a Standard Victory (+2 Round Points)!'
+        : 'Los rivales también saben crear sinergias y ahora lideran la Derecha. Como el Pleno de 3 frentes (+3 pts) se ha complicado allí, ¡nuestra prioridad es asegurar Centro e Izquierda para llevarnos la Victoria Estándar (+2 Puntos de Ronda)!',
     },
 
     // =========================================================================
@@ -482,8 +488,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Activate the "Play as Shadow" button, select your 8 of Hearts (8♥), and deploy it to the Center Front.'
         : 'Activa el botón "Jugar como Sombra", selecciona tu 8 de Corazones (8♥) y colócalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'In official WarFronts rules, shadow cards are part of a continuous team economy: teams start Round 1 with 0 markers and earn them at round end (+1 win, +2 loss, +3 streak of 2+ losses, +1 tie in 2v2), saving them across rounds. In this drill, we provide 2 simulated markers so you can master their use. Playing a card as shadow deploys it FACE DOWN solely for opponents, but it remains fully VISIBLE to your entire team (highlighted with a purple border). Teammates can distribute available markers freely. Your ally A2 sees your 8♥ clearly to coordinate and build suit synergy (+10 pts for 3 hearts), while opponents only see the dark back, completely intimidating them.'
-        : 'En el reglamento oficial, las cartas sombra forman parte de una economía continua de equipo: los equipos inician la Ronda 1 con 0 marcadores y los ganan al final de la ronda (+1 por ganar, +2 por perder, +3 si llevas 2+ derrotas seguidas o +1 si hay empate en 2v2), ahorrándolos entre rondas. En este tutorial te proporcionamos 2 marcadores simulados para aprender su uso. Al jugar una carta como sombra, esta se coloca BOCA ABAJO únicamente para los rivales, pero permanece VISIBLE para todo tu equipo (con borde morado). El equipo reparte sus marcadores libremente. Tu aliado A2 ve perfectamente tu 8♥ para coordinar la estrategia y calcular las sinergias (+10 pts por 3 corazones), mientras que los rivales solo ven el reverso oscuro, intimidándolos por completo.',
+        ? 'In official WarFronts v2.0 rules, shadow cards are part of a continuous team economy: teams start Round 1 with 0 markers and earn them at round end (+1 win, +2 loss, +3 streak of 2+ losses, +1 tie in 2v2), saving them across rounds. In this drill, we provide 2 simulated markers so you can master their use. When playing a Shadow Card, you silently show it to your teammates before placing it face-down (in the digital game, it remains fully VISIBLE to your entire team with a purple border while hidden from opponents). Your ally A2 sees your 8♥ clearly to coordinate and build suit synergy (+10 pts for 3 hearts), while opponents only see the dark back, completely intimidating them.'
+        : 'En el reglamento oficial v2.0, las cartas sombra forman parte de una economía continua de equipo: los equipos inician la Ronda 1 con 0 marcadores y los ganan al final de la ronda (+1 por ganar, +2 por perder, +3 si llevas 2+ derrotas seguidas o +1 si hay empate en 2v2), ahorrándolos entre rondas. En este tutorial te proporcionamos 2 marcadores simulados para aprender su uso. Al jugar una Carta Sombra, se enseña en silencio a los compañeros antes de bajarla BOCA ABAJO (en la versión digital permanece VISIBLE para todo tu equipo con borde morado y oculta para los rivales). Tu aliado A2 ve perfectamente tu 8♥ para coordinar la estrategia y calcular las sinergias (+10 pts por 3 corazones), mientras que los rivales solo ven el reverso oscuro, intimidándolos por completo.',
       whyNotOthers: isEn
         ? [
             {
@@ -716,8 +722,8 @@ export function getTutorialSteps(lang = 'es') {
         ? 'Deploy your final card, the Four of Clubs (4♣), to the Right Front.'
         : 'Despliega tu última carta, el Cuatro de Tréboles (4♣), en el Frente Derecho.',
       whyThisCard: isEn
-        ? 'You only have the 4♣ remaining. Center and Left are mathematically won by your team (2 of 3 fronts secured!). Deploying 4♣ to the Right Front is your ideal closing move: it feeds 4 points directly into your team\'s Cumulative Points tally for tie-breakers!'
-        : 'Te queda únicamente el 4♣. El Centro y la Izquierda ya están matemáticamente ganados por vuestro equipo (¡2 de 3 frentes asegurados!). Desplegar el 4♣ en el Frente Derecho es tu jugada de cierre perfecta: sumas 4 puntos directamente al marcador de Puntos Acumulados de tu equipo. ¡Los puntos acumulados deciden quién gana el juego en caso de empate!',
+        ? 'You only have the 4♣ remaining. Center and Left are mathematically won by your team (2 of 3 fronts secured = +2 Round Points!). Deploying 4♣ to the Right Front is your ideal closing move: it feeds 4 points directly into your team\'s Cumulative Points tally for tie-breakers!'
+        : 'Te queda únicamente el 4♣. El Centro y la Izquierda ya están matemáticamente ganados por vuestro equipo (¡2 de 3 frentes asegurados = +2 Puntos de Ronda!). Desplegar el 4♣ en el Frente Derecho es tu jugada de cierre perfecta: sumas 4 puntos directamente al marcador de Puntos Acumulados de tu equipo. ¡Los puntos acumulados deciden quién gana el juego en caso de empate en Puntos de Ronda!',
       whyNotOthers: isEn
         ? [
             {

@@ -82,12 +82,12 @@ export function ScoreBoard({
           </div>
         </div>
 
-        {/* Marcador Principal de Rondas y Puntos Acumulados */}
+        {/* Marcador Principal de Puntos de Ronda y Puntos Acumulados */}
         <div className="flex items-center gap-4 bg-black/60 border border-amber-500/25 rounded-2xl px-4 py-1.5 shadow-inner">
-          {/* Rondas Ganadas */}
-          <div className="text-center">
-            <span className="text-[9px] uppercase font-serif font-bold text-amber-200/60 tracking-wider">
-              {is1v1 ? ui.game.scoreboard.youVsRival : ui.game.scoreboard.teamAVsTeamB}
+          {/* Puntos de Ronda (1 / 2 / 3 Pts) */}
+          <div className="text-center" title={ui.game.scoreboard.roundPointsTooltip}>
+            <span className="text-[9px] uppercase font-serif font-bold text-amber-200/60 tracking-wider block">
+              {ui.game.scoreboard.roundPointsLabel} ({is1v1 ? ui.game.scoreboard.youVsRival : ui.game.scoreboard.teamAVsTeamB})
             </span>
             <div className="text-base sm:text-lg font-serif font-black leading-none mt-0.5">
               <span className="text-emerald-400">{teamARoundPoints}</span>

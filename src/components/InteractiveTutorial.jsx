@@ -1024,13 +1024,13 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 {isEn ? 'Official Resolution Phase: Round Conquered' : 'Fase Oficial de Resolución: Ronda Conquistada'}
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-100 uppercase tracking-wide">
-                {isEn ? 'Round Victory for Allied Team (A)!' : '¡Victoria de Ronda para el Equipo Aliado (A)!'}
+                {isEn ? 'Round Victory for Allied Team (A) (+2 Round Points)!' : '¡Victoria de Ronda para el Equipo Aliado (A) (+2 Puntos de Ronda)!'}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">
+              <p className="text-xs sm:text-sm text-slate-300 mt-1">
                 {isEn ? (
-                  <>Fronts Won: <strong className="text-emerald-400">2</strong> (Center and Left) vs <strong className="text-rose-400">1</strong> (Right). Official rule: Winning 2 fronts earns the Round Point!</>
+                  <>Fronts Won: <strong className="text-emerald-400">2</strong> (Center and Left) vs <strong className="text-rose-400">1</strong> (Right). Official Scale: <strong className="text-emerald-300">Winning 2 fronts awards +2 Round Points!</strong> (Winning all 3 fronts awards +3 pts, and a tie awards +1 pt to each team).</>
                 ) : (
-                  <>Frentes Ganados: <strong className="text-emerald-400">2</strong> (Centro e Izquierda) vs <strong className="text-rose-400">1</strong> (Derecha). Regla oficial: ¡Al ganar 2 frentes obtenéis el Punto de Ronda!</>
+                  <>Frentes Ganados: <strong className="text-emerald-400">2</strong> (Centro e Izquierda) vs <strong className="text-rose-400">1</strong> (Derecha). Escala oficial: <strong className="text-emerald-300">¡Al ganar 2 frentes obtenéis +2 Puntos de Ronda!</strong> (Ganar los 3 frentes otorga +3 pts y el empate +1 pt para cada equipo).</>
                 )}
               </p>
             </div>
@@ -1165,6 +1165,32 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 </div>
               </div>
 
+              {/* Escala Oficial de Puntos de Ronda (1, 2 y 3 Puntos) */}
+              <div className="bg-slate-950/90 border border-amber-500/35 p-3.5 rounded-xl text-xs space-y-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-bold text-amber-300 uppercase tracking-wide">
+                    {isEn ? 'Official Round Points System (1, 2 & 3 Points):' : 'Sistema Oficial de Puntos de Ronda (1, 2 y 3 Puntos):'}
+                  </span>
+                  <span className="font-mono font-bold text-emerald-400">
+                    {isEn ? 'Team A: +2 Round Points | Team B: +0 Round Points' : 'Equipo A: +2 Puntos de Ronda | Equipo B: +0 Puntos de Ronda'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center">
+                  <div className="p-2 rounded-lg border bg-slate-900/60 border-slate-800 text-slate-400 opacity-75">
+                    <div className="text-[10px] font-bold uppercase tracking-wider">{isEn ? 'Tie in Fronts' : 'Empate en la Ronda'}</div>
+                    <div className="text-sm font-black font-mono text-sky-300 mt-0.5">{isEn ? '+1 Point EACH' : '+1 Punto C/U'}</div>
+                  </div>
+                  <div className="p-2 rounded-lg border bg-emerald-950/60 border-emerald-400/70 text-emerald-200 shadow-[0_0_12px_rgba(16,185,129,0.2)]">
+                    <div className="text-[10px] font-bold uppercase tracking-wider">{isEn ? 'Standard Win (2 Fronts) • OBTAINED!' : 'Victoria Estándar (2 Frentes) • ¡LOGRADO!'}</div>
+                    <div className="text-sm font-black font-mono text-emerald-300 mt-0.5">{isEn ? '+2 Points Winner' : '+2 Puntos Ganador'}</div>
+                  </div>
+                  <div className="p-2 rounded-lg border bg-slate-900/60 border-slate-800 text-slate-400 opacity-75">
+                    <div className="text-[10px] font-bold uppercase tracking-wider">{isEn ? 'Full Sweep (All 3 Fronts)' : 'Dominio Total / Pleno (3 Frentes)'}</div>
+                    <div className="text-sm font-black font-mono text-amber-300 mt-0.5">{isEn ? '+3 Points Winner' : '+3 Puntos Ganador'}</div>
+                  </div>
+                </div>
+              </div>
+
               {/* Explicación de los Puntos Acumulados */}
               <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
                 <div>
@@ -1261,10 +1287,10 @@ export function InteractiveTutorial({ onBackToMenu }) {
               <div className="flex items-center gap-2 text-slate-200">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
-                  <strong>{isEn ? '2-Front Rule:' : 'Regla de los 2 Frentes:'}</strong>{' '}
+                  <strong>{isEn ? '1, 2 & 3 Round Points System:' : 'Sistema de 1, 2 y 3 Puntos de Ronda:'}</strong>{' '}
                   {isEn
-                    ? 'Conquering at least 2 of the 3 battlefronts secures the round.'
-                    : 'Conquistar al menos 2 de los 3 frentes otorga la ronda.'}
+                    ? 'Tie in the round (+1 pt for EACH team), Standard Victory of 2 fronts (+2 pts), and Full Sweep / "Pleno" of all 3 fronts (+3 pts).'
+                    : 'Empate en la ronda (+1 pt para CADA equipo), Victoria estándar al ganar 2 frentes (+2 pts) y Dominio Total / "Pleno" al ganar los 3 frentes (+3 pts).'}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-slate-200">

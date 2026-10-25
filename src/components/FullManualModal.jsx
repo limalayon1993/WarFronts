@@ -140,9 +140,9 @@ export function FullManualModal({ isOpen, onClose }) {
                   </h4>
                   <p>
                     {isEn ? (
-                      <>The match is contested over a <strong className="text-slate-100">fixed total of Rounds</strong>. The team securing the most round points is declared the victor. In the event of a tie upon completing all rounds, the match will be resolved via the <strong className="text-emerald-400">cumulative score</strong> criterion (total points scored in every round).</>
+                      <>The match is contested over a <strong className="text-slate-100">fixed total of Rounds</strong>. The team securing the <strong className="text-amber-400">highest total sum of Round Points</strong> at the end of those rounds is declared the victor. In the event of a tie upon completing all rounds, the match will be resolved via the <strong className="text-emerald-400">cumulative score</strong> criterion (total numerical points scored in every round).</>
                     ) : (
-                      <>La partida se disputa a un <strong className="text-slate-100">total fijo de Rondas</strong>. El equipo que obtenga la mayoría de puntos de ronda se declara vencedor. En caso de empate al finalizar las rondas, la partida se resolverá mediante el criterio de <strong className="text-emerald-400">puntuación acumulada</strong> (puntos totales en cada ronda).</>
+                      <>La partida se disputa a un <strong className="text-slate-100">total fijo de Rondas</strong>. El equipo que obtenga la <strong className="text-amber-400">mayor suma de Puntos de Ronda</strong> al término de las mismas se declara vencedor. En caso de empate al finalizar las rondas, la partida se resolverá mediante el criterio de <strong className="text-emerald-400">puntuación acumulada</strong> (puntos numéricos totales en cada ronda).</>
                     )}
                   </p>
 
@@ -174,9 +174,9 @@ export function FullManualModal({ isOpen, onClose }) {
                   </h4>
                   <p>
                     {isEn ? (
-                      <>Achieve the highest total numerical value on <strong className="text-emerald-400">at least 2 of the 3 War Fronts</strong> (Left, Center, and Right) upon conclusion of deployment.</>
+                      <>Conquer as many of the <strong className="text-emerald-400">3 War Fronts</strong> (Left, Center, and Right) as possible by achieving the highest total numerical value on them upon conclusion of deployment, earning <strong className="text-amber-400">1, 2, or up to 3 Round Points</strong> depending on the dominance achieved.</>
                     ) : (
-                      <>Obtener el mayor valor numérico total en <strong className="text-emerald-400">al menos 2 de los 3 Frentes de Guerra</strong> (Izquierdo, Central y Derecho) al finalizar el despliegue.</>
+                      <>Conquistar la mayor cantidad posible de los <strong className="text-emerald-400">3 Frentes de Guerra</strong> (Izquierdo, Central y Derecho) obteniendo el mayor valor numérico total en ellos al finalizar el despliegue, para sumar <strong className="text-amber-400">1, 2 o hasta 3 Puntos de Ronda</strong> según el dominio logrado.</>
                     )}
                   </p>
                 </div>
@@ -462,11 +462,14 @@ export function FullManualModal({ isOpen, onClose }) {
                   </h4>
                   <p className="text-xs sm:text-sm">
                     {isEn ? (
-                      <>Both teams begin the first round of the match with <strong className="text-purple-300">zero (0) markers</strong> in their Team Shadow Pool. During the Tactics Phase, the team decides how many markers from its accumulated reserve to spend and distributes them freely among its players according to strategy. <strong className="text-purple-300">Unused markers are preserved for future rounds</strong>. A player may receive multiple markers (being able to play multiple face-down cards in that round) or receive none. Cards played as Shadows remain concealed solely from the opposing team. Any player may secretly inspect the value and suit of Shadow Cards played by their teammates (visible with a purple border).</>
+                      <>Both teams begin the first round of the match with <strong className="text-purple-300">zero (0) markers</strong> in their Team Shadow Pool. During the Tactics Phase, the team decides how many markers from its accumulated reserve to spend and distributes them freely among its players according to strategy. <strong className="text-purple-300">Unused markers are preserved for future rounds</strong>. A player may receive multiple markers (being able to play multiple face-down cards in that round) or receive none.</>
                     ) : (
-                      <>Ambos equipos inician la primera ronda de la partida con <strong className="text-purple-300">cero (0) marcadores</strong> en su Fondo de Sombras. Durante la Fase de Táctica, el equipo decide cuántos marcadores de su reserva acumulada desea gastar y los reparte libremente entre sus jugadores según su estrategia. <strong className="text-purple-300">Los marcadores no utilizados se conservan para rondas futuras</strong>. Un jugador puede recibir múltiples marcadores (pudiendo jugar varias cartas boca abajo en esa ronda) o no recibir ninguno. Las cartas jugadas como Sombra permanecerán ocultas únicamente para el equipo rival. Cualquier jugador podrá consultar en secreto el valor y palo de las Cartas Sombra jugadas por sus compañeros de equipo (visibles con borde morado).</>
+                      <>Ambos equipos inician la primera ronda de la partida con <strong className="text-purple-300">cero (0) marcadores</strong> en su Fondo de Sombras. Durante la Fase de Táctica, el equipo decide cuántos marcadores de su reserva acumulada desea gastar y los reparte libremente entre sus jugadores según su estrategia. <strong className="text-purple-300">Los marcadores no utilizados se conservan para rondas futuras</strong>. Un jugador puede recibir múltiples marcadores (pudiendo jugar varias cartas boca abajo en esa ronda) o no recibir ninguno.</>
                     )}
                   </p>
+                  <div className="bg-slate-950/80 p-3 rounded border border-slate-800 text-xs text-slate-300 mt-2">
+                    <strong>{isEn ? 'Silent Show to Teammates (Teammate Peek):' : 'Muestra en Silencio al Equipo (Vistazo de Compañero):'}</strong> {isEn ? 'Cards played as Shadows remain concealed solely from the opposing team. At the exact moment a player decides to play a Shadow Card, before placing it face-down on the chosen front, they must silently show it to their teammates so they know its value and suit, without speaking or making additional gestures (in the digital version, allied Shadow Cards are automatically visible to your entire team with a purple border).' : 'Las cartas jugadas como Sombra permanecerán ocultas únicamente para el equipo rival. En el instante exacto en que un jugador decide jugar una Carta de Sombra, antes de depositarla boca abajo en el frente elegido, debe mostrársela en silencio a sus compañeros de equipo para que conozcan su valor y palo, sin pronunciar palabra ni hacer gestos adicionales (en la versión digital, las Cartas Sombra aliadas son visibles automáticamente para todo tu equipo con borde morado).'}
+                  </div>
                   <div className="bg-slate-950/80 p-3 rounded border border-slate-800 text-xs text-slate-300 mt-2">
                     <strong>{isEn ? 'Use of Shadow Marker (Anti-Cheat Control):' : 'Uso del Marcador de Sombra (Control Anti-trampas):'}</strong> {isEn ? 'The moment a player decides to play a card face-down, one of the Shadow Markers previously assigned to the team must be placed on the table. This guarantees total transparency regarding how many concealed cards remain available for each team member.' : 'En el momento en que un jugador decide jugar una carta boca abajo, debe colocarse en la mesa uno de los Marcadores de Sombra que se le asignaron al equipo previamente. Esto garantiza transparencia total sobre cuántas cartas ocultas le quedan por jugar a cada miembro del equipo.'}
                   </div>
@@ -531,7 +534,7 @@ export function FullManualModal({ isOpen, onClose }) {
                     </div>
                     <ul className="text-xs sm:text-sm space-y-1.5 text-slate-300">
                       <li>• <strong>{isEn ? 'Total Free Communication:' : 'Comunicación Total Libre:'}</strong> {isEn ? 'Teams have 30 seconds to talk and coordinate macro strategy before cards are dealt.' : 'Los equipos disponen de un tiempo de 30 segundos para hablar y coordinar su estrategia general antes de recibir sus cartas.'}</li>
-                      <li>• <strong>{isEn ? 'Macro Strategy:' : 'Estrategia Macro:'}</strong> {isEn ? 'Plan sector distribution ("Attack Center and Left", "Let\'s build a straight in Center") and decide how many shadow markers from the accumulated pool will be invested this round or saved for future rounds.' : 'Se planifica la distribución de las zonas ("Ataquemos fuerte Centro e Izquierda", "Intentemos armar una escalera en el centro") y se decide cuántos marcadores de sombra del fondo acumulado se invertirán en esta ronda o cuántos se ahorrarán para futuras rondas.'}</li>
+                      <li>• <strong>{isEn ? 'Macro Strategy:' : 'Estrategia Macro:'}</strong> {isEn ? 'Plan sector distribution ("Attack Center and Left", "Let\'s build a straight in Center", "Let\'s push for the 3-front Sweep") and decide how many shadow markers from the accumulated pool will be invested this round or saved for future rounds.' : 'Se planifica la distribución de las zonas ("Ataquemos fuerte Centro e Izquierda", "Intentemos armar una escalera en el centro", "Busquemos el Pleno de 3 frentes") y se decide cuántos marcadores de sombra del fondo acumulado se invertirán en esta ronda o cuántos se ahorrarán para futuras rondas.'}</li>
                       <li>• <strong>{isEn ? 'Time Budget:' : 'Presupuesto Temporal:'}</strong> {isEn ? 'Teams can agree on clock distribution (e.g. initial players play in 3-5 seconds to save time for endgame calculations).' : 'Los equipos pueden pactar la distribución de su reloj compartido (ejemplo: acordar que los jugadores iniciales jueguen en 3–5 segundos para reservar tiempo de cálculo al cierre de la ronda).'}</li>
                       <li className="text-emerald-300 font-semibold">• <strong>{isEn ? 'Anti-Alpha Player Guarantee:' : 'Garantía Anti-Jugador Alfa:'}</strong> {isEn ? 'Having no cards in hand prevents any single player from dictating teammate actions.' : 'Al no tener aún las cartas en mano, es imposible que un jugador ordene las jugadas exactas a sus compañeros.'}</li>
                     </ul>
@@ -560,13 +563,13 @@ export function FullManualModal({ isOpen, onClose }) {
                       <li>• <strong>{isEn ? 'Clock Start:' : 'Inicio del Reloj:'}</strong> {isEn ? 'The clock for the team holding the Initiative Token starts immediately when the phase begins.' : 'El reloj del equipo con la Ficha de Iniciativa se activa en el instante en que comienza la fase.'}</li>
                       <li>• <strong>{isEn ? 'Turn Order & Alternation:' : 'Orden de Turnos e Intercalado:'}</strong> {isEn ? 'Starts with the Initiative team. Turns strictly alternate 1-by-1 (e.g., A1 ➔ B1 ➔ A2 ➔ B2) until all players have deployed all cards.' : 'Inicia un jugador del equipo con la Ficha de Iniciativa. Los turnos se alternan estrictamente 1 a 1 entre jugadores de ambos equipos de forma fija (ej: A1 ➔ B1 ➔ A2 ➔ B2) hasta que todos los jugadores hayan colocado todas sus cartas.'}</li>
                       <li>• <strong>{isEn ? 'Unique Turn Action:' : 'Acción Única del Turno:'}</strong> {isEn ? 'On their turn, the player MUST place exactly ONE (1) card on any unsaturated front. Passing or playing 2 cards is forbidden. Placing the card switches the clock to the other team.' : 'En su turno, el jugador DEBE colocar exactamente UNA (1) carta en cualquiera de los 3 Frentes que no haya alcanzado el Límite Territorial Compartido. No se permite jugar 2 cartas en un mismo turno ni pasar el turno. Cuando se coloca la carta el cronómetro empieza a contar para el otro equipo.'}</li>
-                      <li>• {isEn ? 'If choosing to play face-down (Shadow Card), one of the Shadow Markers belonging to the team must be flipped/turned in. If the team has no markers left, the card must obligatorily be played face-up.' : 'Si decide jugarla boca abajo (Carta de Sombra), debe voltear/entregar uno de los Marcadores de Sombra que le pertenecen al equipo. Si el equipo no tiene marcadores, debe jugar su carta obligatoriamente boca arriba.'}</li>
+                      <li>• {isEn ? 'If choosing to play face-down (Shadow Card), one of the Shadow Markers belonging to the team must be flipped/turned in, the card is silently shown to teammates, and then placed face-down on the chosen front. If the team has no markers left, the card must obligatorily be played face-up.' : 'Si decide jugarla boca abajo (Carta de Sombra), debe voltear/entregar uno de los Marcadores de Sombra que le pertenecen al equipo, enseñar la carta en silencio a sus compañeros de equipo y colocarla boca abajo en el frente elegido. Si el equipo no tiene marcadores, debe jugar su carta obligatoriamente boca arriba.'}</li>
                       <li>• <strong>{isEn ? 'Territorial Front Limit:' : 'Restricción del Límite Territorial Compartido:'}</strong> {isEn ? 'Cards cannot be played on fronts where total cards have reached the limit (8 in 1v1/2v2; 12 in 3v3; 16 in 4v4).' : 'No se puede colocar una carta en un Frente donde la suma total de cartas de ambos equipos ya haya alcanzado el límite permitido (8 cartas en 1v1 y 2v2; 12 cartas en 3v3; 16 cartas en 4v4).'}</li>
                       <li className="text-rose-300 font-semibold bg-rose-950/30 p-2.5 rounded border border-rose-900/60">
                         <strong>{isEn ? 'Loss on Time (Flag Fall):' : 'Derrota por Tiempo (Caída de Bandera):'}</strong> {isEn ? 'If a team clock reaches 00:00 before completing turns:' : 'Si el reloj de un equipo llega a 00:00 antes de completar sus turnos:'}
                         <div className="mt-1 pl-2 space-y-0.5 font-normal text-slate-300 text-xs">
                           <div>- {isEn ? 'The round ends instantaneously.' : 'La ronda finaliza de manera instantánea.'}</div>
-                          <div>- {isEn ? 'The offending team automatically loses the round and the opponent scores +1 Round Point.' : 'El equipo infractor pierde la ronda automáticamente y el equipo rival suma el +1 Punto de Ronda de forma directa.'}</div>
+                          <div>- {isEn ? 'The offending team automatically loses the round and the opponent scores +2 Round Points directly (standard victory), unless at that exact instant the opponent already held a higher score on all 3 fronts with all cards played, in which case they score +3 Round Points.' : 'El equipo infractor pierde la ronda automáticamente y el equipo rival suma 2 Puntos de Ronda de forma directa (victoria estándar), salvo que en ese instante ya tuviera mayor puntuación en los 3 frentes habiéndose jugado todas las cartas del rival, en cuyo caso sumará 3 Puntos de Ronda.'}</div>
                           <div>- <strong>{isEn ? 'Cumulative Score Conservation:' : 'Conservación de Puntos Acumulados:'}</strong> {isEn ? 'Cards played on fronts up to flag fall are revealed and tallied (base value + synergy bonuses) for overall match tiebreakers.' : 'Se voltean las cartas jugadas hasta ese instante en la mesa y se suman los valores base y bonificaciones por sinergia ya colocadas por ambos bandos. Esos puntos se registran obligatoriamente en la Hoja de Anotación para el criterio de desempate final de la partida.'}</div>
                         </div>
                       </li>
@@ -579,13 +582,21 @@ export function FullManualModal({ isOpen, onClose }) {
                   <h4 className="font-bold text-amber-400 mb-2">{isEn ? 'UPON COMPLETING DEPLOYMENT:' : 'TRAS COMPLETAR EL DESPLIEGUE:'}</h4>
                   <div>1. <strong>{isEn ? 'Revelation:' : 'Revelación:'}</strong> {isEn ? 'Flip all Shadow Cards (making them publicly visible to the rival team and spectators).' : 'Voltear todas las Cartas Sombra (haciéndolas visibles al equipo rival y espectadores).'}</div>
                   <div>2. <strong>{isEn ? 'Sum:' : 'Suma:'}</strong> {isEn ? 'Base Value + Synergy Bonuses (Suit +5, Pair +10, Straight +15, Trio +20).' : 'Valor Base + Bonificaciones por Sinergia (Palo +5, Pareja +10, Escalera +15, Trío +20).'}</div>
-                  <div>3. <strong>{isEn ? 'Winner:' : 'Ganador:'}</strong> {isEn ? 'Winning 2 of 3 Fronts = +1 Round Point. Record cumulative front points.' : 'Ganar 2 de 3 Frentes = +1 Pt de Ronda. Registra también los puntos numéricos acumulados en la Hoja de Anotación.'}</div>
+                  <div className="pt-2 border-t border-slate-800">
+                    3. <strong className="text-emerald-400">{isEn ? 'Round Points Allocation (1, 2 & 3 Points):' : 'Asignación de Puntos de Ronda (1, 2 y 3 Puntos):'}</strong>
+                    <div className="mt-1.5 pl-3 space-y-1 text-slate-300">
+                      <div>• <strong className="text-sky-300">{isEn ? 'Tie in the round' : 'Empate en la ronda'}</strong> {isEn ? '(e.g. each team wins 1 front and the 3rd is void, or all 3 are void):' : '(ej. cada equipo gana 1 frente y el otro es nulo, o todos son nulos):'} <strong className="text-slate-100">{isEn ? '+1 Round Point for EACH team.' : '1 Punto de Ronda para CADA equipo.'}</strong></div>
+                      <div>• <strong className="text-emerald-300">{isEn ? 'Standard Victory' : 'Victoria estándar'}</strong> {isEn ? '(winning 2 fronts and losing or tying the 3rd):' : '(ganar 2 frentes y perder o empatar el 3º):'} <strong className="text-slate-100">{isEn ? '+2 Round Points for the winning team (0 for the loser).' : '2 Puntos de Ronda para el equipo ganador (0 para el perdedor).'}</strong></div>
+                      <div>• <strong className="text-amber-300">{isEn ? 'Total Dominance / "Sweep"' : 'Dominio Total / "Pleno"'}</strong> {isEn ? '(winning all 3 fronts):' : '(ganar los 3 frentes):'} <strong className="text-slate-100">{isEn ? '+3 Round Points for the winning team (0 for the loser).' : '3 Puntos de Ronda para el equipo ganador (0 para el perdedor).'}</strong></div>
+                      <div className="text-[11px] text-slate-400 italic">{isEn ? '*Note: In all cases, cumulative numerical points across all fronts are also recorded on the Score Sheet.' : '*Nota: En todos los casos se registran también los puntos numéricos acumulados en la Hoja de Anotación.'}</div>
+                    </div>
+                  </div>
                   <div className="pt-2 border-t border-slate-800">
                     4. <strong className="text-purple-300">{isEn ? 'Economy Income (Shadows):' : 'Ingresos de Economía (Sombras):'}</strong> {isEn ? 'After determining the round winner, each team receives new Shadow Markers added immediately to their Team Pool for subsequent rounds. The amount depends on format and round outcome:' : 'Tras determinar al ganador de la ronda, cada equipo recibe nuevos Marcadores de Sombra que se añaden inmediatamente a su Fondo de Equipo para las siguientes rondas. La cantidad depende del formato y del resultado de la ronda:'}
                     <div className="mt-1.5 pl-3 space-y-1 text-slate-300">
-                      <div>• <strong>{isEn ? '1v1 & 2v2 Format:' : 'Formato 1v1 y 2v2:'}</strong> {isEn ? 'Winning Team (+1), Losing Team (+2), Loser on streak of 2+ consecutive losses (+3). Void Round (+1 to both).' : 'Equipo Ganador (+1), Equipo Perdedor (+2), Perdedor en racha de 2 o más derrotas consecutivas (+3). Ronda Nula (+1 a ambos).'}</div>
-                      <div>• <strong>{isEn ? '3v3 Format:' : 'Formato 3v3:'}</strong> {isEn ? 'Winning Team (+2), Losing Team (+3), Loser on streak of 2+ consecutive losses (+4). Void Round (+2 to both).' : 'Equipo Ganador (+2), Equipo Perdedor (+3), Perdedor en racha de 2 o más derrotas consecutivas (+4). Ronda Nula (+2 a ambos).'}</div>
-                      <div>• <strong>{isEn ? '4v4 Format:' : 'Formato 4v4:'}</strong> {isEn ? 'Winning Team (+2), Losing Team (+4), Loser on streak of 2+ consecutive losses (+5). Void Round (+2 to both).' : 'Equipo Ganador (+2), Equipo Perdedor (+4), Perdedor en racha de 2 o más derrotas consecutivas (+5). Ronda Nula (+2 a ambos).'}</div>
+                      <div>• <strong>{isEn ? '1v1 & 2v2 Format:' : 'Formato 1v1 y 2v2:'}</strong> {isEn ? 'Winning Team (+1), Losing Team (+2), Loser on streak of 2+ consecutive losses (+3). Tied Round (+1 to both).' : 'Equipo Ganador (+1), Equipo Perdedor (+2), Perdedor en racha de 2 o más derrotas consecutivas (+3). Empate de Ronda (+1 a ambos).'}</div>
+                      <div>• <strong>{isEn ? '3v3 Format:' : 'Formato 3v3:'}</strong> {isEn ? 'Winning Team (+2), Losing Team (+3), Loser on streak of 2+ consecutive losses (+4). Tied Round (+2 to both).' : 'Equipo Ganador (+2), Equipo Perdedor (+3), Perdedor en racha de 2 o más derrotas consecutivas (+4). Empate de Ronda (+2 a ambos).'}</div>
+                      <div>• <strong>{isEn ? '4v4 Format:' : 'Formato 4v4:'}</strong> {isEn ? 'Winning Team (+2), Losing Team (+4), Loser on streak of 2+ consecutive losses (+5). Tied Round (+2 to both).' : 'Equipo Ganador (+2), Equipo Perdedor (+4), Perdedor en racha de 2 o más derrotas consecutivas (+5). Empate de Ronda (+2 a ambos).'}</div>
                     </div>
                   </div>
                 </div>
@@ -612,9 +623,9 @@ export function FullManualModal({ isOpen, onClose }) {
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-300">
                       {isEn ? (
-                        <>If both teams tie in exact score on a Front, the front tiebreaker goes to the team holding the <strong className="text-amber-300">highest base-value individual card</strong> played on it. If exact tie persists, the Front is declared <strong className="text-slate-100">Void</strong> (neither team scores it).</>
+                        <>If both teams tie in exact score on a Front, the front tiebreaker goes to the team holding the <strong className="text-amber-300">highest base-value individual card</strong> played on it (following nominal order from 2 to Ace: 2 &lt; 3 &lt; ... &lt; 10 &lt; J &lt; Q &lt; K &lt; A). If the exact tie persists, the Front is declared <strong className="text-slate-100">Void</strong> (neither team wins that front).</>
                       ) : (
-                        <>Si ambos equipos igualan en puntaje exacto en un Frente, el desempate en ese frente lo gana el equipo que posea la <strong className="text-amber-300">carta individual de mayor valor base</strong> jugada en él. Si el empate persiste, el Frente se declara <strong className="text-slate-100">Nulo</strong> (nadie suma ese frente).</>
+                        <>Si ambos equipos igualan en puntaje exacto en un Frente, el desempate en ese frente lo gana el equipo que posea la <strong className="text-amber-300">carta individual de mayor valor base</strong> jugada en él (siguiendo su valor nominal del 2 al As: 2 &lt; 3 &lt; ... &lt; 10 &lt; J &lt; Q &lt; K &lt; A). Si el empate persiste, el Frente se declara <strong className="text-slate-100">Nulo</strong> (nadie gana ese frente).</>
                       )}
                     </p>
                   </div>
@@ -626,9 +637,9 @@ export function FullManualModal({ isOpen, onClose }) {
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-300">
                       {isEn ? (
-                        <>If the round ends tied (e.g. Team A wins Left, Team B wins Right, and Center is Void), the <strong className="text-slate-100">Round is declared Void</strong>. Neither team scores the round point, but numerical points obtained across all fronts <strong className="text-emerald-400">must be recorded</strong> for cumulative scoring.</>
+                        <>If the round ends tied in conquered fronts (e.g., Team A wins Left, Team B wins Right, and Center is Void; or all 3 fronts are Void), a <strong className="text-sky-300">Round Tie</strong> occurs. In this case, <strong className="text-amber-300">both teams score 1 Round Point each</strong>, and the numerical points obtained by each team across the fronts of that round <strong className="text-emerald-400">must be recorded</strong> on the score sheet for cumulative scoring. <em className="text-slate-400">(Note: If two fronts are Void and one team wins the remaining front 1 to 0, it is considered a standard victory of <strong>+2 Round Points</strong>).</em></>
                       ) : (
-                        <>Si la ronda concluye igualada (ejemplo: Equipo A gana Izquierda, Equipo B gana Derecha, y el Centro es Nulo), la <strong className="text-slate-100">Ronda se declara Nula</strong>. Ningún equipo anota el punto de ronda, pero los puntos numéricos obtenidos por cada equipo en los frentes de esa ronda <strong className="text-emerald-400">sí deben registrarse</strong> en la hoja de anotación para el cálculo de puntos acumulados.</>
+                        <>Si la ronda concluye igualada en frentes conquistados (ejemplo: Equipo A gana Izquierda, Equipo B gana Derecha y el Centro es Nulo; o los 3 frentes resultan Nulos), se produce un <strong className="text-sky-300">Empate de Ronda</strong>. En este caso, <strong className="text-amber-300">ambos equipos suman 1 Punto de Ronda cada uno</strong>, y los puntos numéricos obtenidos por cada equipo en los frentes de esa ronda <strong className="text-emerald-400">sí deben registrarse</strong> en la hoja de anotación para el cálculo de puntos acumulados. <em className="text-slate-400">(Nota: Si dos frentes resultan Nulos y un equipo gana el frente restante 1 a 0, se considera victoria estándar de <strong>2 Puntos de Ronda</strong>).</em></>
                       )}
                     </p>
                   </div>
@@ -668,9 +679,9 @@ export function FullManualModal({ isOpen, onClose }) {
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-300">
                       {isEn ? (
-                        <>If a team collecting the maximum shadow bonus from a loss streak manages to win a round or tie it (Void Round), its streak resets instantaneously. Their subsequent defeat will count as the first.</>
+                        <>If a team collecting the maximum shadow bonus from a loss streak manages to win a round (scoring 2 or 3 points) or tie it (scoring 1 point each), its streak resets instantaneously. Their subsequent defeat will count as the first.</>
                       ) : (
-                        <>Si un equipo que está cobrando el bono máximo de sombras por racha de derrotas logra ganar una ronda o empatarla (Ronda Nula), su racha se reinicia instantáneamente. Su siguiente derrota contará como la primera.</>
+                        <>Si un equipo que está cobrando el bono máximo de sombras por racha de derrotas logra ganar una ronda (sumando 2 o 3 puntos) o empatarla (sumando 1 punto cada uno), su racha se reinicia instantáneamente. Su siguiente derrota contará como la primera.</>
                       )}
                     </p>
                   </div>
@@ -698,9 +709,9 @@ export function FullManualModal({ isOpen, onClose }) {
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-300">
                       {isEn ? (
-                        <>After playing the scheduled rounds (4, 6, or 8), the team with the most rounds won takes the victory.</>
+                        <>After playing the scheduled rounds (4, 6, or 8), the team that has accumulated the <strong className="text-emerald-400">highest total amount of Round Points</strong> takes the victory.</>
                       ) : (
-                        <>Tras disputar las rondas reglamentarias (4, 6 u 8), el equipo con más rondas ganadas obtiene la victoria.</>
+                        <>Tras disputar las rondas reglamentarias (4, 6 u 8), el equipo que haya acumulado la <strong className="text-emerald-400">mayor cantidad total de Puntos de Ronda</strong> obtiene la victoria.</>
                       )}
                     </p>
                   </div>
@@ -712,9 +723,9 @@ export function FullManualModal({ isOpen, onClose }) {
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-300">
                       {isEn ? (
-                        <>If tied in rounds (e.g. 4-4 or 3-3 with void rounds), <strong className="text-slate-100">total numerical points scored by each team across all fronts</strong> over all rounds are summed. The team with higher cumulative points wins.</>
+                        <>If the match concludes tied in Round Points, <strong className="text-slate-100">total numerical points scored by each team across all fronts</strong> over all regular rounds are summed. The team with higher cumulative points wins.</>
                       ) : (
-                        <>Si la partida concluye empatada en rondas (ej: 4-4, o 3-3 con rondas nulas), se sumarán los <strong className="text-slate-100">puntos numéricos totales obtenidos por cada equipo en todos los frentes</strong> a lo largo de las rondas reglamentarias. El equipo con mayor puntuación acumulada se declara vencedor.</>
+                        <>Si la partida concluye empatada en Puntos de Ronda, se sumarán los <strong className="text-slate-100">puntos numéricos totales obtenidos por cada equipo en todos los frentes</strong> a lo largo de las rondas reglamentarias. El equipo con mayor puntuación acumulada se declara vencedor.</>
                       )}
                     </p>
                   </div>
@@ -726,9 +737,9 @@ export function FullManualModal({ isOpen, onClose }) {
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-300">
                       {isEn ? (
-                        <>If exact tie persists in cumulative points, <strong className="text-slate-100">2 Overtime Rounds</strong> are played (preserving initiative rotation). If still tied, overtime cumulative points are summed until a winner emerges.</>
+                        <>If exact tie persists in cumulative points, <strong className="text-slate-100">2 Overtime Rounds</strong> are played (preserving initiative rotation and the 1, 2, and 3 Round Points system). If still tied in Round Points after overtime, overtime cumulative points are summed until a winner emerges.</>
                       ) : (
-                        <>En el caso poco probable de que persista el empate exacto en puntos acumulados, se jugarán <strong className="text-slate-100">2 Rondas de Prórroga adicionales</strong> (manteniendo la rotación de iniciativa). Si el empate en rondas persiste tras la prórroga, se volverán a sumar los puntos numéricos acumulados de la prórroga. El proceso se repetirá hasta obtener un ganador.</>
+                        <>En el caso poco probable de que persista el empate exacto en puntos acumulados, se jugarán <strong className="text-slate-100">2 Rondas de Prórroga adicionales</strong> (manteniendo la rotación de iniciativa y el sistema de 1, 2 y 3 Puntos de Ronda). Si el empate en Puntos de Ronda persiste tras la prórroga, se volverán a sumar los puntos numéricos acumulados de la prórroga. El proceso se repetirá hasta obtener un ganador.</>
                       )}
                     </p>
                   </div>
@@ -778,7 +789,7 @@ export function FullManualModal({ isOpen, onClose }) {
                       <strong>{isEn ? 'Shared Front Limit:' : 'Límite Territorial Compartido:'}</strong> {isEn ? 'Max 8 cards total per Front summing both duelists.' : 'Máximo 8 cartas en total por Frente sumando las cartas de ambos jugadores.'}
                     </li>
                     <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                      <strong>{isEn ? 'Shadow Economy:' : 'Economía de Sombras:'}</strong> {isEn ? 'Starts at 0. Win (+1), Loss (+2), Loss Streak 2+ (+3), Void Round (+1). Continuous saving across rounds.' : 'Inician con 0. Gana (+1), Pierde (+2), Racha 2+ (+3), Ronda Nula (+1). Ahorro continuo entre rondas.'}
+                      <strong>{isEn ? 'Shadow Economy:' : 'Economía de Sombras:'}</strong> {isEn ? 'Starts at 0. Win (+1), Loss (+2), Loss Streak 2+ (+3), Tied Round (+1). Continuous saving across rounds.' : 'Inician con 0. Gana (+1), Pierde (+2), Racha 2+ (+3), Empate de Ronda (+1). Ahorro continuo entre rondas.'}
                     </li>
                     <li className="bg-slate-950 p-2.5 rounded border border-slate-800 sm:col-span-2">
                       <strong>{isEn ? 'Clock Management in 1v1:' : 'Gestión del Reloj en 1v1:'}</strong> {isEn ? 'The solo player assumes all 10 turns, having the full 10-turn clock pool (e.g. 3m 20s in Medium speed), switching the clock after each card.' : 'El jugador individual asume los 10 turnos de su equipo, disponiendo de la bolsa de tiempo completa de 10 turnos (ej. 3 min 20 s en Ritmo Medio) para alternar sus jugadas frente al rival, pulsando el reloj tras cada una de sus 10 cartas colocadas.'}
@@ -837,7 +848,7 @@ export function FullManualModal({ isOpen, onClose }) {
                         <span className="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-mono">{isEn ? 'Dual Clock' : 'Reloj Dual'}</span>
                       </div>
                       <p className="text-slate-400">
-                        {isEn ? '1-by-1 alternating turns. 1 card per turn on an unsaturated front (max 8 cards combined). Play face-down by spending 1 shadow marker from the accumulated pool. Clock matches mode speed (Fast: 1:40, Medium: 3:20, Slow: 5:00). Flag Fall awards round to opponent while conserving table points. Concludes upon playing all 10 cards, followed by economy payout.' : 'Turnos 1 a 1 alternados (Jugador A ➔ Jugador B ➔ Jugador A...) comenzando por quien tenga la Iniciativa. Se coloca exactamente una carta por turno en un frente no saturado (máximo 8 cartas sumando ambos duelistas). Para jugar boca abajo se gasta 1 marcador del fondo acumulado. En 1v1 el reloj de equipo equivale al reloj de cada duelista (Rápido: 1m 40s, Medio: 3m 20s, Lento: 5m 00s). La Caída de Bandera a 00:00 otorga automáticamente la ronda (+1 Punto) al contrincante conservando los puntos acumulados en mesa. Concluye al jugar las 10 cartas y a continuación se cobra la economía.'}
+                        {isEn ? '1-by-1 alternating turns. 1 card per turn on an unsaturated front (max 8 cards combined). Play face-down directly by spending 1 shadow marker from the accumulated pool. Clock matches mode speed (Fast: 1:40, Medium: 3:20, Slow: 5:00). Flag Fall awards +2 Round Points to the opponent while conserving table points. Upon playing all 10 cards, the 1, 2, and 3 Round Points scale is applied (Tie: +1 each; 2 fronts: +2 pts; all 3 fronts: +3 pts), followed by economy payout.' : 'Turnos 1 a 1 alternados (Jugador A ➔ Jugador B ➔ Jugador A...) comenzando por quien tenga la Iniciativa. Se coloca exactamente una carta por turno en un frente no saturado (máximo 8 cartas sumando ambos duelistas). Para jugar boca abajo se gasta 1 marcador del fondo acumulado (al no haber compañero, se coloca directamente boca abajo). En 1v1 el reloj de equipo equivale al reloj de cada duelista (Rápido: 1m 40s, Medio: 3m 20s, Lento: 5m 00s). La Caída de Bandera a 00:00 otorga automáticamente la ronda (+2 Puntos de Ronda) al contrincante conservando los puntos acumulados en mesa. Al terminar el despliegue de las 10 cartas, se aplica el mismo sistema de 1, 2 y 3 Puntos de Ronda (Empate: +1 c/u; Ganar 2 frentes: +2 pts; Ganar los 3 frentes: +3 pts) y se cobra la economía.'}
                       </p>
                     </div>
                   </div>

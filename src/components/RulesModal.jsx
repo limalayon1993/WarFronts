@@ -16,7 +16,7 @@ export function RulesModal({ isOpen, onClose }) {
           <div className="flex items-center gap-2">
             <Swords className="w-5 h-5 text-amber-400" />
             <h2 className="text-lg font-bold text-slate-100">
-              {isEn ? 'Official Rules: WarFronts (v1.6)' : 'Reglamento Oficial: Frentes de Guerra (v1.6)'}
+              {isEn ? 'Official Rules: WarFronts (v2.0)' : 'Reglamento Oficial: Frentes de Guerra (v2.0)'}
             </h2>
           </div>
           <button
@@ -92,20 +92,20 @@ export function RulesModal({ isOpen, onClose }) {
               <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
                 <h3 className="font-bold text-slate-100 flex items-center gap-2 mb-2">
                   <Swords className="w-4 h-4 text-emerald-400" />
-                  {isEn ? 'Round Goal & Team Clocks' : 'Objetivo de la Ronda y Reloj de Equipo'}
+                  {isEn ? 'Round Scoring (1, 2 & 3 Points) & Team Clocks' : 'Puntuación por Ronda (1, 2 y 3 Puntos) y Reloj de Equipo'}
                 </h3>
                 <p>
                   {isEn ? (
-                    <>Achieve the highest total numerical value in at least <strong className="text-emerald-400">2 of the 3 WarFronts</strong> (Left, Center, and Right) at the end of deployment.</>
+                    <>Conquer the 3 WarFronts (Left, Center, and Right). At the end of deployment, Round Points are awarded as follows: <strong className="text-sky-400">Tie in fronts (+1 Point for EACH team)</strong>, <strong className="text-emerald-400">Standard Victory — 2 fronts won (+2 Points)</strong>, or <strong className="text-amber-400">Full Sweep / "Pleno" — all 3 fronts won (+3 Points)</strong>.</>
                   ) : (
-                    <>Obtener el mayor valor numérico total en al menos <strong className="text-emerald-400">2 de los 3 Frentes de Guerra</strong> (Izquierdo, Central y Derecho) al terminar el despliegue.</>
+                    <>Conquista los 3 Frentes de Guerra (Izquierdo, Central y Derecho). Al terminar el despliegue, los Puntos de Ronda se reparten así: <strong className="text-sky-400">Empate en la ronda (+1 Punto para CADA equipo)</strong>, <strong className="text-emerald-400">Victoria estándar — ganar 2 frentes (+2 Puntos)</strong> o <strong className="text-amber-400">Dominio Total / "Pleno" — ganar los 3 frentes (+3 Puntos)</strong>.</>
                   )}
                 </p>
                 <p className="mt-2 text-xs text-slate-400">
                   {isEn ? (
-                    <>Time is regulated by a <strong className="text-slate-200">Shared Team Clock</strong> (Fast, Medium, or Slow) consumed during teammates' turns and toggled to the rival after each play. If a clock hits 00:00 (Flag Fall), the rival immediately wins the round (+1 Point) and table points are tallied.</>
+                    <>Time is regulated by a <strong className="text-slate-200">Shared Team Clock</strong> (Fast, Medium, or Slow) consumed during teammates' turns and toggled to the rival after each play. If a clock hits 00:00 (Flag Fall), the rival immediately wins the round (+2 Round Points, or +3 if sweeping all 3 fronts) and table points are tallied.</>
                   ) : (
-                    <>El tiempo de juego es un <strong className="text-slate-200">Reloj Compartido de Equipo</strong> (Rápido, Medio o Lento) que se consume durante los turnos de sus integrantes y conmuta al rival tras cada carta jugada. Si un reloj llega a 00:00 (Caída de Bandera), el rival gana de inmediato la ronda (+1 Punto) y se contabilizan los puntos en mesa.</>
+                    <>El tiempo de juego es un <strong className="text-slate-200">Reloj Compartido de Equipo</strong> (Rápido, Medio o Lento) que se consume durante los turnos de sus integrantes y conmuta al rival tras cada carta jugada. Si un reloj llega a 00:00 (Caída de Bandera), el rival gana de inmediato la ronda (+2 Puntos de Ronda, o +3 si ya dominaba los 3 frentes) y se contabilizan los puntos en mesa.</>
                   )}
                 </p>
               </div>
@@ -211,13 +211,13 @@ export function RulesModal({ isOpen, onClose }) {
             <div className="space-y-4">
               <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
                 <h3 className="font-bold text-slate-100 flex items-center gap-2 mb-2 text-purple-400">
-                  <EyeOff className="w-4 h-4" /> {isEn ? 'Shadow Cards (Face-Down)' : 'Cartas de Sombra (Boca Abajo)'}
+                  <EyeOff className="w-4 h-4" /> {isEn ? 'Shadow Economy & Silent Show' : 'Economía de Sombras y Vistazo de Equipo'}
                 </h3>
                 <p className="text-xs">
                   {isEn ? (
-                    <>In 1v1 mode you have <strong className="text-purple-400">2 Shadow Markers</strong> per round. In team modes, Shadow Markers belong to the team as a shared pool: <strong className="text-purple-400">2 in 2v2, 3 in 3v3, and 4 in 4v4</strong>. Any player on the team can deploy cards face-down as long as the team has shadow markers remaining in its pool. Shadow cards remain concealed from opponents, but are <strong className="text-purple-300">completely visible to your entire team</strong> (highlighted with a purple border). Opponents will not know their rank or score until the round concludes.</>
+                    <>Both teams start Round 1 with <strong className="text-purple-400">0 Shadow Markers</strong>. At the end of each round, teams earn Shadow Markers into their shared pool based on the result (e.g. in 1v1/2v2: Win +1, Loss +2, Streak 2+ +3, Tie +1; in 3v3: +2/+3/+4/+2; in 4v4: +2/+4/+5/+2) with continuous saving across rounds. When playing a Shadow Card, it is shown silently to teammates before placing it face-down (visible to your entire team with a purple border), remaining hidden from opponents until round end.</>
                   ) : (
-                    <>En el modo 1v1 dispones de <strong className="text-purple-400">2 Marcadores de Sombra</strong> por ronda. En los modos por equipos, las cartas sombra pertenecen al equipo y forman un fondo común: <strong className="text-purple-400">2 en 2v2, 3 en 3v3 y 4 en 4v4</strong>. Cualquier jugador del equipo puede jugar cartas boca abajo mientras al equipo le queden marcadores en su fondo. Las cartas sombra permanecen ocultas para el rival, pero son <strong className="text-purple-300">completamente visibles para todo tu equipo</strong> (rodeadas con un distintivo borde morado). Tu rival no sabrá qué carta es ni qué puntuación aporta hasta que concluya el despliegue de la ronda.</>
+                    <>Ambos equipos inician la Ronda 1 con <strong className="text-purple-400">0 Marcadores de Sombra</strong>. Al final de cada ronda, los equipos cobran Marcadores de Sombra para su fondo común según el resultado (ej. en 1v1/2v2: Gana +1, Pierde +2, Racha 2+ +3, Empate +1; en 3v3: +2/+3/+4/+2; en 4v4: +2/+4/+5/+2) con ahorro continuo entre rondas. Al jugar una Carta Sombra, se enseña en silencio al equipo antes de bajarla boca abajo (visible para tu equipo con borde morado), permaneciendo oculta para el rival hasta el final de la ronda.</>
                   )}
                 </p>
               </div>
@@ -261,13 +261,13 @@ export function RulesModal({ isOpen, onClose }) {
 
               <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
                 <h3 className="font-bold text-slate-100 mb-2">
-                  {isEn ? '2. Match Tiebreaker (Cumulative Points)' : '2. Desempate de la Partida (Puntos Acumulados)'}
+                  {isEn ? '2. Round Tie & Match Tiebreaker (Cumulative Points)' : '2. Empate de Ronda y Desempate de Partida (Puntos Acumulados)'}
                 </h3>
                 <p className="text-xs">
                   {isEn ? (
-                    <>If round points are tied at match end (e.g. 2-2 or 3-3), the team with the <strong className="text-emerald-400">highest cumulative numerical score</strong> across all fronts wins the match.</>
+                    <>If a round ends tied in fronts (e.g. 1-1 and 1 Void), <strong className="text-sky-400">each team scores +1 Round Point</strong>. If total Round Points are tied at match end, the team with the <strong className="text-emerald-400">highest cumulative numerical score</strong> across all fronts wins the match.</>
                   ) : (
-                    <>Si al terminar todas las rondas hay empate a rondas ganadas (ej. 2-2 o 3-3), gana el jugador que sume la <strong className="text-emerald-400">mayor cantidad de puntos numéricos acumulados</strong> a lo largo de toda la partida.</>
+                    <>Si una ronda termina empatada en frentes (ej. 1-1 y 1 Nulo), <strong className="text-sky-400">cada equipo suma +1 Punto de Ronda</strong>. Si al terminar todas las rondas hay empate en Puntos de Ronda totales, gana el equipo que sume la <strong className="text-emerald-400">mayor cantidad de puntos numéricos acumulados</strong> a lo largo de toda la partida.</>
                   )}
                 </p>
               </div>

@@ -46,15 +46,15 @@ export function getLocalizedFronts(lang = 'es') {
   ];
 }
 
-// Economía de Cartas de Sombra según Reglamento Oficial v1.6 y Guía Rápida v2.0
+// Economía de Cartas de Sombra según Reglamento Oficial v2.0 y Guía Rápida v2.0
 // Ambos equipos inician la Ronda 1 con 0 sombras en su Fondo de Equipo.
 // Al final de la ronda se cobran marcadores según el resultado:
 // - Gana: +1 (1v1, 2v2) / +2 (3v3, 4v4)
 // - Pierde: +2 (1v1, 2v2) / +3 (3v3) / +4 (4v4)
 // - Racha de Derrotas (2 o más consecutivas): +3 (1v1, 2v2) / +4 (3v3) / +5 (4v4)
-// - Ronda Nula / Empate: +1 a ambos (1v1, 2v2) / +2 a ambos (3v3, 4v4)
+// - Empate de Ronda: +1 a ambos (1v1, 2v2) / +2 a ambos (3v3, 4v4)
 // Los marcadores no utilizados se conservan entre rondas (ahorro continuo).
-// La racha de derrotas se reinicia a 0 si se gana o empata (Ronda Nula).
+// La racha de derrotas se reinicia a 0 si se gana (2 o 3 pts) o empata (+1 pt a ambos).
 export const SHADOW_ECONOMY = {
   '1v1': { win: 1, loss: 2, streak: 3, tie: 1 },
   '2v2': { win: 1, loss: 2, streak: 3, tie: 1 },
@@ -63,13 +63,93 @@ export const SHADOW_ECONOMY = {
 };
 
 /**
+ * Calcula la asignación de Puntos de Ronda según el Reglamento Oficial v2.0 (Escala 1 / 2 / 3 Puntos):
+ * - Empate en la Ronda (ej. cada equipo gana 1 frente y el tercero queda Nulo, o los 3 quedan Nulos):
+ *   +1 Punto de Ronda para CADA equipo.
+ * - Victoria Estándar (ganar 2 de los 3 frentes, o ganar 1 a 0 si hay doble frente nulo):
+ *   +2 Puntos de Ronda para el equipo ganador (0 para el perdedor).
+ * - Dominio Total / "Pleno" (ganar los 3 frentes simultáneamente):
+ *   +3 Puntos de Ronda para el equipo ganador (0 para el perdedor).
+ * - Derrota por Tiempo (Caída de Bandera a 00:00):
+ *   El equipo rival suma +2 Puntos de Ronda (victoria estándar) de forma directa, salvo que en ese
+ *   instante ya tuviera mayor puntuación en los 3 frentes y el rival hubiera jugado todas sus cartas (+3 Puntos).
+ */
+export function calculateRoundPoints(
+  teamAFrontWins = 0,
+  teamBFrontWins = 0,
+  flagFallTeam = null,
+  isFlagFallFullSweep = false
+) {
+  if (flagFallTeam === 'teamA') {
+    const pts = isFlagFallFullSweep ? 3 : 2;
+    return {
+      teamAPoints: 0,
+      teamBPoints: pts,
+      roundWinner: 'teamB',
+      winType: isFlagFallFullSweep ? 'sweep' : 'flagFall',
+    };
+  }
+  if (flagFallTeam === 'teamB') {
+    const pts = isFlagFallFullSweep ? 3 : 2;
+    return {
+      teamAPoints: pts,
+      teamBPoints: 0,
+      roundWinner: 'teamA',
+      winType: isFlagFallFullSweep ? 'sweep' : 'flagFall',
+    };
+  }
+
+  if (teamAFrontWins === 3) {
+    return {
+      teamAPoints: 3,
+      teamBPoints: 0,
+      roundWinner: 'teamA',
+      winType: 'sweep',
+    };
+  }
+  if (teamBFrontWins === 3) {
+    return {
+      teamAPoints: 0,
+      teamBPoints: 3,
+      roundWinner: 'teamB',
+      winType: 'sweep',
+    };
+  }
+
+  if (teamAFrontWins > teamBFrontWins) {
+    return {
+      teamAPoints: 2,
+      teamBPoints: 0,
+      roundWinner: 'teamA',
+      winType: 'standard',
+    };
+  }
+  if (teamBFrontWins > teamAFrontWins) {
+    return {
+      teamAPoints: 0,
+      teamBPoints: 2,
+      roundWinner: 'teamB',
+      winType: 'standard',
+    };
+  }
+
+  // Empate en frentes conquistados (ej. 1-1 y 1 Nulo, o 0-0 con 3 Nulos): +1 Punto para CADA equipo
+  return {
+    teamAPoints: 1,
+    teamBPoints: 1,
+    roundWinner: 'tie',
+    winType: 'tie',
+  };
+}
+
+/**
  * Calcula los ingresos de economía (Marcadores de Sombra) al finalizar una ronda
- * según el reglamento oficial (Capítulo 5 y Quick Guide v2.0):
- * - 1v1 y 2v2: Ganador (+1), Perdedor (+2), Perdedor en racha de 2+ derrotas (+3), Ronda Nula (+1 a ambos).
- * - 3v3: Ganador (+2), Perdedor (+3), Perdedor en racha de 2+ derrotas (+4), Ronda Nula (+2 a ambos).
- * - 4v4: Ganador (+2), Perdedor (+4), Perdedor en racha de 2+ derrotas (+5), Ronda Nula (+2 a ambos).
+ * según el reglamento oficial v2.0 (Capítulo 5 y Guía Rápida v2.0):
+ * - 1v1 y 2v2: Ganador (+1), Perdedor (+2), Perdedor en racha de 2+ derrotas (+3), Empate de Ronda (+1 a ambos).
+ * - 3v3: Ganador (+2), Perdedor (+3), Perdedor en racha de 2+ derrotas (+4), Empate de Ronda (+2 a ambos).
+ * - 4v4: Ganador (+2), Perdedor (+4), Perdedor en racha de 2+ derrotas (+5), Empate de Ronda (+2 a ambos).
  * - Reinicio de Racha: Si un equipo que está cobrando el bono máximo de sombras por racha de derrotas
- *   logra ganar una ronda o empatarla (Ronda Nula), su racha se reinicia instantáneamente a 0.
+ *   logra ganar una ronda (2 o 3 pts) o empatarla (+1 pt para cada equipo), su racha se reinicia instantáneamente a 0.
  */
 export function calculateRoundEconomy(modeId = '2v2', roundWinner = 'tie', teamALossStreak = 0, teamBLossStreak = 0) {
   const econ = SHADOW_ECONOMY[modeId] || SHADOW_ECONOMY['2v2'];

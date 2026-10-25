@@ -15,6 +15,7 @@ import {
   resolveFrontWinner,
   getLocalizedFronts,
   SHADOW_ECONOMY,
+  calculateRoundPoints,
   calculateRoundEconomy,
 } from './constants/rules';
 import { useLanguage } from './context/LanguageContext';
@@ -123,11 +124,13 @@ export default function App() {
   function getPenaltyNoticeText(penalty) {
     if (!penalty) return '';
     if (typeof penalty === 'string') return penalty;
-    const { infringingTeam, is1v1: isOne } = penalty;
+    const { infringingTeam, is1v1: isOne, pointsAwarded = 2 } = penalty;
     if (isOne) {
-      return infringingTeam === 'teamA' ? ui.game.notices.flagFall1v1TeamA : ui.game.notices.flagFall1v1TeamB;
+      const fnOrStr = infringingTeam === 'teamA' ? ui.game.notices.flagFall1v1TeamA : ui.game.notices.flagFall1v1TeamB;
+      return typeof fnOrStr === 'function' ? fnOrStr(pointsAwarded) : fnOrStr;
     }
-    return infringingTeam === 'teamA' ? ui.game.notices.flagFallTeamA : ui.game.notices.flagFallTeamB;
+    const fnOrStr = infringingTeam === 'teamA' ? ui.game.notices.flagFallTeamA : ui.game.notices.flagFallTeamB;
+    return typeof fnOrStr === 'function' ? fnOrStr(pointsAwarded) : fnOrStr;
   }
 
   // Frentes de combate: { left: { teamA: [], teamB: [] }, ... }
@@ -565,15 +568,14 @@ export default function App() {
     const newTeamACumulative = prevTeamACumulative + teamARoundScoreSum;
     const newTeamBCumulative = prevTeamBCumulative + teamBRoundScoreSum;
 
-    // Sumar puntos de ronda si gana al menos 2 frentes
-    let roundWinner = 'tie';
-    if (teamAFrontWins >= 2) {
-      prevTeamARoundPts += 1;
-      roundWinner = 'teamA';
-    } else if (teamBFrontWins >= 2) {
-      prevTeamBRoundPts += 1;
-      roundWinner = 'teamB';
-    }
+    // Nuevo sistema oficial de Puntos de Ronda (1, 2 y 3 Puntos):
+    // - Empate en frentes conquistados (ej. 1-1 y 1 Nulo, o 3 Nulos): +1 Punto para CADA equipo
+    // - Victoria Estándar (ganar 2 frentes, o ganar 1-0 por doble frente nulo): +2 Puntos al ganador
+    // - Dominio Total / "Pleno" (ganar los 3 frentes): +3 Puntos al ganador
+    const roundPtsResult = calculateRoundPoints(teamAFrontWins, teamBFrontWins);
+    prevTeamARoundPts += roundPtsResult.teamAPoints;
+    prevTeamBRoundPts += roundPtsResult.teamBPoints;
+    const roundWinner = roundPtsResult.roundWinner;
 
     // Cobro oficial de economía de Marcadores de Sombra (Capítulo 5 y Guía Rápida v2.0)
     const activeModeId = stateRef.current.selectedMode || selectedMode || '2v2';
@@ -589,6 +591,9 @@ export default function App() {
     const roundEconomyData = {
       modeId: activeModeId,
       roundWinner,
+      winType: roundPtsResult.winType,
+      teamAPointsEarned: roundPtsResult.teamAPoints,
+      teamBPointsEarned: roundPtsResult.teamBPoints,
       teamAEarned: econResult.teamAEarned,
       teamBEarned: econResult.teamBEarned,
       teamAReason: econResult.teamAReason,
@@ -776,6 +781,8 @@ export default function App() {
     // y se suman los valores base y sinergias ya colocados por ambos bandos.
     let teamARoundScoreSum = 0;
     let teamBRoundScoreSum = 0;
+    let teamAFrontWins = 0;
+    let teamBFrontWins = 0;
 
     FRONTS.forEach(front => {
       const teamACards = activeFronts[front.id].teamA;
@@ -785,6 +792,10 @@ export default function App() {
 
       teamARoundScoreSum += teamAScore.total;
       teamBRoundScoreSum += teamBScore.total;
+
+      const resolution = resolveFrontWinner(teamACards, teamBCards, language);
+      if (resolution.winner === 'teamA') teamAFrontWins++;
+      if (resolution.winner === 'teamB') teamBFrontWins++;
     });
 
     const prevTeamACumulative = stateRef.current.teamACumulativePoints ?? teamACumulativePoints;
@@ -795,12 +806,21 @@ export default function App() {
     const newTeamACumulative = prevTeamACumulative + teamARoundScoreSum;
     const newTeamBCumulative = prevTeamBCumulative + teamBRoundScoreSum;
 
-    // 2. El equipo rival suma el +1 Punto de Ronda de forma directa
-    if (winnerTeam === 'teamA') {
-      prevTeamARoundPts += 1;
-    } else {
-      prevTeamBRoundPts += 1;
-    }
+    // 2. El equipo infractor pierde la ronda automáticamente y el equipo rival suma +2 Puntos de Ronda
+    // (victoria estándar) de forma directa, salvo que en ese instante ya tuviera mayor puntuación en los 3 frentes
+    // y se hubieran jugado todas las cartas del bando rival/ganador, en cuyo caso sumaría +3 Puntos de Ronda.
+    const activePlayersList = stateRef.current.players || players || [];
+    const winnerTeamPlayers = activePlayersList.filter(p => p.team === winnerTeam);
+    const infringingTeamPlayers = activePlayersList.filter(p => p.team === infringingTeam);
+    const winnerPlayedAllCards = winnerTeamPlayers.length > 0 && winnerTeamPlayers.every(p => (p.hand?.length || 0) === 0);
+    const infringingPlayedAllCards = infringingTeamPlayers.length > 0 && infringingTeamPlayers.every(p => (p.hand?.length || 0) === 0);
+    const winnerLeadsAllThree = winnerTeam === 'teamA' ? teamAFrontWins === 3 : teamBFrontWins === 3;
+    const isFlagFallFullSweep = winnerLeadsAllThree && (winnerPlayedAllCards || infringingPlayedAllCards);
+
+    const roundPtsResult = calculateRoundPoints(teamAFrontWins, teamBFrontWins, infringingTeam, isFlagFallFullSweep);
+    prevTeamARoundPts += roundPtsResult.teamAPoints;
+    prevTeamBRoundPts += roundPtsResult.teamBPoints;
+    const pointsAwarded = winnerTeam === 'teamA' ? roundPtsResult.teamAPoints : roundPtsResult.teamBPoints;
 
     // Cobro oficial de economía de Marcadores de Sombra tras caída de bandera
     const activeModeId = stateRef.current.selectedMode || selectedMode || '2v2';
@@ -816,6 +836,9 @@ export default function App() {
     const roundEconomyData = {
       modeId: activeModeId,
       roundWinner: winnerTeam,
+      winType: roundPtsResult.winType,
+      teamAPointsEarned: roundPtsResult.teamAPoints,
+      teamBPointsEarned: roundPtsResult.teamBPoints,
       teamAEarned: econResult.teamAEarned,
       teamBEarned: econResult.teamBEarned,
       teamAReason: econResult.teamAReason,
@@ -843,7 +866,7 @@ export default function App() {
     setFlagFallTeam(infringingTeam);
 
     const is1v1 = (selectedMode || stateRef.current.selectedMode) === '1v1';
-    const penaltyNoticeObj = { infringingTeam, is1v1 };
+    const penaltyNoticeObj = { infringingTeam, is1v1, pointsAwarded };
 
     setPenaltyNotice(penaltyNoticeObj);
     setTimeout(() => setPenaltyNotice(null), 6000);
