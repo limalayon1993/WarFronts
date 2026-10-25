@@ -86,6 +86,7 @@ export function calculateRoundPoints(
       teamAPoints: 0,
       teamBPoints: pts,
       roundWinner: 'teamB',
+      outcome: 'teamB',
       winType: isFlagFallFullSweep ? 'sweep' : 'flagFall',
     };
   }
@@ -95,6 +96,7 @@ export function calculateRoundPoints(
       teamAPoints: pts,
       teamBPoints: 0,
       roundWinner: 'teamA',
+      outcome: 'teamA',
       winType: isFlagFallFullSweep ? 'sweep' : 'flagFall',
     };
   }
@@ -104,6 +106,7 @@ export function calculateRoundPoints(
       teamAPoints: 3,
       teamBPoints: 0,
       roundWinner: 'teamA',
+      outcome: 'teamA',
       winType: 'sweep',
     };
   }
@@ -112,6 +115,7 @@ export function calculateRoundPoints(
       teamAPoints: 0,
       teamBPoints: 3,
       roundWinner: 'teamB',
+      outcome: 'teamB',
       winType: 'sweep',
     };
   }
@@ -121,6 +125,7 @@ export function calculateRoundPoints(
       teamAPoints: 2,
       teamBPoints: 0,
       roundWinner: 'teamA',
+      outcome: 'teamA',
       winType: 'standard',
     };
   }
@@ -129,6 +134,7 @@ export function calculateRoundPoints(
       teamAPoints: 0,
       teamBPoints: 2,
       roundWinner: 'teamB',
+      outcome: 'teamB',
       winType: 'standard',
     };
   }
@@ -138,6 +144,7 @@ export function calculateRoundPoints(
     teamAPoints: 1,
     teamBPoints: 1,
     roundWinner: 'tie',
+    outcome: 'tie',
     winType: 'tie',
   };
 }

@@ -70,7 +70,7 @@ export function RoundSummaryModal({
 
   const isFlagFallFullSweep = lastRoundEconomy?.winType === 'sweep' && Boolean(flagFallTeam);
   const roundScoring = calculateRoundPoints(teamAFrontWins, teamBFrontWins, flagFallTeam, isFlagFallFullSweep);
-  const roundOutcome = roundScoring.outcome;
+  const roundOutcome = lastRoundEconomy?.roundWinner || roundScoring.roundWinner || roundScoring.outcome || 'tie';
   const winType = lastRoundEconomy?.winType || roundScoring.winType;
   const teamAPtsEarned = lastRoundEconomy?.teamAPointsEarned ?? roundScoring.teamAPoints;
   const teamBPtsEarned = lastRoundEconomy?.teamBPointsEarned ?? roundScoring.teamBPoints;
