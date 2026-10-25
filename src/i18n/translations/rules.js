@@ -49,6 +49,18 @@ export const RULES_TRANSLATIONS = {
       medio: { name: 'Medio', desc: 'Equilibrio táctico estándar' },
       lento: { name: 'Lento', desc: 'Máxima profundidad y cálculo' },
     },
+    matchTypes: {
+      competitive: {
+        name: 'Modo Competitivo',
+        badge: 'Torneo Oficial',
+        subtitle: 'Escala Oficial (2-14) • Economía de Sombras • Reloj Dual',
+      },
+      casual: {
+        name: 'Modo Casual (Party / Amigos)',
+        badge: 'Conteo Rápido y Puntos en Vivo',
+        subtitle: 'Escala Comprimida (1-4) • Marcador en Vivo • 1 Sombra/Jug • 20s/Turno',
+      },
+    },
     reasons: {
       higherScore: 'Mayor puntuación total',
       highestCard: (scoreA, scoreB) => `Desempate por carta más alta (${scoreA} vs ${scoreB})`,
@@ -104,6 +116,18 @@ export const RULES_TRANSLATIONS = {
       rapido: { name: 'Fast', desc: 'Agile & dynamic tempo' },
       medio: { name: 'Medium', desc: 'Standard tactical balance' },
       lento: { name: 'Slow', desc: 'Maximum depth & calculation' },
+    },
+    matchTypes: {
+      competitive: {
+        name: 'Competitive Mode',
+        badge: 'Official Tournament',
+        subtitle: 'Official Scale (2-14) • Shadow Economy • Dual Team Clock',
+      },
+      casual: {
+        name: 'Casual Mode (Party / Friends)',
+        badge: 'Fast Count & Live Score',
+        subtitle: 'Compressed Scale (1-4) • Live Front Score • 1 Shadow/Player • 20s/Turn',
+      },
     },
     reasons: {
       higherScore: 'Higher total score',

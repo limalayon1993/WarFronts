@@ -19,6 +19,7 @@ export function ScoreBoard({
   durationConfig,
   rhythmConfig,
   timeConfig,
+  gameMode = 'competitive',
   isMuted,
   onToggleMute,
   onOpenQuickGuide,
@@ -30,8 +31,9 @@ export function ScoreBoard({
   mySlotId = '',
 }) {
   const { language, isEn, ui } = useLanguage();
+  const isCasual = gameMode === 'casual';
   const localizedSuits = getLocalizedSuits(language);
-  const localizedModes = getLocalizedModes(language);
+  const localizedModes = getLocalizedModes(language, gameMode);
   const localizedDurations = getLocalizedDurations(language);
 
   const is1v1 = modeConfig?.id === '1v1';
@@ -61,6 +63,13 @@ export function ScoreBoard({
                 <span className="text-[9px] bg-black/60 text-amber-300/90 font-serif px-2 py-0.5 rounded border border-amber-500/30 tracking-wider">
                   {effectiveMode?.name}
                 </span>
+                <span className={`text-[9px] font-serif font-bold px-2 py-0.5 rounded border tracking-wider ${
+                  isCasual
+                    ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50'
+                    : 'bg-amber-950/70 text-amber-300 border-amber-500/40'
+                }`}>
+                  {isCasual ? ui.game.scoreboard.casualBadge : ui.game.scoreboard.competitiveBadge}
+                </span>
                 {isMultiplayer && (
                   <span className="text-[9px] bg-black/60 text-amber-200 border border-amber-500/30 px-2 py-0.5 rounded font-mono font-bold flex items-center gap-1">
                     <Wifi className="w-2.5 h-2.5 text-amber-400" />
@@ -71,7 +80,12 @@ export function ScoreBoard({
               </h1>
               <div className="flex items-center gap-2 text-xs font-serif text-slate-400">
                 <span className="text-amber-400/90 font-bold">{ui.common.round} {round}</span> {ui.common.of} {totalRounds} ({effectiveDuration?.name})
-                {timeConfig && (
+                {isCasual ? (
+                  <>
+                    <span className="text-amber-500/40">•</span>
+                    <span className="text-emerald-300 font-mono text-[11px]">{ui.game.scoreboard.casualTurnClockLabel}</span>
+                  </>
+                ) : timeConfig && (
                   <>
                     <span className="text-amber-500/40">•</span>
                     <span className="text-slate-300 font-mono text-[11px]">{timeConfig.label}</span>
@@ -96,19 +110,22 @@ export function ScoreBoard({
             </div>
           </div>
 
-          <div className="h-7 w-px bg-amber-500/20" />
-
-          {/* Puntos Acumulados */}
-          <div className="text-center">
-            <span className="text-[9px] uppercase font-serif font-bold text-amber-200/60 tracking-wider">
-              {ui.game.scoreboard.accumulated}
-            </span>
-            <div className="text-xs sm:text-sm font-serif font-bold text-slate-300 leading-none mt-0.5">
-              <span className="text-emerald-300">{teamACumulativePoints}</span>
-              <span className="text-amber-500/40 mx-1">/</span>
-              <span className="text-rose-300">{teamBCumulativePoints}</span>
-            </div>
-          </div>
+          {/* Puntos Acumulados (Exclusivo Modo Competitivo) */}
+          {!isCasual && (
+            <>
+              <div className="h-7 w-px bg-amber-500/20" />
+              <div className="text-center">
+                <span className="text-[9px] uppercase font-serif font-bold text-amber-200/60 tracking-wider">
+                  {ui.game.scoreboard.accumulated}
+                </span>
+                <div className="text-xs sm:text-sm font-serif font-bold text-slate-300 leading-none mt-0.5">
+                  <span className="text-emerald-300">{teamACumulativePoints}</span>
+                  <span className="text-amber-500/40 mx-1">/</span>
+                  <span className="text-rose-300">{teamBCumulativePoints}</span>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
 

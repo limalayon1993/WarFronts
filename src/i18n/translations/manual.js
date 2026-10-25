@@ -2,11 +2,11 @@ export const MANUAL_TRANSLATIONS = {
   es: {
     headerTitle: 'Reglamento Oficial: Frentes de Guerra',
     headerVersion: 'Versión Oficial 2.0',
-    headerSubtitle: 'Edición Oficial Competitiva • Texto Íntegro del Reglamento',
+    headerSubtitle: 'Edición Oficial Competitiva y Casual • Texto Íntegro del Reglamento',
     closeBtn: 'Cerrar Manual',
     tocTitle: 'Índice de Capítulos',
     officialNoteTitle: 'Anotación Oficial:',
-    officialNoteText: 'Reglamento compilado para competiciones 1v1, 2v2, 3v3 y 4v4.',
+    officialNoteText: 'Reglamento compilado para competiciones 1v1, 2v2, 3v3 y 4v4 (Competitivo y Casual).',
     footerText: 'Reglamento Oficial Frentes de Guerra v2.0 — Todos los derechos reservados',
     footerBackBtn: 'Entendido, Volver',
     sections: [
@@ -18,16 +18,17 @@ export const MANUAL_TRANSLATIONS = {
       { id: 'sec6', num: '6', title: 'Resolución de Empates y Vacíos' },
       { id: 'sec7', num: '7', title: 'Fin de Partida y Desempates' },
       { id: 'sec8', num: '8', title: 'Anexo: Modo de Juego 1v1' },
+      { id: 'sec9', num: '9', title: 'Anexo: Modo Casual (Party)' },
     ],
   },
   en: {
     headerTitle: 'Official Rulebook: WarFronts',
     headerVersion: 'Official Version 2.0',
-    headerSubtitle: 'Official Competitive Edition • Complete Rulebook Text',
+    headerSubtitle: 'Official Competitive & Casual Edition • Complete Rulebook Text',
     closeBtn: 'Close Manual',
     tocTitle: 'Table of Contents',
     officialNoteTitle: 'Official Note:',
-    officialNoteText: 'Rulebook compiled for 1v1, 2v2, 3v3, and 4v4 competitions.',
+    officialNoteText: 'Rulebook compiled for 1v1, 2v2, 3v3, and 4v4 matches (Competitive & Casual).',
     footerText: 'Official WarFronts Rulebook v2.0 — All rights reserved',
     footerBackBtn: 'Understood, Return',
     sections: [
@@ -39,6 +40,7 @@ export const MANUAL_TRANSLATIONS = {
       { id: 'sec6', num: '6', title: 'Tie Resolution & Edge Cases' },
       { id: 'sec7', num: '7', title: 'End of Match & Tiebreakers' },
       { id: 'sec8', num: '8', title: 'Annex: 1v1 Duel Mode' },
+      { id: 'sec9', num: '9', title: 'Annex: Casual Mode (Party)' },
     ],
   },
 };

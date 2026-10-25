@@ -60,6 +60,14 @@ export function QuickGuideModal({ isOpen, onClose }) {
               <span className="flex items-center gap-1.5 text-purple-300">
                 <EyeOff className="w-3.5 h-3.5 text-purple-400" /> {guideT.headerSummary.shadows}
               </span>
+              {guideT.headerSummary.casual && (
+                <>
+                  <span className="text-amber-500/30">•</span>
+                  <span className="flex items-center gap-1.5 text-amber-300 font-bold bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded">
+                    🎉 {guideT.headerSummary.casual}
+                  </span>
+                </>
+              )}
             </div>
             <LanguageToggle compact />
             <button
@@ -501,6 +509,106 @@ export function QuickGuideModal({ isOpen, onClose }) {
               </div>
             </div>
           </div>
+
+          {/* Fila 4: Anexo Modo Casual (Party / Amigos) */}
+          {guideT.block6 && (
+            <div className="casino-panel rounded-2xl p-4 sm:p-5 border border-amber-500/40 bg-gradient-to-b from-amber-950/25 via-[#0b0e17] to-orange-950/20">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-500/25 pb-2.5 mb-3.5">
+                <h3 className="text-xs sm:text-sm font-serif font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                  <span>🎉</span> {guideT.block6.title}
+                </h3>
+                <span className="text-[10px] text-amber-300 bg-amber-500/15 border border-amber-500/35 px-2.5 py-0.5 rounded-full font-mono font-bold uppercase">
+                  {guideT.block6.tag}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
+                {/* 1. Escala Comprimida */}
+                <div className="lg:col-span-7 bg-black/60 p-3 rounded-xl border border-amber-500/25 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-serif font-bold text-amber-300">
+                        🧮 {guideT.block6.scaleTitle}
+                      </span>
+                      <span className="text-[9px] bg-amber-500/20 text-amber-200 border border-amber-500/30 px-1.5 py-0.5 rounded font-mono">
+                        {guideT.block6.scaleBadge}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 mb-2.5">
+                      {guideT.block6.baseCards.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-slate-950/90 border border-amber-500/25 rounded-lg p-2 text-center"
+                        >
+                          <span className="text-[10px] text-slate-400 font-serif block">{item.label}</span>
+                          <strong className="text-xs sm:text-sm font-serif font-black text-amber-300">{item.val}</strong>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                      {guideT.block6.synergies.map((syn, idx) => (
+                        <div
+                          key={idx}
+                          className="bg-slate-950/80 border border-slate-800 rounded-lg p-2 flex flex-col justify-between"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-serif font-bold text-slate-200">{syn.title}</span>
+                            <span className="text-xs font-mono font-black text-amber-400">{syn.bonus}</span>
+                          </div>
+                          <p className="text-[10px] text-slate-400 font-serif mt-0.5">{syn.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-2 pt-1.5 border-t border-amber-500/20 text-[10px] text-amber-200/90 font-serif">
+                    • {guideT.block6.frontTieNote}
+                  </div>
+                </div>
+
+                {/* 2, 3 y 4: Sombra fija, Reloj 20s y Desempate directo */}
+                <div className="lg:col-span-5 flex flex-col gap-2 justify-between">
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-purple-500/30">
+                    <div className="text-xs font-serif font-bold text-purple-300 mb-0.5">
+                      🌑 {guideT.block6.shadowTitle}
+                    </div>
+                    <p className="text-[11px] text-slate-300 font-serif leading-relaxed">
+                      {guideT.block6.shadowDesc}
+                    </p>
+                  </div>
+
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-amber-500/30">
+                    <div className="text-xs font-serif font-bold text-amber-300 mb-0.5">
+                      ⏱️ {guideT.block6.clockTitle}
+                    </div>
+                    <p className="text-[11px] text-slate-300 font-serif leading-relaxed">
+                      {guideT.block6.clockDesc}
+                    </p>
+                  </div>
+
+                  <div className="bg-black/60 p-2.5 rounded-xl border border-emerald-500/30">
+                    <div className="text-xs font-serif font-bold text-emerald-300 mb-0.5">
+                      🏆 {guideT.block6.overtimeTitle}
+                    </div>
+                    <p className="text-[11px] text-slate-300 font-serif leading-relaxed">
+                      {guideT.block6.overtimeDesc}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nota de Versión Digital */}
+              <div className="mt-3 bg-emerald-950/35 border border-emerald-500/40 rounded-xl p-2.5 flex items-start gap-2 text-xs font-serif">
+                <Sparkles className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-emerald-300">{guideT.block6.digitalNoteTitle} </strong>
+                  <span className="text-slate-200">{guideT.block6.digitalNoteDesc}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Pie con botón de cerrar */}

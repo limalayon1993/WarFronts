@@ -20,6 +20,8 @@ import {
   Crown,
   AlertCircle,
   X,
+  Trophy,
+  PartyPopper,
 } from 'lucide-react';
 import {
   GAME_MODES,
@@ -29,6 +31,7 @@ import {
   getLocalizedModes,
   getLocalizedDurations,
   getLocalizedTimeOptions,
+  getLocalizedMatchTypes,
 } from '../constants/rules';
 import { mp, formatRoomCode, generateRoomCode } from '../utils/multiplayer';
 import { useLanguage } from '../context/LanguageContext';
@@ -52,6 +55,8 @@ export function MultiplayerLobby({
   const [selectedMode, setSelectedMode] = useState('2v2');
   const [selectedRhythm, setSelectedRhythm] = useState(6);
   const [selectedTimeSpeed, setSelectedTimeSpeed] = useState('medio');
+  const [selectedGameMode, setSelectedGameMode] = useState('competitive');
+  const isCasual = selectedGameMode === 'casual';
 
   // Estado de la sala activa
   const [roomCode, setRoomCode] = useState('');
@@ -91,6 +96,7 @@ export function MultiplayerLobby({
       setSelectedMode(lobby.modeId);
       setSelectedRhythm(lobby.rhythmRounds);
       if (lobby.timeSpeed) setSelectedTimeSpeed(lobby.timeSpeed);
+      if (lobby.gameMode) setSelectedGameMode(lobby.gameMode);
       setAutoFillBots(lobby.autoFillBots);
     });
 
@@ -157,7 +163,7 @@ export function MultiplayerLobby({
       unsubDisconnect();
       unsubClientDisc();
     };
-  }, [onStartMultiplayerGame, lobbySlots, selectedMode, selectedRhythm, selectedTimeSpeed, autoFillBots, isEn]);
+  }, [onStartMultiplayerGame, lobbySlots, selectedMode, selectedRhythm, selectedTimeSpeed, selectedGameMode, autoFillBots, isEn]);
 
   // Inicializar slots de la sala (todos los puestos no-host empiezan vacíos)
   const buildInitialSlots = (modeId, hostName, fillWithBots = false) => {
@@ -405,8 +411,15 @@ export function MultiplayerLobby({
     broadcastLobbyState(lobbySlots, selectedMode, newRhythm, autoFillBots, selectedTimeSpeed);
   };
 
+  // Host: Cambiar modalidad de reglas (Competitivo vs Casual) en la sala
+  const handleChangeRuleMode = (newRuleMode) => {
+    if (!isHost) return;
+    setSelectedGameMode(newRuleMode);
+    broadcastLobbyState(lobbySlots, selectedMode, selectedRhythm, autoFillBots, selectedTimeSpeed, newRuleMode);
+  };
+
   // Host: Difundir estado del lobby a todos los peers
-  const broadcastLobbyState = (slots, modeId, rhythmRounds, fillBots, timeSpeed = null) => {
+  const broadcastLobbyState = (slots, modeId, rhythmRounds, fillBots, timeSpeed = null, ruleMode = null) => {
     mp.broadcast({
       type: 'LOBBY_STATE',
       lobby: {
@@ -414,6 +427,7 @@ export function MultiplayerLobby({
         modeId,
         rhythmRounds,
         timeSpeed: timeSpeed || selectedTimeSpeed,
+        gameMode: ruleMode || selectedGameMode,
         autoFillBots: fillBots,
       },
     });
@@ -438,6 +452,7 @@ export function MultiplayerLobby({
       modeId: selectedMode,
       rhythmRounds: selectedRhythm,
       timeSpeed: selectedTimeSpeed,
+      gameMode: selectedGameMode,
       slots: lobbySlots,
       mySlotId,
       isHost: true,
@@ -477,9 +492,10 @@ export function MultiplayerLobby({
     onBackToMenu();
   };
 
-  const localizedModes = getLocalizedModes(language);
+  const localizedModes = getLocalizedModes(language, selectedGameMode);
   const localizedDurations = getLocalizedDurations(language);
   const localizedTimeOptions = getLocalizedTimeOptions(language);
+  const localizedMatchTypes = getLocalizedMatchTypes(language);
   const modeConfig = localizedModes[selectedMode] || localizedModes['2v2'];
   const modeTimes = TEAM_TIMES[selectedMode] || TEAM_TIMES['2v2'];
   const currentTimeConfig = modeTimes[selectedTimeSpeed] || modeTimes['medio'];
@@ -589,6 +605,80 @@ export function MultiplayerLobby({
           {/* TAB 1: CREAR SALA (Estructura idéntica al Menú de Partida contra Bots) */}
           {activeTab === 'create' && (
             <div className="w-full flex flex-col items-center">
+              {/* 0. Selección de Modalidad de Reglas: Competitivo vs Casual */}
+              <div className="w-full mb-7">
+                <div className="flex items-center justify-between mb-3 px-1 font-serif">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-200/80 flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-amber-400" /> {ui.menu.setup.modeTypeLabel}
+                  </span>
+                  <span className="text-xs text-slate-400">
+                    {isEn ? 'Choose between Official Competitive Rules or Casual Party Mode' : 'Elige entre Reglas Oficiales Competitivas o Modo Casual (Party / Amigos)'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                  {['competitive', 'casual'].map((typeId) => {
+                    const typeInfo = localizedMatchTypes[typeId];
+                    const isSelected = selectedGameMode === typeId;
+                    const isTypeCasual = typeId === 'casual';
+                    return (
+                      <button
+                        key={typeId}
+                        type="button"
+                        onClick={() => setSelectedGameMode(typeId)}
+                        className={`
+                          text-left rounded-2xl p-4 sm:p-5 transition-all duration-200 flex flex-col justify-between relative cursor-pointer
+                          ${isSelected
+                            ? isTypeCasual
+                              ? 'border-2 border-emerald-400 bg-gradient-to-b from-[#132824] to-[#0b1615] shadow-[0_0_25px_rgba(16,185,129,0.3)] ring-2 ring-emerald-400/40 -translate-y-0.5'
+                              : 'border-2 border-amber-400 bg-gradient-to-b from-[#182030] to-[#0c101a] shadow-[0_0_25px_rgba(212,175,55,0.35)] ring-2 ring-amber-400/40 -translate-y-0.5'
+                            : 'border border-amber-500/20 bg-black/60 hover:bg-[#101624] hover:border-amber-500/40 opacity-75 hover:opacity-100'
+                          }
+                        `}
+                      >
+                        <div className="flex items-center justify-between mb-2 gap-2">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${
+                              isTypeCasual
+                                ? 'bg-emerald-500/20 border-emerald-400/50 text-emerald-300'
+                                : 'bg-amber-500/20 border-amber-400/50 text-amber-300'
+                            }`}>
+                              {isTypeCasual ? <PartyPopper className="w-5 h-5" /> : <Trophy className="w-5 h-5" />}
+                            </div>
+                            <div>
+                              <h3 className={`text-lg font-serif font-black ${isSelected ? (isTypeCasual ? 'text-emerald-200' : 'text-amber-200') : 'text-slate-100'}`}>
+                                {typeInfo.name}
+                              </h3>
+                              <span className={`text-[11px] font-serif font-semibold ${isTypeCasual ? 'text-emerald-400/90' : 'text-amber-400/90'}`}>
+                                {typeInfo.subtitle}
+                              </span>
+                            </div>
+                          </div>
+
+                          {isSelected ? (
+                            <span className={`text-[10px] font-serif font-black px-2.5 py-0.5 rounded-full border flex items-center gap-1 shadow-sm ${
+                              isTypeCasual
+                                ? 'bg-emerald-500/25 text-emerald-300 border-emerald-400'
+                                : 'bg-amber-500/25 text-amber-300 border-amber-400'
+                            }`}>
+                              <Check className="w-3 h-3 stroke-[3]" />
+                              {isEn ? 'ACTIVE' : 'ACTIVO'}
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-serif font-bold px-2.5 py-0.5 rounded-full border bg-black/50 text-slate-400 border-slate-700">
+                              {typeInfo.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-300 leading-relaxed mt-1">
+                          {typeInfo.description}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* 1. Selección de Formato de Juego */}
               <div className="w-full mb-7">
                 <div className="flex items-center justify-between mb-3 px-1 font-serif">
@@ -645,77 +735,111 @@ export function MultiplayerLobby({
                         {/* Resumen táctico inferior */}
                         <div className="mt-4 pt-3 border-t border-amber-500/15 flex items-center justify-between text-[11px] text-slate-400 font-serif">
                           <span>{isEn ? 'Front Cap:' : 'Límite Frente:'} <strong className="text-slate-200">{mode.maxFrontCards}</strong></span>
-                          <span title={isEn ? 'Shadow Economy: Start at 0, earned per round (Win/Loss/Streak), continuous savings' : 'Economía de Sombras: Inician en 0, se cobran por ronda (Gana/Pierde/Racha), ahorro continuo'}>
-                            {isEn ? 'Shadows (R1: 0):' : 'Sombras (R1: 0):'}{' '}
-                            <strong className="text-purple-400 font-mono font-bold">
-                              {mode.economy ? `+${mode.economy.win}/+${mode.economy.loss}/+${mode.economy.streak}` : (mode.id === '3v3' ? '+2/+3/+4' : mode.id === '4v4' ? '+2/+4/+5' : '+1/+2/+3')}
-                            </strong>
+                          {isCasual ? (
+                            <span title={isEn ? 'Casual Mode: 1 personal Shadow Marker per player each round' : 'Modo Casual: 1 Marcador de Sombra fijo por jugador y por ronda'}>
+                              {isEn ? 'Shadows:' : 'Sombras:'}{' '}
+                              <strong className="text-emerald-400 font-mono font-bold">
+                                {isEn ? '1 / Player' : '1 / Jugador'}
+                              </strong>
+                            </span>
+                          ) : (
+                            <span title={isEn ? 'Shadow Economy: Start at 0, earned per round (Win/Loss/Streak), continuous savings' : 'Economía de Sombras: Inician en 0, se cobran por ronda (Gana/Pierde/Racha), ahorro continuo'}>
+                              {isEn ? 'Shadows (R1: 0):' : 'Sombras (R1: 0):'}{' '}
+                              <strong className="text-purple-400 font-mono font-bold">
+                                {mode.economy ? `+${mode.economy.win}/+${mode.economy.loss}/+${mode.economy.streak}` : (mode.id === '3v3' ? '+2/+3/+4' : mode.id === '4v4' ? '+2/+4/+5' : '+1/+2/+3')}
+                              </strong>
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 2. Selección de Tiempo de Equipo (Competitivo) o Reloj Individual 20s (Casual) */}
+              {!isCasual ? (
+                <div className="w-full mb-7">
+                  <div className="flex items-center justify-between mb-3 px-1 font-serif">
+                    <span className="text-xs font-bold uppercase tracking-wider text-amber-200/80 flex items-center gap-1.5">
+                      <Timer className="w-4 h-4 text-amber-400" /> {ui.menu.setup.step3}
+                    </span>
+                    <span className="text-xs text-slate-400">
+                      {isEn ? 'Joint team time bank for each round' : 'Bolsa de tiempo conjunta por equipo para cada ronda'}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+                    {localizedTimeOptions.map((timeOpt) => {
+                      const isSelected = selectedTimeSpeed === timeOpt.id;
+                      const speedConfig = modeTimes[timeOpt.id];
+                      return (
+                        <button
+                          key={timeOpt.id}
+                          type="button"
+                          onClick={() => setSelectedTimeSpeed(timeOpt.id)}
+                          className={`
+                            p-4 rounded-2xl border-2 transition-all text-left flex items-center justify-between cursor-pointer relative
+                            ${isSelected
+                              ? 'border-amber-400 bg-gradient-to-b from-[#182030] to-[#0c101a] ring-2 ring-amber-400/40 text-slate-100 shadow-[0_0_20px_rgba(212,175,55,0.3)] -translate-y-0.5'
+                              : 'border-amber-500/20 bg-black/60 hover:bg-[#101624] hover:border-amber-500/40 text-slate-300 opacity-75 hover:opacity-100'
+                            }
+                          `}
+                        >
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className={`font-serif font-bold text-base ${isSelected ? 'text-amber-200' : 'text-slate-100'}`}>{timeOpt.name}</span>
+                              {isSelected && (
+                                <span className="inline-flex items-center gap-1 text-[9px] font-serif font-black uppercase text-amber-300 bg-amber-500/25 px-2 py-0.5 rounded-full border border-amber-400 shadow-sm">
+                                  <Check className="w-2.5 h-2.5 stroke-[3] text-amber-400" />
+                                  {isEn ? 'ACTIVE' : 'ACTIVO'}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs font-serif text-slate-400">{timeOpt.desc}</span>
+                          </div>
+
+                          <span className={`text-xs font-mono font-bold px-2.5 py-1.5 rounded-lg border shadow-inner ${
+                            isSelected
+                              ? 'text-amber-300 bg-amber-500/20 border-amber-400'
+                              : 'text-amber-400 bg-black/60 border-amber-500/25'
+                          }`}>
+                            {speedConfig?.label}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[11px] font-serif text-slate-400 mt-2 px-1">
+                    {isEn
+                      ? 'Time is shared across the entire team and counts down during members\' turns. Resets to full value each round.'
+                      : 'El tiempo es compartido para todo el equipo y se consume durante los turnos de sus componentes. Se reinicia al valor completo en cada nueva ronda.'}
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full mb-7">
+                  <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/25 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-300 shrink-0 mt-0.5">
+                        <Timer className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-xs font-serif font-black uppercase tracking-wider text-emerald-300">
+                            {ui.menu.setup.casualClockTitle}
+                          </span>
+                          <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/25 text-emerald-200 border border-emerald-400/50">
+                            {ui.menu.setup.casualClockFixedBadge}
                           </span>
                         </div>
-                      </button>
-                    );
-                  })}
+                        <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+                          {ui.menu.setup.casualClockDesc}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              {/* 2. Selección de Tiempo de Equipo (Reloj Compartido) */}
-              <div className="w-full mb-7">
-                <div className="flex items-center justify-between mb-3 px-1 font-serif">
-                  <span className="text-xs font-bold uppercase tracking-wider text-amber-200/80 flex items-center gap-1.5">
-                    <Timer className="w-4 h-4 text-amber-400" /> {ui.menu.setup.step3}
-                  </span>
-                  <span className="text-xs text-slate-400">
-                    {isEn ? 'Joint team time bank for each round' : 'Bolsa de tiempo conjunta por equipo para cada ronda'}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-                  {localizedTimeOptions.map((timeOpt) => {
-                    const isSelected = selectedTimeSpeed === timeOpt.id;
-                    const speedConfig = modeTimes[timeOpt.id];
-                    return (
-                      <button
-                        key={timeOpt.id}
-                        type="button"
-                        onClick={() => setSelectedTimeSpeed(timeOpt.id)}
-                        className={`
-                          p-4 rounded-2xl border-2 transition-all text-left flex items-center justify-between cursor-pointer relative
-                          ${isSelected
-                            ? 'border-amber-400 bg-gradient-to-b from-[#182030] to-[#0c101a] ring-2 ring-amber-400/40 text-slate-100 shadow-[0_0_20px_rgba(212,175,55,0.3)] -translate-y-0.5'
-                            : 'border-amber-500/20 bg-black/60 hover:bg-[#101624] hover:border-amber-500/40 text-slate-300 opacity-75 hover:opacity-100'
-                          }
-                        `}
-                      >
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className={`font-serif font-bold text-base ${isSelected ? 'text-amber-200' : 'text-slate-100'}`}>{timeOpt.name}</span>
-                            {isSelected && (
-                              <span className="inline-flex items-center gap-1 text-[9px] font-serif font-black uppercase text-amber-300 bg-amber-500/25 px-2 py-0.5 rounded-full border border-amber-400 shadow-sm">
-                                <Check className="w-2.5 h-2.5 stroke-[3] text-amber-400" />
-                                {isEn ? 'ACTIVE' : 'ACTIVO'}
-                              </span>
-                            )}
-                          </div>
-                          <span className="text-xs font-serif text-slate-400">{timeOpt.desc}</span>
-                        </div>
-
-                        <span className={`text-xs font-mono font-bold px-2.5 py-1.5 rounded-lg border shadow-inner ${
-                          isSelected
-                            ? 'text-amber-300 bg-amber-500/20 border-amber-400'
-                            : 'text-amber-400 bg-black/60 border-amber-500/25'
-                        }`}>
-                          {speedConfig?.label}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <p className="text-[11px] font-serif text-slate-400 mt-2 px-1">
-                  {isEn
-                    ? 'Time is shared across the entire team and counts down during members\' turns. Resets to full value each round.'
-                    : 'El tiempo es compartido para todo el equipo y se consume durante los turnos de sus componentes. Se reinicia al valor completo en cada nueva ronda.'}
-                </p>
-              </div>
+              )}
 
               {/* 3. Selección de Duración de la Partida */}
               <div className="w-full mb-7">
@@ -773,11 +897,11 @@ export function MultiplayerLobby({
               {/* 4. Resumen y Botón Principal de Crear Sala */}
               <div className="w-full max-w-4xl casino-panel rounded-2xl p-5 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 mt-2">
                 <div>
-                  <span className="text-[11px] uppercase font-serif font-bold text-amber-400 tracking-wider block">
-                    {isEn ? 'Multiplayer Match Summary' : 'Resumen de Configuración Multijugador'}
+                  <span className={`text-[11px] uppercase font-serif font-bold tracking-wider block ${isCasual ? 'text-emerald-400' : 'text-amber-400'}`}>
+                    {isEn ? 'Multiplayer Match Summary' : 'Resumen de Configuración Multijugador'} — {localizedMatchTypes[selectedGameMode]?.name}
                   </span>
                   <div className="text-sm font-serif font-bold text-slate-200 mt-0.5">
-                    {modeConfig.name} • {currentTimeConfig?.text || currentTimeConfig?.label} • {currentDuration?.name} ({selectedRhythm} {isEn ? 'Rounds' : 'Rondas'})
+                    {modeConfig.name} • {isCasual ? (isEn ? '20s / Turn (Casual)' : '20s / Turno (Casual)') : (currentTimeConfig?.text || currentTimeConfig?.label)} • {currentDuration?.name} ({selectedRhythm} {isEn ? 'Rounds' : 'Rondas'})
                   </div>
                 </div>
 
@@ -850,12 +974,20 @@ export function MultiplayerLobby({
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs uppercase font-serif font-black text-amber-400 tracking-wider">
                 {isEn ? 'Multiplayer Room' : 'Sala Multijugador'}
               </span>
+              <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-serif font-black uppercase tracking-wider border flex items-center gap-1 ${
+                isCasual
+                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-400/60'
+                  : 'bg-amber-950/80 text-amber-300 border-amber-400/60'
+              }`}>
+                {isCasual ? <PartyPopper className="w-3 h-3 text-emerald-400" /> : <Trophy className="w-3 h-3 text-amber-400" />}
+                <span>{localizedMatchTypes[selectedGameMode]?.name}</span>
+              </span>
               <span className="text-[10px] bg-black/60 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-serif font-bold">
-                {modeConfig.name} • {currentTimeConfig?.text || currentTimeConfig?.label} • {isEn ? 'Duration' : 'Duración'} {currentDuration?.name} ({selectedRhythm} {isEn ? 'Rounds' : 'Rondas'})
+                {modeConfig.name} • {isCasual ? (isEn ? '20s / Turn' : '20s / Turno') : (currentTimeConfig?.text || currentTimeConfig?.label)} • {isEn ? 'Duration' : 'Duración'} {currentDuration?.name} ({selectedRhythm} {isEn ? 'Rounds' : 'Rondas'})
               </span>
             </div>
             <div className="flex items-center gap-2 mt-0.5">
@@ -878,6 +1010,21 @@ export function MultiplayerLobby({
                 {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Share2 className="w-3.5 h-3.5 text-amber-400" />}
                 <span className="hidden sm:inline">{copiedLink ? ui.multiplayer.copiedLink : ui.multiplayer.copyLink}</span>
               </button>
+
+              {isHost && (
+                <button
+                  type="button"
+                  onClick={() => handleChangeRuleMode(isCasual ? 'competitive' : 'casual')}
+                  className={`ml-1 px-2.5 py-1 rounded-lg text-[10px] font-serif font-bold border transition cursor-pointer flex items-center gap-1 ${
+                    isCasual
+                      ? 'bg-emerald-950/70 hover:bg-emerald-900 text-emerald-300 border-emerald-500/50'
+                      : 'bg-amber-950/70 hover:bg-amber-900 text-amber-300 border-amber-500/50'
+                  }`}
+                  title={isEn ? 'Switch between Competitive and Casual Mode' : 'Alternar entre Modo Competitivo y Modo Casual'}
+                >
+                  <span>{isCasual ? (isEn ? 'Switch to Competitive' : 'Cambiar a Competitivo') : (isEn ? 'Switch to Casual' : 'Cambiar a Casual')}</span>
+                </button>
+              )}
             </div>
           </div>
         </div>

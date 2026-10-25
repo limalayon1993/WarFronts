@@ -21,11 +21,13 @@ export function FrontZone({
   isPlayerTurn = false,
   maxFrontCards = 8,
   modeId = '1v1',
+  gameMode = 'competitive',
   viewerPlayerId = null,
   viewerTeam = 'teamA',
   onDeploy,
 }) {
   const { language, isEn, ui } = useLanguage();
+  const isCasual = gameMode === 'casual';
   const localizedFront = getLocalizedFronts(language).find(f => f.id === frontKey) || frontInfo;
 
   const [isDragOver, setIsDragOver] = React.useState(false);
@@ -58,12 +60,12 @@ export function FrontZone({
   // Para las tropas del propio equipo, las sombras son visibles tácticamente entre compañeros
   // Por tanto, sus sinergias se calculan siempre (isRevealed = true)
   const { frontScore: allyScore, cardSynergies: allySynergies } = React.useMemo(
-    () => analyzeCardSynergies(allyCards, true, language),
-    [allyCards, language]
+    () => analyzeCardSynergies(allyCards, true, language, gameMode),
+    [allyCards, language, gameMode]
   );
   const { frontScore: enemyScore, cardSynergies: enemySynergies } = React.useMemo(
-    () => analyzeCardSynergies(enemyCards, isRoundOver, language),
-    [enemyCards, isRoundOver, language]
+    () => analyzeCardSynergies(enemyCards, isRoundOver, language, gameMode),
+    [enemyCards, isRoundOver, language, gameMode]
   );
 
   // Conteo de cartas sombra aliadas activas en el frente (visibles para el equipo pero con distintivo de sombra)
@@ -71,6 +73,9 @@ export function FrontZone({
     () => allyCards.filter(c => c.isShadow && !isRoundOver).length,
     [allyCards, isRoundOver]
   );
+
+  const allySynergyBonus = allyScore.total - allyScore.baseTotal;
+  const enemySynergyBonus = enemyScore.total - enemyScore.baseTotal;
 
   const allyLabel = isTeamMode 
     ? (isViewerTeamB ? ui.game.front.yourTeamB : ui.game.front.yourTeamA) 
@@ -130,9 +135,9 @@ export function FrontZone({
               ? 'bg-purple-800 text-purple-100 border-purple-400 scale-105 shadow-md shadow-purple-900/60 ring-1 ring-purple-300'
               : 'bg-purple-950/80 text-purple-200 border-purple-700/60 hover:border-purple-400'
           }`}
-          title={isEn ? `Trio of ${trio.rank}s` : `Trío de ${trio.rank}s`}
+          title={isEn ? `Trio of ${trio.rank}s (+${isCasual ? 4 : 20} pts)` : `Trío de ${trio.rank}s (+${isCasual ? 4 : 20} pts)`}
         >
-          <span>✦ {isEn ? 'Trio' : 'Trío'} {trio.rank}</span>
+          <span>✦ {isEn ? 'Trio' : 'Trío'} {trio.rank}{isCasual ? ' (+4)' : ''}</span>
         </span>
       );
     });
@@ -150,9 +155,9 @@ export function FrontZone({
               ? 'bg-amber-600 text-stone-950 border-amber-300 scale-105 shadow-md shadow-amber-900/60 ring-1 ring-amber-300'
               : 'bg-amber-950/80 text-amber-200 border-amber-600/60 hover:border-amber-400'
           }`}
-          title={isEn ? `Pair of ${pair.rank}s` : `Pareja de ${pair.rank}s`}
+          title={isEn ? `Pair of ${pair.rank}s (+${isCasual ? 2 : 10} pts)` : `Pareja de ${pair.rank}s (+${isCasual ? 2 : 10} pts)`}
         >
-          <span>👥 {isEn ? 'Pair' : 'Par'} {pair.rank}</span>
+          <span>👥 {isEn ? 'Pair' : 'Par'} {pair.rank}{isCasual ? ' (+2)' : ''}</span>
         </span>
       );
     });
@@ -170,16 +175,17 @@ export function FrontZone({
               ? 'bg-cyan-700 text-cyan-100 border-cyan-300 scale-105 shadow-md shadow-cyan-900/60 ring-1 ring-cyan-300'
               : 'bg-cyan-950/80 text-cyan-200 border-cyan-700/60 hover:border-cyan-400'
           }`}
-          title={isEn ? `Straight ${straight.label}` : `Escalera ${straight.label}`}
+          title={isEn ? `Straight ${straight.label} (+${isCasual ? 3 : 15} pts)` : `Escalera ${straight.label} (+${isCasual ? 3 : 15} pts)`}
         >
-          <span>⚡ {isEn ? 'Str' : 'Esc'} {straight.label}</span>
+          <span>⚡ {isEn ? 'Str' : 'Esc'} {straight.label}{isCasual ? ' (+3)' : ''}</span>
         </span>
       );
     });
 
-    // Sinergias de Palo
+    // Sinergias de Palo / Color
+    const minSuitCountForBonus = isCasual ? 3 : 2;
     Object.entries(score.synergiesBySuit || {}).forEach(([suit, data]) => {
-      if (data.count >= 2) {
+      if (data.count >= minSuitCountForBonus) {
         const isRed = suit === 'hearts' || suit === 'diamonds';
         const isHovered = hoveredSynergyFilter?.side === side && hoveredSynergyFilter?.type === 'suit' && hoveredSynergyFilter?.value === suit;
         const suitSymbol = SUITS[suit]?.symbol || suit;
@@ -193,9 +199,15 @@ export function FrontZone({
                 ? 'bg-stone-800 text-amber-200 border-amber-300 scale-105 shadow-md ring-1 ring-amber-300'
                 : 'bg-black/60 text-slate-300 border-amber-500/25 hover:border-amber-400/50'
             }`}
-            title={`${getLocalizedSuits(language)[suit]?.name || SUITS[suit]?.name || suit} x${data.count}`}
+            title={
+              isCasual
+                ? `${getLocalizedSuits(language)[suit]?.name || SUITS[suit]?.name || suit} x${data.count} (+2 pts ${isEn ? 'Color' : 'Color'})`
+                : `${getLocalizedSuits(language)[suit]?.name || SUITS[suit]?.name || suit} x${data.count}`
+            }
           >
-            <span className={isRed ? 'text-rose-400' : 'text-slate-200'}>{suitSymbol}x{data.count}</span>
+            <span className={isRed ? 'text-rose-400' : 'text-slate-200'}>
+              {suitSymbol}x{data.count}{isCasual ? ' (+2)' : ''}
+            </span>
           </span>
         );
       }
@@ -282,8 +294,8 @@ export function FrontZone({
 
       {/* Lado de Rivales (Arriba) */}
       <div className="my-1.5 min-h-[90px] flex flex-col justify-start">
-        {/* Cabecera del Rival: Etiqueta y Conteo */}
-        <div className="flex items-center justify-between text-[11px] mb-1.5 px-0.5">
+        {/* Cabecera del Rival: Etiqueta, Conteo y Puntuación en Vivo (Modo Casual) */}
+        <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] mb-1.5 px-0.5">
           <div className="flex items-center gap-1.5">
             <span className={`font-serif font-bold tracking-wider uppercase text-[10px] ${enemyColor}`}>
               {enemyLabel}
@@ -293,15 +305,40 @@ export function FrontZone({
             </span>
           </div>
 
-          {enemyScore.hiddenCount > 0 && (
-            <span
-              className="bg-purple-950/70 border border-purple-500/40 text-purple-300 px-1.5 py-0.5 rounded text-[9px] font-serif font-bold tracking-wider uppercase flex items-center gap-0.5"
-              title={isEn ? "Hidden shadow cards" : "Cartas sombras ocultas"}
-            >
-              <span>+{enemyScore.hiddenCount}</span>
-              <span className="text-[8px]">{ui.game.card.shadowBadge}</span>
-            </span>
-          )}
+          <div className="flex items-center gap-1.5">
+            {isCasual && (
+              <div
+                className="flex items-center gap-1 bg-rose-950/85 border border-rose-500/50 px-2 py-0.5 rounded-lg shadow-sm"
+                title={
+                  isRoundOver
+                    ? (isEn ? 'Final revealed rival score (Base + Synergies)' : 'Puntuación final revelada del rival (Base + Sinergias)')
+                    : (isEn ? 'Visible rival score (excludes hidden Shadow Cards until revelation)' : 'Puntuación visible del rival (las Cartas Sombra enemigas no suman hasta revelarse)')
+                }
+              >
+                <span className="text-[9px] font-serif font-bold uppercase tracking-wider text-rose-300/90">
+                  {isRoundOver ? ui.game.front.liveFinalTotal : ui.game.front.liveRivalVisible}:
+                </span>
+                <span className="text-xs font-mono font-black text-rose-200">
+                  {enemyScore.total}
+                </span>
+                {enemySynergyBonus > 0 && (
+                  <span className="text-[8px] font-mono text-amber-300">
+                    ({enemyScore.baseTotal}+{enemySynergyBonus})
+                  </span>
+                )}
+              </div>
+            )}
+
+            {enemyScore.hiddenCount > 0 && (
+              <span
+                className="bg-purple-950/70 border border-purple-500/40 text-purple-300 px-1.5 py-0.5 rounded text-[9px] font-serif font-bold tracking-wider uppercase flex items-center gap-0.5"
+                title={isEn ? "Hidden shadow cards (not added to visible score until round end)" : "Cartas sombras ocultas (no suman al marcador público hasta el final de la ronda)"}
+              >
+                <span>+{enemyScore.hiddenCount}</span>
+                <span className="text-[8px]">{ui.game.card.shadowBadge}</span>
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Pastillas de Formaciones Activas del Rival */}
@@ -332,6 +369,7 @@ export function FrontZone({
                     synergy={cardSynergy}
                     isHighlighted={isHighlighted}
                     isDimmed={isDimmed}
+                    gameMode={gameMode}
                     onMouseEnter={() => {
                       if (!card.isShadow || isRoundOver) {
                         setHoveredCardId(card.id);
@@ -347,16 +385,31 @@ export function FrontZone({
       </div>
 
       {/* Divisor Central / Balanza de Batalla táctica de Salón */}
-      <div className="py-1.5 my-1 border-y border-amber-500/20 flex items-center justify-between bg-black/50 px-3 rounded-xl shadow-inner">
+      <div className="py-1.5 my-1 border-y border-amber-500/20 flex items-center justify-between bg-black/50 px-3 rounded-xl shadow-inner gap-2">
         <div className="flex items-center gap-1.5 text-[11px] font-serif font-bold text-amber-200/80">
-          <Swords className="w-3.5 h-3.5 text-amber-400/80" />
-          <span className="tracking-wide">
-            {isSaturated
-              ? (isEn ? 'Limit reached' : 'Límite alcanzado')
-              : totalCards === 0
-              ? (isEn ? 'Open line' : 'Frente abierto')
-              : (isEn ? `${teamBCards.length} vs ${teamACards.length} troops` : `${teamBCards.length} vs ${teamACards.length} tropas`)}
-          </span>
+          <Swords className="w-3.5 h-3.5 text-amber-400/80 shrink-0" />
+          {isCasual ? (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] uppercase tracking-wider text-emerald-300/90">
+                {ui.game.front.liveScoreTitle}:
+              </span>
+              <span className="font-mono text-xs font-black px-1.5 py-0.5 rounded bg-black/70 border border-emerald-500/30">
+                <span className="text-emerald-400">{allyScore.total}</span>
+                <span className="text-slate-500 mx-1">vs</span>
+                <span className="text-rose-400">
+                  {enemyScore.total}{!isRoundOver && enemyScore.hiddenCount > 0 ? '?' : ''}
+                </span>
+              </span>
+            </div>
+          ) : (
+            <span className="tracking-wide">
+              {isSaturated
+                ? (isEn ? 'Limit reached' : 'Límite alcanzado')
+                : totalCards === 0
+                ? (isEn ? 'Open line' : 'Frente abierto')
+                : (isEn ? `${teamBCards.length} vs ${teamACards.length} troops` : `${teamBCards.length} vs ${teamACards.length} tropas`)}
+            </span>
+          )}
         </div>
 
         {/* Indicador de Acción al pasar el cursor o arrastrar */}
@@ -370,7 +423,9 @@ export function FrontZone({
           </div>
         ) : (
           <span className="text-[10px] text-slate-500 font-serif italic tracking-wider">
-            {isEn ? 'Tactical assessment' : 'Cálculo de mesa'}
+            {isCasual
+              ? (isSaturated ? (isEn ? 'Limit reached' : 'Límite alcanzado') : (isEn ? 'Live score active' : 'Suma en vivo'))
+              : (isEn ? 'Tactical assessment' : 'Cálculo de mesa')}
           </span>
         )}
       </div>
@@ -405,6 +460,7 @@ export function FrontZone({
                     synergy={cardSynergy}
                     isHighlighted={isHighlighted}
                     isDimmed={isDimmed}
+                    gameMode={gameMode}
                     onMouseEnter={() => {
                       setHoveredCardId(card.id);
                     }}
@@ -416,8 +472,8 @@ export function FrontZone({
           )}
         </div>
 
-        {/* Pie de tropas propias: Etiqueta y Conteo */}
-        <div className="flex items-center justify-between text-[11px] px-0.5">
+        {/* Pie de tropas propias: Etiqueta, Conteo y Puntuación Real en Vivo (Modo Casual) */}
+        <div className="flex flex-wrap items-center justify-between gap-1 text-[11px] px-0.5">
           <div className="flex items-center gap-1.5">
             <span className={`font-serif font-bold tracking-wider uppercase text-[10px] ${allyColor}`}>
               {allyLabel}
@@ -427,15 +483,45 @@ export function FrontZone({
             </span>
           </div>
 
-          {allyShadowCount > 0 && (
-            <span
-              className="bg-purple-950/70 border border-purple-500/40 text-purple-300 px-1.5 py-0.5 rounded text-[9px] font-serif font-bold tracking-wider uppercase flex items-center gap-0.5"
-              title={isEn ? "Team shadow cards" : "Cartas sombras del equipo"}
-            >
-              <span>+{allyShadowCount}</span>
-              <span className="text-[8px]">{ui.game.card.shadowBadge}</span>
-            </span>
-          )}
+          <div className="flex items-center gap-1.5">
+            {isCasual && (
+              <div
+                className="flex items-center gap-1 bg-emerald-950/85 border border-emerald-500/50 px-2 py-0.5 rounded-lg shadow-sm"
+                title={
+                  isEn
+                    ? 'Real allied total score (includes your team Shadow Cards)'
+                    : 'Puntuación real aliada en vivo (incluye las Cartas Sombra de tu equipo)'
+                }
+              >
+                <span className="text-[9px] font-serif font-bold uppercase tracking-wider text-emerald-300/90">
+                  {isRoundOver ? ui.game.front.liveFinalTotal : ui.game.front.liveAlliedTotal}:
+                </span>
+                <span className="text-xs font-mono font-black text-emerald-200">
+                  {allyScore.total}
+                </span>
+                {allySynergyBonus > 0 && (
+                  <span className="text-[8px] font-mono text-amber-300">
+                    ({allyScore.baseTotal}+{allySynergyBonus})
+                  </span>
+                )}
+                {allyShadowCount > 0 && !isRoundOver && (
+                  <span className="text-[8px] font-serif text-purple-300 ml-0.5">
+                    {ui.game.front.liveIncludesShadows}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {allyShadowCount > 0 && (
+              <span
+                className="bg-purple-950/70 border border-purple-500/40 text-purple-300 px-1.5 py-0.5 rounded text-[9px] font-serif font-bold tracking-wider uppercase flex items-center gap-0.5"
+                title={isEn ? "Team shadow cards" : "Cartas sombras del equipo"}
+              >
+                <span>+{allyShadowCount}</span>
+                <span className="text-[8px]">{ui.game.card.shadowBadge}</span>
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>

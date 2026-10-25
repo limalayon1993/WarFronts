@@ -1,6 +1,6 @@
 import React from 'react';
 import { EyeOff } from 'lucide-react';
-import { SUITS, getLocalizedSuits } from '../constants/rules';
+import { SUITS, getLocalizedSuits, getCardCasualBase } from '../constants/rules';
 import { useLanguage } from '../context/LanguageContext';
 
 export function Card({
@@ -16,6 +16,7 @@ export function Card({
   synergy = null,
   isHighlighted = false,
   isDimmed = false,
+  gameMode = 'competitive',
   onClick,
   onDragStart,
   onDragEnd,
@@ -23,9 +24,14 @@ export function Card({
   onMouseLeave,
 }) {
   const { isEn, ui } = useLanguage();
+  const isCasual = gameMode === 'casual';
   const localizedSuits = React.useMemo(() => getLocalizedSuits(isEn ? 'en' : 'es'), [isEn]);
   const suitInfo = card ? (localizedSuits[card.suit] || SUITS[card.suit]) : null;
   const isRed = card?.suit === 'hearts' || card?.suit === 'diamonds';
+  const casualBasePts = React.useMemo(
+    () => (card && !card.isHidden && card.rank && card.rank !== '?' ? getCardCasualBase(card) : null),
+    [card]
+  );
 
   // Tooltip explicativo con desglose táctico de sinergias activas
   const synergyTooltip = React.useMemo(() => {
@@ -123,7 +129,7 @@ export function Card({
 
         {/* Sello de Sombra de equipo */}
         <div
-          className="absolute bottom-1 left-1 z-20 pointer-events-none"
+          className="absolute bottom-1 left-1 z-20 pointer-events-none flex items-center gap-0.5"
           title={
             isOwner
               ? (ui.game.card?.ownShadowTooltip || (isEn ? "Your Shadow Card (Hidden from enemies)" : "Tu Carta Sombra (Oculta para rivales)"))
@@ -133,6 +139,11 @@ export function Card({
           <span className="w-4 h-4 rounded-full bg-purple-950/95 text-purple-300 border border-purple-500/80 flex items-center justify-center shadow">
             <EyeOff className="w-2.5 h-2.5" />
           </span>
+          {isCasual && casualBasePts !== null && (
+            <span className="px-1 py-0.2 rounded bg-emerald-950/95 text-emerald-300 border border-emerald-500/70 text-[7px] font-mono font-black leading-none shadow">
+              {casualBasePts}p
+            </span>
+          )}
         </div>
 
         {/* Contenedor interno recortado al borde redondeado de la carta */}
@@ -260,15 +271,26 @@ export function Card({
         </div>
       )}
 
-      {/* Indicador de Carta Sombra que ha sido revelada (icono discreto en esquina inferior izquierda) */}
-      {isRevealed && isShadow && (
+      {/* Indicador de Carta Sombra que ha sido revelada o valor base comprimido en Modo Casual */}
+      {((isRevealed && isShadow) || (isCasual && casualBasePts !== null)) && (
         <div
-          className="absolute bottom-1 left-1 z-20 pointer-events-none"
-          title={isEn ? "Played as a Shadow Card" : "Jugada como Carta Sombra"}
+          className="absolute bottom-1 left-1 z-20 pointer-events-none flex items-center gap-0.5"
+          title={
+            isRevealed && isShadow
+              ? (isEn ? "Played as a Shadow Card" : "Jugada como Carta Sombra")
+              : (isEn ? `Casual Base Value: ${casualBasePts} pt(s)` : `Valor Base Casual: ${casualBasePts} pto(s)`)
+          }
         >
-          <span className="w-4 h-4 rounded-full bg-purple-950/95 text-purple-300 border border-purple-500/80 flex items-center justify-center shadow-md">
-            <EyeOff className="w-2.5 h-2.5" />
-          </span>
+          {isRevealed && isShadow && (
+            <span className="w-4 h-4 rounded-full bg-purple-950/95 text-purple-300 border border-purple-500/80 flex items-center justify-center shadow-md">
+              <EyeOff className="w-2.5 h-2.5" />
+            </span>
+          )}
+          {isCasual && casualBasePts !== null && (
+            <span className="px-1 py-0.2 rounded bg-emerald-950/95 text-emerald-300 border border-emerald-500/70 text-[7px] sm:text-[8px] font-mono font-black leading-none shadow">
+              {casualBasePts}p
+            </span>
+          )}
         </div>
       )}
 

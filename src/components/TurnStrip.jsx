@@ -10,91 +10,141 @@ export function TurnStrip({
   isBotThinking,
   teamAClock = 200,
   teamBClock = 200,
+  turnClock = 20,
   teamAShadowsLeft = 2,
   teamBShadowsLeft = 2,
   modeId = '2v2',
+  gameMode = 'competitive',
 }) {
   const { language, isEn, ui } = useLanguage();
+  const isCasual = gameMode === 'casual';
   const activePlayer = players.find(p => p.id === currentTurnPlayerId) || players[activePlayerIndex];
   const activeTeam = activePlayer?.team || 'teamA';
   const is1v1 = modeId === '1v1';
 
   return (
     <div className="bg-[#07090e]/95 border-b border-amber-500/20 px-3 sm:px-4 py-2 flex flex-col md:flex-row items-center justify-between gap-2.5 text-xs font-serif shadow-md">
-      {/* Indicador del turno activo y Reloj Dual de Equipo */}
+      {/* Indicador del turno activo y Reloj (Dual en Competitivo / Individual 20s en Casual) */}
       <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
-        {/* Reloj Dual de Equipo (Dual Precision Tournament Clock) */}
-        <div className="flex items-center gap-1.5 bg-black/70 p-1 rounded-2xl border border-amber-500/30 shadow-inner">
-          {/* Reloj Equipo A */}
-          <div
-            className={`flex items-center gap-2 px-3 py-1 rounded-xl border font-mono transition-all duration-200 ${
-              activeTeam === 'teamA'
-                ? teamAClock <= 10
+        {isCasual ? (
+          /* Reloj de Turno Individual (20s fijos en Modo Casual) */
+          <div className="flex items-center gap-2 bg-black/70 p-1 rounded-2xl border border-emerald-500/35 shadow-inner">
+            <div
+              className={`flex items-center gap-2 px-3 py-1 rounded-xl border font-mono transition-all duration-200 ${
+                turnClock <= 5
                   ? 'bg-rose-950/90 border-rose-500 text-rose-200 ring-2 ring-rose-500/50 animate-pulse'
-                  : teamAClock <= 20
+                  : turnClock <= 10
                   ? 'bg-amber-950/90 border-amber-500 text-amber-200 ring-1 ring-amber-500/40'
                   : 'bg-emerald-950/90 border-emerald-400 text-emerald-300 ring-1 ring-emerald-500/40 shadow-emerald-500/20 shadow-md'
-                : 'bg-black/40 border-stone-800/80 text-stone-500 opacity-60'
-            }`}
-            title={isEn ? `Clock for ${is1v1 ? 'your squad (A)' : 'Allied Squad (A)'}` : `Reloj de ${is1v1 ? 'tu equipo (A)' : 'Equipo Aliado (A)'}`}
-          >
-            <div className="flex flex-col text-left">
-              <span className="text-[8px] font-serif uppercase font-bold tracking-widest opacity-80 leading-none">
-                {is1v1 ? ui.game.turnStrip.youA : ui.game.turnStrip.teamA}
-              </span>
-              <span className="text-xs sm:text-sm font-mono font-black leading-tight tracking-tight">
-                {formatClockTime(teamAClock)}
-              </span>
-            </div>
-            {/* Fondo de Sombras del Equipo A */}
-            <div
-              className="flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-purple-500/40 bg-purple-950/60 text-purple-300 ml-0.5"
-              title={ui.game.turnStrip.teamShadowsTitle ? ui.game.turnStrip.teamShadowsTitle(is1v1 ? (isEn ? 'Your' : 'Tu') : (isEn ? 'Team A' : 'Equipo A'), teamAShadowsLeft) : `${teamAShadowsLeft}`}
+              }`}
+              title={
+                isEn
+                  ? '20s Individual Turn Clock (Casual Mode): Auto-plays 1st card face up in the front with fewest cards on timeout'
+                  : 'Reloj de Turno Individual de 20s (Modo Casual): Si llega a 00:00 juega automáticamente tu 1ª carta boca arriba en el frente con menos cartas'
+              }
             >
-              <EyeOff className="w-2.5 h-2.5 text-purple-400" />
-              <span className="font-mono text-[10px] font-bold">{teamAShadowsLeft}</span>
-            </div>
-            {activeTeam === 'teamA' && (
+              <Timer className="w-4 h-4 text-emerald-400 shrink-0" />
+              <div className="flex flex-col text-left">
+                <span className="text-[8px] font-serif uppercase font-bold tracking-widest opacity-85 leading-none">
+                  {ui.game.turnStrip.casualTurnClockLabel}
+                </span>
+                <span className="text-xs sm:text-sm font-mono font-black leading-tight tracking-tight">
+                  {formatClockTime(turnClock)}
+                </span>
+              </div>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-            )}
-          </div>
+            </div>
 
-          <span className="text-amber-500/40 text-[9px] font-serif font-black px-0.5">VS</span>
-
-          {/* Reloj Equipo B */}
-          <div
-            className={`flex items-center gap-2 px-3 py-1 rounded-xl border font-mono transition-all duration-200 ${
-              activeTeam === 'teamB'
-                ? teamBClock <= 10
-                  ? 'bg-rose-950/90 border-rose-500 text-rose-200 ring-2 ring-rose-500/50 animate-pulse'
-                  : teamBClock <= 20
-                  ? 'bg-amber-950/90 border-amber-500 text-amber-200 ring-1 ring-amber-500/40'
-                  : 'bg-rose-950/90 border-rose-400 text-rose-300 ring-1 ring-rose-500/40 shadow-rose-500/20 shadow-md'
-                : 'bg-black/40 border-stone-800/80 text-stone-500 opacity-60'
-            }`}
-            title={isEn ? `Clock for ${is1v1 ? 'rival (B)' : 'Rival Squad (B)'}` : `Reloj de ${is1v1 ? 'rival (B)' : 'Equipo Rival (B)'}`}
-          >
-            {activeTeam === 'teamB' && (
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
-            )}
-            {/* Fondo de Sombras del Equipo B */}
+            {/* Sombra personal del jugador activo */}
             <div
-              className="flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-purple-500/40 bg-purple-950/60 text-purple-300 mr-0.5"
-              title={ui.game.turnStrip.teamShadowsTitle ? ui.game.turnStrip.teamShadowsTitle(is1v1 ? (isEn ? 'Rival' : 'Rival') : (isEn ? 'Team B' : 'Equipo B'), teamBShadowsLeft) : `${teamBShadowsLeft}`}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-xl border border-purple-500/40 bg-purple-950/70 text-purple-200"
+              title={
+                ui.game.turnStrip.personalShadowTitle
+                  ? ui.game.turnStrip.personalShadowTitle(activePlayer?.name || '', activePlayer?.shadowsLeft ?? 0)
+                  : `${activePlayer?.shadowsLeft ?? 0}`
+              }
             >
-              <EyeOff className="w-2.5 h-2.5 text-purple-400" />
-              <span className="font-mono text-[10px] font-bold">{teamBShadowsLeft}</span>
-            </div>
-            <div className="flex flex-col text-right">
-              <span className="text-[8px] font-serif uppercase font-bold tracking-widest opacity-80 leading-none">
-                {is1v1 ? ui.game.turnStrip.rivalB : ui.game.turnStrip.teamB}
+              <EyeOff className="w-3 h-3 text-purple-400" />
+              <span className="text-[9px] font-serif uppercase font-bold tracking-wider">
+                {ui.game.turnStrip.personalShadowLabel}:
               </span>
-              <span className="text-xs sm:text-sm font-mono font-black leading-tight tracking-tight">
-                {formatClockTime(teamBClock)}
-              </span>
+              <span className="font-mono text-[11px] font-black">{activePlayer?.shadowsLeft ?? 0}/1</span>
             </div>
           </div>
-        </div>
+        ) : (
+          /* Reloj Dual de Equipo (Dual Precision Tournament Clock) */
+          <div className="flex items-center gap-1.5 bg-black/70 p-1 rounded-2xl border border-amber-500/30 shadow-inner">
+            {/* Reloj Equipo A */}
+            <div
+              className={`flex items-center gap-2 px-3 py-1 rounded-xl border font-mono transition-all duration-200 ${
+                activeTeam === 'teamA'
+                  ? teamAClock <= 10
+                    ? 'bg-rose-950/90 border-rose-500 text-rose-200 ring-2 ring-rose-500/50 animate-pulse'
+                    : teamAClock <= 20
+                    ? 'bg-amber-950/90 border-amber-500 text-amber-200 ring-1 ring-amber-500/40'
+                    : 'bg-emerald-950/90 border-emerald-400 text-emerald-300 ring-1 ring-emerald-500/40 shadow-emerald-500/20 shadow-md'
+                  : 'bg-black/40 border-stone-800/80 text-stone-500 opacity-60'
+              }`}
+              title={isEn ? `Clock for ${is1v1 ? 'your squad (A)' : 'Allied Squad (A)'}` : `Reloj de ${is1v1 ? 'tu equipo (A)' : 'Equipo Aliado (A)'}`}
+            >
+              <div className="flex flex-col text-left">
+                <span className="text-[8px] font-serif uppercase font-bold tracking-widest opacity-80 leading-none">
+                  {is1v1 ? ui.game.turnStrip.youA : ui.game.turnStrip.teamA}
+                </span>
+                <span className="text-xs sm:text-sm font-mono font-black leading-tight tracking-tight">
+                  {formatClockTime(teamAClock)}
+                </span>
+              </div>
+              {/* Fondo de Sombras del Equipo A */}
+              <div
+                className="flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-purple-500/40 bg-purple-950/60 text-purple-300 ml-0.5"
+                title={ui.game.turnStrip.teamShadowsTitle ? ui.game.turnStrip.teamShadowsTitle(is1v1 ? (isEn ? 'Your' : 'Tu') : (isEn ? 'Team A' : 'Equipo A'), teamAShadowsLeft) : `${teamAShadowsLeft}`}
+              >
+                <EyeOff className="w-2.5 h-2.5 text-purple-400" />
+                <span className="font-mono text-[10px] font-bold">{teamAShadowsLeft}</span>
+              </div>
+              {activeTeam === 'teamA' && (
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+              )}
+            </div>
+
+            <span className="text-amber-500/40 text-[9px] font-serif font-black px-0.5">VS</span>
+
+            {/* Reloj Equipo B */}
+            <div
+              className={`flex items-center gap-2 px-3 py-1 rounded-xl border font-mono transition-all duration-200 ${
+                activeTeam === 'teamB'
+                  ? teamBClock <= 10
+                    ? 'bg-rose-950/90 border-rose-500 text-rose-200 ring-2 ring-rose-500/50 animate-pulse'
+                    : teamBClock <= 20
+                    ? 'bg-amber-950/90 border-amber-500 text-amber-200 ring-1 ring-amber-500/40'
+                    : 'bg-rose-950/90 border-rose-400 text-rose-300 ring-1 ring-rose-500/40 shadow-rose-500/20 shadow-md'
+                  : 'bg-black/40 border-stone-800/80 text-stone-500 opacity-60'
+              }`}
+              title={isEn ? `Clock for ${is1v1 ? 'rival (B)' : 'Rival Squad (B)'}` : `Reloj de ${is1v1 ? 'rival (B)' : 'Equipo Rival (B)'}`}
+            >
+              {activeTeam === 'teamB' && (
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+              )}
+              {/* Fondo de Sombras del Equipo B */}
+              <div
+                className="flex items-center gap-1 px-1.5 py-0.5 rounded-md border border-purple-500/40 bg-purple-950/60 text-purple-300 mr-0.5"
+                title={ui.game.turnStrip.teamShadowsTitle ? ui.game.turnStrip.teamShadowsTitle(is1v1 ? (isEn ? 'Rival' : 'Rival') : (isEn ? 'Team B' : 'Equipo B'), teamBShadowsLeft) : `${teamBShadowsLeft}`}
+              >
+                <EyeOff className="w-2.5 h-2.5 text-purple-400" />
+                <span className="font-mono text-[10px] font-bold">{teamBShadowsLeft}</span>
+              </div>
+              <div className="flex flex-col text-right">
+                <span className="text-[8px] font-serif uppercase font-bold tracking-widest opacity-80 leading-none">
+                  {is1v1 ? ui.game.turnStrip.rivalB : ui.game.turnStrip.teamB}
+                </span>
+                <span className="text-xs sm:text-sm font-mono font-black leading-tight tracking-tight">
+                  {formatClockTime(teamBClock)}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Turno actual */}
         <div className="flex items-center gap-2 font-serif">
@@ -151,6 +201,23 @@ export function TurnStrip({
                     title={isEn ? "Opens the round attacking (Team with Initiative)" : "Abre la ronda atacando (Equipo con Iniciativa)"}
                   >
                     {isEn ? '1st' : '1º'}
+                  </span>
+                )}
+                {isCasual && (
+                  <span
+                    className={`inline-flex items-center gap-0.5 text-[9px] font-mono px-1 py-0.2 rounded border ${
+                      (player.shadowsLeft ?? 0) > 0
+                        ? 'bg-purple-950/80 text-purple-300 border-purple-500/50'
+                        : 'bg-black/40 text-stone-600 border-stone-800'
+                    }`}
+                    title={
+                      ui.game.turnStrip.personalShadowTitle
+                        ? ui.game.turnStrip.personalShadowTitle(player.name, player.shadowsLeft ?? 0)
+                        : `${player.shadowsLeft ?? 0}`
+                    }
+                  >
+                    <EyeOff className="w-2.5 h-2.5" />
+                    <span>{player.shadowsLeft ?? 0}</span>
                   </span>
                 )}
                 <span className="font-mono text-[10px] text-amber-500/60 font-semibold">

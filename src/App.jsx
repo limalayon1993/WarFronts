@@ -14,9 +14,13 @@ import {
   calculateFrontScore,
   resolveFrontWinner,
   getLocalizedFronts,
+  getLocalizedSuits,
   SHADOW_ECONOMY,
   calculateRoundPoints,
   calculateRoundEconomy,
+  CASUAL_TURN_SECONDS,
+  CASUAL_SHADOWS_PER_PLAYER,
+  findCasualAutoPlayFront,
 } from './constants/rules';
 import { useLanguage } from './context/LanguageContext';
 import { chooseBotMove } from './utils/aiBot';
@@ -60,10 +64,13 @@ export default function App() {
   const [multiplayerSlots, setMultiplayerSlots] = useState(null);
   const [readyPlayers, setReadyPlayers] = useState([]);
 
-  // Selección del Menú: Formato, Duración (rondas) y Tiempo de Equipo
+  // Selección del Menú: Modalidad de Reglas, Formato, Duración (rondas) y Tiempo de Equipo
+  const [selectedGameMode, setSelectedGameMode] = useState('competitive'); // 'competitive' | 'casual'
+  const [tutorialMode, setTutorialMode] = useState('competitive'); // 'competitive' | 'casual'
   const [selectedMode, setSelectedMode] = useState('1v1');
   const [selectedRhythm, setSelectedRhythm] = useState(6);
   const [selectedTimeSpeed, setSelectedTimeSpeed] = useState('medio');
+  const isCasual = selectedGameMode === 'casual';
 
   // Configuración activa de la partida
   const modeConfig = GAME_MODES[selectedMode] || GAME_MODES['1v1'];
@@ -71,10 +78,11 @@ export default function App() {
   const rhythmConfig = durationConfig;
   const timeConfig = getTeamTimeConfig(selectedMode, selectedTimeSpeed);
 
-  // Reloj de equipo compartido (segundos restantes por ronda para cada bando)
+  // Reloj de equipo compartido (segundos restantes por ronda para cada bando) y Reloj de Turno Individual (Modo Casual: 20s)
   const defaultInitialClock = getTeamTimeSeconds(selectedMode, selectedTimeSpeed);
   const [teamAClock, setTeamAClock] = useState(defaultInitialClock);
   const [teamBClock, setTeamBClock] = useState(defaultInitialClock);
+  const [turnClock, setTurnClock] = useState(CASUAL_TURN_SECONDS);
 
   // Estado de la partida
   const [round, setRound] = useState(1);
@@ -124,6 +132,14 @@ export default function App() {
   function getPenaltyNoticeText(penalty) {
     if (!penalty) return '';
     if (typeof penalty === 'string') return penalty;
+    if (penalty.type === 'casualAutoPlay') {
+      const fObj = localizedFronts.find(f => f.id === penalty.frontKey);
+      const frontName = fObj ? fObj.name : penalty.frontKey;
+      if (typeof ui.game.notices.casualAutoPlay === 'function') {
+        return ui.game.notices.casualAutoPlay(penalty.playerName, penalty.cardLabel, frontName);
+      }
+      return `${penalty.playerName}: ${penalty.cardLabel} -> ${frontName}`;
+    }
     const { infringingTeam, is1v1: isOne, pointsAwarded = 2 } = penalty;
     if (isOne) {
       const fnOrStr = infringingTeam === 'teamA' ? ui.game.notices.flagFall1v1TeamA : ui.game.notices.flagFall1v1TeamB;
@@ -171,7 +187,9 @@ export default function App() {
     currentTurnPlayerId,
     teamAClock,
     teamBClock,
+    turnClock,
     selectedTimeSpeed,
+    selectedGameMode,
     phase,
     round,
     totalMatchRounds,
@@ -228,7 +246,10 @@ export default function App() {
       currentTurnPlayerId: base.currentTurnPlayerId,
       teamAClock: base.teamAClock,
       teamBClock: base.teamBClock,
+      turnClock: base.turnClock ?? turnClock,
       selectedTimeSpeed: base.selectedTimeSpeed,
+      selectedGameMode: base.selectedGameMode ?? selectedGameMode,
+      gameMode: base.selectedGameMode ?? selectedGameMode,
       phase: base.phase,
       round: base.round,
       totalMatchRounds: base.totalMatchRounds,
@@ -315,7 +336,10 @@ export default function App() {
     setCurrentTurnPlayerId(syncData.currentTurnPlayerId);
     if (syncData.teamAClock !== undefined) setTeamAClock(syncData.teamAClock);
     if (syncData.teamBClock !== undefined) setTeamBClock(syncData.teamBClock);
+    if (syncData.turnClock !== undefined) setTurnClock(syncData.turnClock);
     if (syncData.selectedTimeSpeed !== undefined) setSelectedTimeSpeed(syncData.selectedTimeSpeed);
+    const incomingGameMode = syncData.selectedGameMode || syncData.gameMode;
+    if (incomingGameMode) setSelectedGameMode(incomingGameMode);
     if (syncData.penaltyNotice !== undefined) setPenaltyNotice(syncData.penaltyNotice);
     setPhase(syncData.phase);
     setRound(syncData.round);
@@ -354,7 +378,9 @@ export default function App() {
       currentTurnPlayerId: syncData.currentTurnPlayerId,
       teamAClock: syncData.teamAClock ?? stateRef.current.teamAClock,
       teamBClock: syncData.teamBClock ?? stateRef.current.teamBClock,
+      turnClock: syncData.turnClock ?? stateRef.current.turnClock,
       selectedTimeSpeed: syncData.selectedTimeSpeed ?? stateRef.current.selectedTimeSpeed,
+      selectedGameMode: incomingGameMode ?? stateRef.current.selectedGameMode,
       phase: syncData.phase,
       round: syncData.round,
       totalMatchRounds: syncData.totalMatchRounds,
@@ -447,8 +473,16 @@ export default function App() {
     };
   }, []);
 
-  // Generar lista de jugadores según el modo e iniciativa
-  function createPlayerList(mode, initTeam, customSlots = null, teamAShadows = 0, teamBShadows = 0) {
+  // Generar lista de jugadores según el modo, iniciativa y modalidad (Competitivo vs Casual)
+  function createPlayerList(
+    mode,
+    initTeam,
+    customSlots = null,
+    teamAShadows = 0,
+    teamBShadows = 0,
+    ruleMode = 'competitive'
+  ) {
+    const isCasualRule = ruleMode === 'casual';
     if (customSlots && customSlots.length > 0) {
       // Usar los slots configurados en el lobby multijugador, ordenados intercalando turnos
       const teamAPlayers = customSlots.filter(s => s.team === 'teamA');
@@ -472,7 +506,9 @@ export default function App() {
         isBot: s.isBot,
         peerId: s.peerId,
         hand: [],
-        shadowsLeft: s.team === 'teamA' ? teamAShadows : teamBShadows,
+        shadowsLeft: isCasualRule
+          ? CASUAL_SHADOWS_PER_PLAYER
+          : (s.team === 'teamA' ? teamAShadows : teamBShadows),
       }));
     }
 
@@ -489,7 +525,7 @@ export default function App() {
           isBot: i !== 1,
           peerId: null,
           hand: [],
-          shadowsLeft: teamAShadows,
+          shadowsLeft: isCasualRule ? CASUAL_SHADOWS_PER_PLAYER : teamAShadows,
         });
         list.push({
           id: `B${i}`,
@@ -499,7 +535,7 @@ export default function App() {
           isBot: true,
           peerId: null,
           hand: [],
-          shadowsLeft: teamBShadows,
+          shadowsLeft: isCasualRule ? CASUAL_SHADOWS_PER_PLAYER : teamBShadows,
         });
       }
     } else {
@@ -512,7 +548,7 @@ export default function App() {
           isBot: true,
           peerId: null,
           hand: [],
-          shadowsLeft: teamBShadows,
+          shadowsLeft: isCasualRule ? CASUAL_SHADOWS_PER_PLAYER : teamBShadows,
         });
         list.push({
           id: `A${i}`,
@@ -522,7 +558,7 @@ export default function App() {
           isBot: i !== 1,
           peerId: null,
           hand: [],
-          shadowsLeft: teamAShadows,
+          shadowsLeft: isCasualRule ? CASUAL_SHADOWS_PER_PLAYER : teamAShadows,
         });
       }
     }
@@ -540,6 +576,8 @@ export default function App() {
 
     const activeFronts = currentFronts || stateRef.current.fronts || fronts;
     const activePlayersList = currentPlayersList || stateRef.current.players || players;
+    const activeGameMode = stateRef.current.selectedGameMode || selectedGameMode || 'competitive';
+    const isCasualMode = activeGameMode === 'casual';
 
     let teamARoundScoreSum = 0;
     let teamBRoundScoreSum = 0;
@@ -549,13 +587,13 @@ export default function App() {
     FRONTS.forEach(front => {
       const teamACards = activeFronts[front.id].teamA;
       const teamBCards = activeFronts[front.id].teamB;
-      const teamAScore = calculateFrontScore(teamACards, true);
-      const teamBScore = calculateFrontScore(teamBCards, true);
+      const teamAScore = calculateFrontScore(teamACards, true, activeGameMode);
+      const teamBScore = calculateFrontScore(teamBCards, true, activeGameMode);
 
       teamARoundScoreSum += teamAScore.total;
       teamBRoundScoreSum += teamBScore.total;
 
-      const resolution = resolveFrontWinner(teamACards, teamBCards, language);
+      const resolution = resolveFrontWinner(teamACards, teamBCards, language, activeGameMode);
       if (resolution.winner === 'teamA') teamAFrontWins++;
       if (resolution.winner === 'teamB') teamBFrontWins++;
     });
@@ -565,8 +603,9 @@ export default function App() {
     let prevTeamARoundPts = stateRef.current.teamARoundPoints ?? teamARoundPoints;
     let prevTeamBRoundPts = stateRef.current.teamBRoundPoints ?? teamBRoundPoints;
 
-    const newTeamACumulative = prevTeamACumulative + teamARoundScoreSum;
-    const newTeamBCumulative = prevTeamBCumulative + teamBRoundScoreSum;
+    // En Modo Casual NO se registran ni usan puntos acumulados entre rondas
+    const newTeamACumulative = isCasualMode ? 0 : (prevTeamACumulative + teamARoundScoreSum);
+    const newTeamBCumulative = isCasualMode ? 0 : (prevTeamBCumulative + teamBRoundScoreSum);
 
     // Nuevo sistema oficial de Puntos de Ronda (1, 2 y 3 Puntos):
     // - Empate en frentes conquistados (ej. 1-1 y 1 Nulo, o 3 Nulos): +1 Punto para CADA equipo
@@ -577,34 +616,38 @@ export default function App() {
     prevTeamBRoundPts += roundPtsResult.teamBPoints;
     const roundWinner = roundPtsResult.roundWinner;
 
-    // Cobro oficial de economía de Marcadores de Sombra (Capítulo 5 y Guía Rápida v2.0)
+    // Cobro oficial de economía de Marcadores de Sombra (Capítulo 5; desactivado en Modo Casual)
     const activeModeId = stateRef.current.selectedMode || selectedMode || '2v2';
     const currentAStreak = stateRef.current.teamALossStreak ?? teamALossStreak;
     const currentBStreak = stateRef.current.teamBLossStreak ?? teamBLossStreak;
-    const econResult = calculateRoundEconomy(activeModeId, roundWinner, currentAStreak, currentBStreak);
+    const econResult = isCasualMode
+      ? { teamAEarned: 0, teamBEarned: 0, teamANewStreak: 0, teamBNewStreak: 0, teamAReason: 'casual', teamBReason: 'casual' }
+      : calculateRoundEconomy(activeModeId, roundWinner, currentAStreak, currentBStreak);
 
     const prevTeamAShadows = stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft;
     const prevTeamBShadows = stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft;
-    const updatedTeamAShadows = prevTeamAShadows + econResult.teamAEarned;
-    const updatedTeamBShadows = prevTeamBShadows + econResult.teamBEarned;
+    const updatedTeamAShadows = isCasualMode ? 0 : (prevTeamAShadows + econResult.teamAEarned);
+    const updatedTeamBShadows = isCasualMode ? 0 : (prevTeamBShadows + econResult.teamBEarned);
 
-    const roundEconomyData = {
-      modeId: activeModeId,
-      roundWinner,
-      winType: roundPtsResult.winType,
-      teamAPointsEarned: roundPtsResult.teamAPoints,
-      teamBPointsEarned: roundPtsResult.teamBPoints,
-      teamAEarned: econResult.teamAEarned,
-      teamBEarned: econResult.teamBEarned,
-      teamAReason: econResult.teamAReason,
-      teamBReason: econResult.teamBReason,
-      teamAPrevBank: prevTeamAShadows,
-      teamBPrevBank: prevTeamBShadows,
-      teamATotalBank: updatedTeamAShadows,
-      teamBTotalBank: updatedTeamBShadows,
-      teamANewStreak: econResult.teamANewStreak,
-      teamBNewStreak: econResult.teamBNewStreak,
-    };
+    const roundEconomyData = isCasualMode
+      ? null
+      : {
+          modeId: activeModeId,
+          roundWinner,
+          winType: roundPtsResult.winType,
+          teamAPointsEarned: roundPtsResult.teamAPoints,
+          teamBPointsEarned: roundPtsResult.teamBPoints,
+          teamAEarned: econResult.teamAEarned,
+          teamBEarned: econResult.teamBEarned,
+          teamAReason: econResult.teamAReason,
+          teamBReason: econResult.teamBReason,
+          teamAPrevBank: prevTeamAShadows,
+          teamBPrevBank: prevTeamBShadows,
+          teamATotalBank: updatedTeamAShadows,
+          teamBTotalBank: updatedTeamBShadows,
+          teamANewStreak: econResult.teamANewStreak,
+          teamBNewStreak: econResult.teamBNewStreak,
+        };
 
     setTeamARoundPoints(prevTeamARoundPts);
     setTeamBRoundPoints(prevTeamBRoundPts);
@@ -659,12 +702,14 @@ export default function App() {
       if (activePlayersList[nextIndex].hand.length > 0) {
         const nextPlayerId = activePlayersList[nextIndex].id;
         setCurrentTurnPlayerId(nextPlayerId);
+        setTurnClock(CASUAL_TURN_SECONDS);
 
         stateRef.current = {
           ...stateRef.current,
           fronts: activeFronts,
           players: activePlayersList,
           currentTurnPlayerId: nextPlayerId,
+          turnClock: CASUAL_TURN_SECONDS,
         };
 
         const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
@@ -684,22 +729,29 @@ export default function App() {
   function executePlayerMove(playerId, card, frontKey, asShadow) {
     const currentList = stateRef.current.players || players;
     const currentActiveFronts = stateRef.current.fronts || fronts;
+    const activeGameMode = stateRef.current.selectedGameMode || selectedGameMode || 'competitive';
+    const isCasualMode = activeGameMode === 'casual';
     const player = currentList.find(p => p.id === playerId);
     if (!player) return;
 
-    // Comprobar disponibilidad en el Fondo de Sombras del Equipo
+    // Comprobar disponibilidad de Marcador de Sombra (Personal en Modo Casual, Fondo de Equipo en Competitivo)
     const currentTeamAShadows = stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft;
     const currentTeamBShadows = stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft;
     const currentTeamShadows = player.team === 'teamA' ? currentTeamAShadows : currentTeamBShadows;
+    const availableShadows = isCasualMode ? (player.shadowsLeft ?? 0) : currentTeamShadows;
 
-    const validAsShadow = Boolean(asShadow && currentTeamShadows > 0);
+    const validAsShadow = Boolean(asShadow && availableShadows > 0);
 
-    const newTeamAShadows = player.team === 'teamA'
-      ? (validAsShadow ? Math.max(0, currentTeamAShadows - 1) : currentTeamAShadows)
-      : currentTeamAShadows;
-    const newTeamBShadows = player.team === 'teamB'
-      ? (validAsShadow ? Math.max(0, currentTeamBShadows - 1) : currentTeamBShadows)
-      : currentTeamBShadows;
+    const newTeamAShadows = isCasualMode
+      ? 0
+      : (player.team === 'teamA'
+          ? (validAsShadow ? Math.max(0, currentTeamAShadows - 1) : currentTeamAShadows)
+          : currentTeamAShadows);
+    const newTeamBShadows = isCasualMode
+      ? 0
+      : (player.team === 'teamB'
+          ? (validAsShadow ? Math.max(0, currentTeamBShadows - 1) : currentTeamBShadows)
+          : currentTeamBShadows);
 
     setTeamAShadowsLeft(newTeamAShadows);
     setTeamBShadowsLeft(newTeamBShadows);
@@ -723,8 +775,19 @@ export default function App() {
     };
     setFronts(updatedFronts);
 
-    // Actualizar jugador (remover carta de mano y sincronizar sombras de equipo restantes)
+    // Actualizar jugador (remover carta de mano y sincronizar sombras restantes)
     const updatedPlayers = currentList.map(p => {
+      if (isCasualMode) {
+        if (p.id === playerId) {
+          return {
+            ...p,
+            hand: p.hand.filter(c => c.id !== card.id),
+            shadowsLeft: validAsShadow ? Math.max(0, (p.shadowsLeft || 0) - 1) : (p.shadowsLeft || 0),
+          };
+        }
+        return p;
+      }
+
       const remainingTeamShadows = p.team === 'teamA' ? newTeamAShadows : newTeamBShadows;
       if (p.id === playerId) {
         return {
@@ -766,6 +829,59 @@ export default function App() {
     } else {
       advanceToNextTurn(playerId, updatedPlayers, updatedFronts);
     }
+  }
+
+  // Manejo oficial de Infracción por Tiempo en Modo Casual (20s agotados -> Auto-play 1ª carta BOCA ARRIBA en el frente válido con menos cartas)
+  function handleCasualTurnTimeout() {
+    if (stateRef.current.phase !== 'deployment' && phase !== 'deployment') return;
+
+    const curr = stateRef.current;
+    const currList = curr.players || players;
+    const activeFronts = curr.fronts || fronts;
+    const activePlayer = currList.find(p => p.id === curr.currentTurnPlayerId);
+
+    if (!activePlayer || !activePlayer.hand || activePlayer.hand.length === 0) {
+      if (activePlayer) {
+        advanceToNextTurn(activePlayer.id, currList, activeFronts);
+      }
+      return;
+    }
+
+    const activeModeId = curr.selectedMode || selectedMode || '2v2';
+    const activeCfg = GAME_MODES[activeModeId] || modeConfig;
+    const targetFrontKey = findCasualAutoPlayFront(activeFronts, activeCfg.maxFrontCards);
+    if (!targetFrontKey) {
+      handleDeploymentEnd(activeFronts, currList);
+      return;
+    }
+
+    sound.playTimeout();
+    const autoCard = activePlayer.hand[0];
+    const suitSymbol = getLocalizedSuits(language)[autoCard.suit]?.symbol || '';
+    const cardLabel = `${autoCard.rank}${suitSymbol}`;
+
+    const autoPlayNoticeObj = {
+      type: 'casualAutoPlay',
+      playerName: activePlayer.name,
+      cardLabel,
+      frontKey: targetFrontKey,
+    };
+
+    setPenaltyNotice(autoPlayNoticeObj);
+    stateRef.current.penaltyNotice = autoPlayNoticeObj;
+    setTimeout(() => setPenaltyNotice(null), 5000);
+
+    const isMp = Boolean(curr.isMultiplayer || isMultiplayer || mp.isHost);
+    const isHst = Boolean(curr.isHost || isHost || mp.isHost);
+    if (isMp && isHst) {
+      mp.broadcast({
+        type: 'PENALTY_NOTICE',
+        notice: getPenaltyNoticeText(autoPlayNoticeObj),
+      });
+    }
+
+    // Jugar automáticamente la primera carta de su mano BOCA ARRIBA (asShadow = false)
+    executePlayerMove(activePlayer.id, autoCard, targetFrontKey, false);
   }
 
   // Manejo oficial de Caída de Bandera (Derrota por Tiempo al llegar a 00:00 el reloj de equipo)
@@ -916,6 +1032,7 @@ export default function App() {
     const initialClock = getTeamTimeSeconds(modeConfig.id, selectedTimeSpeed);
     setTeamAClock(initialClock);
     setTeamBClock(initialClock);
+    setTurnClock(CASUAL_TURN_SECONDS);
     setPhase('deployment');
 
     stateRef.current = {
@@ -925,6 +1042,7 @@ export default function App() {
       phase: 'deployment',
       teamAClock: initialClock,
       teamBClock: initialClock,
+      turnClock: CASUAL_TURN_SECONDS,
       readyPlayers: [],
     };
 
@@ -1048,7 +1166,7 @@ export default function App() {
     handleSetRoundReady(mySlotId, nextReady);
   }
 
-  // Iniciar una ronda concreta con reseteo reglamentario de Reloj de Equipo
+  // Iniciar una ronda concreta con reseteo reglamentario de Reloj de Equipo (o Turno 20s en Modo Casual)
   function startNewRound(
     roundNumber,
     newInitiativeTeam,
@@ -1057,7 +1175,8 @@ export default function App() {
     cfg = modeConfig,
     customSlots = null,
     forceMultiplayerHost = false,
-    speed = null
+    speed = null,
+    ruleMode = null
   ) {
     let pool = [...currentDrawPool];
     let discards = [...currentDiscardPool];
@@ -1068,11 +1187,13 @@ export default function App() {
       discards = [];
     }
 
-    // 1. Fondo de Sombras oficial: Ronda 1 inicia estrictamente con 0.
-    // En rondas posteriores se conserva el fondo acumulado (ahorro continuo).
+    const activeGameMode = ruleMode || stateRef.current.selectedGameMode || selectedGameMode || 'competitive';
+    const isCasualMode = activeGameMode === 'casual';
+
+    // 1. Fondo de Sombras oficial (Competitivo) o Sombras personales fijas (Casual: 1 por jugador/ronda)
     let teamAShadowsForRound = 0;
     let teamBShadowsForRound = 0;
-    if (roundNumber === 1) {
+    if (roundNumber === 1 || isCasualMode) {
       teamAShadowsForRound = 0;
       teamBShadowsForRound = 0;
       setTeamAShadowsLeft(0);
@@ -1087,7 +1208,14 @@ export default function App() {
 
     // 2. Jugadores (usar customSlots o los guardados en multiplayerSlots)
     const effectiveSlots = customSlots || multiplayerSlots;
-    const playerList = createPlayerList(cfg, newInitiativeTeam, effectiveSlots, teamAShadowsForRound, teamBShadowsForRound);
+    const playerList = createPlayerList(
+      cfg,
+      newInitiativeTeam,
+      effectiveSlots,
+      teamAShadowsForRound,
+      teamBShadowsForRound,
+      activeGameMode
+    );
 
     // En todos los modos (1v1 y equipos), la Fase 2 es sin cartas en mano (se reparten en Fase 3)
     playerList.forEach(player => {
@@ -1117,6 +1245,7 @@ export default function App() {
     setPlanningTimer(30);
     setTeamAClock(initialClock);
     setTeamBClock(initialClock);
+    setTurnClock(CASUAL_TURN_SECONDS);
     setPhase('planning');
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -1125,7 +1254,6 @@ export default function App() {
     setReadyPlayers(initialBotReadyIds);
 
     // Mensaje descriptivo de quién empieza atacando (sorteo en Ronda 1, rotación en rondas posteriores)
-    const isTeamA = newInitiativeTeam === 'teamA';
     const activeModeId = cfg.id || selectedMode || stateRef.current.selectedMode;
     const is1v1 = activeModeId === '1v1';
     const isMp = isMultiplayer || forceMultiplayerHost || stateRef.current.isMultiplayer;
@@ -1156,16 +1284,18 @@ export default function App() {
       planningTimer: 30,
       teamAClock: initialClock,
       teamBClock: initialClock,
+      turnClock: CASUAL_TURN_SECONDS,
       selectedTimeSpeed: activeSpeed,
+      selectedGameMode: activeGameMode,
       readyPlayers: initialBotReadyIds,
       roundOverTimer: 60,
       roundOverReadyPlayers: [],
       flagFallTeam: null,
       teamAShadowsLeft: teamAShadowsForRound,
       teamBShadowsLeft: teamBShadowsForRound,
-      teamALossStreak: roundNumber === 1 ? 0 : (stateRef.current.teamALossStreak ?? teamALossStreak),
-      teamBLossStreak: roundNumber === 1 ? 0 : (stateRef.current.teamBLossStreak ?? teamBLossStreak),
-      lastRoundEconomy: roundNumber === 1 ? null : (stateRef.current.lastRoundEconomy ?? lastRoundEconomy),
+      teamALossStreak: (roundNumber === 1 || isCasualMode) ? 0 : (stateRef.current.teamALossStreak ?? teamALossStreak),
+      teamBLossStreak: (roundNumber === 1 || isCasualMode) ? 0 : (stateRef.current.teamBLossStreak ?? teamBLossStreak),
+      lastRoundEconomy: (roundNumber === 1 || isCasualMode) ? null : (stateRef.current.lastRoundEconomy ?? lastRoundEconomy),
       isMultiplayer: isMultiplayerActive,
       isHost: isHostActive,
     };
@@ -1196,7 +1326,7 @@ export default function App() {
     const initialDeck = createDeck(modeConfig.decks);
     const initialInitiative = determineInitialInitiative();
 
-    startNewRound(1, initialInitiative, initialDeck, [], modeConfig, null, false, selectedTimeSpeed);
+    startNewRound(1, initialInitiative, initialDeck, [], modeConfig, null, false, selectedTimeSpeed, selectedGameMode);
     setScreen('game');
   }
 
@@ -1205,6 +1335,7 @@ export default function App() {
     const isHostUser = Boolean(lobbyData.isHost);
     const assignedSlot = lobbyData.mySlotId || mp.myPlayerId || (isHostUser ? 'A1' : null);
     const activeSpeed = lobbyData.timeSpeed || selectedTimeSpeed;
+    const activeRuleMode = lobbyData.gameMode || selectedGameMode || 'competitive';
 
     setIsMultiplayer(true);
     setIsHost(isHostUser);
@@ -1213,6 +1344,7 @@ export default function App() {
     setSelectedMode(lobbyData.modeId);
     setSelectedRhythm(lobbyData.rhythmRounds);
     setSelectedTimeSpeed(activeSpeed);
+    setSelectedGameMode(activeRuleMode);
     setMultiplayerRoomCode(mp.roomCode);
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -1222,6 +1354,7 @@ export default function App() {
     stateRef.current.mySlotId = assignedSlot;
     stateRef.current.selectedMode = lobbyData.modeId;
     stateRef.current.selectedTimeSpeed = activeSpeed;
+    stateRef.current.selectedGameMode = activeRuleMode;
 
     const activeConfig = GAME_MODES[lobbyData.modeId] || GAME_MODES['2v2'];
     setTotalMatchRounds(lobbyData.rhythmRounds);
@@ -1246,12 +1379,13 @@ export default function App() {
           modeId: lobbyData.modeId,
           rhythmRounds: lobbyData.rhythmRounds,
           timeSpeed: activeSpeed,
+          gameMode: activeRuleMode,
           slots: lobbyData.slots,
           isHost: false,
         },
       });
 
-      startNewRound(1, initialInitiative, initialDeck, [], activeConfig, lobbyData.slots, true, activeSpeed);
+      startNewRound(1, initialInitiative, initialDeck, [], activeConfig, lobbyData.slots, true, activeSpeed, activeRuleMode);
     }
 
     setScreen('game');
@@ -1307,11 +1441,12 @@ export default function App() {
       modeConfig,
       multiplayerSlots,
       false,
-      stateRef.current.selectedTimeSpeed || selectedTimeSpeed
+      stateRef.current.selectedTimeSpeed || selectedTimeSpeed,
+      stateRef.current.selectedGameMode || selectedGameMode
     );
   }
 
-  // Disputar Prórroga oficial de 2 rondas por empate exacto en acumulados (Capítulo 7)
+  // Disputar Prórroga oficial de 2 rondas por empate exacto (Capítulo 7 / Anexo Casual)
   function handlePlayOvertime() {
     setTotalMatchRounds(prev => prev + 2);
     setPhase('roundOver');
@@ -1339,7 +1474,7 @@ export default function App() {
     const newDeck = createDeck(modeConfig.decks);
     const initialInitiative = determineInitialInitiative();
 
-    startNewRound(1, initialInitiative, newDeck, [], modeConfig, null, false, selectedTimeSpeed);
+    startNewRound(1, initialInitiative, newDeck, [], modeConfig, null, false, selectedTimeSpeed, selectedGameMode);
   }
 
   // Despliegue del jugador humano al hacer clic o soltar una carta en un frente
@@ -1360,10 +1495,13 @@ export default function App() {
     const totalInFront = fronts[frontKey].teamA.length + fronts[frontKey].teamB.length;
     if (totalInFront >= modeConfig.maxFrontCards) return;
 
-    const myTeamShadows = me.team === 'teamA'
-      ? (stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft)
-      : (stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft);
-    const useShadow = isShadowMode && myTeamShadows > 0;
+    const activeGameMode = stateRef.current.selectedGameMode || selectedGameMode || 'competitive';
+    const myAvailableShadows = activeGameMode === 'casual'
+      ? (me.shadowsLeft ?? 0)
+      : (me.team === 'teamA'
+          ? (stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft)
+          : (stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft));
+    const useShadow = isShadowMode && myAvailableShadows > 0;
 
     if (isMultiplayer && !isHost) {
       if (useShadow) {
@@ -1419,13 +1557,22 @@ export default function App() {
     return () => clearInterval(timer);
   }, [screen, phase, planningTimer, isMultiplayer, isHost]);
 
-  // Temporizador oficial del Reloj Compartido de Equipo durante el despliegue
+  // Temporizador oficial durante el despliegue:
+  // - Modo Competitivo: Reloj Compartido de Equipo con Caída de Bandera a 00:00
+  // - Modo Casual: Reloj de Turno Individual (20s) con Auto-Play de la 1ª carta boca arriba en el frente con menos cartas
   useEffect(() => {
     if (screen !== 'game' || phase !== 'deployment') return;
 
-    // Cliente en multijugador: decrementa visualmente el reloj del equipo del jugador activo para máxima fluidez
+    const activeGameMode = stateRef.current.selectedGameMode || selectedGameMode || 'competitive';
+    const isCasualMode = activeGameMode === 'casual';
+
+    // Cliente en multijugador: decrementa visualmente el reloj para máxima fluidez
     if (isMultiplayer && !isHost) {
       const timer = setInterval(() => {
+        if (isCasualMode) {
+          setTurnClock(prev => Math.max(0, prev - 1));
+          return;
+        }
         const currList = stateRef.current.players || players;
         const active = currList.find(p => p.id === currentTurnPlayerId);
         const activeTeam = active?.team || 'teamA';
@@ -1438,10 +1585,28 @@ export default function App() {
       return () => clearInterval(timer);
     }
 
-    // Host o Local: control oficial y sanción por Caída de Bandera a 00:00
+    // Host o Local: control oficial de reloj
     const timer = setInterval(() => {
       const curr = stateRef.current;
       if (curr.phase !== 'deployment') return;
+
+      if (isCasualMode) {
+        setTurnClock(prev => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            handleCasualTurnTimeout();
+            return 0;
+          }
+          const next = prev - 1;
+          stateRef.current.turnClock = next;
+          return next;
+        });
+
+        if (isMultiplayer && isHost) {
+          broadcastStateToClients(stateRef.current);
+        }
+        return;
+      }
 
       const currList = curr.players || players;
       const active = currList.find(p => p.id === curr.currentTurnPlayerId);
@@ -1477,13 +1642,29 @@ export default function App() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [screen, phase, currentTurnPlayerId, isMultiplayer, isHost, players]);
+  }, [screen, phase, currentTurnPlayerId, isMultiplayer, isHost, players, selectedGameMode]);
 
-  // Alerta sonora para cuando al equipo del jugador humano le queden 10 segundos o menos en el reloj
+  // Alerta sonora cuando queden pocos segundos en el reloj
   const lastBeepSecondRef = useRef(null);
   useEffect(() => {
     if (screen !== 'game' || phase !== 'deployment') {
       lastBeepSecondRef.current = null;
+      return;
+    }
+
+    if (selectedGameMode === 'casual') {
+      if (currentTurnPlayerId !== mySlotId) {
+        lastBeepSecondRef.current = null;
+        return;
+      }
+      if (turnClock <= 5 && turnClock > 0) {
+        if (lastBeepSecondRef.current !== turnClock) {
+          lastBeepSecondRef.current = turnClock;
+          sound.playWarningCountdown(turnClock);
+        }
+      } else {
+        lastBeepSecondRef.current = null;
+      }
       return;
     }
 
@@ -1505,7 +1686,7 @@ export default function App() {
     } else {
       lastBeepSecondRef.current = null;
     }
-  }, [teamAClock, teamBClock, currentTurnPlayerId, viewerTeam, phase, screen, players]);
+  }, [teamAClock, teamBClock, turnClock, selectedGameMode, currentTurnPlayerId, mySlotId, viewerTeam, phase, screen, players]);
 
   // Sonido de aviso cuando te toca tirar
   const prevTurnPlayerRef = useRef(null);
@@ -1547,9 +1728,12 @@ export default function App() {
         const freshList = stateRef.current.players || players;
         const freshFronts = stateRef.current.fronts || fronts;
         const freshBot = freshList.find(p => p.id === activePlayer.id) || activePlayer;
-        const botTeamShadows = freshBot.team === 'teamA'
-          ? (stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft)
-          : (stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft);
+        const activeRuleMode = stateRef.current.selectedGameMode || selectedGameMode || 'competitive';
+        const botAvailableShadows = activeRuleMode === 'casual'
+          ? (freshBot.shadowsLeft ?? 0)
+          : (freshBot.team === 'teamA'
+              ? (stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft)
+              : (stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft));
 
         const currentRoundNum = stateRef.current.round ?? round;
         const totalRoundsNum = stateRef.current.totalMatchRounds ?? totalMatchRounds;
@@ -1560,7 +1744,7 @@ export default function App() {
           botPlayerId: freshBot.id,
           allPlayers: freshList,
           fronts: freshFronts,
-          botShadowsLeft: botTeamShadows,
+          botShadowsLeft: botAvailableShadows,
           maxFrontCards: modeConfig.maxFrontCards,
           currentRound: currentRoundNum,
           totalRounds: totalRoundsNum,
@@ -1568,6 +1752,7 @@ export default function App() {
           teamLossStreak: freshBot.team === 'teamA'
             ? (stateRef.current.teamALossStreak ?? teamALossStreak)
             : (stateRef.current.teamBLossStreak ?? teamBLossStreak),
+          gameMode: activeRuleMode,
         });
 
         if (move) {
@@ -1585,7 +1770,7 @@ export default function App() {
     } else {
       setIsBotThinking(false);
     }
-  }, [screen, phase, currentTurnPlayerId, isMultiplayer, isHost, selectedTimeSpeed]);
+  }, [screen, phase, currentTurnPlayerId, isMultiplayer, isHost, selectedTimeSpeed, selectedGameMode]);
 
   // Temporizador oficial de resumen de ronda (60 segundos con avance automático)
   useEffect(() => {
@@ -1635,13 +1820,18 @@ export default function App() {
         <MainMenu
           selectedMode={selectedMode}
           setSelectedMode={setSelectedMode}
+          selectedGameMode={selectedGameMode}
+          setSelectedGameMode={setSelectedGameMode}
           selectedRhythm={selectedRhythm}
           setSelectedRhythm={setSelectedRhythm}
           selectedTimeSpeed={selectedTimeSpeed}
           setSelectedTimeSpeed={setSelectedTimeSpeed}
           onStartGame={handleStartGame}
           onOpenMultiplayer={() => setScreen('multiplayer_lobby')}
-          onOpenTutorial={() => setScreen('tutorial')}
+          onOpenTutorial={(mode) => {
+            setTutorialMode(mode === 'casual' ? 'casual' : 'competitive');
+            setScreen('tutorial');
+          }}
           onOpenQuickGuide={() => setIsQuickGuideOpen(true)}
           onOpenFullManual={() => setIsFullManualOpen(true)}
           isMuted={isMuted}
@@ -1653,10 +1843,11 @@ export default function App() {
     );
   }
 
-  // PANTALLA: TUTORIAL INTERACTIVO 2v2 GUIADO
+  // PANTALLA: TUTORIAL INTERACTIVO 2v2 GUIADO (COMPETITIVO Y CASUAL)
   if (screen === 'tutorial') {
     return (
       <InteractiveTutorial
+        initialTutorialMode={tutorialMode}
         onBackToMenu={() => setScreen('menu')}
       />
     );
@@ -1695,6 +1886,7 @@ export default function App() {
         durationConfig={durationConfig}
         rhythmConfig={rhythmConfig}
         timeConfig={timeConfig}
+        gameMode={selectedGameMode}
         isMuted={isMuted}
         onToggleMute={() => setIsMuted(sound.toggleMute())}
         onOpenQuickGuide={() => setIsQuickGuideOpen(true)}
@@ -1706,7 +1898,7 @@ export default function App() {
         mySlotId={mySlotId}
       />
 
-      {/* Tira Secuencial de Turnos para 1v1, 2v2, 3v3 y 4v4 con Reloj Oficial de Equipo */}
+      {/* Tira Secuencial de Turnos para 1v1, 2v2, 3v3 y 4v4 con Reloj Oficial de Equipo o de Turno */}
       {phase === 'deployment' && (
         <TurnStrip
           players={players}
@@ -1714,9 +1906,11 @@ export default function App() {
           isBotThinking={isBotThinking}
           teamAClock={teamAClock}
           teamBClock={teamBClock}
+          turnClock={turnClock}
           teamAShadowsLeft={teamAShadowsLeft}
           teamBShadowsLeft={teamBShadowsLeft}
           modeId={selectedMode}
+          gameMode={selectedGameMode}
         />
       )}
 
@@ -1750,7 +1944,9 @@ export default function App() {
           <div className="flex items-center gap-2 max-w-2xl">
             <Clock className="w-4 h-4 shrink-0 text-amber-400 animate-spin" />
             <span>
-              {selectedMode === '1v1' ? ui.game.planning.banner1v1 : ui.game.planning.bannerTeam}
+              {isCasual
+                ? (selectedMode === '1v1' ? ui.game.planning.bannerCasual1v1 : ui.game.planning.bannerCasualTeam)
+                : (selectedMode === '1v1' ? ui.game.planning.banner1v1 : ui.game.planning.bannerTeam)}
             </span>
           </div>
 
@@ -1816,6 +2012,7 @@ export default function App() {
               isPlayerTurn={isMyTurn}
               maxFrontCards={modeConfig.maxFrontCards}
               modeId={selectedMode}
+              gameMode={selectedGameMode}
               viewerPlayerId={mySlotId}
               viewerTeam={viewerTeam}
               onDeploy={handleDeployPlayerCard}
@@ -1847,23 +2044,29 @@ export default function App() {
 
               {/* Botón de Modo Sombra */}
               {(() => {
-                const currentMyTeamShadows = (localPlayer?.team === 'teamA' ? teamAShadowsLeft : teamBShadowsLeft) ?? 0;
+                const currentAvailableShadows = isCasual
+                  ? (localPlayer?.shadowsLeft ?? 0)
+                  : ((localPlayer?.team === 'teamA' ? teamAShadowsLeft : teamBShadowsLeft) ?? 0);
                 return (
                   <button
                     type="button"
-                    disabled={!localPlayer || currentMyTeamShadows <= 0 || !isMyTurn}
+                    disabled={!localPlayer || currentAvailableShadows <= 0 || !isMyTurn}
                     onClick={() => setIsShadowMode(prev => !prev)}
                     title={
-                      currentMyTeamShadows <= 0
-                        ? (round === 1
-                          ? (isEn ? 'Ronda 1 inicia con 0 sombras en el Fondo de Equipo. Se cobrarán al finalizar la ronda según el resultado.' : 'La Ronda 1 inicia con 0 sombras en el Fondo de Equipo. Se cobrarán al finalizar la ronda según el resultado.')
-                          : (isEn ? 'Your team has exhausted its shadow marker pool for this round.' : 'Tu equipo ha agotado su fondo de marcadores de sombra para esta ronda.'))
-                        : (isEn ? 'Activate to deploy next card concealed as a Shadow' : 'Activar para jugar la siguiente carta oculta como Sombra')
+                      currentAvailableShadows <= 0
+                        ? (isCasual
+                          ? ui.game.hand.casualShadowTitleEmpty
+                          : (round === 1
+                            ? (isEn ? 'Round 1 starts with 0 shadows in the Team Pool. They are awarded at the end of the round based on the result.' : 'La Ronda 1 inicia con 0 sombras en el Fondo de Equipo. Se cobrarán al finalizar la ronda según el resultado.')
+                            : (isEn ? 'Your team has exhausted its shadow marker pool for this round.' : 'Tu equipo ha agotado su fondo de marcadores de sombra para esta ronda.')))
+                        : (isCasual
+                          ? ui.game.hand.casualShadowTitleReady
+                          : (isEn ? 'Activate to deploy next card concealed as a Shadow' : 'Activar para jugar la siguiente carta oculta como Sombra'))
                     }
                     className={`text-xs px-3.5 py-1.5 rounded-xl border font-serif font-bold tracking-wider uppercase flex items-center gap-1.5 transition cursor-pointer ${
                       isShadowMode
                         ? 'bg-gradient-to-r from-purple-900 to-indigo-950 text-purple-200 border-purple-400/80 shadow-[0_0_15px_rgba(168,85,247,0.35)] ring-1 ring-purple-400'
-                        : currentMyTeamShadows > 0
+                        : currentAvailableShadows > 0
                         ? 'bg-[#141220] text-purple-300 border-purple-800/80 hover:bg-[#1d1a30]'
                         : 'bg-black/40 text-stone-600 border-stone-800 cursor-not-allowed'
                     }`}
@@ -1872,9 +2075,11 @@ export default function App() {
                       {isShadowMode ? ui.game.hand.shadowActiveBtn : ui.game.hand.playShadowBtn}
                     </span>
                     <span className="bg-purple-950/90 text-purple-300 border border-purple-800/60 px-1.5 py-0.2 rounded text-[10px] font-mono">
-                      {ui.game.hand.teamShadowsRemaining
-                        ? ui.game.hand.teamShadowsRemaining(currentMyTeamShadows, selectedMode === '1v1')
-                        : ui.game.hand.shadowsRemaining(currentMyTeamShadows)}
+                      {isCasual && ui.game.hand.personalShadowRemaining
+                        ? ui.game.hand.personalShadowRemaining(currentAvailableShadows)
+                        : ui.game.hand.teamShadowsRemaining
+                        ? ui.game.hand.teamShadowsRemaining(currentAvailableShadows, selectedMode === '1v1')
+                        : ui.game.hand.shadowsRemaining(currentAvailableShadows)}
                     </span>
                   </button>
                 );
@@ -1885,9 +2090,14 @@ export default function App() {
             <div>
               {isMyTurn ? (
                 <span className="text-xs font-serif text-amber-300 font-bold tracking-wide animate-pulse">
-                  {selectedCardId
-                    ? ui.game.hand.actionInstructionDrag(formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock))
-                    : ui.game.hand.actionInstructionPick(formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock))}
+                  {(() => {
+                    const displayClock = isCasual
+                      ? formatClockTime(turnClock)
+                      : formatClockTime(viewerTeam === 'teamA' ? teamAClock : teamBClock);
+                    return selectedCardId
+                      ? ui.game.hand.actionInstructionDrag(displayClock)
+                      : ui.game.hand.actionInstructionPick(displayClock);
+                  })()}
                 </span>
               ) : phase === 'planning' ? (
                 <span className="text-xs font-serif text-amber-300/80 tracking-wide">
@@ -1918,6 +2128,7 @@ export default function App() {
                       card={card}
                       isSelected={isSelected}
                       isPlayable={isMyTurn}
+                      gameMode={selectedGameMode}
                       onClick={() => {
                         if (isMyTurn) {
                           setSelectedCardId(prev => (prev === card.id ? null : card.id));
@@ -1950,6 +2161,7 @@ export default function App() {
         totalRounds={totalMatchRounds}
         fronts={fronts}
         modeId={selectedMode}
+        gameMode={selectedGameMode}
         onNextRound={handleNextRound}
         isMultiplayer={isMultiplayer}
         readyPlayers={roundOverReadyPlayers}
@@ -1971,6 +2183,7 @@ export default function App() {
         teamACumulativePoints={teamACumulativePoints}
         teamBCumulativePoints={teamBCumulativePoints}
         modeId={selectedMode}
+        gameMode={selectedGameMode}
         onRestart={handleRestartGame}
         onBackToMenu={handleBackToMenu}
         onPlayOvertime={handlePlayOvertime}

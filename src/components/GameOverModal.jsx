@@ -10,12 +10,14 @@ export function GameOverModal({
   teamACumulativePoints,
   teamBCumulativePoints,
   modeId = '1v1',
+  gameMode = 'competitive',
   onRestart,
   onBackToMenu,
   onPlayOvertime,
 }) {
   const { isEn, ui } = useLanguage();
   const is1v1 = modeId === '1v1';
+  const isCasual = gameMode === 'casual';
   let winner = 'tie';
   let reason = '';
 
@@ -29,8 +31,12 @@ export function GameOverModal({
     reason = is1v1
       ? ui.gameOver.reasonRounds1v1Lose(teamBRoundPoints, teamARoundPoints)
       : ui.gameOver.reasonRoundsTeamLose(teamBRoundPoints, teamARoundPoints);
+  } else if (isCasual) {
+    // Modo Casual: Desempate directo por Prórroga de 2 rondas (sin puntos acumulados)
+    winner = 'tie';
+    reason = ui.gameOver.reasonCasualTieOvertime || ui.gameOver.reasonTieOvertime;
   } else {
-    // Empate en rondas: Criterio de Puntos Acumulados
+    // Modo Competitivo: Empate en rondas -> Criterio de Puntos Acumulados
     if (teamACumulativePoints > teamBCumulativePoints) {
       winner = 'teamA';
       reason = ui.gameOver.reasonCumulativeWin(teamACumulativePoints, teamBCumulativePoints);
@@ -92,14 +98,18 @@ export function GameOverModal({
             </span>
           </div>
 
-          <div className="h-px bg-amber-500/15" />
+          {!isCasual && (
+            <>
+              <div className="h-px bg-amber-500/15" />
 
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>{ui.gameOver.cumulativePointsLabel}</span>
-            <span className="font-mono font-bold text-sm">
-              <strong className="text-emerald-400">{teamACumulativePoints}</strong> {ui.common.pts} — <strong className="text-rose-400">{teamBCumulativePoints}</strong> {ui.common.pts}
-            </span>
-          </div>
+              <div className="flex items-center justify-between text-xs text-slate-400">
+                <span>{ui.gameOver.cumulativePointsLabel}</span>
+                <span className="font-mono font-bold text-sm">
+                  <strong className="text-emerald-400">{teamACumulativePoints}</strong> {ui.common.pts} — <strong className="text-rose-400">{teamBCumulativePoints}</strong> {ui.common.pts}
+                </span>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Botones de acción */}

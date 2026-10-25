@@ -46,6 +46,84 @@ export function getLocalizedFronts(lang = 'es') {
   ];
 }
 
+export const CASUAL_TURN_SECONDS = 20;
+export const CASUAL_SHADOWS_PER_PLAYER = 1;
+
+export const MATCH_TYPES = {
+  competitive: {
+    id: 'competitive',
+    name: 'Modo Competitivo',
+    subtitle: 'Escala Oficial • Economía de Sombras • Reloj Dual',
+  },
+  casual: {
+    id: 'casual',
+    name: 'Modo Casual (Party / Amigos)',
+    subtitle: 'Escala Comprimida (1-4) • 1 Sombra/Jug • 20s/Turno',
+  },
+};
+
+export function getLocalizedMatchTypes(lang = 'es') {
+  const isEn = lang === 'en';
+  return {
+    competitive: {
+      id: 'competitive',
+      name: isEn ? 'Competitive Mode' : 'Modo Competitivo',
+      badge: isEn ? 'Official Tournament' : 'Torneo Oficial',
+      subtitle: isEn ? 'Official Scale (2-14) • Shadow Economy • Dual Team Clock' : 'Escala Oficial (2-14) • Economía de Sombras • Reloj Dual',
+      description: isEn
+        ? 'Nominal card values (2-14) and +5/+10/+15/+20 synergies. Shared team shadow economy across rounds, dual chess clock, and cumulative score tiebreaker.'
+        : 'Valores nominales (2-14) y sinergias +5/+10/+15/+20. Fondo de sombras compartido con ahorro entre rondas, reloj dual de equipo y desempate por puntos acumulados.',
+    },
+    casual: {
+      id: 'casual',
+      name: isEn ? 'Casual Mode (Party / Friends)' : 'Modo Casual (Party / Amigos)',
+      badge: isEn ? 'Fast Count & Live Score' : 'Conteo Rápido y Puntos en Vivo',
+      subtitle: isEn ? 'Compressed Scale (1-4) • Live Front Score • 1 Shadow/Player • 20s/Turn' : 'Escala Comprimida (1-4) • Marcador en Vivo • 1 Sombra/Jug • 20s/Turno',
+      description: isEn
+        ? 'Simplified 1-4 card values and +2/+3/+4 synergies with live real-time front score counters. 1 personal shadow per player/round, 20s individual turn timer (auto-play on timeout), and direct 2-round overtime tiebreaker.'
+        : 'Escala simplificada (1-4 pts) y sinergias +2/+3/+4 con contador de puntos en vivo en cada frente. 1 sombra fija por jugador/ronda, turno individual de 20s (despliegue automático si se agota) y desempate directo por prórroga.',
+    },
+  };
+}
+
+/**
+ * Obtiene el valor base de una carta en el Modo Casual ("Escala Comprimida"):
+ * - Cartas del 2 al 6 = 1 punto
+ * - Cartas del 7 al 10 = 2 puntos
+ * - Figuras (J, Q, K) = 3 puntos
+ * - As (A) = 4 puntos
+ */
+export function getCardCasualBase(cardOrBase) {
+  const base = typeof cardOrBase === 'object' ? (cardOrBase?.base || 0) : Number(cardOrBase || 0);
+  if (base >= 2 && base <= 6) return 1;
+  if (base >= 7 && base <= 10) return 2;
+  if (base >= 11 && base <= 13) return 3;
+  if (base === 14) return 4;
+  return 0;
+}
+
+/**
+ * Determina el frente válido (no saturado) con menor cantidad total de cartas
+ * para la infracción por tiempo (Auto-play) en Modo Casual.
+ * En caso de empate, prioriza por orden estándar: Izquierdo ('left') -> Central ('center') -> Derecho ('right').
+ */
+export function findCasualAutoPlayFront(fronts, maxFrontCards = 8) {
+  const standardOrder = ['left', 'center', 'right'];
+  let bestFrontKey = null;
+  let minTotalCards = Infinity;
+
+  for (const frontKey of standardOrder) {
+    const front = fronts?.[frontKey];
+    if (!front) continue;
+    const totalCards = (front.teamA?.length || 0) + (front.teamB?.length || 0);
+    if (totalCards < maxFrontCards && totalCards < minTotalCards) {
+      minTotalCards = totalCards;
+      bestFrontKey = frontKey;
+    }
+  }
+  return bestFrontKey;
+}
+
 // Economía de Cartas de Sombra según Reglamento Oficial v2.0 y Guía Rápida v2.0
 // Ambos equipos inician la Ronda 1 con 0 sombras en su Fondo de Equipo.
 // Al final de la ronda se cobran marcadores según el resultado:
@@ -281,32 +359,57 @@ export const TEAM_TIME_OPTIONS = [
   { id: 'lento', name: 'Lento', desc: 'Máxima profundidad y cálculo' },
 ];
 
-export function getLocalizedModes(lang = 'es') {
+export function getLocalizedModes(lang = 'es', gameMode = 'competitive') {
   const isEn = lang === 'en';
+  const isCasual = gameMode === 'casual';
   return {
     '1v1': {
       ...GAME_MODES['1v1'],
       name: isEn ? '1 vs 1' : '1 contra 1',
       subtitle: isEn ? 'Tactical Commanders Duel' : 'Duelo Táctico de Comandantes',
-      description: isEn ? '1 deck (52 cards). 10 cards per player. Continuous shadow economy (start at 0). Limit of 8 cards per front.' : GAME_MODES['1v1'].description,
+      description: isCasual
+        ? (isEn
+          ? '1 deck (52 cards). 10 cards per player. 1 personal shadow/round. 20s turn clock. Limit of 8 cards per front.'
+          : '1 baraja (52 cartas). 10 cartas por duelista. 1 sombra fija/ronda por jugador. Turno de 20s. Límite de 8 cartas por frente.')
+        : (isEn
+          ? '1 deck (52 cards). 10 cards per player. Continuous shadow economy (start at 0). Limit of 8 cards per front.'
+          : GAME_MODES['1v1'].description),
     },
     '2v2': {
       ...GAME_MODES['2v2'],
       name: isEn ? '2 vs 2' : '2 contra 2',
       subtitle: isEn ? 'Tactical Squads by Pairs' : 'Escuadrón Táctico por Parejas',
-      description: isEn ? '1 deck (52 cards). 4 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 8 cards per front.' : GAME_MODES['2v2'].description,
+      description: isCasual
+        ? (isEn
+          ? '1 deck (52 cards). 4 players, 5 cards each. 1 personal shadow/round. 20s turn clock. Limit of 8 cards per front.'
+          : '1 baraja (52 cartas). 4 jugadores, 5 cartas c/u. 1 sombra fija/ronda por jugador. Turno de 20s. Límite de 8 cartas por frente.')
+        : (isEn
+          ? '1 deck (52 cards). 4 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 8 cards per front.'
+          : GAME_MODES['2v2'].description),
     },
     '3v3': {
       ...GAME_MODES['3v3'],
       name: isEn ? '3 vs 3' : '3 contra 3',
       subtitle: isEn ? 'Extended Front Battle' : 'Batalla de Frente Ampliado',
-      description: isEn ? '2 combined decks (104 cards). 6 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 12 cards per front.' : GAME_MODES['3v3'].description,
+      description: isCasual
+        ? (isEn
+          ? '2 combined decks (104 cards). 6 players, 5 cards each. 1 personal shadow/round. 20s turn clock. Limit of 12 cards per front.'
+          : '2 barajas combinadas (104 cartas). 6 jugadores, 5 cartas c/u. 1 sombra fija/ronda por jugador. Turno de 20s. Límite de 12 cartas por frente.')
+        : (isEn
+          ? '2 combined decks (104 cards). 6 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 12 cards per front.'
+          : GAME_MODES['3v3'].description),
     },
     '4v4': {
       ...GAME_MODES['4v4'],
       name: isEn ? '4 vs 4' : '4 contra 4',
       subtitle: isEn ? 'Total Army Warfare' : 'Guerra Total de Ejércitos',
-      description: isEn ? '2 combined decks (104 cards). 8 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 16 cards per front.' : GAME_MODES['4v4'].description,
+      description: isCasual
+        ? (isEn
+          ? '2 combined decks (104 cards). 8 players, 5 cards each. 1 personal shadow/round. 20s turn clock. Limit of 16 cards per front.'
+          : '2 barajas combinadas (104 cartas). 8 jugadores, 5 cartas c/u. 1 sombra fija/ronda por jugador. Turno de 20s. Límite de 16 cartas por frente.')
+        : (isEn
+          ? '2 combined decks (104 cards). 8 players, 5 cards each. Continuous shadow economy (start at 0). Limit of 16 cards per front.'
+          : GAME_MODES['4v4'].description),
     },
   };
 }
@@ -461,28 +564,55 @@ export function findShortStraights(cardValues) {
 
 /**
  * Calcula el desglose de puntuación de un equipo en un frente según el reglamento oficial v1.6 / v2.0.
- * La mecánica de la carta de sinergia/triunfo se ha eliminado por completo.
- * Nuevas sinergias y formaciones oficiales:
+ * Soporta tanto el Modo Competitivo como el Modo Casual ("Escala Comprimida"):
+ *
+ * MODO COMPETITIVO (`gameMode === 'competitive'`):
  * - Valor base: 2 al 10 nominal, J=11, Q=12, K=13, A=14
- * - Sinergia de Palo: +5 Puntos (por cada carta adicional del mismo palo en el frente)
+ * - Sinergia de Palo: +5 Puntos (por cada carta adicional del mismo palo en el frente, a partir de 2)
  * - Pareja: +10 Puntos (2 cartas del mismo valor)
  * - Escalera Corta: +15 Puntos (3 cartas consecutivas)
- * - Trío: +20 Puntos (3 cartas del mismo valor). Aclaración oficial: Formar un Trío anula automáticamente
- *   la bonificación de la Pareja por las mismas cartas; no se suman +20 y +10 por las mismas cartas.
+ * - Trío: +20 Puntos (3 cartas del mismo valor; anula la bonificación de Pareja de esas mismas cartas)
+ *
+ * MODO CASUAL (`gameMode === 'casual'` - Escala Comprimida):
+ * - Valor base: 2-6 = 1 pt, 7-10 = 2 pts, J/Q/K = 3 pts, As (A) = 4 pts
+ * - Color (3 o más cartas del mismo palo en el mismo frente): +2 puntos totales (bono único al tener 3+)
+ * - Pareja (2 cartas del mismo valor nominal): +2 puntos
+ * - Escalera Corta (3 cartas de valor nominal consecutivo): +3 puntos
+ * - Trío (3 cartas del mismo valor nominal): +4 puntos (anula la bonificación de Pareja de esas mismas cartas)
+ * - Desempate en un Frente: carta individual de mayor jerarquía nominal (2 < 3 < ... < K < A)
  *
  * @param {Array} cards - Lista de cartas del equipo en ese frente
  * @param {boolean|string} countShadowsOrTrump - Si booleano: cuenta sombras; si string (antiguo trumpSuit): retrocompatibilidad
- * @param {boolean} countShadowsParam - Opcional si se pasa trumpSuit antes
+ * @param {boolean|string} countShadowsOrGameMode - Opcional: booleano (si se pasó trumpSuit antes) o gameMode ('competitive'|'casual')
+ * @param {string} gameModeParam - Modo de juego ('competitive' | 'casual')
  */
-export function calculateFrontScore(cards = [], countShadowsOrTrump = true, countShadowsParam = true) {
+export function calculateFrontScore(
+  cards = [],
+  countShadowsOrTrump = true,
+  countShadowsOrGameMode = true,
+  gameModeParam = 'competitive'
+) {
   let countShadows = true;
   if (typeof countShadowsOrTrump === 'boolean') {
     countShadows = countShadowsOrTrump;
-  } else if (typeof countShadowsParam === 'boolean') {
-    countShadows = countShadowsParam;
+  } else if (typeof countShadowsOrGameMode === 'boolean') {
+    countShadows = countShadowsOrGameMode;
   }
 
-  const activeCards = cards.filter(c => countShadows || !c.isShadow);
+  let gameMode = 'competitive';
+  if (countShadowsOrTrump === 'casual' || countShadowsOrTrump === 'competitive') {
+    gameMode = countShadowsOrTrump;
+  } else if (countShadowsOrGameMode === 'casual' || countShadowsOrGameMode === 'competitive') {
+    gameMode = countShadowsOrGameMode;
+  } else if (gameModeParam === 'casual' || gameModeParam === 'competitive') {
+    gameMode = gameModeParam;
+  }
+  const isCasual = gameMode === 'casual';
+
+  // Filtrar cartas activas; nunca contabilizar cartas censuradas ('?' o base <= 0)
+  const activeCards = (cards || []).filter(
+    c => c && (countShadows || !c.isShadow) && !c.isHidden && c.rank !== '?' && Number(c.base) > 0
+  );
 
   let baseTotal = 0;
   let highestBaseCard = 0;
@@ -491,7 +621,8 @@ export function calculateFrontScore(cards = [], countShadowsOrTrump = true, coun
   const activeValues = [];
 
   activeCards.forEach(card => {
-    baseTotal += card.base;
+    const cardPoints = isCasual ? getCardCasualBase(card.base) : card.base;
+    baseTotal += cardPoints;
     if (card.base > highestBaseCard) {
       highestBaseCard = card.base;
     }
@@ -501,11 +632,22 @@ export function calculateFrontScore(cards = [], countShadowsOrTrump = true, coun
     activeValues.push(card.base);
   });
 
-  // 1. Sinergia de palo (+5 pts por cada carta adicional del mismo palo)
+  // 1. Sinergia de palo / Color
+  // Competitivo: +5 pts por cada carta adicional del mismo palo (count >= 2 => (count - 1) * 5)
+  // Casual: Color (3 o más cartas del mismo palo en el mismo frente) => +2 puntos totales únicos
   let suitSynergyTotal = 0;
   const synergiesBySuit = {};
   Object.entries(suitCounts).forEach(([suit, count]) => {
-    if (count >= 2) {
+    if (isCasual) {
+      if (count >= 3) {
+        const bonus = 2;
+        suitSynergyTotal += bonus;
+        synergiesBySuit[suit] = {
+          count,
+          bonus,
+        };
+      }
+    } else if (count >= 2) {
       const bonus = (count - 1) * 5;
       suitSynergyTotal += bonus;
       synergiesBySuit[suit] = {
@@ -515,7 +657,9 @@ export function calculateFrontScore(cards = [], countShadowsOrTrump = true, coun
     }
   });
 
-  // 2. Parejas (+10 pts) y Tríos (+20 pts, anula la Pareja para esas cartas)
+  // 2. Parejas (Competitivo: +10 pts / Casual: +2 pts) y Tríos (Competitivo: +20 pts / Casual: +4 pts; anula Pareja)
+  const pairBonusValue = isCasual ? 2 : 10;
+  const trioBonusValue = isCasual ? 4 : 20;
   let pairTotal = 0;
   let trioTotal = 0;
   const pairs = [];
@@ -533,22 +677,23 @@ export function calculateFrontScore(cards = [], countShadowsOrTrump = true, coun
       trios.push({
         base,
         rank: rankLabel,
-        bonus: 20,
+        bonus: trioBonusValue,
       });
-      trioTotal += 20;
+      trioTotal += trioBonusValue;
     }
 
     for (let i = 0; i < numPairs; i++) {
       pairs.push({
         base,
         rank: rankLabel,
-        bonus: 10,
+        bonus: pairBonusValue,
       });
-      pairTotal += 10;
+      pairTotal += pairBonusValue;
     }
   });
 
-  // 3. Escalera Corta (+15 pts por 3 cartas consecutivas)
+  // 3. Escalera Corta (Competitivo: +15 pts / Casual: +3 pts por 3 cartas consecutivas)
+  const straightBonusValue = isCasual ? 3 : 15;
   const straightTriplets = findShortStraights(activeValues);
   const straights = straightTriplets.map(triplet => {
     const isAceLow = triplet.includes(14) && triplet.includes(2) && triplet.includes(3);
@@ -557,11 +702,11 @@ export function calculateFrontScore(cards = [], countShadowsOrTrump = true, coun
     return {
       values: sortedVals,
       ranks: rankLabels,
-      bonus: 15,
+      bonus: straightBonusValue,
       label: rankLabels.join('-'),
     };
   });
-  const straightTotal = straights.length * 15;
+  const straightTotal = straights.length * straightBonusValue;
 
   const synergyTotal = suitSynergyTotal + pairTotal + trioTotal + straightTotal;
   const total = baseTotal + synergyTotal;
@@ -580,9 +725,12 @@ export function calculateFrontScore(cards = [], countShadowsOrTrump = true, coun
     straights,
     trumpTotal: 0, // Conservado en 0 para evitar errores si algún componente legacy lo lee
     highestBaseCard,
-    cardCount: cards.length,
+    highestRankLabel: highestBaseCard > 0 ? getRankLabel(highestBaseCard) : '-',
+    cardCount: (cards || []).length,
     activeCount: activeCards.length,
-    hiddenCount: cards.filter(c => c.isShadow && !countShadows).length,
+    hiddenCount: (cards || []).filter(c => c && (c.isShadow && !countShadows || c.isHidden || c.rank === '?')).length,
+    shadowCount: (cards || []).filter(c => c && c.isShadow).length,
+    gameMode,
   };
 }
 
@@ -672,15 +820,18 @@ export function sortFrontCards(cards = [], isRevealed = false) {
  * @param {boolean} isRevealed - Si se deben contabilizar cartas sombra reveladas
  * @param {string} lang - Idioma para etiquetas y tooltips ('es' | 'en')
  */
-export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es') {
+export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es', gameMode = 'competitive') {
   const isEn = lang === 'en';
-  const activeCards = cards.filter(c => isRevealed || !c.isShadow);
-  const frontScore = calculateFrontScore(cards, isRevealed);
+  const isCasual = gameMode === 'casual';
+  const activeCards = (cards || []).filter(
+    c => c && (isRevealed || !c.isShadow) && !c.isHidden && c.rank !== '?' && Number(c.base) > 0
+  );
+  const frontScore = calculateFrontScore(cards, isRevealed, gameMode);
 
   const cardSynergies = {};
   const partnerSets = {};
 
-  cards.forEach(c => {
+  (cards || []).forEach(c => {
     cardSynergies[c.id] = {
       cardId: c.id,
       inPair: false,
@@ -701,9 +852,10 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
     partnerSets[c.id] = new Set();
   });
 
-  // 1. Sinergias de Palo (+5 pts por carta adicional cuando hay >= 2)
+  // 1. Sinergias de Palo / Color (Competitivo: >=2 cartas; Casual: >=3 cartas con bono único +2)
+  const minSuitCards = isCasual ? 3 : 2;
   Object.entries(frontScore.synergiesBySuit || {}).forEach(([suit, data]) => {
-    if (data.count >= 2) {
+    if (data.count >= minSuitCards) {
       const suitCards = activeCards.filter(c => c.suit === suit);
       const suitCardIds = suitCards.map(c => c.id);
       const localizedSuits = getLocalizedSuits(lang);
@@ -715,7 +867,9 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
           item.suitCount = data.count;
           item.suitBonus = data.bonus;
           item.synergyDescriptions.push(
-            `${suitName} x${data.count}`
+            isCasual
+              ? (isEn ? `Flush ${suitName} (${data.count}) +2` : `Color ${suitName} (${data.count}) +2`)
+              : `${suitName} x${data.count}`
           );
           suitCardIds.forEach(id => {
             if (id !== c.id) partnerSets[c.id].add(id);
@@ -735,7 +889,7 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
         item.inTrio = true;
         item.trioRank = trio.rank;
         item.synergyDescriptions.push(
-          isEn ? `Trio of ${trio.rank}s` : `Trío de ${trio.rank}s`
+          isEn ? `Trio of ${trio.rank}s (+${trio.bonus})` : `Trío de ${trio.rank}s (+${trio.bonus})`
         );
         trioCardIds.forEach(id => {
           if (id !== c.id) partnerSets[c.id].add(id);
@@ -754,7 +908,7 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
         item.inPair = true;
         item.pairRank = pair.rank;
         item.synergyDescriptions.push(
-          isEn ? `Pair of ${pair.rank}s` : `Pareja de ${pair.rank}s`
+          isEn ? `Pair of ${pair.rank}s (+${pair.bonus})` : `Pareja de ${pair.rank}s (+${pair.bonus})`
         );
         pairCardIds.forEach(id => {
           if (id !== c.id) partnerSets[c.id].add(id);
@@ -775,7 +929,7 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
           item.straightLabels.push(straight.label);
         }
         item.synergyDescriptions.push(
-          isEn ? `Straight ${straight.label}` : `Escalera ${straight.label}`
+          isEn ? `Straight ${straight.label} (+${straight.bonus})` : `Escalera ${straight.label} (+${straight.bonus})`
         );
         straightCardIds.forEach(id => {
           if (id !== c.id) partnerSets[c.id].add(id);
@@ -785,7 +939,7 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
   });
 
   // 5. Determinar Multi-Combos y Sinergia Primaria
-  cards.forEach(c => {
+  (cards || []).forEach(c => {
     const item = cardSynergies[c.id];
     if (!item) return;
 
@@ -819,13 +973,31 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
 /**
  * Resuelve el ganador de un frente entre Equipo A y Equipo B
  */
-export function resolveFrontWinner(teamACards, teamBCards, trumpSuitOrLang = 'es', langParam = 'es') {
-  const lang = typeof trumpSuitOrLang === 'string' && (trumpSuitOrLang === 'es' || trumpSuitOrLang === 'en')
-    ? trumpSuitOrLang
-    : (typeof langParam === 'string' ? langParam : 'es');
+export function resolveFrontWinner(
+  teamACards,
+  teamBCards,
+  trumpSuitOrLang = 'es',
+  langOrGameMode = 'es',
+  gameModeParam = 'competitive'
+) {
+  let lang = 'es';
+  if (trumpSuitOrLang === 'es' || trumpSuitOrLang === 'en') {
+    lang = trumpSuitOrLang;
+  } else if (langOrGameMode === 'es' || langOrGameMode === 'en') {
+    lang = langOrGameMode;
+  }
 
-  const teamACalc = calculateFrontScore(teamACards, true);
-  const teamBCalc = calculateFrontScore(teamBCards, true);
+  let gameMode = 'competitive';
+  if (trumpSuitOrLang === 'casual' || trumpSuitOrLang === 'competitive') {
+    gameMode = trumpSuitOrLang;
+  } else if (langOrGameMode === 'casual' || langOrGameMode === 'competitive') {
+    gameMode = langOrGameMode;
+  } else if (gameModeParam === 'casual' || gameModeParam === 'competitive') {
+    gameMode = gameModeParam;
+  }
+
+  const teamACalc = calculateFrontScore(teamACards, true, gameMode);
+  const teamBCalc = calculateFrontScore(teamBCards, true, gameMode);
   const isEn = lang === 'en';
 
   if (teamACalc.total > teamBCalc.total) {
@@ -835,21 +1007,23 @@ export function resolveFrontWinner(teamACards, teamBCards, trumpSuitOrLang = 'es
     return { winner: 'teamB', reason: isEn ? 'Higher total score' : 'Mayor puntuación total' };
   }
 
-  // Empate en puntuación: Criterio oficial de la carta individual de mayor valor base
+  // Empate en puntuación: Criterio oficial de la carta individual de mayor jerarquía nominal (2 < 3 < ... < K < A)
+  const rankA = getRankLabel(teamACalc.highestBaseCard);
+  const rankB = getRankLabel(teamBCalc.highestBaseCard);
   if (teamACalc.highestBaseCard > teamBCalc.highestBaseCard) {
     return {
       winner: 'teamA',
       reason: isEn
-        ? `Tie-breaker by highest base card (${teamACalc.highestBaseCard} vs ${teamBCalc.highestBaseCard})`
-        : `Desempate por carta más alta (${teamACalc.highestBaseCard} vs ${teamBCalc.highestBaseCard})`
+        ? `Tie-breaker by highest nominal card (${rankA} vs ${rankB})`
+        : `Desempate por carta más alta (${rankA} vs ${rankB})`
     };
   }
   if (teamBCalc.highestBaseCard > teamACalc.highestBaseCard) {
     return {
       winner: 'teamB',
       reason: isEn
-        ? `Tie-breaker by highest base card (${teamBCalc.highestBaseCard} vs ${teamACalc.highestBaseCard})`
-        : `Desempate por carta más alta (${teamBCalc.highestBaseCard} vs ${teamACalc.highestBaseCard})`
+        ? `Tie-breaker by highest nominal card (${rankB} vs ${rankA})`
+        : `Desempate por carta más alta (${rankB} vs ${rankA})`
     };
   }
 

@@ -30,9 +30,12 @@ import {
   Clock,
 } from 'lucide-react';
 
-export function InteractiveTutorial({ onBackToMenu }) {
+export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBackToMenu }) {
   const { language, isEn } = useLanguage();
-  const tutorialSteps = getTutorialSteps(language);
+  const [tutorialMode, setTutorialMode] = useState(initialTutorialMode === 'casual' ? 'casual' : 'competitive');
+  const isCasual = tutorialMode === 'casual';
+
+  const tutorialSteps = getTutorialSteps(language, tutorialMode);
   const localizedSuits = getLocalizedSuits(language);
   const localizedFronts = getLocalizedFronts(language);
 
@@ -47,12 +50,33 @@ export function InteractiveTutorial({ onBackToMenu }) {
   const [draggingCardId, setDraggingCardId] = useState(null);
   const [dragOverFrontKey, setDragOverFrontKey] = useState(null);
   const [isShadowActive, setIsShadowActive] = useState(false);
-  const [shadowsLeft, setShadowsLeft] = useState(2);
+  const [shadowsLeft, setShadowsLeft] = useState(initialTutorialMode === 'casual' ? 1 : 2);
   const [isMuted, setIsMuted] = useState(false);
   const [warningMessage, setWarningMessage] = useState(null);
 
   const currentStep = tutorialSteps[stepIndex] || tutorialSteps[0];
   const processedBotStepsRef = useRef(new Set());
+
+  // Cambiar entre Tutorial Competitivo y Tutorial Casual reiniciando el tablero de forma limpia
+  function handleSwitchTutorialMode(nextMode) {
+    if (nextMode === tutorialMode) return;
+    sound.playCard();
+    processedBotStepsRef.current.clear();
+    setTutorialMode(nextMode);
+    setStepIndex(0);
+    setFronts({
+      left: { teamA: [], teamB: [] },
+      center: { teamA: [], teamB: [] },
+      right: { teamA: [], teamB: [] },
+    });
+    setPlayerHand([]);
+    setSelectedCardId(null);
+    setDraggingCardId(null);
+    setDragOverFrontKey(null);
+    setIsShadowActive(false);
+    setShadowsLeft(nextMode === 'casual' ? 1 : 2);
+    setWarningMessage(null);
+  }
 
   // Lanzar confeti al llegar a la graduación
   useEffect(() => {
@@ -272,14 +296,15 @@ export function InteractiveTutorial({ onBackToMenu }) {
     setStepIndex(prev => prev + 1);
   }
 
-  // Puntuaciones actuales de los frentes (calculadas sin contar sombras hasta la resolución)
+  // Puntuaciones actuales de los frentes (en Modo Casual el equipo aliado ve su total real incluyendo sus sombras, y el rival solo sus cartas visibles hasta la resolución)
   const isResolutionPhase = currentStep.type === 'resolution' || currentStep.type === 'conclusion';
-  const leftScoreA = calculateFrontScore(fronts.left.teamA, null, isResolutionPhase);
-  const leftScoreB = calculateFrontScore(fronts.left.teamB, null, isResolutionPhase);
-  const centerScoreA = calculateFrontScore(fronts.center.teamA, null, isResolutionPhase);
-  const centerScoreB = calculateFrontScore(fronts.center.teamB, null, isResolutionPhase);
-  const rightScoreA = calculateFrontScore(fronts.right.teamA, null, isResolutionPhase);
-  const rightScoreB = calculateFrontScore(fronts.right.teamB, null, isResolutionPhase);
+  const allyRevealState = isCasual ? true : isResolutionPhase;
+  const leftScoreA = calculateFrontScore(fronts.left.teamA, null, allyRevealState, language, tutorialMode);
+  const leftScoreB = calculateFrontScore(fronts.left.teamB, null, isResolutionPhase, language, tutorialMode);
+  const centerScoreA = calculateFrontScore(fronts.center.teamA, null, allyRevealState, language, tutorialMode);
+  const centerScoreB = calculateFrontScore(fronts.center.teamB, null, isResolutionPhase, language, tutorialMode);
+  const rightScoreA = calculateFrontScore(fronts.right.teamA, null, allyRevealState, language, tutorialMode);
+  const rightScoreB = calculateFrontScore(fronts.right.teamB, null, isResolutionPhase, language, tutorialMode);
 
   const frontScores = {
     left: { a: leftScoreA, b: leftScoreB },
@@ -296,11 +321,11 @@ export function InteractiveTutorial({ onBackToMenu }) {
       {/* CABECERA DE LA ACADEMIA TÁCTICA */}
       <header className="bg-slate-900/90 border-b border-slate-800 px-4 py-2.5 backdrop-blur shadow-lg z-20">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
-          {/* Logo y Modo Tutorial */}
-          <div className="flex items-center gap-3">
+          {/* Logo y Selector de Modo Tutorial */}
+          <div className="flex items-center gap-3 flex-wrap">
             <button
               onClick={onBackToMenu}
-              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1.5 text-xs font-semibold"
+              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 hover:text-white transition flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
               title={isEn ? 'Return to Main Menu' : 'Salir al Menú Principal'}
             >
               <Home className="w-4 h-4 text-amber-400" />
@@ -312,10 +337,16 @@ export function InteractiveTutorial({ onBackToMenu }) {
             </div>
 
             <div>
-              <h1 className="text-sm sm:text-base font-black tracking-wider text-slate-100 uppercase flex items-center gap-2">
+              <h1 className="text-sm sm:text-base font-black tracking-wider text-slate-100 uppercase flex items-center gap-2 flex-wrap">
                 <span>{isEn ? 'Tactical Academy' : 'Academia Táctica'}</span>
-                <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full font-bold">
-                  {isEn ? 'Guided 2v2 Tutorial' : 'Tutorial Guiado 2v2'}
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
+                  isCasual
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                }`}>
+                  {isCasual
+                    ? (isEn ? 'Casual Mode (Party)' : 'Modo Casual (Party)')
+                    : (isEn ? 'Competitive Mode' : 'Modo Competitivo')}
                 </span>
               </h1>
               <div className="text-[11px] text-slate-400 font-medium">
@@ -326,71 +357,136 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 )}
               </div>
             </div>
+
+            {/* Selector rápido entre Tutorial Competitivo y Tutorial Casual */}
+            <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 gap-1">
+              <button
+                type="button"
+                onClick={() => handleSwitchTutorialMode('competitive')}
+                className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
+                  !isCasual
+                    ? 'bg-amber-500 text-slate-950 shadow'
+                    : 'text-slate-400 hover:text-amber-300'
+                }`}
+              >
+                {isEn ? 'Competitive' : 'Competitivo'}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSwitchTutorialMode('casual')}
+                className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider transition cursor-pointer ${
+                  isCasual
+                    ? 'bg-emerald-500 text-slate-950 shadow'
+                    : 'text-slate-400 hover:text-emerald-300'
+                }`}
+              >
+                {isEn ? 'Casual (Party)' : 'Casual (Party)'}
+              </button>
+            </div>
           </div>
 
-          {/* Bonificaciones por Sinergia Oficiales */}
-          <div className="hidden sm:flex items-center gap-2.5 bg-slate-900/90 border border-amber-500/40 rounded-xl px-3 py-1.5 shadow-md">
-            <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+          {/* Bonificaciones por Sinergia según Modo */}
+          <div className={`hidden sm:flex items-center gap-2.5 bg-slate-900/90 border rounded-xl px-3 py-1.5 shadow-md ${
+            isCasual ? 'border-emerald-500/40' : 'border-amber-500/40'
+          }`}>
+            <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+              isCasual ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
+            }`}>
               <Sparkles className="w-3.5 h-3.5" />
             </div>
             <div>
-              <div className="flex items-center gap-1 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
-                {isEn ? 'Official Scoring & Formations' : 'Sinergias Oficiales'}
+              <div className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider ${
+                isCasual ? 'text-emerald-400' : 'text-amber-400'
+              }`}>
+                {isCasual
+                  ? (isEn ? 'Compressed Scale (1–4) & Casual Synergies' : 'Escala Comprimida (1–4) y Sinergias Casual')
+                  : (isEn ? 'Official Scoring & Formations' : 'Sinergias Oficiales')}
               </div>
-              <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
-                <span className="text-indigo-300 font-mono">+5 {isEn ? 'Suit' : 'Palo'}</span>
-                <span className="text-slate-600">•</span>
-                <span className="text-emerald-300 font-mono">+10 {isEn ? 'Pair' : 'Pareja'}</span>
-                <span className="text-slate-600">•</span>
-                <span className="text-amber-300 font-mono">+15 {isEn ? 'Straight' : 'Escalera'}</span>
-                <span className="text-slate-600">•</span>
-                <span className="text-rose-300 font-mono">+20 {isEn ? 'Trio' : 'Trío'}</span>
-              </div>
+              {isCasual ? (
+                <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+                  <span className="text-indigo-300 font-mono">+2 {isEn ? 'Color (3+)' : 'Color (3+)'}</span>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-emerald-300 font-mono">+2 {isEn ? 'Pair' : 'Pareja'}</span>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-amber-300 font-mono">+3 {isEn ? 'Straight' : 'Escalera'}</span>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-rose-300 font-mono">+4 {isEn ? 'Trio' : 'Trío'}</span>
+                </div>
+              ) : (
+                <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+                  <span className="text-indigo-300 font-mono">+5 {isEn ? 'Suit' : 'Palo'}</span>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-emerald-300 font-mono">+10 {isEn ? 'Pair' : 'Pareja'}</span>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-amber-300 font-mono">+15 {isEn ? 'Straight' : 'Escalera'}</span>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-rose-300 font-mono">+20 {isEn ? 'Trio' : 'Trío'}</span>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Reloj Dual de Equipo en la cabecera del tutorial */}
-          <div className="hidden md:flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 shadow-inner">
-            <div
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono transition-all ${
-                currentStep.type === 'player_turn' || currentStep.botTeam === 'teamA'
-                  ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300 ring-2 ring-emerald-500/40 shadow-emerald-500/20 shadow-sm'
-                  : 'bg-slate-900/60 border-slate-800 text-slate-500 opacity-60'
-              }`}
-              title={isEn ? "Your team's clock (Team A)" : 'Reloj de tu equipo (Equipo A)'}
-            >
-              <div className="flex flex-col text-left">
-                <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">
-                  {isEn ? 'Team A' : 'Equipo A'}
-                </span>
-                <span className="text-xs font-black leading-tight">03:20</span>
-              </div>
-              {(currentStep.type === 'player_turn' || currentStep.botTeam === 'teamA') && (
+          {/* Reloj en la cabecera del tutorial (20s Individual en Casual vs Dual en Competitivo) */}
+          {isCasual ? (
+            <div className="hidden md:flex items-center gap-2 bg-slate-950 p-1.5 rounded-xl border border-emerald-500/40 shadow-inner">
+              <div className="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-950/90 border border-emerald-400 text-emerald-300 font-mono">
+                <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="flex flex-col text-left">
+                  <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">
+                    {isEn ? 'Turn Clock (Casual)' : 'Reloj Turno (Casual)'}
+                  </span>
+                  <span className="text-xs font-black leading-tight">00:20</span>
+                </div>
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-              )}
-            </div>
-
-            <span className="text-slate-600 text-[10px] font-bold px-0.5">VS</span>
-
-            <div
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono transition-all ${
-                currentStep.botTeam === 'teamB'
-                  ? 'bg-rose-950/90 border-rose-400 text-rose-300 ring-2 ring-rose-500/40 shadow-rose-500/20 shadow-sm'
-                  : 'bg-slate-900/60 border-slate-800 text-slate-500 opacity-60'
-              }`}
-              title={isEn ? "Opponent team's clock (Team B)" : 'Reloj del equipo rival (Equipo B)'}
-            >
-              <div className="flex flex-col text-left">
-                <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">
-                  {isEn ? 'Team B' : 'Equipo B'}
-                </span>
-                <span className="text-xs font-black leading-tight">03:20</span>
               </div>
-              {currentStep.botTeam === 'teamB' && (
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
-              )}
+              <div className="px-2 py-1 rounded-lg bg-purple-950/80 border border-purple-500/40 text-purple-300 font-mono text-[10px] font-bold flex items-center gap-1">
+                <EyeOff className="w-3 h-3" />
+                <span>{shadowsLeft}/1</span>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="hidden md:flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 shadow-inner">
+              <div
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono transition-all ${
+                  currentStep.type === 'player_turn' || currentStep.botTeam === 'teamA'
+                    ? 'bg-emerald-950/90 border-emerald-400 text-emerald-300 ring-2 ring-emerald-500/40 shadow-emerald-500/20 shadow-sm'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-500 opacity-60'
+                }`}
+                title={isEn ? "Your team's clock (Team A)" : 'Reloj de tu equipo (Equipo A)'}
+              >
+                <div className="flex flex-col text-left">
+                  <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">
+                    {isEn ? 'Team A' : 'Equipo A'}
+                  </span>
+                  <span className="text-xs font-black leading-tight">03:20</span>
+                </div>
+                {(currentStep.type === 'player_turn' || currentStep.botTeam === 'teamA') && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                )}
+              </div>
+
+              <span className="text-slate-600 text-[10px] font-bold px-0.5">VS</span>
+
+              <div
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border font-mono transition-all ${
+                  currentStep.botTeam === 'teamB'
+                    ? 'bg-rose-950/90 border-rose-400 text-rose-300 ring-2 ring-rose-500/40 shadow-rose-500/20 shadow-sm'
+                    : 'bg-slate-900/60 border-slate-800 text-slate-500 opacity-60'
+                }`}
+                title={isEn ? "Opponent team's clock (Team B)" : 'Reloj del equipo rival (Equipo B)'}
+              >
+                <div className="flex flex-col text-left">
+                  <span className="text-[7px] uppercase font-bold tracking-wider opacity-80 leading-none">
+                    {isEn ? 'Team B' : 'Equipo B'}
+                  </span>
+                  <span className="text-xs font-black leading-tight">03:20</span>
+                </div>
+                {currentStep.botTeam === 'teamB' && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping" />
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Estado de Equipos & Sonido & Idioma */}
           <div className="flex items-center gap-2">
@@ -638,9 +734,21 @@ export function InteractiveTutorial({ onBackToMenu }) {
                     <span className="font-semibold text-rose-400">
                       {isEn ? 'Opponent Team (B)' : 'Equipo Rival (B)'}
                     </span>
-                    <span className="font-mono text-xs text-slate-400">
-                      {teamBCards.length} {isEn ? 'cards' : 'cartas'}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {isCasual && (
+                        <span className="bg-rose-950/85 border border-rose-500/50 text-rose-200 px-1.5 py-0.5 rounded font-mono text-[10px] font-black">
+                          {isResolutionPhase ? (isEn ? 'Final:' : 'Final:') : (isEn ? 'Visible:' : 'Visible:')} {fScore?.b.total || 0} pts
+                        </span>
+                      )}
+                      {fScore?.b.hiddenCount > 0 && !isResolutionPhase && (
+                        <span className="bg-purple-950/80 border border-purple-500/40 text-purple-300 px-1.5 py-0.5 rounded text-[9px] font-bold">
+                          +{fScore.b.hiddenCount} 🌑
+                        </span>
+                      )}
+                      <span className="font-mono text-xs text-slate-400">
+                        {teamBCards.length} {isEn ? 'cards' : 'cartas'}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="flex flex-wrap gap-x-2.5 gap-y-3.5 items-center min-h-[64px] bg-slate-950/40 rounded-lg p-2 border border-slate-800/80">
@@ -671,6 +779,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                                 isOwner={false}
                                 isTeammate={false}
                                 compact
+                                gameMode={tutorialMode}
                               />
                             </div>
                           </div>
@@ -691,7 +800,9 @@ export function InteractiveTutorial({ onBackToMenu }) {
                     <span className="font-mono text-[10px]">
                       <strong className="text-emerald-400">{fScore?.a.total || 0}</strong>
                       <span className="text-slate-500 mx-1">vs</span>
-                      <strong className="text-rose-400">{fScore?.b.total || 0} pts</strong>
+                      <strong className="text-rose-400">
+                        {fScore?.b.total || 0}{!isResolutionPhase && fScore?.b.hiddenCount > 0 ? '?' : ''} pts
+                      </strong>
                     </span>
                   </div>
 
@@ -702,7 +813,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                     </div>
                   ) : (
                     <span className="text-[10px] text-slate-500 font-mono italic">
-                      {isEn ? 'Evaluated zone' : 'Zona evaluada'}
+                      {isCasual ? (isEn ? 'Live score' : 'Suma en vivo') : (isEn ? 'Evaluated zone' : 'Zona evaluada')}
                     </span>
                   )}
                 </div>
@@ -737,6 +848,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                                 isOwner={c.isOwner}
                                 isTeammate={true}
                                 compact
+                                gameMode={tutorialMode}
                               />
                             </div>
                           </div>
@@ -749,9 +861,16 @@ export function InteractiveTutorial({ onBackToMenu }) {
                     <span className="font-semibold text-emerald-400">
                       {isEn ? 'Your Ally Team (A)' : 'Tu Equipo Aliado (A)'}
                     </span>
-                    <span className="font-mono text-xs text-slate-400">
-                      {teamACards.length} {isEn ? 'cards' : 'cartas'}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {isCasual && (
+                        <span className="bg-emerald-950/85 border border-emerald-500/50 text-emerald-200 px-1.5 py-0.5 rounded font-mono text-[10px] font-black">
+                          {isResolutionPhase ? (isEn ? 'Final:' : 'Final:') : (isEn ? 'Real Total:' : 'Total Real:')} {fScore?.a.total || 0} pts
+                        </span>
+                      )}
+                      <span className="font-mono text-xs text-slate-400">
+                        {teamACards.length} {isEn ? 'cards' : 'cartas'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -812,7 +931,9 @@ export function InteractiveTutorial({ onBackToMenu }) {
                     : isEn ? 'Play as Shadow' : 'Jugar como Sombra'}
                 </span>
                 <span className="bg-purple-950 px-1.5 py-0.2 rounded text-[10px] font-mono">
-                  {shadowsLeft} {isEn ? (shadowsLeft === 1 ? 'team shadow left' : 'team shadows left') : (shadowsLeft === 1 ? 'de equipo restante' : 'de equipo restantes')}
+                  {isCasual
+                    ? `${shadowsLeft}/1 ${isEn ? 'personal shadow' : 'sombra personal'}`
+                    : `${shadowsLeft} ${isEn ? (shadowsLeft === 1 ? 'team shadow left' : 'team shadows left') : (shadowsLeft === 1 ? 'de equipo restante' : 'de equipo restantes')}`}
                 </span>
               </button>
             </div>
@@ -881,6 +1002,7 @@ export function InteractiveTutorial({ onBackToMenu }) {
                         card={card}
                         isSelected={isSelected}
                         isPlayable={isRequired}
+                        gameMode={tutorialMode}
                         onClick={() => handleSelectPlayerCard(card)}
                         onDragStart={(e) => {
                           if (isRequired) {
@@ -910,11 +1032,19 @@ export function InteractiveTutorial({ onBackToMenu }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
           <div className="bg-slate-900 border border-slate-700 w-full max-w-xl rounded-2xl shadow-2xl p-6 sm:p-8 flex flex-col">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/50 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/20">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center border shadow-lg ${
+                isCasual
+                  ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-emerald-500/20'
+                  : 'bg-amber-500/20 border-amber-500/50 text-amber-400 shadow-amber-500/20'
+              }`}>
                 <Shield className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded border ${
+                  isCasual
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                    : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                }`}>
                   {currentStep.subtitle}
                 </span>
                 <h2 className="text-xl sm:text-2xl font-black text-slate-100 uppercase tracking-wide mt-1">
@@ -926,82 +1056,124 @@ export function InteractiveTutorial({ onBackToMenu }) {
             <div className="space-y-3 my-4 text-xs sm:text-sm text-slate-300 leading-relaxed bg-slate-950/70 p-4 rounded-xl border border-slate-800">
               {currentStep.content.map((paragraph, idx) => (
                 <p key={idx} className="flex items-start gap-2">
-                  <span className="text-amber-400 font-bold shrink-0 mt-0.5">•</span>
+                  <span className={`${isCasual ? 'text-emerald-400' : 'text-amber-400'} font-bold shrink-0 mt-0.5`}>•</span>
                   <span>{paragraph}</span>
                 </p>
               ))}
             </div>
 
-            {/* Simulación visual del Reloj Dual de Equipo */}
+            {/* Simulación visual del Reloj (20s Individual en Casual vs Dual en Competitivo) */}
             {currentStep.stage === 'team_clock' && (
-              <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 mb-4 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-amber-400" /> {isEn ? 'Dual Team Clock (2v2 Simulation)' : 'Reloj Dual de Equipo (Simulación 2v2)'}
-                  </span>
-                  <span className="text-[10px] bg-slate-800 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">
-                    {isEn ? 'Medium Speed (3m 20s)' : 'Ritmo Medio (3m 20s)'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-center gap-2.5 sm:gap-3">
-                  {/* Reloj Equipo A */}
-                  <div className="flex-1 bg-emerald-950/80 border-2 border-emerald-400 p-2.5 rounded-xl text-center shadow-lg shadow-emerald-500/20 ring-2 ring-emerald-500/30">
-                    <span className="text-[9px] sm:text-[10px] uppercase font-bold text-emerald-300 block">
-                      {isEn ? 'Your Team (You & A2) • ACTIVE' : 'Tu Equipo (Tú y A2) • ACTIVO'}
+              isCasual ? (
+                <div className="bg-slate-950 p-3.5 rounded-xl border border-emerald-500/40 mb-4 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-emerald-400" /> {isEn ? 'Individual Turn Clock (Casual Mode)' : 'Reloj de Turno Individual (Modo Casual)'}
                     </span>
-                    <span className="text-xl sm:text-2xl font-black font-mono text-emerald-300">
-                      03:20
+                    <span className="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-mono font-bold">
+                      {isEn ? 'Fixed 20s / turn' : 'Fijo 20s / turno'}
                     </span>
-                    <div className="text-[9px] text-emerald-400/90 mt-0.5 animate-pulse font-medium">
-                      {isEn ? 'Counts down on your turn' : 'Descuenta en tu turno'}
-                    </div>
                   </div>
 
-                  <span className="text-slate-500 font-black text-xs sm:text-sm">VS</span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="bg-emerald-950/80 border-2 border-emerald-400 p-2.5 rounded-xl text-center shadow-lg">
+                      <span className="text-[9px] uppercase font-bold text-emerald-300 block">
+                        {isEn ? 'Active Player Turn Clock' : 'Reloj del Jugador en Turno'}
+                      </span>
+                      <span className="text-2xl font-black font-mono text-emerald-200">
+                        00:20
+                      </span>
+                      <div className="text-[9px] text-emerald-400/90 mt-0.5">
+                        {isEn ? 'Resets to 20s on every turn change' : 'Se reinicia a 20s en cada cambio de turno'}
+                      </div>
+                    </div>
 
-                  {/* Reloj Equipo B */}
-                  <div className="flex-1 bg-slate-900/60 border border-slate-800 p-2.5 rounded-xl text-center opacity-70">
-                    <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 block">
-                      {isEn ? 'Opponent Team (B1 & B2) • PAUSED' : 'Equipo Rival (B1 y B2) • PAUSADO'}
-                    </span>
-                    <span className="text-xl sm:text-2xl font-black font-mono text-slate-400">
-                      03:20
-                    </span>
-                    <div className="text-[9px] text-slate-500 mt-0.5">
-                      {isEn ? 'Activates when card is placed' : 'Se activa al colocar tu carta'}
+                    <div className="bg-slate-900/90 border border-amber-500/35 p-2.5 rounded-xl text-left flex flex-col justify-center">
+                      <span className="text-[10px] uppercase font-bold text-amber-300 block mb-1">
+                        {isEn ? 'Timeout Rule (00:00 Auto-Play):' : 'Regla al Agotar 00:00 (Auto-Play):'}
+                      </span>
+                      <p className="text-[10px] text-slate-300 leading-snug">
+                        {isEn
+                          ? 'Round is NOT lost! Plays your 1st card in hand FACE UP into the valid front with the FEWEST total cards.'
+                          : '¡NO se pierde la ronda! Se juega tu 1ª carta en mano BOCA ARRIBA en el frente válido con MENOS cartas.'}
+                      </p>
                     </div>
                   </div>
                 </div>
+              ) : (
+                <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 mb-4 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-amber-400" /> {isEn ? 'Dual Team Clock (2v2 Simulation)' : 'Reloj Dual de Equipo (Simulación 2v2)'}
+                    </span>
+                    <span className="text-[10px] bg-slate-800 text-amber-400 px-2 py-0.5 rounded font-mono font-bold">
+                      {isEn ? 'Medium Speed (3m 20s)' : 'Ritmo Medio (3m 20s)'}
+                    </span>
+                  </div>
 
-                <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center text-[10px] text-slate-400 pt-1 border-t border-slate-800">
-                  <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                    <strong className="text-emerald-400 block font-bold">{isEn ? 'Fast' : 'Rápido'}</strong>
-                    <span className="font-mono">1m 40s (100s)</span>
+                  <div className="flex items-center justify-center gap-2.5 sm:gap-3">
+                    {/* Reloj Equipo A */}
+                    <div className="flex-1 bg-emerald-950/80 border-2 border-emerald-400 p-2.5 rounded-xl text-center shadow-lg shadow-emerald-500/20 ring-2 ring-emerald-500/30">
+                      <span className="text-[9px] sm:text-[10px] uppercase font-bold text-emerald-300 block">
+                        {isEn ? 'Your Team (You & A2) • ACTIVE' : 'Tu Equipo (Tú y A2) • ACTIVO'}
+                      </span>
+                      <span className="text-xl sm:text-2xl font-black font-mono text-emerald-300">
+                        03:20
+                      </span>
+                      <div className="text-[9px] text-emerald-400/90 mt-0.5 animate-pulse font-medium">
+                        {isEn ? 'Counts down on your turn' : 'Descuenta en tu turno'}
+                      </div>
+                    </div>
+
+                    <span className="text-slate-500 font-black text-xs sm:text-sm">VS</span>
+
+                    {/* Reloj Equipo B */}
+                    <div className="flex-1 bg-slate-900/60 border border-slate-800 p-2.5 rounded-xl text-center opacity-70">
+                      <span className="text-[9px] sm:text-[10px] uppercase font-bold text-slate-400 block">
+                        {isEn ? 'Opponent Team (B1 & B2) • PAUSED' : 'Equipo Rival (B1 y B2) • PAUSADO'}
+                      </span>
+                      <span className="text-xl sm:text-2xl font-black font-mono text-slate-400">
+                        03:20
+                      </span>
+                      <div className="text-[9px] text-slate-500 mt-0.5">
+                        {isEn ? 'Activates when card is placed' : 'Se activa al colocar tu carta'}
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-slate-900 p-1.5 rounded border border-amber-500/40">
-                    <strong className="text-amber-400 block font-bold">{isEn ? 'Medium' : 'Medio'}</strong>
-                    <span className="font-mono">3m 20s (200s)</span>
-                  </div>
-                  <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
-                    <strong className="text-indigo-400 block font-bold">{isEn ? 'Slow' : 'Lento'}</strong>
-                    <span className="font-mono">5m 00s (300s)</span>
+
+                  <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+                    <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
+                      <strong className="text-emerald-400 block font-bold">{isEn ? 'Fast' : 'Rápido'}</strong>
+                      <span className="font-mono">1m 40s (100s)</span>
+                    </div>
+                    <div className="bg-slate-900 p-1.5 rounded border border-amber-500/40">
+                      <strong className="text-amber-400 block font-bold">{isEn ? 'Medium' : 'Medio'}</strong>
+                      <span className="font-mono">3m 20s (200s)</span>
+                    </div>
+                    <div className="bg-slate-900 p-1.5 rounded border border-slate-800">
+                      <strong className="text-indigo-400 block font-bold">{isEn ? 'Slow' : 'Lento'}</strong>
+                      <span className="font-mono">5m 00s (300s)</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )
             )}
 
             <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
               <button
                 onClick={onBackToMenu}
-                className="text-xs font-bold text-slate-400 hover:text-white transition"
+                className="text-xs font-bold text-slate-400 hover:text-white transition cursor-pointer"
               >
                 {isEn ? 'Exit to Menu' : 'Salir al Menú'}
               </button>
 
               <button
                 onClick={handleNextDialog}
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all hover:scale-105 active:scale-95"
+                className={`px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+                  isCasual
+                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 hover:brightness-110 text-slate-950 shadow-emerald-500/20'
+                    : 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-amber-500/20'
+                }`}
               >
                 <span>{currentStep.buttonText}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -1021,7 +1193,9 @@ export function InteractiveTutorial({ onBackToMenu }) {
             <div className="px-6 py-5 border-b border-slate-800 text-center bg-gradient-to-r from-emerald-950/80 via-slate-900 to-emerald-950/80">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 border bg-emerald-500/20 text-emerald-400 border-emerald-500/40">
                 <Award className="w-4 h-4" />
-                {isEn ? 'Official Resolution Phase: Round Conquered' : 'Fase Oficial de Resolución: Ronda Conquistada'}
+                {isCasual
+                  ? (isEn ? 'Casual Mode Resolution: Compressed Scale & Live Score' : 'Resolución en Modo Casual: Escala Comprimida y Suma en Vivo')
+                  : (isEn ? 'Official Resolution Phase: Round Conquered' : 'Fase Oficial de Resolución: Ronda Conquistada')}
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-slate-100 uppercase tracking-wide">
                 {isEn ? 'Round Victory for Allied Team (A) (+2 Round Points)!' : '¡Victoria de Ronda para el Equipo Aliado (A) (+2 Puntos de Ronda)!'}
@@ -1037,133 +1211,265 @@ export function InteractiveTutorial({ onBackToMenu }) {
 
             {/* Desglose de los 3 frentes con sombras reveladas */}
             <div className="p-6 overflow-y-auto space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {/* 1. FRENTE CENTRAL */}
-                <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="font-bold text-xs text-slate-200">
-                        {isEn ? 'Center Front' : 'Frente Central'}
-                      </span>
-                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
-                        {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
-                      </span>
-                    </div>
+              {isCasual ? (
+                /* DESGLOSE EN MODO CASUAL (ESCALA COMPRIMIDA 1 AL 4) */
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {/* 1. FRENTE CENTRAL (CASUAL) */}
+                  <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span className="font-bold text-xs text-slate-200">
+                          {isEn ? 'Center Front' : 'Frente Central'}
+                        </span>
+                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
+                          {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
+                        </span>
+                      </div>
 
-                    <div className="my-3 text-center">
-                      <div className="text-2xl font-black font-mono">
-                        <span className="text-emerald-400">57</span>
-                        <span className="text-slate-600 text-sm mx-2">vs</span>
-                        <span className="text-rose-400">33</span>
+                      <div className="my-3 text-center">
+                        <div className="text-2xl font-black font-mono">
+                          <span className="text-emerald-400">12</span>
+                          <span className="text-slate-600 text-sm mx-2">vs</span>
+                          <span className="text-rose-400">7</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {isEn ? 'Compressed Scale + Color (+2)' : 'Escala Comprimida + Color (+2)'}
+                        </div>
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">
-                        {isEn ? 'Higher total score' : 'Mayor puntuación total'}
+
+                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                        <div>
+                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                          {isEn
+                            ? 'K♥ (3) + Q♥ (3) + shadow 8♥ (2) + 9♥ (2) + Color 3+ Hearts (+2 pts) = '
+                            : 'K♥ (3) + Q♥ (3) + 8♥ sombra (2) + 9♥ (2) + Color 3+ Corazones (+2 pts) = '}
+                          <strong>12 pts</strong>.
+                        </div>
+                        <div>
+                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                          {isEn
+                            ? 'Q♦ (3) + J♥ (3) + 5♥ (1) (only 2 Hearts = no Color) = '
+                            : 'Q♦ (3) + J♥ (3) + 5♥ (1) (solo 2 Corazones = sin Color) = '}
+                          <strong>7 pts</strong>.
+                        </div>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                      <div>
-                        <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
-                        {isEn
-                          ? 'K♥ (13) + Q♥ (12) + revealed shadow 8♥ (8) + 9♥ (9) + 4-Hearts Synergy (+15 pts) = '
-                          : 'K♥ (13) + Q♥ (12) + 8♥ sombra revelada (8) + 9♥ (9) + Sinergia de 4 Corazones (+15 pts) = '}
-                        <strong>57 pts</strong>.
+                  {/* 2. FRENTE IZQUIERDO (CASUAL) */}
+                  <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span className="font-bold text-xs text-slate-200">
+                          {isEn ? 'Left Front' : 'Frente Izquierdo'}
+                        </span>
+                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
+                          {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
+                        </span>
                       </div>
-                      <div>
-                        <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
-                        {isEn
-                          ? 'Q♦ (12) + J♥ (11) + 5♥ (5) + 2-Hearts Synergy (+5 pts) = '
-                          : 'Q♦ (12) + J♥ (11) + 5♥ (5) + Sinergia 2 Corazones (+5 pts) = '}
-                        <strong>33 pts</strong>.
+
+                      <div className="my-3 text-center">
+                        <div className="text-2xl font-black font-mono">
+                          <span className="text-emerald-400">10</span>
+                          <span className="text-slate-600 text-sm mx-2">vs</span>
+                          <span className="text-rose-400">6</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {isEn ? '4-pt Ace + Diamond Color (+2)' : 'As de 4 pts + Color Diamantes (+2)'}
+                        </div>
+                      </div>
+
+                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                        <div>
+                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                          {isEn
+                            ? 'J♦ (3) + Your Ace A♦ (4) + 3♦ (1) + Color 3 Diamonds (+2 pts) = '
+                            : 'J♦ (3) + Tu As A♦ (4) + 3♦ (1) + Color 3 Diamantes (+2 pts) = '}
+                          <strong>10 pts</strong>.
+                        </div>
+                        <div>
+                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                          {isEn
+                            ? '5♦ (1) + Revealed shadow 10♦ (2) + 4♦ (1) + Color 3 Diamonds (+2 pts) = '
+                            : '5♦ (1) + Sombra 10♦ revelada (2) + 4♦ (1) + Color 3 Diamantes (+2 pts) = '}
+                          <strong>6 pts</strong>.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3. FRENTE DERECHO (CASUAL) */}
+                  <div className="p-3.5 rounded-xl border bg-rose-950/20 border-rose-500/40 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span className="font-bold text-xs text-slate-200">
+                          {isEn ? 'Right Front' : 'Frente Derecho'}
+                        </span>
+                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-rose-500/20 text-rose-400">
+                          {isEn ? 'Team B' : 'Equipo B'}
+                        </span>
+                      </div>
+
+                      <div className="my-3 text-center">
+                        <div className="text-2xl font-black font-mono">
+                          <span className="text-emerald-400">4</span>
+                          <span className="text-slate-600 text-sm mx-2">vs</span>
+                          <span className="text-rose-400">10</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {isEn ? 'Rival 3-Spade Color (+2)' : 'Color de 3 Picas del rival (+2)'}
+                        </div>
+                      </div>
+
+                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                        <div>
+                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                          {isEn
+                            ? '10♠ (2) + 6♠ (1) + 4♣ (1) (only 2 Spades = no Color) = '
+                            : '10♠ (2) + 6♠ (1) + 4♣ (1) (solo 2 Picas = sin Color) = '}
+                          <strong>4 pts</strong>.
+                        </div>
+                        <div>
+                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                          {isEn
+                            ? 'K♠ (3) + 7♠ (2) + 2♣ (1) + 9♠ (2) + Color 3 Spades (+2 pts) = '
+                            : 'K♠ (3) + 7♠ (2) + 2♣ (1) + 9♠ (2) + Color 3 Picas (+2 pts) = '}
+                          <strong>10 pts</strong>.
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
+              ) : (
+                /* DESGLOSE EN MODO COMPETITIVO */
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {/* 1. FRENTE CENTRAL */}
+                  <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span className="font-bold text-xs text-slate-200">
+                          {isEn ? 'Center Front' : 'Frente Central'}
+                        </span>
+                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
+                          {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
+                        </span>
+                      </div>
 
-                {/* 2. FRENTE IZQUIERDO */}
-                <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="font-bold text-xs text-slate-200">
-                        {isEn ? 'Left Front' : 'Frente Izquierdo'}
-                      </span>
-                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
-                        {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
-                      </span>
+                      <div className="my-3 text-center">
+                        <div className="text-2xl font-black font-mono">
+                          <span className="text-emerald-400">57</span>
+                          <span className="text-slate-600 text-sm mx-2">vs</span>
+                          <span className="text-rose-400">33</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {isEn ? 'Higher total score' : 'Mayor puntuación total'}
+                        </div>
+                      </div>
+
+                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                        <div>
+                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                          {isEn
+                            ? 'K♥ (13) + Q♥ (12) + revealed shadow 8♥ (8) + 9♥ (9) + 4-Hearts Synergy (+15 pts) = '
+                            : 'K♥ (13) + Q♥ (12) + 8♥ sombra revelada (8) + 9♥ (9) + Sinergia de 4 Corazones (+15 pts) = '}
+                          <strong>57 pts</strong>.
+                        </div>
+                        <div>
+                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                          {isEn
+                            ? 'Q♦ (12) + J♥ (11) + 5♥ (5) + 2-Hearts Synergy (+5 pts) = '
+                            : 'Q♦ (12) + J♥ (11) + 5♥ (5) + Sinergia 2 Corazones (+5 pts) = '}
+                          <strong>33 pts</strong>.
+                        </div>
+                      </div>
                     </div>
+                  </div>
 
-                    <div className="my-3 text-center">
-                      <div className="text-2xl font-black font-mono">
-                        <span className="text-emerald-400">38</span>
-                        <span className="text-slate-600 text-sm mx-2">vs</span>
-                        <span className="text-rose-400">29</span>
+                  {/* 2. FRENTE IZQUIERDO */}
+                  <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span className="font-bold text-xs text-slate-200">
+                          {isEn ? 'Left Front' : 'Frente Izquierdo'}
+                        </span>
+                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
+                          {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
+                        </span>
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">
-                        {isEn ? 'Higher total score' : 'Mayor puntuación total'}
+
+                      <div className="my-3 text-center">
+                        <div className="text-2xl font-black font-mono">
+                          <span className="text-emerald-400">38</span>
+                          <span className="text-slate-600 text-sm mx-2">vs</span>
+                          <span className="text-rose-400">29</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {isEn ? 'Higher total score' : 'Mayor puntuación total'}
+                        </div>
+                      </div>
+
+                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                        <div>
+                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                          {isEn
+                            ? 'J♦ (11) + Your Ace A♦ (14) + 3♦ (3) + 3-Diamonds Synergy (+10 pts) = '
+                            : 'J♦ (11) + Tu As A♦ (14) + 3♦ (3) + Sinergia de 3 Diamantes (+10 pts) = '}
+                          <strong>38 pts</strong>.
+                        </div>
+                        <div>
+                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                          {isEn
+                            ? '5♦ (5) + Revealed shadow 10♦ (10) + 4♦ (4) + 3-Diamonds Synergy (+10 pts) = '
+                            : '5♦ (5) + Sombra 10♦ revelada (10) + 4♦ (4) + Sinergia 3 Diamantes (+10 pts) = '}
+                          <strong>29 pts</strong>.
+                        </div>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                      <div>
-                        <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
-                        {isEn
-                          ? 'J♦ (11) + Your Ace A♦ (14) + 3♦ (3) + 3-Diamonds Synergy (+10 pts) = '
-                          : 'J♦ (11) + Tu As A♦ (14) + 3♦ (3) + Sinergia de 3 Diamantes (+10 pts) = '}
-                        <strong>38 pts</strong>.
+                  {/* 3. FRENTE DERECHO */}
+                  <div className="p-3.5 rounded-xl border bg-rose-950/20 border-rose-500/40 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                        <span className="font-bold text-xs text-slate-200">
+                          {isEn ? 'Right Front' : 'Frente Derecho'}
+                        </span>
+                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-rose-500/20 text-rose-400">
+                          {isEn ? 'Team B' : 'Equipo B'}
+                        </span>
                       </div>
-                      <div>
-                        <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
-                        {isEn
-                          ? '5♦ (5) + Revealed shadow 10♦ (10) + 4♦ (4) + 3-Diamonds Synergy (+10 pts) = '
-                          : '5♦ (5) + Sombra 10♦ revelada (10) + 4♦ (4) + Sinergia 3 Diamantes (+10 pts) = '}
-                        <strong>29 pts</strong>.
+
+                      <div className="my-3 text-center">
+                        <div className="text-2xl font-black font-mono">
+                          <span className="text-emerald-400">25</span>
+                          <span className="text-slate-600 text-sm mx-2">vs</span>
+                          <span className="text-rose-400">41</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {isEn ? 'Opponent spades control' : 'Control rival por picas'}
+                        </div>
+                      </div>
+
+                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                        <div>
+                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                          {isEn
+                            ? '10♠ (10) + 6♠ (6) + 4♣ (4) + 2-Spades Synergy (+5 pts) = '
+                            : '10♠ (10) + 6♠ (6) + 4♣ (4) + Sinergia de 2 Picas (+5 pts) = '}
+                          <strong>25 pts</strong>.
+                        </div>
+                        <div>
+                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                          {isEn
+                            ? 'K♠ (13) + 7♠ (7) + 2♣ (2) + 9♠ (9) + 3-Spades Synergy (+10 pts) = '
+                            : 'K♠ (13) + 7♠ (7) + 2♣ (2) + 9♠ (9) + Sinergia 3 Picas (+10 pts) = '}
+                          <strong>41 pts</strong>.
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* 3. FRENTE DERECHO */}
-                <div className="p-3.5 rounded-xl border bg-rose-950/20 border-rose-500/40 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                      <span className="font-bold text-xs text-slate-200">
-                        {isEn ? 'Right Front' : 'Frente Derecho'}
-                      </span>
-                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-rose-500/20 text-rose-400">
-                        {isEn ? 'Team B' : 'Equipo B'}
-                      </span>
-                    </div>
-
-                    <div className="my-3 text-center">
-                      <div className="text-2xl font-black font-mono">
-                        <span className="text-emerald-400">25</span>
-                        <span className="text-slate-600 text-sm mx-2">vs</span>
-                        <span className="text-rose-400">41</span>
-                      </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">
-                        {isEn ? 'Opponent spades control' : 'Control rival por picas'}
-                      </div>
-                    </div>
-
-                    <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                      <div>
-                        <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
-                        {isEn
-                          ? '10♠ (10) + 6♠ (6) + 4♣ (4) + 2-Spades Synergy (+5 pts) = '
-                          : '10♠ (10) + 6♠ (6) + 4♣ (4) + Sinergia de 2 Picas (+5 pts) = '}
-                        <strong>25 pts</strong>.
-                      </div>
-                      <div>
-                        <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
-                        {isEn
-                          ? 'K♠ (13) + 7♠ (7) + 2♣ (2) + 9♠ (9) + 3-Spades Synergy (+10 pts) = '
-                          : 'K♠ (13) + 7♠ (7) + 2♣ (2) + 9♠ (9) + Sinergia 3 Picas (+10 pts) = '}
-                        <strong>41 pts</strong>.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
 
               {/* Escala Oficial de Puntos de Ronda (1, 2 y 3 Puntos) */}
               <div className="bg-slate-950/90 border border-amber-500/35 p-3.5 rounded-xl text-xs space-y-2.5">
@@ -1191,54 +1497,81 @@ export function InteractiveTutorial({ onBackToMenu }) {
                 </div>
               </div>
 
-              {/* Explicación de los Puntos Acumulados */}
-              <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                <div>
-                  <span className="font-bold text-slate-200 block text-sm">
-                    {isEn ? 'Total Round Cumulative Points:' : 'Puntos Acumulados Totales de la Ronda:'}
-                  </span>
-                  <span className="text-slate-400">
+              {isCasual ? (
+                /* Explicación de Desempate por Prórroga Directa y 1 Sombra Personal en Modo Casual */
+                <div className="bg-emerald-950/30 border border-emerald-500/40 p-4 rounded-xl space-y-2.5 text-xs">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <span className="font-bold text-emerald-300 text-sm flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-emerald-400" />
+                      {isEn ? 'Casual Mode End-of-Round & Tiebreaker Rules:' : 'Reglas de Fin de Ronda y Desempate en Modo Casual:'}
+                    </span>
+                    <span className="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-mono font-bold uppercase">
+                      {isEn ? 'Direct 2-Round Overtime' : 'Prórroga Directa de 2 Rondas'}
+                    </span>
+                  </div>
+                  <p className="text-slate-300 leading-relaxed">
                     {isEn
-                      ? 'Numerical scores across all fronts are summed to break overall match ties.'
-                      : 'Se suman las puntuaciones numéricas de todos los frentes para resolver posibles desempates globales de partida.'}
-                  </span>
+                      ? '• No Cumulative Points: In Casual Mode, front scores are NOT summed across rounds for tie-breaking. If Round Points are tied at the end of the agreed rounds (4, 6, or 8), the match goes directly into a 2-Round Overtime!'
+                      : '• Sin Puntos Acumulados: En el Modo Casual NO se registran ni usan las sumas de puntos de los frentes entre rondas para desempatar. Si al terminar las rondas pares acordadas (4, 6 u 8) hay empate en Puntos de Ronda, ¡la partida entra directamente en una Prórroga de 2 rondas!'}
+                  </p>
+                  <p className="text-slate-300 leading-relaxed">
+                    {isEn
+                      ? '• Personal Shadow Renewal: Every player automatically receives 1 fresh personal Shadow Marker at the start of the next round (non-cumulative).'
+                      : '• Renovación de Sombra Personal: Al comenzar la siguiente ronda, cada jugador vuelve a recibir automáticamente 1 Marcador de Sombra personal (no acumulable).'}
+                  </p>
                 </div>
-                <div className="font-mono font-bold text-base text-right shrink-0">
-                  <span className="text-emerald-400">{isEn ? 'Team A: 120 pts' : 'Equipo A: 120 pts'}</span>
-                  <span className="text-slate-600 mx-2">/</span>
-                  <span className="text-rose-400">{isEn ? 'Team B: 103 pts' : 'Equipo B: 103 pts'}</span>
-                </div>
-              </div>
+              ) : (
+                <>
+                  {/* Explicación de los Puntos Acumulados */}
+                  <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                    <div>
+                      <span className="font-bold text-slate-200 block text-sm">
+                        {isEn ? 'Total Round Cumulative Points:' : 'Puntos Acumulados Totales de la Ronda:'}
+                      </span>
+                      <span className="text-slate-400">
+                        {isEn
+                          ? 'Numerical scores across all fronts are summed to break overall match ties.'
+                          : 'Se suman las puntuaciones numéricas de todos los frentes para resolver posibles desempates globales de partida.'}
+                      </span>
+                    </div>
+                    <div className="font-mono font-bold text-base text-right shrink-0">
+                      <span className="text-emerald-400">{isEn ? 'Team A: 120 pts' : 'Equipo A: 120 pts'}</span>
+                      <span className="text-slate-600 mx-2">/</span>
+                      <span className="text-rose-400">{isEn ? 'Team B: 103 pts' : 'Equipo B: 103 pts'}</span>
+                    </div>
+                  </div>
 
-              {/* Ingresos de Economía: Sombras (Reglamento Oficial) */}
-              <div className="bg-purple-950/30 border border-purple-500/40 p-4 rounded-xl space-y-3 text-xs">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-purple-200 text-sm flex items-center gap-2">
-                    <EyeOff className="w-4 h-4 text-purple-400" />
-                    {isEn ? 'Shadow Economy Income (Official Rulebook):' : 'Ingresos de Economía: Sombras (Reglamento Oficial):'}
-                  </span>
-                  <span className="text-[10px] bg-purple-900/50 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded font-mono font-bold uppercase">
-                    {isEn ? 'Continuous Savings' : 'Ahorro Continuo'}
-                  </span>
-                </div>
-                <p className="text-slate-300 leading-relaxed">
-                  {isEn
-                    ? 'In competitive matches, teams begin Round 1 with 0 Shadow Markers and earn markers at the conclusion of each round according to performance. Unspent markers carry over and accumulate into future rounds!'
-                    : 'En partidas oficiales, los equipos inician la Ronda 1 con 0 Marcadores de Sombra y reciben nuevos marcadores al concluir cada ronda según su resultado. ¡Los marcadores no gastados se conservan y acumulan para las siguientes rondas!'}
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-center">
-                  <div className="bg-black/60 p-2.5 rounded-lg border border-emerald-500/30">
-                    <span className="text-emerald-400 font-bold block">{isEn ? 'Team A (Round Winner):' : 'Equipo A (Ganador de Ronda):'}</span>
-                    <span className="text-lg font-black font-mono text-emerald-300">+1 {isEn ? 'Shadow Marker' : 'Marcador de Sombra'}</span>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{isEn ? 'Added to team pool for Round 2' : 'Sumado a la reserva para la Ronda 2'}</div>
+                  {/* Ingresos de Economía: Sombras (Reglamento Oficial) */}
+                  <div className="bg-purple-950/30 border border-purple-500/40 p-4 rounded-xl space-y-3 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-purple-200 text-sm flex items-center gap-2">
+                        <EyeOff className="w-4 h-4 text-purple-400" />
+                        {isEn ? 'Shadow Economy Income (Official Rulebook):' : 'Ingresos de Economía: Sombras (Reglamento Oficial):'}
+                      </span>
+                      <span className="text-[10px] bg-purple-900/50 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded font-mono font-bold uppercase">
+                        {isEn ? 'Continuous Savings' : 'Ahorro Continuo'}
+                      </span>
+                    </div>
+                    <p className="text-slate-300 leading-relaxed">
+                      {isEn
+                        ? 'In competitive matches, teams begin Round 1 with 0 Shadow Markers and earn markers at the conclusion of each round according to performance. Unspent markers carry over and accumulate into future rounds!'
+                        : 'En partidas oficiales, los equipos inician la Ronda 1 con 0 Marcadores de Sombra y reciben nuevos marcadores al concluir cada ronda según su resultado. ¡Los marcadores no gastados se conservan y acumulan para las siguientes rondas!'}
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-center">
+                      <div className="bg-black/60 p-2.5 rounded-lg border border-emerald-500/30">
+                        <span className="text-emerald-400 font-bold block">{isEn ? 'Team A (Round Winner):' : 'Equipo A (Ganador de Ronda):'}</span>
+                        <span className="text-lg font-black font-mono text-emerald-300">+1 {isEn ? 'Shadow Marker' : 'Marcador de Sombra'}</span>
+                        <div className="text-[10px] text-slate-400 mt-0.5">{isEn ? 'Added to team pool for Round 2' : 'Sumado a la reserva para la Ronda 2'}</div>
+                      </div>
+                      <div className="bg-black/60 p-2.5 rounded-lg border border-purple-500/30">
+                        <span className="text-rose-400 font-bold block">{isEn ? 'Team B (Round Loser):' : 'Equipo B (Perdedor de Ronda):'}</span>
+                        <span className="text-lg font-black font-mono text-purple-300">+2 {isEn ? 'Shadow Markers' : 'Marcadores de Sombra'}</span>
+                        <div className="text-[10px] text-slate-400 mt-0.5">{isEn ? 'Comeback boost for Round 2 (+3 if 2+ defeat streak)' : 'Impulso de remontada para R2 (+3 si encadena 2+ derrotas)'}</div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="bg-black/60 p-2.5 rounded-lg border border-purple-500/30">
-                    <span className="text-rose-400 font-bold block">{isEn ? 'Team B (Round Loser):' : 'Equipo B (Perdedor de Ronda):'}</span>
-                    <span className="text-lg font-black font-mono text-purple-300">+2 {isEn ? 'Shadow Markers' : 'Marcadores de Sombra'}</span>
-                    <div className="text-[10px] text-slate-400 mt-0.5">{isEn ? 'Comeback boost for Round 2 (+3 if 2+ defeat streak)' : 'Impulso de remontada para R2 (+3 si encadena 2+ derrotas)'}</div>
-                  </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
 
             <div className="px-6 py-4 border-t border-slate-800 bg-slate-950 flex justify-end">
@@ -1259,104 +1592,188 @@ export function InteractiveTutorial({ onBackToMenu }) {
       {/* ===================================================================== */}
       {currentStep.type === 'conclusion' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-md animate-fadeIn">
-          <div className="bg-slate-900 border border-amber-500/50 w-full max-w-xl rounded-3xl shadow-2xl p-6 sm:p-8 text-center flex flex-col items-center relative overflow-hidden">
+          <div className={`bg-slate-900 border w-full max-w-xl rounded-3xl shadow-2xl p-6 sm:p-8 text-center flex flex-col items-center relative overflow-hidden ${
+            isCasual ? 'border-emerald-500/50' : 'border-amber-500/50'
+          }`}>
             <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="w-20 h-20 rounded-3xl bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center text-amber-400 shadow-xl shadow-amber-500/20 mb-4 animate-bounce">
+            <div className={`w-20 h-20 rounded-3xl border-2 flex items-center justify-center shadow-xl mb-4 animate-bounce ${
+              isCasual
+                ? 'bg-emerald-500/20 border-emerald-400 text-emerald-400 shadow-emerald-500/20'
+                : 'bg-amber-500/20 border-amber-400 text-amber-400 shadow-amber-500/20'
+            }`}>
               <Trophy className="w-10 h-10" />
             </div>
 
-            <span className="text-xs font-black uppercase tracking-widest text-amber-400 mb-1">
-              {isEn ? 'Tactical Instruction Certificate' : 'Certificado de Instrucción Táctica'}
+            <span className={`text-xs font-black uppercase tracking-widest mb-1 ${
+              isCasual ? 'text-emerald-400' : 'text-amber-400'
+            }`}>
+              {isCasual
+                ? (isEn ? 'Casual Mode (Party) Certificate' : 'Certificado del Modo Casual (Party)')
+                : (isEn ? 'Tactical Instruction Certificate' : 'Certificado de Instrucción Táctica')}
             </span>
 
             <h2 className="text-2xl sm:text-3xl font-black text-slate-100 uppercase tracking-wide mb-2">
-              {isEn ? 'GRADUATE COMMANDER!' : '¡COMANDANTE GRADUADO!'}
+              {currentStep.title}
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 max-w-md mb-6 leading-relaxed">
-              {isEn ? (
-                <>You have completed the official <strong>WarFronts</strong> tutorial. You now master all the necessary mechanics for competitive play:</>
+              {isCasual ? (
+                isEn ? (
+                  <>You have completed the <strong>Casual Mode (Party / Friends)</strong> tutorial. You now master all 5 key differences of Casual Mode:</>
+                ) : (
+                  <>Has completado el tutorial del <strong>Modo Casual (Party / Amigos)</strong>. Ya dominas los 5 pilares clave del Modo Casual:</>
+                )
               ) : (
-                <>Has completado el tutorial oficial de <strong>Frentes de Guerra</strong>. Conoces al detalle todas las mecánicas necesarias para disputar cualquier partida competitiva:</>
+                isEn ? (
+                  <>You have completed the official <strong>WarFronts</strong> tutorial. You now master all the necessary mechanics for competitive play:</>
+                ) : (
+                  <>Has completado el tutorial oficial de <strong>Frentes de Guerra</strong>. Conoces al detalle todas las mecánicas necesarias para disputar cualquier partida competitiva:</>
+                )
               )}
             </p>
 
             {/* Checklist de conceptos dominados */}
-            <div className="w-full bg-slate-950/80 border border-slate-800 rounded-2xl p-4 mb-6 text-left text-xs space-y-2.5">
-              <div className="flex items-center gap-2 text-slate-200">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>
-                  <strong>{isEn ? '1, 2 & 3 Round Points System:' : 'Sistema de 1, 2 y 3 Puntos de Ronda:'}</strong>{' '}
-                  {isEn
-                    ? 'Tie in the round (+1 pt for EACH team), Standard Victory of 2 fronts (+2 pts), and Full Sweep / "Pleno" of all 3 fronts (+3 pts).'
-                    : 'Empate en la ronda (+1 pt para CADA equipo), Victoria estándar al ganar 2 frentes (+2 pts) y Dominio Total / "Pleno" al ganar los 3 frentes (+3 pts).'}
-                </span>
+            {isCasual ? (
+              <div className="w-full bg-slate-950/80 border border-emerald-500/30 rounded-2xl p-4 mb-6 text-left text-xs space-y-2.5">
+                <div className="flex items-start gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>{isEn ? '1. Compressed Scale (1–4) & Synergies:' : '1. Escala Comprimida (1 al 4) y Sinergias:'}</strong>{' '}
+                    {isEn
+                      ? '2–6 = 1 pt, 7–10 = 2 pts, J–K = 3 pts, Ace = 4 pts. Color (3+ of same suit) = +2 pts total, Pair = +2 pts, Straight = +3 pts, Trio = +4 pts.'
+                      : '2–6 = 1 pto, 7–10 = 2 pts, J–K = 3 pts, As = 4 pts. Color (3+ del mismo palo) = +2 pts totales, Pareja = +2 pts, Escalera = +3 pts, Trío = +4 pts.'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>{isEn ? '2. Live Score Counter on Each Front:' : '2. Contador de Puntos en Vivo en Cada Frente:'}</strong>{' '}
+                    {isEn
+                      ? 'Displays your real allied score (including allied shadows) and visible rival score automatically. Enemy shadows stay hidden until Revelation.'
+                      : 'Muestra automáticamente tu suma real aliada (incluyendo tus sombras) y la suma visible del rival. Las sombras enemigas no suman hasta la Revelación.'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>{isEn ? '3. 1 Fixed Personal Shadow per Player/Round:' : '3. 1 Carta Sombra Fija por Jugador y Ronda:'}</strong>{' '}
+                    {isEn
+                      ? 'Personal, non-transferable, and non-cumulative across rounds (silently shown to teammates when played).'
+                      : 'Personal, intransferible y no acumulable entre rondas (mostrada en silencio a tus compañeros al jugarse).'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>{isEn ? '4. 20s Turn Clock & Automatic Deployment:' : '4. Turno de 20s y Despliegue Automático:'}</strong>{' '}
+                    {isEn
+                      ? 'If the 20s timer hits 00:00, the round is NOT lost: the 1st card in hand is played face up into the valid front with the fewest cards.'
+                      : 'Si el reloj de 20s llega a 00:00, NO se pierde la ronda: se juega automáticamente la 1ª carta boca arriba en el frente válido con menos cartas.'}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>{isEn ? '5. Direct 2-Round Overtime Tiebreaker:' : '5. Desempate Final Directo por Prórroga de 2 Rondas:'}</strong>{' '}
+                    {isEn
+                      ? 'No cumulative front scores across rounds. Ties in Round Points go directly into a 2-round Overtime!'
+                      : 'Sin puntos acumulados entre rondas. Cualquier empate final en Puntos de Ronda va directo a una Prórroga de 2 rondas.'}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-slate-200">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>
-                  <strong>{isEn ? 'Formations & Synergies:' : 'Formaciones y Sinergias:'}</strong>{' '}
-                  {isEn
-                    ? 'Suit (+5), Pair (+10), Short Straight (+15), and Trio (+20) deepen strategic play.'
-                    : 'Palo (+5), Pareja (+10), Escalera Corta (+15) y Trío (+20) aportan máxima profundidad estratégica.'}
-                </span>
+            ) : (
+              <div className="w-full bg-slate-950/80 border border-slate-800 rounded-2xl p-4 mb-6 text-left text-xs space-y-2.5">
+                <div className="flex items-center gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong>{isEn ? '1, 2 & 3 Round Points System:' : 'Sistema de 1, 2 y 3 Puntos de Ronda:'}</strong>{' '}
+                    {isEn
+                      ? 'Tie in the round (+1 pt for EACH team), Standard Victory of 2 fronts (+2 pts), and Full Sweep / "Pleno" of all 3 fronts (+3 pts).'
+                      : 'Empate en la ronda (+1 pt para CADA equipo), Victoria estándar al ganar 2 frentes (+2 pts) y Dominio Total / "Pleno" al ganar los 3 frentes (+3 pts).'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong>{isEn ? 'Formations & Synergies:' : 'Formaciones y Sinergias:'}</strong>{' '}
+                    {isEn
+                      ? 'Suit (+5), Pair (+10), Short Straight (+15), and Trio (+20) deepen strategic play.'
+                      : 'Palo (+5), Pareja (+10), Escalera Corta (+15) y Trío (+20) aportan máxima profundidad estratégica.'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong>{isEn ? 'Suit Synergies in 2v2:' : 'Sinergias de Palo en 2v2:'}</strong>{' '}
+                    {isEn
+                      ? '+5 points for each repeated suit card deployed in a front.'
+                      : '+5 puntos por cada carta repetida del mismo palo en un frente.'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong>{isEn ? 'Shadow Marker:' : 'Marcador de Sombra:'}</strong>{' '}
+                    {isEn
+                      ? 'Concealed deployment from rivals (visible to your own team with a purple border), bluffing opponents and coordinating team plays.'
+                      : 'Despliegue oculto para rivales (visible para tu equipo con borde morado), engañando al enemigo y coordinando jugadas aliadas.'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong>{isEn ? 'Shadow Economy:' : 'Economía de Sombras:'}</strong>{' '}
+                    {isEn
+                      ? 'Start with 0 markers in R1. Earn +1 on win, +2 on loss (+3 on 2+ loss streak), and +1 on tie in 2v2. Continuous saving across rounds.'
+                      : 'Inician con 0 marcadores en R1. Cobran +1 al ganar, +2 al perder (+3 en racha de 2+ derrotas) y +1 en empate en 2v2. Ahorro acumulativo continuo.'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong>{isEn ? 'Tactical Discard:' : 'Descarte Táctico:'}</strong>{' '}
+                    {isEn
+                      ? 'Placing low cards into secure or conceded sectors to boost cumulative tie-breaker points.'
+                      : 'Colocar cartas bajas en frentes perdidos o ganados para sumar puntos acumulados.'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 text-slate-200">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>
+                    <strong>{isEn ? 'Cumulative Points:' : 'Puntos Acumulados:'}</strong>{' '}
+                    {isEn
+                      ? 'Break overall match ties when round points are drawn.'
+                      : 'Deciden el desempate global de la contienda.'}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-slate-200">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>
-                  <strong>{isEn ? 'Suit Synergies in 2v2:' : 'Sinergias de Palo en 2v2:'}</strong>{' '}
-                  {isEn
-                    ? '+5 points for each repeated suit card deployed in a front.'
-                    : '+5 puntos por cada carta repetida del mismo palo en un frente.'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-200">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>
-                  <strong>{isEn ? 'Shadow Marker:' : 'Marcador de Sombra:'}</strong>{' '}
-                  {isEn
-                    ? 'Concealed deployment from rivals (visible to your own team with a purple border), bluffing opponents and coordinating team plays.'
-                    : 'Despliegue oculto para rivales (visible para tu equipo con borde morado), engañando al enemigo y coordinando jugadas aliadas.'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-200">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>
-                  <strong>{isEn ? 'Shadow Economy:' : 'Economía de Sombras:'}</strong>{' '}
-                  {isEn
-                    ? 'Start with 0 markers in R1. Earn +1 on win, +2 on loss (+3 on 2+ loss streak), and +1 on tie in 2v2. Continuous saving across rounds.'
-                    : 'Inician con 0 marcadores en R1. Cobran +1 al ganar, +2 al perder (+3 en racha de 2+ derrotas) y +1 en empate en 2v2. Ahorro acumulativo continuo.'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-200">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>
-                  <strong>{isEn ? 'Tactical Discard:' : 'Descarte Táctico:'}</strong>{' '}
-                  {isEn
-                    ? 'Placing low cards into secure or conceded sectors to boost cumulative tie-breaker points.'
-                    : 'Colocar cartas bajas en frentes perdidos o ganados para sumar puntos acumulados.'}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-slate-200">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>
-                  <strong>{isEn ? 'Cumulative Points:' : 'Puntos Acumulados:'}</strong>{' '}
-                  {isEn
-                    ? 'Break overall match ties when round points are drawn.'
-                    : 'Deciden el desempate global de la contienda.'}
-                </span>
-              </div>
-            </div>
+            )}
 
-            {/* Botón de vuelta al menú */}
-            <button
-              onClick={onBackToMenu}
-              className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
-            >
-              <span>{isEn ? 'Ready for Battle! Return to Main Menu' : '¡Listo para la Batalla! Volver al Menú Principal'}</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
+            {/* Botones de acción al graduarse */}
+            <div className="w-full flex flex-col sm:flex-row gap-2.5">
+              <button
+                onClick={() => handleSwitchTutorialMode(isCasual ? 'competitive' : 'casual')}
+                className="flex-1 py-3.5 px-4 rounded-2xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition cursor-pointer"
+              >
+                <span>
+                  {isCasual
+                    ? (isEn ? 'Try Competitive Tutorial' : 'Ver Tutorial Competitivo')
+                    : (isEn ? 'Try Casual Mode Tutorial' : 'Ver Tutorial Casual (Party)')}
+                </span>
+              </button>
+              <button
+                onClick={onBackToMenu}
+                className={`flex-1 py-3.5 px-4 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-xl transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+                  isCasual
+                    ? 'bg-gradient-to-r from-emerald-400 to-teal-500 text-slate-950 shadow-emerald-500/25'
+                    : 'bg-gradient-to-r from-amber-500 via-amber-500 to-amber-600 text-slate-950 shadow-amber-500/25'
+                }`}
+              >
+                <span>{isEn ? 'Return to Main Menu' : 'Volver al Menú Principal'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       )}

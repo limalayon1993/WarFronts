@@ -737,9 +737,9 @@ export function FullManualModal({ isOpen, onClose }) {
                     </h4>
                     <p className="text-xs sm:text-sm text-slate-300">
                       {isEn ? (
-                        <>If exact tie persists in cumulative points, <strong className="text-slate-100">2 Overtime Rounds</strong> are played (preserving initiative rotation and the 1, 2, and 3 Round Points system). If still tied in Round Points after overtime, overtime cumulative points are summed until a winner emerges.</>
+                        <>If an exact tie persists in cumulative points (or in <strong className="text-amber-300">Casual Mode</strong>, where cumulative numerical front sums are not recorded), <strong className="text-slate-100">2 Overtime Rounds</strong> are played (preserving initiative rotation and the 1, 2, and 3 Round Points system) to guarantee equal starting opportunity.</>
                       ) : (
-                        <>En el caso poco probable de que persista el empate exacto en puntos acumulados, se jugarán <strong className="text-slate-100">2 Rondas de Prórroga adicionales</strong> (manteniendo la rotación de iniciativa y el sistema de 1, 2 y 3 Puntos de Ronda). Si el empate en Puntos de Ronda persiste tras la prórroga, se volverán a sumar los puntos numéricos acumulados de la prórroga. El proceso se repetirá hasta obtener un ganador.</>
+                        <>En el caso de que persista el empate exacto en puntos acumulados (o en el <strong className="text-amber-300">Modo Casual</strong>, donde no se anotan las sumas numéricas de cada frente), se jugarán <strong className="text-slate-100">2 Rondas de Prórroga adicionales</strong> (manteniendo la rotación de iniciativa y el sistema de 1, 2 y 3 Puntos de Ronda) para garantizar igualdad de salida.</>
                       )}
                     </p>
                   </div>
@@ -852,6 +852,179 @@ export function FullManualModal({ isOpen, onClose }) {
                       </p>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* SECCIÓN 9: ANEXO: MODO CASUAL (PARTY / AMIGOS) */}
+            {activeSection === 'sec9' && (
+              <div className="space-y-4 animate-fadeIn">
+                <div className="border-b border-slate-800 pb-3">
+                  <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
+                    {isEn ? 'Chapter 9' : 'Capítulo 9'}
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">
+                    {isEn ? '9. Annex: Casual Mode (Party / Friends)' : '9. Anexo: Modo Casual (Party / Amigos)'}
+                  </h3>
+                </div>
+
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                  {isEn ? (
+                    <>The general rules of Competitive Mode (including the <strong className="text-amber-300">1, 2, and 3 Round Points</strong> scoring system and the rule of <strong className="text-purple-300">silently showing your Shadow Card to teammates before placing it</strong>) remain intact, applying only the following 3 adaptations designed to maximize dynamism, eliminate pen-and-paper tracking, and speed up calculations at parties or gatherings with friends:</>
+                  ) : (
+                    <>Las reglas generales del Modo Competitivo (incluyendo el sistema de puntuación de <strong className="text-amber-300">1, 2 y 3 Puntos de Ronda</strong> y la regla de <strong className="text-purple-300">mostrar en silencio la Carta Sombra a los compañeros antes de colocarla</strong>) se mantienen intactas, aplicando únicamente las siguientes 3 adaptaciones diseñadas para maximizar el dinamismo, eliminar el uso de papel y lápiz y agilizar el cálculo en fiestas o reuniones con amigos:</>
+                  )}
+                </p>
+
+                {/* 1. Conteo Rápido de Frentes ("Escala Comprimida") */}
+                <div className="bg-slate-900/80 border border-amber-500/30 p-4 rounded-xl space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <h4 className="font-bold text-amber-400">
+                      {isEn ? '1. Fast Front Counting ("Compressed Scale")' : '1. Conteo Rápido de Frentes ("Escala Comprimida")'}
+                    </h4>
+                    <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded font-mono font-bold">
+                      {isEn ? 'Scale 1 to 4' : 'Escala 1 al 4'}
+                    </span>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-slate-300">
+                    {isEn ? (
+                      <>So that any player can calculate at a glance who dominates each front without doing two-digit additions, Competitive Mode values are replaced by the following simplified scale:</>
+                    ) : (
+                      <>Para que cualquier jugador pueda calcular de un vistazo quién domina cada frente sin hacer sumas de dos dígitos, se sustituyen los valores del Modo Competitivo por la siguiente escala simplificada:</>
+                    )}
+                  </p>
+
+                  <div className="space-y-2">
+                    <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+                      {isEn ? 'Simplified Base Card Values:' : 'Valor Base Simplificado de las Cartas:'}
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-center">
+                        <span className="text-slate-400 block">{isEn ? 'Low Cards (2 to 6)' : 'Cartas Bajas (2 al 6)'}</span>
+                        <strong className="text-sm text-amber-300 font-black">{isEn ? '1 point' : '1 punto'}</strong>
+                      </div>
+                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-center">
+                        <span className="text-slate-400 block">{isEn ? 'Mid Cards (7 to 10)' : 'Cartas Medias (7 al 10)'}</span>
+                        <strong className="text-sm text-amber-300 font-black">{isEn ? '2 points' : '2 puntos'}</strong>
+                      </div>
+                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-center">
+                        <span className="text-slate-400 block">{isEn ? 'Figures (J, Q, K)' : 'Figuras (J, Q, K)'}</span>
+                        <strong className="text-sm text-amber-300 font-black">{isEn ? '3 points' : '3 puntos'}</strong>
+                      </div>
+                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-center">
+                        <span className="text-slate-400 block">{isEn ? 'Ace (A)' : 'As (A)'}</span>
+                        <strong className="text-sm text-emerald-400 font-black">{isEn ? '4 points' : '4 puntos'}</strong>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 pt-1">
+                    <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+                      {isEn ? 'Simplified Synergy Bonuses:' : 'Bonificaciones por Sinergia Simplificadas:'}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
+                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
+                        <strong className="text-emerald-400">{isEn ? 'Flush / Color (3+ cards of the same suit on the front):' : 'Color (3 o más cartas del mismo palo en el frente):'}</strong>{' '}
+                        {isEn ? '+2 total points (single flat bonus upon reaching at least 3 cards of the same suit).' : '+2 puntos totales (bonificación única al alcanzar al menos 3 cartas del mismo palo).'}
+                      </div>
+                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
+                        <strong className="text-sky-400">{isEn ? 'Pair (2 cards of the same rank):' : 'Pareja (2 cartas del mismo número/letra):'}</strong>{' '}
+                        {isEn ? '+2 points.' : '+2 puntos.'}
+                      </div>
+                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
+                        <strong className="text-purple-400">{isEn ? 'Short Straight (3 consecutive nominal rank cards):' : 'Escalera Corta (3 cartas de valor nominal consecutivo):'}</strong>{' '}
+                        {isEn ? '+3 points.' : '+3 puntos.'}
+                      </div>
+                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
+                        <strong className="text-rose-400">{isEn ? 'Trio (3 cards of the same rank):' : 'Trío (3 cartas del mismo número/letra):'}</strong>{' '}
+                        {isEn ? '+4 points (cancels the Pair bonus for those same cards).' : '+4 puntos (anula la bonificación de Pareja de esas mismas cartas).'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-950 p-3 rounded border border-slate-800 text-xs text-slate-300 space-y-1.5">
+                    <strong className="text-amber-300 block">{isEn ? 'Front & Match Tiebreakers:' : 'Desempate en un Frente y en la Partida:'}</strong>
+                    <p>
+                      • {isEn ? (
+                        <>If a front is tied in points, the team holding the <strong className="text-slate-100">single highest nominal rank card (2 &lt; 3 &lt; ... &lt; K &lt; A)</strong> played on that front still wins it.</>
+                      ) : (
+                        <>Si un frente empata a puntos, sigue ganando el equipo que tenga la <strong className="text-slate-100">carta individual de mayor jerarquía nominal (2 &lt; 3 &lt; ... &lt; K &lt; A)</strong> jugada en ese frente.</>
+                      )}
+                    </p>
+                    <p>
+                      • {isEn ? (
+                        <><strong>No Score Sheet for Front Sums:</strong> In Casual Mode, numerical front points are not recorded across rounds; only <strong className="text-emerald-300">Round Points (1, 2, or 3 pts)</strong> are tracked. If Round Points are tied after the scheduled rounds, the match goes directly into a <strong className="text-amber-300">2-round Overtime</strong> (one with initiative for each team).</>
+                      ) : (
+                        <><strong>Sin Hoja de Anotación de Sumas:</strong> En el Modo Casual no se anotan los puntos numéricos de los frentes entre rondas; únicamente se llevan los <strong className="text-emerald-300">Puntos de Ronda (1, 2 o 3 pts)</strong> con fichas, monedas o marcador. Si al terminar las rondas reglamentarias hay empate en Puntos de Ronda, se juega directamente una <strong className="text-amber-300">Prórroga de 2 rondas</strong> (una con iniciativa para cada equipo).</>
+                      )}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 2. Gestión Individual de Cartas Sombra */}
+                <div className="bg-slate-900/80 border border-purple-500/30 p-4 rounded-xl space-y-2 text-xs sm:text-sm text-slate-300">
+                  <h4 className="font-bold text-purple-400">
+                    {isEn ? '2. Individual Shadow Card Management' : '2. Gestión Individual de Cartas Sombra'}
+                  </h4>
+                  <p>
+                    • <strong className="text-slate-100">{isEn ? 'Fixed & Individual Marker:' : 'Marcador Fijo e Individual:'}</strong>{' '}
+                    {isEn ? (
+                      <>The shared Team Shadow Pool and post-round income are removed. Each player receives <strong className="text-purple-300">exactly one (1) Shadow Marker per round</strong> to play one card face-down (showing it silently to teammates beforehand).</>
+                    ) : (
+                      <>Se suprime el Fondo de Sombras compartido del equipo y los ingresos posronda. Cada jugador dispone <strong className="text-purple-300">exactamente de un (1) Marcador de Sombra por ronda</strong> para jugar una carta boca abajo (mostrándosela previamente en silencio a sus compañeros).</>
+                    )}
+                  </p>
+                  <p>
+                    • <strong className="text-slate-100">{isEn ? 'Non-Transferable & Non-Cumulative Use:' : 'Uso Intransferible y No Acumulable:'}</strong>{' '}
+                    {isEn ? (
+                      <>The marker is strictly personal and cannot be given or distributed among teammates. If a player does not use their face-down card during the current round, the marker does not carry over to future rounds. At the start of each new round, every player has their single marker again.</>
+                    ) : (
+                      <>El marcador es de uso estrictamente personal y no puede cederse ni repartirse entre los miembros del equipo. Si un jugador no utiliza su carta boca abajo durante la ronda en curso, el marcador no se acumula para rondas posteriores. Al inicio de cada nueva ronda, cada jugador vuelve a disponer de su único marcador.</>
+                    )}
+                  </p>
+                </div>
+
+                {/* 3. Tiempo de Turno Individual */}
+                <div className="bg-slate-900/80 border border-amber-500/30 p-4 rounded-xl space-y-2 text-xs sm:text-sm text-slate-300">
+                  <h4 className="font-bold text-amber-400">
+                    {isEn ? '3. Individual Turn Clock (20s)' : '3. Tiempo de Turno Individual (20s)'}
+                  </h4>
+                  <p>
+                    • <strong className="text-slate-100">{isEn ? 'Team Clock Removed:' : 'Supresión del Reloj de Equipo:'}</strong>{' '}
+                    {isEn ? 'The dual chess clock and shared time bank are eliminated.' : 'Se elimina el cronómetro dual y la bolsa de tiempo compartida.'}
+                  </p>
+                  <p>
+                    • <strong className="text-slate-100">{isEn ? 'Fixed Time per Play:' : 'Tiempo Fijo por Jugada:'}</strong>{' '}
+                    {isEn ? (
+                      <>Each player has an individual time limit of <strong className="text-amber-300">20 seconds per turn</strong> to place their card on a valid front.</>
+                    ) : (
+                      <>Cada jugador dispone de un tiempo límite individual de <strong className="text-amber-300">20 segundos por turno</strong> para colocar su carta en un frente válido.</>
+                    )}
+                  </p>
+                  <p>
+                    • <strong className="text-slate-100">{isEn ? 'Timeout Infraction (Auto-Play):' : 'Infracción por Tiempo (Auto-Play):'}</strong>{' '}
+                    {isEn ? (
+                      <>If a player runs out of their 20-second turn time without placing a card, they do NOT lose the round; instead, the system automatically plays the <strong className="text-rose-300">first available card in their hand face-up</strong> into the valid front with the fewest total cards at that moment.</>
+                    ) : (
+                      <>Si el jugador agota su tiempo reglamentario de 20 segundos sin haber colocado una carta, NO se pierde la ronda; en su lugar, deberá jugar de manera inmediata (automáticamente en la app) la <strong className="text-rose-300">primera carta de su mano boca arriba</strong> en el frente válido que contenga menos cartas en ese momento.</>
+                    )}
+                  </p>
+                </div>
+
+                {/* Nota de Versión Digital */}
+                <div className="bg-emerald-950/30 border border-emerald-500/40 p-4 rounded-xl text-xs sm:text-sm text-slate-200 space-y-1">
+                  <h4 className="font-bold text-emerald-400 flex items-center gap-2">
+                    <span>💻</span>
+                    {isEn ? 'Digital Edition Note: Real-Time Front Score Counters' : 'Nota de la Versión Digital: Marcador de Puntos en Tiempo Real'}
+                  </h4>
+                  <p className="text-slate-300 leading-relaxed">
+                    {isEn ? (
+                      <>In the digital version of Casual Mode, the point sum (Base + Synergies) of each of the 3 fronts is automatically displayed on screen in real time so players never have to do mental math. For information security, your team sees its true score (including allied Shadow Cards), while enemy Shadow Cards do not add points to the public counter until the Revelation Phase at the end of deployment.</>
+                    ) : (
+                      <>En la versión digital del Modo Casual, la suma de puntos (Base + Sinergias) de cada uno de los 3 frentes se muestra automáticamente en pantalla en tiempo real para evitar el cálculo mental. Por seguridad de información oculta, el equipo aliado ve su suma real (incluyendo sus propias Cartas Sombra), mientras que las Cartas Sombra rivales no suman puntos en el marcador público hasta la Fase de Revelación al final del despliegue.</>
+                    )}
+                  </p>
                 </div>
               </div>
             )}

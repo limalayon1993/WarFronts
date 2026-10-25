@@ -35,8 +35,13 @@ export function chooseBotMove({
   totalRounds = 4,
   isFinalRound = false,
   teamLossStreak = 0,
+  gameMode = 'competitive',
 }) {
   if (!botHand || botHand.length === 0) return null;
+
+  const isCasual = gameMode === 'casual';
+  // Factor de escala: en Modo Casual (1-4 pts) los umbrales equivalen a ~0.22x de la escala Competitiva
+  const scale = isCasual ? 0.22 : 1;
 
   const enemyTeam = botTeam === 'teamA' ? 'teamB' : 'teamA';
   const frontKeys = Object.keys(fronts);
@@ -89,19 +94,19 @@ export function chooseBotMove({
     const enemyCards = sanitizedFronts[fKey][enemyTeam];
 
     // Puntuación de nuestro equipo (cartas activas)
-    const myScoreObj = calculateFrontScore(myCards, true);
+    const myScoreObj = calculateFrontScore(myCards, true, gameMode);
     const myScore = myScoreObj.total;
 
     // Puntuación visible del enemigo (excluye cartas sombra)
-    const enemyVisibleObj = calculateFrontScore(enemyCards, false);
+    const enemyVisibleObj = calculateFrontScore(enemyCards, false, gameMode);
     const enemyVisibleScore = enemyVisibleObj.total;
 
     // Detección de cartas sombra rivales sin filtrar su contenido
     const enemyShadowCount = enemyCards.filter(c => c.isShadow && !c.isRevealed).length;
     
     // Estimación táctica de amenaza: una sombra rival suele ser una carta alta o combo clave.
-    // Asignamos ~11 puntos de expectativa por cada sombra oculta, sin saber qué carta es.
-    const enemyEstimatedShadowScore = enemyShadowCount * 11;
+    // Competitivo: ~11 puntos por sombra; Casual: ~3 puntos por sombra.
+    const enemyEstimatedShadowScore = enemyShadowCount * (isCasual ? 3 : 11);
     const enemyEstimatedTotal = enemyVisibleScore + enemyEstimatedShadowScore;
 
     const totalCards = myCards.length + enemyCards.length;
@@ -113,19 +118,15 @@ export function chooseBotMove({
     const isEmpty = myCards.length === 0 && enemyCards.length === 0;
 
     // Frente ya asegurado:
-    // - Si el rival no ha puesto nada y ya tenemos >= 15 pts, o
-    // - Si la ventaja es abrumadora (>= 22 pts), o
-    // - Si la ventaja es de >= 14 pts y quedan apenas 2 huecos en el frente.
     const isSecured = 
-      (isMineUncontested && myScore >= 15) ||
-      (enemyCards.length > 0 && diff >= 22) ||
-      (enemyCards.length > 0 && diff >= 14 && remainingSlots <= 2);
+      (isMineUncontested && myScore >= 15 * scale) ||
+      (enemyCards.length > 0 && diff >= 22 * scale) ||
+      (enemyCards.length > 0 && diff >= 14 * scale && remainingSlots <= 2);
 
     // Frente prácticamente perdido:
-    // Desventaja profunda (<= -22 pts) y quedan muy pocos huecos (<= 2), o desventaja > -34 pts
     const isLost = 
-      (diff <= -22 && remainingSlots <= 2) ||
-      (diff <= -34);
+      (diff <= -22 * scale && remainingSlots <= 2) ||
+      (diff <= -34 * scale);
 
     // Frente en disputa activa
     const isContested = !isSecured && !isLost && !isEmpty && !isMineUncontested;
@@ -171,11 +172,11 @@ export function chooseBotMove({
 
       // Calcular puntos brutos que aportaría la carta
       const hypoCards = [...myCards, card];
-      const newScoreObj = calculateFrontScore(hypoCards, true);
+      const newScoreObj = calculateFrontScore(hypoCards, true, gameMode);
       const pointsGained = newScoreObj.total - fa.myScore;
 
-      // Base: puntos aportados
-      let rating = pointsGained * 1.2;
+      // Base: puntos aportados (normalizado en modo casual para mantener pesos equivalentes)
+      let rating = pointsGained * (isCasual ? 4.5 : 1.2);
 
       // =========================================================================
       // REGLA 1: ANTI-OVERKILL Y COMBATE A LA OFUSCACIÓN
@@ -183,20 +184,20 @@ export function chooseBotMove({
       // =========================================================================
       if (fa.isMineUncontested) {
         // El rival no ha puesto NINGUNA tropa en este frente (0 cartas)
-        if (fa.myScore >= 24) {
-          // Ya tenemos 24+ puntos frente a la nada. Castigo masivo para frenar el amontonamiento.
+        if (fa.myScore >= 24 * scale) {
+          // Ya tenemos puntos sobrados frente a la nada. Castigo masivo para frenar el amontonamiento.
           rating -= 60;
-        } else if (fa.myScore >= 15) {
-          // Ventaja cómoda (15-23 pts) sin resistencia enemiga:
+        } else if (fa.myScore >= 15 * scale) {
+          // Ventaja cómoda sin resistencia enemiga:
           // Muy mala idea gastar una carta alta, y desaconsejado jugar cualquier otra
           rating -= isHighCard ? 45 : 30;
-        } else if (fa.myScore >= 8) {
-          // Ya tenemos 1 carta sólida (8-14 pts). Si aún no hay rival, NO gastar As ni Rey.
+        } else if (fa.myScore >= 8 * scale) {
+          // Ya tenemos 1 carta sólida. Si aún no hay rival, NO gastar As ni Rey.
           if (isHighCard) rating -= 25;
         }
       } else if (fa.isSecured) {
         // Hay tropas rivales, pero la ventaja es decisiva
-        if (fa.diff >= 28) {
+        if (fa.diff >= 28 * scale) {
           rating -= 50; // Overkill total
         } else {
           rating -= isHighCard ? 35 : 20;
@@ -228,7 +229,7 @@ export function chooseBotMove({
         if (fa.diff <= 0 && newEstimatedDiff > 0) {
           // ¡Remontada! Cambia el frente de derrota/empate a victoria
           rating += 26;
-        } else if (fa.diff > 0 && fa.diff <= 8 && newEstimatedDiff >= 12) {
+        } else if (fa.diff > 0 && fa.diff <= 8 * scale && newEstimatedDiff >= 12 * scale) {
           // Convierte una ventaja frágil en una ventaja sólida
           rating += 18;
         } else if (fa.diff < 0 && newEstimatedDiff > fa.diff) {
@@ -261,25 +262,27 @@ export function chooseBotMove({
       // REGLA 5: SINERGIAS Y COMBOS CON SENTIDO ESTRATÉGICO
       // =========================================================================
       // Solo premiar sinergias si el frente no está ya sobrecargado o asegurado
-      const shouldRewardSynergies = !fa.isSecured && !(fa.isMineUncontested && fa.myScore >= 16);
+      const shouldRewardSynergies = !fa.isSecured && !(fa.isMineUncontested && fa.myScore >= 16 * scale);
 
       if (shouldRewardSynergies) {
-        // Trío (+20 oficial)
+        // Trío (+20 competitivo / +4 casual)
         if (newScoreObj.trioTotal > fa.myScoreObj.trioTotal) {
           rating += 16;
         }
-        // Escalera (+15 oficial)
+        // Escalera (+15 competitivo / +3 casual)
         else if (newScoreObj.straightTotal > fa.myScoreObj.straightTotal) {
           rating += 14;
         }
-        // Pareja (+10 oficial)
+        // Pareja (+10 competitivo / +2 casual)
         else if (newScoreObj.pairTotal > fa.myScoreObj.pairTotal) {
           rating += 10;
         }
 
-        // Sinergia de palo (+5 pts)
-        if (fa.mySuits.includes(card.suit)) {
-          rating += 6;
+        // Sinergia de palo / Color
+        if (newScoreObj.suitSynergyTotal > fa.myScoreObj.suitSynergyTotal) {
+          rating += isCasual ? 10 : 6;
+        } else if (fa.mySuits.includes(card.suit)) {
+          rating += isCasual ? 4 : 6;
         }
       }
 
@@ -311,18 +314,30 @@ export function chooseBotMove({
     });
   });
 
-  // 5. DECISIÓN TÁCTICA DEL MARCADOR DE SOMBRA Y AHORRO ECONÓMICO (Reglamento Oficial v1.6 / v2.0)
-  // Ahora las sombras forman parte de una economía continua: ahorrar sombras en rondas ya decididas
-  // permite conservarlas para las siguientes rondas; tener racha de derrotas o gran fondo permite
-  // desplegar ataques sorpresa de remontada.
+  // 5. DECISIÓN TÁCTICA DEL MARCADOR DE SOMBRA (Competitivo vs Casual)
   if (bestMove && botShadowsLeft > 0) {
     const targetAnalysis = frontAnalysis[bestMove.frontKey];
     const isHighCard = bestMove.card.base >= 11; // J, Q, K, As
     const isAceOrKing = bestMove.card.base >= 13; // K, As
 
-    // A. REGLA DE AHORRO MACRO ECONÓMICO (Escala 1/2/3 Puntos):
-    // Si los 3 frentes ya están matemáticamente decididos, o ya hemos perdido 2 frentes y tenemos pocas sombras,
-    // y NO es la última ronda de la partida, la IA AHORRA sus marcadores para la siguiente ronda.
+    // MODO CASUAL: 1 Marcador de Sombra fijo por jugador y por ronda (NO acumulable entre rondas;
+    // si no se usa en la ronda se pierde). Por tanto, la IA siempre procura aprovechar su sombra en la ronda.
+    if (isCasual) {
+      const isWorthyCasualFront = !targetAnalysis.isLost && !targetAnalysis.isSecured;
+      if (botHand.length === 1) {
+        // Última carta de la mano en la ronda: usar la sombra para no desperdiciarla
+        bestMove.asShadow = true;
+      } else if (isWorthyCasualFront && isHighCard) {
+        bestMove.asShadow = Math.random() < 0.85;
+      } else if (isWorthyCasualFront && botHand.length <= 2) {
+        bestMove.asShadow = Math.random() < 0.75;
+      } else if (targetAnalysis.isContested) {
+        bestMove.asShadow = Math.random() < 0.55;
+      }
+      return bestMove;
+    }
+
+    // MODO COMPETITIVO: Economía continua de sombras entre rondas
     const isRoundAlreadyDecided =
       ((securedFrontsCount + lostFrontsCount >= 3) || (lostFrontsCount >= 2 && botShadowsLeft <= 2)) &&
       !isFinalRound;
@@ -336,29 +351,22 @@ export function chooseBotMove({
 
     if (isWorthyFront) {
       // B. ESCASEZ DE FONDOS (botShadowsLeft === 1):
-      // Si el equipo solo dispone de 1 marcador en su reserva, es altamente selectivo (ahorro para rondas futuras),
-      // a menos que sea la última ronda de la partida.
       if (botShadowsLeft === 1 && !isFinalRound) {
         if (isAceOrKing && targetAnalysis.isContested && Math.abs(targetAnalysis.diff) <= 10) {
-          // Carta decisiva en frente reñido
           bestMove.asShadow = Math.random() < 0.75;
         } else if (botHand.length <= 2 && targetAnalysis.isContested) {
-          // Cierre de ronda clutch
           bestMove.asShadow = Math.random() < 0.65;
         } else {
-          // Ahorro estratégico: no se gasta en aperturas ni en cartas medias
           bestMove.asShadow = false;
         }
       } 
       // C. ABUNDANCIA DE FONDOS O IMPULSO DE REMONTADA (botShadowsLeft >= 3 o teamLossStreak >= 2 o Última Ronda):
-      // El equipo cuenta con un banco acumulado o bono de racha (+3, +4, +5) para forzar la remontada.
       else if (botShadowsLeft >= 3 || teamLossStreak >= 2 || isFinalRound) {
         if (isHighCard && targetAnalysis.isContested) {
           bestMove.asShadow = Math.random() < 0.90;
         } else if (botHand.length <= 3 && targetAnalysis.isContested) {
           bestMove.asShadow = Math.random() < 0.80;
         } else if (isHighCard && targetAnalysis.isEmpty) {
-          // Apertura psicológica agresiva
           bestMove.asShadow = Math.random() < 0.50;
         } else if (targetAnalysis.isContested) {
           bestMove.asShadow = Math.random() < 0.40;

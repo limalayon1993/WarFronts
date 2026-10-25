@@ -69,6 +69,16 @@ export function RulesModal({ isOpen, onClose }) {
           >
             {isEn ? 'Tiebreakers' : 'Desempates'}
           </button>
+          <button
+            onClick={() => setActiveTab('casual')}
+            className={`py-3 px-3 border-b-2 transition ${
+              activeTab === 'casual'
+                ? 'border-amber-400 text-amber-400'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            {isEn ? '🎉 Casual Mode' : '🎉 Modo Casual'}
+          </button>
         </div>
 
         {/* Contenido con scroll */}
@@ -261,13 +271,61 @@ export function RulesModal({ isOpen, onClose }) {
 
               <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
                 <h3 className="font-bold text-slate-100 mb-2">
-                  {isEn ? '2. Round Tie & Match Tiebreaker (Cumulative Points)' : '2. Empate de Ronda y Desempate de Partida (Puntos Acumulados)'}
+                  {isEn ? '2. Round Tie & Match Tiebreaker (Cumulative Points / Overtime)' : '2. Empate de Ronda y Desempate de Partida (Puntos Acumulados / Prórroga)'}
                 </h3>
                 <p className="text-xs">
                   {isEn ? (
-                    <>If a round ends tied in fronts (e.g. 1-1 and 1 Void), <strong className="text-sky-400">each team scores +1 Round Point</strong>. If total Round Points are tied at match end, the team with the <strong className="text-emerald-400">highest cumulative numerical score</strong> across all fronts wins the match.</>
+                    <>If a round ends tied in fronts (e.g. 1-1 and 1 Void), <strong className="text-sky-400">each team scores +1 Round Point</strong>. If total Round Points are tied at match end: in <strong className="text-emerald-400">Competitive Mode</strong>, the team with the highest cumulative numerical score across all fronts wins (or 2-round Overtime if still tied); in <strong className="text-amber-400">Casual Mode</strong>, the match goes directly into a 2-round Overtime.</>
                   ) : (
-                    <>Si una ronda termina empatada en frentes (ej. 1-1 y 1 Nulo), <strong className="text-sky-400">cada equipo suma +1 Punto de Ronda</strong>. Si al terminar todas las rondas hay empate en Puntos de Ronda totales, gana el equipo que sume la <strong className="text-emerald-400">mayor cantidad de puntos numéricos acumulados</strong> a lo largo de toda la partida.</>
+                    <>Si una ronda termina empatada en frentes (ej. 1-1 y 1 Nulo), <strong className="text-sky-400">cada equipo suma +1 Punto de Ronda</strong>. Si al terminar todas las rondas hay empate en Puntos de Ronda totales: en <strong className="text-emerald-400">Modo Competitivo</strong> gana quien sume más puntos numéricos acumulados en los frentes (o Prórroga de 2 rondas si persiste); en <strong className="text-amber-400">Modo Casual</strong> se juega directamente una Prórroga de 2 rondas.</>
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'casual' && (
+            <div className="space-y-4">
+              <div className="bg-slate-950/70 p-4 rounded-xl border border-amber-500/30">
+                <h3 className="font-bold text-amber-400 mb-2">
+                  {isEn ? '1. Compressed Scale (Base 1-4 & Synergies)' : '1. Escala Comprimida (Base 1-4 y Sinergias)'}
+                </h3>
+                <ul className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs mb-3">
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800 text-center"><strong>2 - 6</strong> = 1 pt</li>
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800 text-center"><strong>7 - 10</strong> = 2 pts</li>
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800 text-center"><strong>J, Q, K</strong> = 3 pts</li>
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800 text-center"><strong className="text-amber-400">As (A)</strong> = 4 pts</li>
+                </ul>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-emerald-400">{isEn ? 'Color (3+ same suit):' : 'Color (3+ mismo palo):'}</strong> +2 pts {isEn ? 'total' : 'totales'}</li>
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-sky-400">{isEn ? 'Pair:' : 'Pareja:'}</strong> +2 pts</li>
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-purple-400">{isEn ? 'Short Straight (3):' : 'Escalera Corta (3):'}</strong> +3 pts</li>
+                  <li className="bg-slate-900 p-2 rounded border border-slate-800"><strong className="text-rose-400">{isEn ? 'Trio:' : 'Trío:'}</strong> +4 pts ({isEn ? 'cancels Pair' : 'anula Pareja'})</li>
+                </ul>
+              </div>
+
+              <div className="bg-slate-950/70 p-4 rounded-xl border border-slate-800">
+                <h3 className="font-bold text-purple-400 mb-1">
+                  {isEn ? '2. 1 Fixed Personal Shadow & 20s Turn Clock' : '2. 1 Sombra Fija Personal y Turno de 20s'}
+                </h3>
+                <p className="text-xs">
+                  {isEn ? (
+                    <>Each player receives <strong className="text-purple-300">1 fixed personal Shadow Marker per round</strong> (non-transferable, non-cumulative, silently shown to teammates when played). Each turn has a <strong className="text-amber-300">fixed 20-second clock</strong>; if time reaches 00:00, your first card in hand is automatically played face-up on the valid front with the fewest cards.</>
+                  ) : (
+                    <>Cada jugador recibe <strong className="text-purple-300">1 Marcador de Sombra fijo personal por ronda</strong> (intransferible, no acumulable, mostrado en silencio al equipo al jugarse). Cada turno tiene un <strong className="text-amber-300">reloj fijo de 20 segundos</strong>; si llega a 00:00, se juega automáticamente la primera carta de tu mano boca arriba en el frente válido con menos cartas.</>
+                  )}
+                </p>
+              </div>
+
+              <div className="bg-emerald-950/30 p-4 rounded-xl border border-emerald-500/40">
+                <h3 className="font-bold text-emerald-400 mb-1">
+                  {isEn ? '3. Live Score Counter & Direct 2-Round Overtime' : '3. Contador de Puntos en Vivo y Prórroga Directa'}
+                </h3>
+                <p className="text-xs">
+                  {isEn ? (
+                    <>In the digital version of Casual Mode, each front displays the live point sum automatically (including allied shadows for your team, while hiding rival shadows until Revelation). Cumulative front scores are not tracked across rounds; any tie in Round Points at match end goes directly into a 2-round Overtime.</>
+                  ) : (
+                    <>En la versión digital del Modo Casual, cada frente muestra automáticamente la suma de puntos en tiempo real (incluyendo las sombras aliadas para tu equipo y ocultando las rivales hasta la Revelación). No se registran sumas acumuladas entre rondas; cualquier empate en Puntos de Ronda al final de la partida va directamente a una Prórroga de 2 rondas.</>
                   )}
                 </p>
               </div>
