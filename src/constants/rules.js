@@ -590,7 +590,8 @@ export function calculateFrontScore(
   cards = [],
   countShadowsOrTrump = true,
   countShadowsOrGameMode = true,
-  gameModeParam = 'competitive'
+  gameModeParam = 'competitive',
+  fifthParam = null
 ) {
   let countShadows = true;
   if (typeof countShadowsOrTrump === 'boolean') {
@@ -606,6 +607,8 @@ export function calculateFrontScore(
     gameMode = countShadowsOrGameMode;
   } else if (gameModeParam === 'casual' || gameModeParam === 'competitive') {
     gameMode = gameModeParam;
+  } else if (fifthParam === 'casual' || fifthParam === 'competitive') {
+    gameMode = fifthParam;
   }
   const isCasual = gameMode === 'casual';
 

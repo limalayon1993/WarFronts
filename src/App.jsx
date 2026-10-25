@@ -167,6 +167,7 @@ export default function App() {
   const [teamALossStreak, setTeamALossStreak] = useState(0);
   const [teamBLossStreak, setTeamBLossStreak] = useState(0);
   const [lastRoundEconomy, setLastRoundEconomy] = useState(null);
+  const [roundHistory, setRoundHistory] = useState([]);
 
   // Jugador local y perspectiva de equipo
   const localPlayer = players.find(p => p.id === mySlotId) || (!isMultiplayer ? players.find(p => p.isHuman) : null);
@@ -214,6 +215,7 @@ export default function App() {
     teamALossStreak,
     teamBLossStreak,
     lastRoundEconomy,
+    roundHistory,
   };
 
   // Detectar parámetro ?room=WF-XXXX en la URL
@@ -272,6 +274,7 @@ export default function App() {
       teamALossStreak: base.teamALossStreak ?? teamALossStreak,
       teamBLossStreak: base.teamBLossStreak ?? teamBLossStreak,
       lastRoundEconomy: base.lastRoundEconomy ?? lastRoundEconomy,
+      roundHistory: base.roundHistory ?? roundHistory,
     };
 
     mp.connections.forEach((conn, peerId) => {
@@ -366,6 +369,7 @@ export default function App() {
     if (syncData.teamALossStreak !== undefined) setTeamALossStreak(syncData.teamALossStreak);
     if (syncData.teamBLossStreak !== undefined) setTeamBLossStreak(syncData.teamBLossStreak);
     if (syncData.lastRoundEconomy !== undefined) setLastRoundEconomy(syncData.lastRoundEconomy);
+    if (syncData.roundHistory !== undefined) setRoundHistory(syncData.roundHistory);
 
     if (syncData.phase === 'roundOver' && prevPhase !== 'roundOver') {
       sound.playReveal();
@@ -398,6 +402,7 @@ export default function App() {
       teamALossStreak: syncData.teamALossStreak ?? stateRef.current.teamALossStreak,
       teamBLossStreak: syncData.teamBLossStreak ?? stateRef.current.teamBLossStreak,
       lastRoundEconomy: syncData.lastRoundEconomy ?? stateRef.current.lastRoundEconomy,
+      roundHistory: syncData.roundHistory ?? stateRef.current.roundHistory ?? [],
     };
   }
 
@@ -649,6 +654,25 @@ export default function App() {
           teamBNewStreak: econResult.teamBNewStreak,
         };
 
+    const currentRoundNum = stateRef.current.round ?? round ?? 1;
+    const prevHistory = stateRef.current.roundHistory ?? roundHistory ?? [];
+    const roundEntry = {
+      round: currentRoundNum,
+      teamAFrontWins,
+      teamBFrontWins,
+      teamAPoints: roundPtsResult.teamAPoints,
+      teamBPoints: roundPtsResult.teamBPoints,
+      teamAScoreSum: teamARoundScoreSum,
+      teamBScoreSum: teamBRoundScoreSum,
+      roundWinner,
+      winType: roundPtsResult.winType,
+      flagFallTeam: null,
+    };
+    const nextRoundHistory = [
+      ...prevHistory.filter(item => item.round !== currentRoundNum),
+      roundEntry,
+    ];
+
     setTeamARoundPoints(prevTeamARoundPts);
     setTeamBRoundPoints(prevTeamBRoundPts);
     setTeamACumulativePoints(newTeamACumulative);
@@ -658,6 +682,7 @@ export default function App() {
     setTeamALossStreak(econResult.teamANewStreak);
     setTeamBLossStreak(econResult.teamBNewStreak);
     setLastRoundEconomy(roundEconomyData);
+    setRoundHistory(nextRoundHistory);
     setPhase('roundOver');
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -680,6 +705,7 @@ export default function App() {
       teamALossStreak: econResult.teamANewStreak,
       teamBLossStreak: econResult.teamBNewStreak,
       lastRoundEconomy: roundEconomyData,
+      roundHistory: nextRoundHistory,
     };
 
     const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
@@ -892,6 +918,7 @@ export default function App() {
 
     const winnerTeam = infringingTeam === 'teamA' ? 'teamB' : 'teamA';
     const activeFronts = stateRef.current.fronts || fronts;
+    const activeGameMode = stateRef.current.selectedGameMode || selectedGameMode || 'competitive';
 
     // 1. Conservación de Puntos Acumulados: Se voltean las cartas jugadas hasta ese instante en la mesa
     // y se suman los valores base y sinergias ya colocados por ambos bandos.
@@ -903,13 +930,13 @@ export default function App() {
     FRONTS.forEach(front => {
       const teamACards = activeFronts[front.id].teamA;
       const teamBCards = activeFronts[front.id].teamB;
-      const teamAScore = calculateFrontScore(teamACards, true);
-      const teamBScore = calculateFrontScore(teamBCards, true);
+      const teamAScore = calculateFrontScore(teamACards, true, activeGameMode);
+      const teamBScore = calculateFrontScore(teamBCards, true, activeGameMode);
 
       teamARoundScoreSum += teamAScore.total;
       teamBRoundScoreSum += teamBScore.total;
 
-      const resolution = resolveFrontWinner(teamACards, teamBCards, language);
+      const resolution = resolveFrontWinner(teamACards, teamBCards, language, activeGameMode);
       if (resolution.winner === 'teamA') teamAFrontWins++;
       if (resolution.winner === 'teamB') teamBFrontWins++;
     });
@@ -967,6 +994,25 @@ export default function App() {
       teamBNewStreak: econResult.teamBNewStreak,
     };
 
+    const currentRoundNum = stateRef.current.round ?? round ?? 1;
+    const prevHistory = stateRef.current.roundHistory ?? roundHistory ?? [];
+    const roundEntry = {
+      round: currentRoundNum,
+      teamAFrontWins,
+      teamBFrontWins,
+      teamAPoints: roundPtsResult.teamAPoints,
+      teamBPoints: roundPtsResult.teamBPoints,
+      teamAScoreSum: teamARoundScoreSum,
+      teamBScoreSum: teamBRoundScoreSum,
+      roundWinner: roundPtsResult.roundWinner,
+      winType: roundPtsResult.winType,
+      flagFallTeam: infringingTeam,
+    };
+    const nextRoundHistory = [
+      ...prevHistory.filter(item => item.round !== currentRoundNum),
+      roundEntry,
+    ];
+
     setTeamARoundPoints(prevTeamARoundPts);
     setTeamBRoundPoints(prevTeamBRoundPts);
     setTeamACumulativePoints(newTeamACumulative);
@@ -976,6 +1022,7 @@ export default function App() {
     setTeamALossStreak(econResult.teamANewStreak);
     setTeamBLossStreak(econResult.teamBNewStreak);
     setLastRoundEconomy(roundEconomyData);
+    setRoundHistory(nextRoundHistory);
     setPhase('roundOver');
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -1003,6 +1050,7 @@ export default function App() {
       teamALossStreak: econResult.teamANewStreak,
       teamBLossStreak: econResult.teamBNewStreak,
       lastRoundEconomy: roundEconomyData,
+      roundHistory: nextRoundHistory,
     };
 
     const isMp = Boolean(stateRef.current.isMultiplayer || isMultiplayer || mp.isHost);
@@ -1193,6 +1241,9 @@ export default function App() {
     // 1. Fondo de Sombras oficial (Competitivo) o Sombras personales fijas (Casual: 1 por jugador/ronda)
     let teamAShadowsForRound = 0;
     let teamBShadowsForRound = 0;
+    if (roundNumber === 1) {
+      setRoundHistory([]);
+    }
     if (roundNumber === 1 || isCasualMode) {
       teamAShadowsForRound = 0;
       teamBShadowsForRound = 0;
@@ -1296,6 +1347,7 @@ export default function App() {
       teamALossStreak: (roundNumber === 1 || isCasualMode) ? 0 : (stateRef.current.teamALossStreak ?? teamALossStreak),
       teamBLossStreak: (roundNumber === 1 || isCasualMode) ? 0 : (stateRef.current.teamBLossStreak ?? teamBLossStreak),
       lastRoundEconomy: (roundNumber === 1 || isCasualMode) ? null : (stateRef.current.lastRoundEconomy ?? lastRoundEconomy),
+      roundHistory: roundNumber === 1 ? [] : (stateRef.current.roundHistory ?? roundHistory ?? []),
       isMultiplayer: isMultiplayerActive,
       isHost: isHostActive,
     };
@@ -1319,6 +1371,7 @@ export default function App() {
     setTeamALossStreak(0);
     setTeamBLossStreak(0);
     setLastRoundEconomy(null);
+    setRoundHistory([]);
     setTotalMatchRounds(durationConfig.rounds);
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -1367,6 +1420,7 @@ export default function App() {
     setTeamALossStreak(0);
     setTeamBLossStreak(0);
     setLastRoundEconomy(null);
+    setRoundHistory([]);
 
     if (isHostUser) {
       const initialDeck = createDeck(activeConfig.decks);
@@ -1469,6 +1523,7 @@ export default function App() {
     setTeamALossStreak(0);
     setTeamBLossStreak(0);
     setLastRoundEconomy(null);
+    setRoundHistory([]);
     setTotalMatchRounds(durationConfig.rounds);
 
     const newDeck = createDeck(modeConfig.decks);
@@ -2182,6 +2237,7 @@ export default function App() {
         teamBRoundPoints={teamBRoundPoints}
         teamACumulativePoints={teamACumulativePoints}
         teamBCumulativePoints={teamBCumulativePoints}
+        roundHistory={roundHistory}
         modeId={selectedMode}
         gameMode={selectedGameMode}
         onRestart={handleRestartGame}

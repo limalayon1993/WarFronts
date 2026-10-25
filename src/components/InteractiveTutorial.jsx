@@ -299,12 +299,12 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
   // Puntuaciones actuales de los frentes (en Modo Casual el equipo aliado ve su total real incluyendo sus sombras, y el rival solo sus cartas visibles hasta la resolución)
   const isResolutionPhase = currentStep.type === 'resolution' || currentStep.type === 'conclusion';
   const allyRevealState = isCasual ? true : isResolutionPhase;
-  const leftScoreA = calculateFrontScore(fronts.left.teamA, null, allyRevealState, language, tutorialMode);
-  const leftScoreB = calculateFrontScore(fronts.left.teamB, null, isResolutionPhase, language, tutorialMode);
-  const centerScoreA = calculateFrontScore(fronts.center.teamA, null, allyRevealState, language, tutorialMode);
-  const centerScoreB = calculateFrontScore(fronts.center.teamB, null, isResolutionPhase, language, tutorialMode);
-  const rightScoreA = calculateFrontScore(fronts.right.teamA, null, allyRevealState, language, tutorialMode);
-  const rightScoreB = calculateFrontScore(fronts.right.teamB, null, isResolutionPhase, language, tutorialMode);
+  const leftScoreA = calculateFrontScore(fronts.left.teamA, allyRevealState, tutorialMode);
+  const leftScoreB = calculateFrontScore(fronts.left.teamB, isResolutionPhase, tutorialMode);
+  const centerScoreA = calculateFrontScore(fronts.center.teamA, allyRevealState, tutorialMode);
+  const centerScoreB = calculateFrontScore(fronts.center.teamB, isResolutionPhase, tutorialMode);
+  const rightScoreA = calculateFrontScore(fronts.right.teamA, allyRevealState, tutorialMode);
+  const rightScoreB = calculateFrontScore(fronts.right.teamB, isResolutionPhase, tutorialMode);
 
   const frontScores = {
     left: { a: leftScoreA, b: leftScoreB },
