@@ -139,7 +139,7 @@ export function Card({
           <span className="w-4 h-4 rounded-full bg-purple-950/95 text-purple-300 border border-purple-500/80 flex items-center justify-center shadow">
             <EyeOff className="w-2.5 h-2.5" />
           </span>
-          {isCasual && casualBasePts !== null && (
+          {casualBasePts !== null && (
             <span className="px-1 py-0.2 rounded bg-emerald-950/95 text-emerald-300 border border-emerald-500/70 text-[7px] font-mono font-black leading-none shadow">
               {casualBasePts}p
             </span>
@@ -271,14 +271,14 @@ export function Card({
         </div>
       )}
 
-      {/* Indicador de Carta Sombra que ha sido revelada o valor base comprimido en Modo Casual */}
-      {((isRevealed && isShadow) || (isCasual && casualBasePts !== null)) && (
+      {/* Indicador de Carta Sombra que ha sido revelada y Valor Base en la Escala Táctica Unificada (1-4 pts) */}
+      {((isRevealed && isShadow) || casualBasePts !== null) && (
         <div
           className="absolute bottom-1 left-1 z-20 pointer-events-none flex items-center gap-0.5"
           title={
             isRevealed && isShadow
               ? (isEn ? "Played as a Shadow Card" : "Jugada como Carta Sombra")
-              : (isEn ? `Casual Base Value: ${casualBasePts} pt(s)` : `Valor Base Casual: ${casualBasePts} pto(s)`)
+              : (isEn ? `Base Value: ${casualBasePts} pt(s)` : `Valor Base: ${casualBasePts} pto(s)`)
           }
         >
           {isRevealed && isShadow && (
@@ -286,7 +286,7 @@ export function Card({
               <EyeOff className="w-2.5 h-2.5" />
             </span>
           )}
-          {isCasual && casualBasePts !== null && (
+          {casualBasePts !== null && (
             <span className="px-1 py-0.2 rounded bg-emerald-950/95 text-emerald-300 border border-emerald-500/70 text-[7px] sm:text-[8px] font-mono font-black leading-none shadow">
               {casualBasePts}p
             </span>

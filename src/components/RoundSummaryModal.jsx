@@ -153,12 +153,6 @@ export function RoundSummaryModal({
                   </span>
                 )}
               </p>
-              <div className="mt-2.5 mx-auto max-w-xl px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] sm:text-xs text-amber-200 flex items-center justify-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>
-                  <strong>{isEn ? 'Score Conservation (Chapter 5):' : 'Conservación de Puntos (Capítulo 5):'}</strong> {isEn ? 'Points of all cards deployed on fronts up to flag fall are tallied and preserved for cumulative score.' : 'Se computan y conservan al acumulado los puntos numéricos de todas las tropas colocadas en los frentes hasta el instante de la caída.'}
-                </span>
-              </div>
             </div>
           ) : (
             <p className="text-xs sm:text-sm text-slate-300 mt-1">
@@ -291,28 +285,28 @@ export function RoundSummaryModal({
                         </div>
                       </div>
 
-                      {/* Desglose de puntuación Rival B */}
+                      {/* Desglose de puntuación Rival B (Escala Táctica Unificada v2.1) */}
                       <div className="flex flex-wrap gap-1 mt-2 pt-1.5 border-t border-amber-700/25 text-[9px] font-mono">
-                        <span className="bg-slate-900/90 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800">
+                        <span className="bg-slate-900/90 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800" title={isEn ? "Base Points (1–4 scale)" : "Puntos Base (escala 1–4)"}>
                           Base: {teamBScore.baseTotal}
                         </span>
                         {teamBScore.suitSynergyTotal > 0 && (
-                          <span className="bg-indigo-950/90 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isCasual ? (isEn ? "Color Synergy (2 cards: +1 pt / 3+ cards: +3 pts)" : "Color (2 cartas: +1 pt / 3+ cartas: +3 pts)") : (isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)")}>
-                            {isCasual ? (isEn ? 'Color' : 'Color') : (isEn ? 'Suit' : 'Palo')} +{teamBScore.suitSynergyTotal}
+                          <span className="bg-indigo-950/90 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isEn ? "Suit Synergy (+1 pt per additional card of same suit)" : "Sinergia de Palo (+1 pt por cada carta adicional del mismo palo)"}>
+                            {isEn ? 'Suit' : 'Palo'} +{teamBScore.suitSynergyTotal}
                           </span>
                         )}
                         {teamBScore.pairTotal > 0 && (
-                          <span className="bg-amber-950/90 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isCasual ? (isEn ? "Pair (+3)" : "Pareja (+3)") : (isEn ? "Pair (+10)" : "Pareja (+10)")}>
+                          <span className="bg-amber-950/90 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isEn ? "Pair (+2 pts)" : "Pareja (+2 pts)"}>
                             {isEn ? 'Pair' : 'Pareja'} +{teamBScore.pairTotal}
                           </span>
                         )}
                         {teamBScore.straightTotal > 0 && (
-                          <span className="bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isCasual ? (isEn ? "Short Straight (+4)" : "Escalera Corta (+4)") : (isEn ? "Short Straight (+15)" : "Escalera Corta (+15)")}>
+                          <span className="bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isEn ? "Short Straight (+4 pts)" : "Escalera Corta (+4 pts)"}>
                             {isEn ? 'Straight' : 'Escalera'} +{teamBScore.straightTotal}
                           </span>
                         )}
                         {teamBScore.trioTotal > 0 && (
-                          <span className="bg-rose-950/90 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isCasual ? (isEn ? "Trio (+6)" : "Trío (+6)") : (isEn ? "Trio (+20)" : "Trío (+20)")}>
+                          <span className="bg-rose-950/90 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isEn ? "Trio (+5 pts; cancels Pair)" : "Trío (+5 pts; anula Pareja)"}>
                             {isEn ? 'Trio' : 'Trío'} +{teamBScore.trioTotal}
                           </span>
                         )}
@@ -359,28 +353,28 @@ export function RoundSummaryModal({
                         </div>
                       </div>
 
-                      {/* Desglose de puntuación Aliado A */}
+                      {/* Desglose de puntuación Aliado A (Escala Táctica Unificada v2.1) */}
                       <div className="flex flex-wrap gap-1 mt-2 pt-1.5 border-t border-sky-700/25 text-[9px] font-mono">
-                        <span className="bg-slate-900/90 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800">
+                        <span className="bg-slate-900/90 text-slate-300 px-1.5 py-0.5 rounded border border-slate-800" title={isEn ? "Base Points (1–4 scale)" : "Puntos Base (escala 1–4)"}>
                           Base: {teamAScore.baseTotal}
                         </span>
                         {teamAScore.suitSynergyTotal > 0 && (
-                          <span className="bg-indigo-950/90 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isCasual ? (isEn ? "Color Synergy (2 cards: +1 pt / 3+ cards: +3 pts)" : "Color (2 cartas: +1 pt / 3+ cartas: +3 pts)") : (isEn ? "Suit Synergy (+5 each)" : "Sinergia de Palo (+5 c/u)")}>
-                            {isCasual ? (isEn ? 'Color' : 'Color') : (isEn ? 'Suit' : 'Palo')} +{teamAScore.suitSynergyTotal}
+                          <span className="bg-indigo-950/90 text-indigo-300 px-1.5 py-0.5 rounded border border-indigo-700/60" title={isEn ? "Suit Synergy (+1 pt per additional card of same suit)" : "Sinergia de Palo (+1 pt por cada carta adicional del mismo palo)"}>
+                            {isEn ? 'Suit' : 'Palo'} +{teamAScore.suitSynergyTotal}
                           </span>
                         )}
                         {teamAScore.pairTotal > 0 && (
-                          <span className="bg-amber-950/90 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isCasual ? (isEn ? "Pair (+3)" : "Pareja (+3)") : (isEn ? "Pair (+10)" : "Pareja (+10)")}>
+                          <span className="bg-amber-950/90 text-amber-300 px-1.5 py-0.5 rounded border border-amber-700/60" title={isEn ? "Pair (+2 pts)" : "Pareja (+2 pts)"}>
                             {isEn ? 'Pair' : 'Pareja'} +{teamAScore.pairTotal}
                           </span>
                         )}
                         {teamAScore.straightTotal > 0 && (
-                          <span className="bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isCasual ? (isEn ? "Short Straight (+4)" : "Escalera Corta (+4)") : (isEn ? "Short Straight (+15)" : "Escalera Corta (+15)")}>
+                          <span className="bg-emerald-950/90 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-700/60" title={isEn ? "Short Straight (+4 pts)" : "Escalera Corta (+4 pts)"}>
                             {isEn ? 'Straight' : 'Escalera'} +{teamAScore.straightTotal}
                           </span>
                         )}
                         {teamAScore.trioTotal > 0 && (
-                          <span className="bg-rose-950/90 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isCasual ? (isEn ? "Trio (+6)" : "Trío (+6)") : (isEn ? "Trio (+20)" : "Trío (+20)")}>
+                          <span className="bg-rose-950/90 text-rose-300 px-1.5 py-0.5 rounded border border-rose-700/60" title={isEn ? "Trio (+5 pts; cancels Pair)" : "Trío (+5 pts; anula Pareja)"}>
                             {isEn ? 'Trio' : 'Trío'} +{teamAScore.trioTotal}
                           </span>
                         )}
@@ -449,30 +443,15 @@ export function RoundSummaryModal({
             </div>
           ) : (
             <>
-              {/* Suma de puntos acumulados (Exclusivo Modo Competitivo) */}
-              <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-slate-200 block">{ui.summary.cumulativeTitle}</span>
-                  <span className="text-slate-400">
-                    {flagFallTeam
-                      ? (isEn ? 'Official conservation: Cumulative points from cards on table until flag fall' : 'Conservación oficial: Puntos numéricos de las cartas colocadas en mesa hasta la caída de bandera')
-                      : ui.summary.cumulativeDesc}
-                  </span>
-                </div>
-                <div className="text-right font-mono font-bold text-sm">
-                  <span className="text-sky-400">+{roundPointsTeamA} {ui.common.pts}</span>
-                  <span className="text-slate-600 mx-2">/</span>
-                  <span className="text-amber-400">+{roundPointsTeamB} {ui.common.pts}</span>
-                </div>
-              </div>
-
-              {/* 4. Ingresos de Economía (Sombras) — Capítulo 5 y Guía Rápida v2.0 */}
+              {/* 4. Ingresos de Economía (Sombras) — Capítulo 5 y Guía Rápida v2.1 */}
               {(() => {
                 const effectiveEcon = lastRoundEconomy || calculateRoundEconomy(modeId, roundOutcome, 0, 0);
                 const teamAEarned = effectiveEcon.teamAEarned ?? 1;
                 const teamBEarned = effectiveEcon.teamBEarned ?? 1;
                 const teamAReason = effectiveEcon.teamAReason ?? 'win';
                 const teamBReason = effectiveEcon.teamBReason ?? 'loss';
+                const teamAPrev = effectiveEcon.teamAPrevBank ?? teamAShadowsLeft;
+                const teamBPrev = effectiveEcon.teamBPrevBank ?? teamBShadowsLeft;
                 const teamATotal = effectiveEcon.teamATotalBank ?? teamAShadowsLeft;
                 const teamBTotal = effectiveEcon.teamBTotalBank ?? teamBShadowsLeft;
 
@@ -516,12 +495,12 @@ export function RoundSummaryModal({
                         </div>
                         <div>
                           <span className="font-serif font-black text-purple-200 text-xs sm:text-sm tracking-wide block uppercase">
-                            {isEn ? '4. Shadow Economy Income (Official Rules)' : '4. Ingresos de Economía: Sombras (Reglamento Oficial)'}
+                            {isEn ? '4. Shadow Economy & Team Pool (Official Rules v2.1)' : '4. Economía de Sombras y Fondo de Equipo (Reglamento v2.1)'}
                           </span>
                           <span className="text-[11px] text-purple-300/70">
                             {isEn
-                              ? 'Unspent markers are preserved across rounds (continuous savings). Streaks reset on win or tie.'
-                              : 'Los marcadores no utilizados se conservan entre rondas (ahorro continuo). La racha se reinicia al ganar o empatar.'}
+                              ? 'Unspent markers are preserved in the Team Pool (1st Match Tiebreaker: Shadow Efficiency). Streaks reset on win or tie.'
+                              : 'Los marcadores sin gastar se conservan en el Fondo de Equipo (1.er Criterio de Desempate: Eficiencia de Sombras). La racha se reinicia al ganar o empatar.'}
                           </span>
                         </div>
                       </div>
@@ -540,9 +519,16 @@ export function RoundSummaryModal({
                           {getReasonBadge(teamAReason, teamAEarned)}
                         </div>
                         <div className="flex items-center justify-between text-slate-300 font-mono text-[11px]">
-                          <span>{isEn ? 'Income this round:' : 'Ingreso esta ronda:'} <strong className="text-purple-300 font-bold">+{teamAEarned} 🌑</strong></span>
                           <span>
-                            {isEn ? 'Next Round Bank:' : 'Fondo Siguiente Ronda:'}{' '}
+                            {isFinalRound
+                              ? (isEn ? 'Unspent at match end:' : 'Sin gastar al cierre:')
+                              : (isEn ? 'Income this round:' : 'Ingreso esta ronda:')}{' '}
+                            <strong className="text-purple-300 font-bold">
+                              {isFinalRound ? `${teamAPrev} 🌑` : `+${teamAEarned} 🌑`}
+                            </strong>
+                          </span>
+                          <span>
+                            {isFinalRound ? (isEn ? 'If Overtime:' : 'Si hay Prórroga:') : (isEn ? 'Next Round Bank:' : 'Fondo Siguiente Ronda:')}{' '}
                             <strong className="text-emerald-400 font-bold text-xs">{teamATotal} 🌑</strong>
                           </span>
                         </div>
@@ -557,9 +543,16 @@ export function RoundSummaryModal({
                           {getReasonBadge(teamBReason, teamBEarned)}
                         </div>
                         <div className="flex items-center justify-between text-slate-300 font-mono text-[11px]">
-                          <span>{isEn ? 'Income this round:' : 'Ingreso esta ronda:'} <strong className="text-purple-300 font-bold">+{teamBEarned} 🌑</strong></span>
                           <span>
-                            {isEn ? 'Next Round Bank:' : 'Fondo Siguiente Ronda:'}{' '}
+                            {isFinalRound
+                              ? (isEn ? 'Unspent at match end:' : 'Sin gastar al cierre:')
+                              : (isEn ? 'Income this round:' : 'Ingreso esta ronda:')}{' '}
+                            <strong className="text-purple-300 font-bold">
+                              {isFinalRound ? `${teamBPrev} 🌑` : `+${teamBEarned} 🌑`}
+                            </strong>
+                          </span>
+                          <span>
+                            {isFinalRound ? (isEn ? 'If Overtime:' : 'Si hay Prórroga:') : (isEn ? 'Next Round Bank:' : 'Fondo Siguiente Ronda:')}{' '}
                             <strong className="text-amber-400 font-bold text-xs">{teamBTotal} 🌑</strong>
                           </span>
                         </div>

@@ -399,30 +399,23 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                 isCasual ? 'text-emerald-400' : 'text-amber-400'
               }`}>
                 {isCasual
-                  ? (isEn ? 'Compressed Scale (1–4) & Casual Synergies' : 'Escala Comprimida (1–4) y Sinergias Casual')
+                  ? (isEn ? 'Unified Scale & Synergies' : 'Escala y Sinergias Unificadas')
                   : (isEn ? 'Official Scoring & Formations' : 'Sinergias Oficiales')}
               </div>
-              {isCasual ? (
-                <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
-                  <span className="text-indigo-300 font-mono">+1/+3 {isEn ? 'Color (2/3+)' : 'Color (2/3+)'}</span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-emerald-300 font-mono">+3 {isEn ? 'Pair' : 'Pareja'}</span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-amber-300 font-mono">+4 {isEn ? 'Straight' : 'Escalera'}</span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-rose-300 font-mono">+6 {isEn ? 'Trio' : 'Trío'}</span>
-                </div>
-              ) : (
-                <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
-                  <span className="text-indigo-300 font-mono">+5 {isEn ? 'Suit' : 'Palo'}</span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-emerald-300 font-mono">+10 {isEn ? 'Pair' : 'Pareja'}</span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-amber-300 font-mono">+15 {isEn ? 'Straight' : 'Escalera'}</span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-rose-300 font-mono">+20 {isEn ? 'Trio' : 'Trío'}</span>
-                </div>
-              )}
+              <div className="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+                <span
+                  className="text-indigo-300 font-mono"
+                  title={isEn ? 'Suit (Color): +1 pt per additional card' : 'Palo (Color): +1 pt por adicional'}
+                >
+                  +1 {isEn ? 'Suit' : 'Palo'} <span className="text-[9.5px] font-normal text-indigo-400/90">({isEn ? '+1 add' : '+1 por adicional'})</span>
+                </span>
+                <span className="text-slate-600">•</span>
+                <span className="text-emerald-300 font-mono">+2 {isEn ? 'Pair' : 'Pareja'}</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-amber-300 font-mono">+4 {isEn ? 'Straight' : 'Escalera'}</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-rose-300 font-mono">+5 {isEn ? 'Trio' : 'Trío'}</span>
+              </div>
             </div>
           </div>
 
@@ -1062,27 +1055,27 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
               ))}
             </div>
 
-            {/* Simulación visual de Sinergias Rebalanceadas y Contador en Vivo (Paso 1 Casual) */}
-            {currentStep.stage === 'trump_reveal' && isCasual && (
+            {/* Simulación visual de Sinergias Unificadas y Contador en Vivo (Paso 1) */}
+            {currentStep.stage === 'trump_reveal' && (
               <div className="bg-slate-950 p-3.5 rounded-xl border border-emerald-500/40 mb-4 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-emerald-400" />
-                    {isEn ? 'Rebalanced Synergies & Live Counter Example' : 'Sinergias Rebalanceadas y Ejemplo en Contador en Vivo'}
+                    {isEn ? 'Unified Synergies & Live Counter Example (v2.1)' : 'Sinergias Unificadas y Ejemplo en Contador en Vivo (v2.1)'}
                   </span>
                   <span className="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-mono font-bold">
-                    {isEn ? 'Live Auto-Sum' : 'Suma en Vivo'}
+                    {isEn ? 'Unified Scale' : 'Escala Unificada'}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-center text-[10px]">
                   <div className="bg-slate-900/90 border border-indigo-500/40 p-2 rounded-lg">
-                    <span className="text-indigo-300 font-bold block">{isEn ? 'Color (2 / 3+)' : 'Color (2 / 3+)'}</span>
-                    <strong className="text-sm font-black font-mono text-indigo-200">+1 / +3 pts</strong>
+                    <span className="text-indigo-300 font-bold block">{isEn ? 'Suit (+1/extra)' : 'Palo (+1/extra)'}</span>
+                    <strong className="text-sm font-black font-mono text-indigo-200">+1 pt / c.</strong>
                   </div>
                   <div className="bg-slate-900/90 border border-emerald-500/40 p-2 rounded-lg">
                     <span className="text-emerald-300 font-bold block">{isEn ? 'Pair (2 eq.)' : 'Pareja (2 ig.)'}</span>
-                    <strong className="text-sm font-black font-mono text-emerald-200">+3 pts</strong>
+                    <strong className="text-sm font-black font-mono text-emerald-200">+2 pts</strong>
                   </div>
                   <div className="bg-slate-900/90 border border-amber-500/40 p-2 rounded-lg">
                     <span className="text-amber-300 font-bold block">{isEn ? 'Straight (3)' : 'Escalera (3)'}</span>
@@ -1090,11 +1083,11 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                   </div>
                   <div className="bg-slate-900/90 border border-rose-500/40 p-2 rounded-lg">
                     <span className="text-rose-300 font-bold block">{isEn ? 'Trio (3 eq.)' : 'Trío (3 ig.)'}</span>
-                    <strong className="text-sm font-black font-mono text-rose-200">+6 pts</strong>
+                    <strong className="text-sm font-black font-mono text-rose-200">+5 pts</strong>
                   </div>
                 </div>
 
-                {/* Ejemplo visual animado de Pareja (+3) en el contador en vivo */}
+                {/* Ejemplo visual animado de Pareja (+2) en el contador */}
                 <div className="bg-emerald-950/50 border border-emerald-500/40 rounded-lg p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="text-[10px] font-bold uppercase text-emerald-300">
@@ -1109,15 +1102,26 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                     </span>
                     <span className="text-slate-400 font-bold">+</span>
                     <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/50 px-2 py-0.5 rounded font-mono font-black text-[11px] animate-pulse">
-                      {isEn ? 'Pair +3 pts' : 'Pareja +3 pts'}
+                      {isEn ? 'Pair +2 pts' : 'Pareja +2 pts'}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5 bg-slate-950/90 border border-emerald-400/60 px-2.5 py-1 rounded-lg shadow">
                     <span className="text-[10px] text-slate-400 uppercase font-bold">
-                      {isEn ? 'Live Counter:' : 'Contador en Vivo:'}
+                      {isEn ? 'Total Score:' : 'Puntuación Total:'}
                     </span>
-                    <span className="text-sm font-black font-mono text-emerald-300">7 pts</span>
+                    <span className="text-sm font-black font-mono text-emerald-300">6 pts</span>
                   </div>
+                </div>
+
+                {/* Recordatorio de Desempate Nominal */}
+                <div className="bg-slate-900/80 border border-amber-500/30 rounded-lg p-2 text-[11px] text-slate-300 flex items-start gap-1.5">
+                  <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
+                  <span>
+                    <strong>{isEn ? 'Front Tiebreaker:' : 'Desempate en un Frente:'}</strong>{' '}
+                    {isEn
+                      ? 'If both teams tie in points on a front, the team with the highest nominal rank card (2 < 3 < ... < 10 < J < Q < K < A) wins the front.'
+                      : 'Si ambos equipos empatan a puntos en un frente, gana el equipo con la carta de mayor jerarquía nominal (2 < 3 < ... < 10 < J < Q < K < A).'}
+                  </span>
                 </div>
               </div>
             )}
@@ -1271,265 +1275,134 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
 
             {/* Desglose de los 3 frentes con sombras reveladas */}
             <div className="p-6 overflow-y-auto space-y-4">
-              {isCasual ? (
-                /* DESGLOSE EN MODO CASUAL (ESCALA COMPRIMIDA 1 AL 4) */
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {/* 1. FRENTE CENTRAL (CASUAL) */}
-                  <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span className="font-bold text-xs text-slate-200">
-                          {isEn ? 'Center Front' : 'Frente Central'}
-                        </span>
-                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
-                          {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
-                        </span>
-                      </div>
+              {/* DESGLOSE UNIFICADO v2.1 PARA AMBOS MODOS */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* 1. FRENTE CENTRAL */}
+                <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                      <span className="font-bold text-xs text-slate-200">
+                        {isEn ? 'Center Front' : 'Frente Central'}
+                      </span>
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
+                        {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
+                      </span>
+                    </div>
 
-                      <div className="my-3 text-center">
-                        <div className="text-2xl font-black font-mono">
-                          <span className="text-emerald-400">13</span>
-                          <span className="text-slate-600 text-sm mx-2">vs</span>
-                          <span className="text-rose-400">8</span>
-                        </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">
-                          {isEn ? 'Compressed Scale + Color (+3 vs +1)' : 'Escala Comprimida + Color (+3 vs +1)'}
-                        </div>
+                    <div className="my-3 text-center">
+                      <div className="text-2xl font-black font-mono">
+                        <span className="text-emerald-400">13</span>
+                        <span className="text-slate-600 text-sm mx-2">vs</span>
+                        <span className="text-rose-400">8</span>
                       </div>
-
-                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                        <div>
-                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
-                          {isEn
-                            ? 'K♥ (3) + Q♥ (3) + shadow 8♥ (2) + 9♥ (2) + Color 3+ Hearts (+3 pts) = '
-                            : 'K♥ (3) + Q♥ (3) + 8♥ sombra (2) + 9♥ (2) + Color 3+ Corazones (+3 pts) = '}
-                          <strong>13 pts</strong>.
-                        </div>
-                        <div>
-                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
-                          {isEn
-                            ? 'Q♦ (3) + J♥ (3) + 5♥ (1) + Color 2 Hearts (+1 pt) = '
-                            : 'Q♦ (3) + J♥ (3) + 5♥ (1) + Color 2 Corazones (+1 pto) = '}
-                          <strong>8 pts</strong>.
-                        </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {isEn ? 'Unified Scale + Hearts Suit (+3 vs +1)' : 'Escala Unificada + Color Corazones (+3 vs +1)'}
                       </div>
                     </div>
-                  </div>
 
-                  {/* 2. FRENTE IZQUIERDO (CASUAL) */}
-                  <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span className="font-bold text-xs text-slate-200">
-                          {isEn ? 'Left Front' : 'Frente Izquierdo'}
-                        </span>
-                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
-                          {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
-                        </span>
+                    <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                      <div>
+                        <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                        {isEn
+                          ? 'K♥ (3) + Q♥ (3) + shadow 8♥ (2) + 9♥ (2) + 4-Hearts (+3 pts) = '
+                          : 'K♥ (3) + Q♥ (3) + 8♥ sombra (2) + 9♥ (2) + 4 Corazones (+3 pts) = '}
+                        <strong>13 pts</strong>.
                       </div>
-
-                      <div className="my-3 text-center">
-                        <div className="text-2xl font-black font-mono">
-                          <span className="text-emerald-400">11</span>
-                          <span className="text-slate-600 text-sm mx-2">vs</span>
-                          <span className="text-rose-400">7</span>
-                        </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">
-                          {isEn ? '4-pt Ace + Diamond Color (+3)' : 'As de 4 pts + Color Diamantes (+3)'}
-                        </div>
-                      </div>
-
-                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                        <div>
-                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
-                          {isEn
-                            ? 'J♦ (3) + Your Ace A♦ (4) + 3♦ (1) + Color 3 Diamonds (+3 pts) = '
-                            : 'J♦ (3) + Tu As A♦ (4) + 3♦ (1) + Color 3 Diamantes (+3 pts) = '}
-                          <strong>11 pts</strong>.
-                        </div>
-                        <div>
-                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
-                          {isEn
-                            ? '5♦ (1) + Revealed shadow 10♦ (2) + 4♦ (1) + Color 3 Diamonds (+3 pts) = '
-                            : '5♦ (1) + Sombra 10♦ revelada (2) + 4♦ (1) + Color 3 Diamantes (+3 pts) = '}
-                          <strong>7 pts</strong>.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 3. FRENTE DERECHO (CASUAL) */}
-                  <div className="p-3.5 rounded-xl border bg-rose-950/20 border-rose-500/40 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span className="font-bold text-xs text-slate-200">
-                          {isEn ? 'Right Front' : 'Frente Derecho'}
-                        </span>
-                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-rose-500/20 text-rose-400">
-                          {isEn ? 'Team B' : 'Equipo B'}
-                        </span>
-                      </div>
-
-                      <div className="my-3 text-center">
-                        <div className="text-2xl font-black font-mono">
-                          <span className="text-emerald-400">5</span>
-                          <span className="text-slate-600 text-sm mx-2">vs</span>
-                          <span className="text-rose-400">11</span>
-                        </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">
-                          {isEn ? 'Rival 3-Spade Color (+3 vs +1)' : 'Color de 3 Picas del rival (+3 vs +1)'}
-                        </div>
-                      </div>
-
-                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                        <div>
-                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
-                          {isEn
-                            ? '10♠ (2) + 6♠ (1) + 4♣ (1) + Color 2 Spades (+1 pt) = '
-                            : '10♠ (2) + 6♠ (1) + 4♣ (1) + Color 2 Picas (+1 pto) = '}
-                          <strong>5 pts</strong>.
-                        </div>
-                        <div>
-                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
-                          {isEn
-                            ? 'K♠ (3) + 7♠ (2) + 2♣ (1) + 9♠ (2) + Color 3 Spades (+3 pts) = '
-                            : 'K♠ (3) + 7♠ (2) + 2♣ (1) + 9♠ (2) + Color 3 Picas (+3 pts) = '}
-                          <strong>11 pts</strong>.
-                        </div>
+                      <div>
+                        <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                        {isEn
+                          ? 'Q♦ (3) + J♥ (3) + 5♥ (1) + 2-Hearts (+1 pt) = '
+                          : 'Q♦ (3) + J♥ (3) + 5♥ (1) + 2 Corazones (+1 pto) = '}
+                        <strong>8 pts</strong>.
                       </div>
                     </div>
                   </div>
                 </div>
-              ) : (
-                /* DESGLOSE EN MODO COMPETITIVO */
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {/* 1. FRENTE CENTRAL */}
-                  <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span className="font-bold text-xs text-slate-200">
-                          {isEn ? 'Center Front' : 'Frente Central'}
-                        </span>
-                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
-                          {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
-                        </span>
-                      </div>
 
-                      <div className="my-3 text-center">
-                        <div className="text-2xl font-black font-mono">
-                          <span className="text-emerald-400">57</span>
-                          <span className="text-slate-600 text-sm mx-2">vs</span>
-                          <span className="text-rose-400">33</span>
-                        </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">
-                          {isEn ? 'Higher total score' : 'Mayor puntuación total'}
-                        </div>
-                      </div>
+                {/* 2. FRENTE IZQUIERDO */}
+                <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                      <span className="font-bold text-xs text-slate-200">
+                        {isEn ? 'Left Front' : 'Frente Izquierdo'}
+                      </span>
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
+                        {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
+                      </span>
+                    </div>
 
-                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                        <div>
-                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
-                          {isEn
-                            ? 'K♥ (13) + Q♥ (12) + revealed shadow 8♥ (8) + 9♥ (9) + 4-Hearts Synergy (+15 pts) = '
-                            : 'K♥ (13) + Q♥ (12) + 8♥ sombra revelada (8) + 9♥ (9) + Sinergia de 4 Corazones (+15 pts) = '}
-                          <strong>57 pts</strong>.
-                        </div>
-                        <div>
-                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
-                          {isEn
-                            ? 'Q♦ (12) + J♥ (11) + 5♥ (5) + 2-Hearts Synergy (+5 pts) = '
-                            : 'Q♦ (12) + J♥ (11) + 5♥ (5) + Sinergia 2 Corazones (+5 pts) = '}
-                          <strong>33 pts</strong>.
-                        </div>
+                    <div className="my-3 text-center">
+                      <div className="text-2xl font-black font-mono">
+                        <span className="text-emerald-400">10</span>
+                        <span className="text-slate-600 text-sm mx-2">vs</span>
+                        <span className="text-rose-400">6</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {isEn ? 'Ace (4p) + Diamonds Suit (+2 vs +2)' : 'As (4p) + Color Diamantes (+2 vs +2)'}
                       </div>
                     </div>
-                  </div>
 
-                  {/* 2. FRENTE IZQUIERDO */}
-                  <div className="p-3.5 rounded-xl border bg-emerald-950/30 border-emerald-500/40 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span className="font-bold text-xs text-slate-200">
-                          {isEn ? 'Left Front' : 'Frente Izquierdo'}
-                        </span>
-                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-emerald-500/20 text-emerald-400">
-                          {isEn ? 'Won (Team A)' : 'Ganado (Equipo A)'}
-                        </span>
+                    <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                      <div>
+                        <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                        {isEn
+                          ? 'J♦ (3) + Your Ace A♦ (4) + 3♦ (1) + 3-Diamonds (+2 pts) = '
+                          : 'J♦ (3) + Tu As A♦ (4) + 3♦ (1) + 3 Diamantes (+2 pts) = '}
+                        <strong>10 pts</strong>.
                       </div>
-
-                      <div className="my-3 text-center">
-                        <div className="text-2xl font-black font-mono">
-                          <span className="text-emerald-400">38</span>
-                          <span className="text-slate-600 text-sm mx-2">vs</span>
-                          <span className="text-rose-400">29</span>
-                        </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">
-                          {isEn ? 'Higher total score' : 'Mayor puntuación total'}
-                        </div>
-                      </div>
-
-                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                        <div>
-                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
-                          {isEn
-                            ? 'J♦ (11) + Your Ace A♦ (14) + 3♦ (3) + 3-Diamonds Synergy (+10 pts) = '
-                            : 'J♦ (11) + Tu As A♦ (14) + 3♦ (3) + Sinergia de 3 Diamantes (+10 pts) = '}
-                          <strong>38 pts</strong>.
-                        </div>
-                        <div>
-                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
-                          {isEn
-                            ? '5♦ (5) + Revealed shadow 10♦ (10) + 4♦ (4) + 3-Diamonds Synergy (+10 pts) = '
-                            : '5♦ (5) + Sombra 10♦ revelada (10) + 4♦ (4) + Sinergia 3 Diamantes (+10 pts) = '}
-                          <strong>29 pts</strong>.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 3. FRENTE DERECHO */}
-                  <div className="p-3.5 rounded-xl border bg-rose-950/20 border-rose-500/40 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                        <span className="font-bold text-xs text-slate-200">
-                          {isEn ? 'Right Front' : 'Frente Derecho'}
-                        </span>
-                        <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-rose-500/20 text-rose-400">
-                          {isEn ? 'Team B' : 'Equipo B'}
-                        </span>
-                      </div>
-
-                      <div className="my-3 text-center">
-                        <div className="text-2xl font-black font-mono">
-                          <span className="text-emerald-400">25</span>
-                          <span className="text-slate-600 text-sm mx-2">vs</span>
-                          <span className="text-rose-400">41</span>
-                        </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">
-                          {isEn ? 'Opponent spades control' : 'Control rival por picas'}
-                        </div>
-                      </div>
-
-                      <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
-                        <div>
-                          <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
-                          {isEn
-                            ? '10♠ (10) + 6♠ (6) + 4♣ (4) + 2-Spades Synergy (+5 pts) = '
-                            : '10♠ (10) + 6♠ (6) + 4♣ (4) + Sinergia de 2 Picas (+5 pts) = '}
-                          <strong>25 pts</strong>.
-                        </div>
-                        <div>
-                          <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
-                          {isEn
-                            ? 'K♠ (13) + 7♠ (7) + 2♣ (2) + 9♠ (9) + 3-Spades Synergy (+10 pts) = '
-                            : 'K♠ (13) + 7♠ (7) + 2♣ (2) + 9♠ (9) + Sinergia 3 Picas (+10 pts) = '}
-                          <strong>41 pts</strong>.
-                        </div>
+                      <div>
+                        <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                        {isEn
+                          ? '5♦ (1) + Revealed shadow 10♦ (2) + 4♦ (1) + 3-Diamonds (+2 pts) = '
+                          : '5♦ (1) + Sombra 10♦ revelada (2) + 4♦ (1) + 3 Diamantes (+2 pts) = '}
+                        <strong>6 pts</strong>.
                       </div>
                     </div>
                   </div>
                 </div>
-              )}
+
+                {/* 3. FRENTE DERECHO */}
+                <div className="p-3.5 rounded-xl border bg-rose-950/20 border-rose-500/40 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+                      <span className="font-bold text-xs text-slate-200">
+                        {isEn ? 'Right Front' : 'Frente Derecho'}
+                      </span>
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded uppercase bg-rose-500/20 text-rose-400">
+                        {isEn ? 'Team B' : 'Equipo B'}
+                      </span>
+                    </div>
+
+                    <div className="my-3 text-center">
+                      <div className="text-2xl font-black font-mono">
+                        <span className="text-emerald-400">5</span>
+                        <span className="text-slate-600 text-sm mx-2">vs</span>
+                        <span className="text-rose-400">10</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {isEn ? 'Rival 3-Spade Suit (+2 vs +1)' : 'Color de 3 Picas del rival (+2 vs +1)'}
+                      </div>
+                    </div>
+
+                    <div className="text-[11px] text-slate-300 space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800">
+                      <div>
+                        <strong className="text-emerald-400">{isEn ? 'Team A:' : 'Equipo A:'}</strong>{' '}
+                        {isEn
+                          ? '10♠ (2) + 6♠ (1) + 4♣ (1) + 2-Spades (+1 pt) = '
+                          : '10♠ (2) + 6♠ (1) + 4♣ (1) + 2 Picas (+1 pto) = '}
+                        <strong>5 pts</strong>.
+                      </div>
+                      <div>
+                        <strong className="text-rose-400">{isEn ? 'Team B:' : 'Equipo B:'}</strong>{' '}
+                        {isEn
+                          ? 'K♠ (3) + 7♠ (2) + 2♣ (1) + 9♠ (2) + 3-Spades (+2 pts) = '
+                          : 'K♠ (3) + 7♠ (2) + 2♣ (1) + 9♠ (2) + 3 Picas (+2 pts) = '}
+                        <strong>10 pts</strong>.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               {/* Escala Oficial de Puntos de Ronda (1, 2 y 3 Puntos) */}
               <div className="bg-slate-950/90 border border-amber-500/35 p-3.5 rounded-xl text-xs space-y-2.5">
@@ -1563,7 +1436,7 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <span className="font-bold text-emerald-300 text-sm flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-emerald-400" />
-                      {isEn ? 'Casual Mode End-of-Round & Tiebreaker Rules:' : 'Reglas de Fin de Ronda y Desempate en Modo Casual:'}
+                      {isEn ? 'Casual Mode End-of-Round & Tiebreaker Rules (v2.1):' : 'Reglas de Fin de Ronda y Desempates en Modo Casual (v2.1):'}
                     </span>
                     <span className="text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded font-mono font-bold uppercase">
                       {isEn ? 'Direct 2-Round Overtime' : 'Prórroga Directa de 2 Rondas'}
@@ -1571,33 +1444,62 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                   </div>
                   <p className="text-slate-300 leading-relaxed">
                     {isEn
-                      ? '• No Cumulative Points: In Casual Mode, front scores are NOT summed across rounds for tie-breaking. If Round Points are tied at the end of the agreed rounds (4, 6, or 8), the match goes directly into a 2-Round Overtime!'
-                      : '• Sin Puntos Acumulados: En el Modo Casual NO se registran ni usan las sumas de puntos de los frentes entre rondas para desempatar. Si al terminar las rondas pares acordadas (4, 6 u 8) hay empate en Puntos de Ronda, ¡la partida entra directamente en una Prórroga de 2 rondas!'}
+                      ? '• Direct Overtime on Match Tie: Front scores are NOT accumulated across rounds. If total Round Points are tied after the regulation rounds (4, 6, or 8), the match is decided directly in a 2-Round Overtime!'
+                      : '• Prórroga Directa en Empate de Partida: En Modo Casual NO se acumulan las sumas de puntos de los frentes. Si hay empate final en Puntos de Ronda tras las rondas reglamentarias (4, 6 u 8), ¡se juega directamente una Prórroga de 2 rondas!'}
                   </p>
                   <p className="text-slate-300 leading-relaxed">
                     {isEn
-                      ? '• Personal Shadow Renewal: Every player automatically receives 1 fresh personal Shadow Marker at the start of the next round (non-cumulative).'
-                      : '• Renovación de Sombra Personal: Al comenzar la siguiente ronda, cada jugador vuelve a recibir automáticamente 1 Marcador de Sombra personal (no acumulable).'}
+                      ? '• 1 Personal Shadow Renewal: Every player receives exactly 1 fresh personal Shadow Marker at the start of each round (intransferible and non-cumulative).'
+                      : '• Renovación de Sombra Personal: Cada jugador recibe exactamente 1 Marcador de Sombra personal al inicio de cada ronda (intransferible y no acumulable).'}
+                  </p>
+                  <p className="text-slate-300 leading-relaxed">
+                    {isEn
+                      ? '• Front Tiebreaker (Nominal Hierarchy): If both teams tie in points on a front, the team holding the single card of highest nominal rank (2 < 3 < ... < 10 < J < Q < K < A) wins the front.'
+                      : '• Desempate en Frente (Jerarquía Nominal): Si empatan a puntos en un frente, gana el equipo con la carta de mayor jerarquía nominal (2 < 3 < ... < 10 < J < Q < K < A).'}
                   </p>
                 </div>
               ) : (
                 <>
-                  {/* Explicación de los Puntos Acumulados */}
-                  <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                    <div>
-                      <span className="font-bold text-slate-200 block text-sm">
-                        {isEn ? 'Total Round Cumulative Points:' : 'Puntos Acumulados Totales de la Ronda:'}
+                  {/* Criterios Oficiales de Desempate v2.1 (Sin Puntos Acumulados) */}
+                  <div className="bg-slate-950/80 border border-amber-500/40 p-4 rounded-xl space-y-2.5 text-xs">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <span className="font-bold text-amber-300 text-sm flex items-center gap-2">
+                        <Flame className="w-4 h-4 text-amber-400" />
+                        {isEn ? 'Official Match Tiebreaker Rules (v2.1):' : 'Criterios Oficiales de Desempate de Partida (v2.1):'}
                       </span>
-                      <span className="text-slate-400">
-                        {isEn
-                          ? 'Numerical scores across all fronts are summed to break overall match ties.'
-                          : 'Se suman las puntuaciones numéricas de todos los frentes para resolver posibles desempates globales de partida.'}
+                      <span className="text-[10px] bg-amber-950/80 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded font-mono font-bold uppercase">
+                        {isEn ? 'Shadow Efficiency' : 'Eficiencia de Sombras'}
                       </span>
                     </div>
-                    <div className="font-mono font-bold text-base text-right shrink-0">
-                      <span className="text-emerald-400">{isEn ? 'Team A: 120 pts' : 'Equipo A: 120 pts'}</span>
-                      <span className="text-slate-600 mx-2">/</span>
-                      <span className="text-rose-400">{isEn ? 'Team B: 103 pts' : 'Equipo B: 103 pts'}</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300">
+                      <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                        <strong className="text-amber-300 block mb-1">
+                          {isEn ? '1st Tiebreaker: Shadow Efficiency' : '1.er Criterio: Eficiencia de Sombras'}
+                        </strong>
+                        <p className="text-[11px] leading-snug">
+                          {isEn
+                            ? 'If Round Points are tied at match end, victory goes to the team with MORE unspent Shadow Markers in their Team Pool!'
+                            : 'Si hay empate en Puntos de Ronda al terminar la partida, ¡gana el equipo que conserve MÁS Marcadores de Sombra sin gastar en su Fondo de Equipo!'}
+                        </p>
+                      </div>
+                      <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                        <strong className="text-amber-300 block mb-1">
+                          {isEn ? '2nd Tiebreaker: 2-Round Overtime' : '2.º Criterio: Prórroga de 2 Rondas'}
+                        </strong>
+                        <p className="text-[11px] leading-snug">
+                          {isEn
+                            ? 'If teams are still tied in unspent Shadow Markers, a 2-Round Overtime is played to break the tie.'
+                            : 'Si también empatan en Marcadores de Sombra en reserva, se disputa una Prórroga de 2 Rondas adicionales.'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-[11px] text-slate-400 bg-black/40 p-2 rounded-lg border border-slate-800 flex items-center gap-2">
+                      <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                      <span>
+                        {isEn
+                          ? 'Front ties are broken by Highest Nominal Rank (2 < 3 < ... < 10 < J < Q < K < A). Front numerical points are no longer accumulated for match tiebreakers!'
+                          : 'Los empates en un frente se resuelven por Jerarquía Nominal (2 < 3 < ... < 10 < J < Q < K < A). ¡Ya no se usan sumas de frentes para desempatar partidas!'}
+                      </span>
                     </div>
                   </div>
 
@@ -1699,46 +1601,46 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                 <div className="flex items-start gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEn ? '1. Rebalanced Compressed Scale (1–4) & Synergies:' : '1. Escala Comprimida Rebalanceada (1 al 4) y Sinergias:'}</strong>{' '}
+                    <strong>{isEn ? '1. Unified Tactical Scale (1–4) & Synergies:' : '1. Escala Táctica Unificada (1 al 4) y Sinergias:'}</strong>{' '}
                     {isEn
-                      ? '2–6 = 1 pt, 7–10 = 2 pts, J–K = 3 pts, Ace = 4 pts. Color (same suit): 2 cards = +1 pt / 3+ cards = +3 pts max, Pair = +3 pts, Straight = +4 pts, Trio = +6 pts.'
-                      : '2–6 = 1 pto, 7–10 = 2 pts, J–K = 3 pts, As = 4 pts. Color (mismo palo): 2 cartas = +1 pto / 3+ cartas = +3 pts máx., Pareja = +3 pts, Escalera = +4 pts, Trío = +6 pts.'}
+                      ? '2–6 = 1 pt, 7–10 = 2 pts, J–K = 3 pts, Ace = 4 pts. Suit: +1 pt per extra card, Pair = +2 pts, Straight = +4 pts, Trio = +5 pts (cancels Pair).'
+                      : '2–6 = 1 pto, 7–10 = 2 pts, J–K = 3 pts, As = 4 pts. Palo: +1 pto por carta extra, Pareja = +2 pts, Escalera = +4 pts, Trío = +5 pts (anula Pareja).'}
                   </span>
                 </div>
                 <div className="flex items-start gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEn ? '2. Live Score Counter on Each Front:' : '2. Contador de Puntos en Vivo en Cada Frente:'}</strong>{' '}
+                    <strong>{isEn ? '2. Front Tiebreaker (Nominal Hierarchy):' : '2. Desempate en un Frente (Jerarquía Nominal):'}</strong>{' '}
                     {isEn
-                      ? 'Displays your real allied score (including allied shadows) and visible rival score automatically. Enemy shadows stay hidden until Revelation.'
-                      : 'Muestra automáticamente tu suma real aliada (incluyendo tus sombras) y la suma visible del rival. Las sombras enemigas no suman hasta la Revelación.'}
+                      ? 'Ties in points are won by the team holding the highest nominal card rank (2 < 3 < ... < 10 < J < Q < K < A).'
+                      : 'Los empates a puntos los gana el equipo con la carta de mayor jerarquía nominal (2 < 3 < ... < 10 < J < Q < K < A).'}
                   </span>
                 </div>
                 <div className="flex items-start gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEn ? '3. 1 Fixed Personal Shadow per Player/Round:' : '3. 1 Carta Sombra Fija por Jugador y Ronda:'}</strong>{' '}
+                    <strong>{isEn ? '3. 1 Fixed Shadow per Player (Modification 1):' : '3. 1 Sombra Fija por Jugador (Modificación 1):'}</strong>{' '}
                     {isEn
-                      ? 'Personal, non-transferable, and non-cumulative across rounds (silently shown to teammates when played).'
-                      : 'Personal, intransferible y no acumulable entre rondas (mostrada en silencio a tus compañeros al jugarse).'}
+                      ? 'Personal, non-transferable, and non-cumulative across rounds (no shared pool or economy).'
+                      : 'Personal, intransferible y no acumulable entre rondas (sin fondo de equipo ni economía posronda).'}
                   </span>
                 </div>
                 <div className="flex items-start gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEn ? '4. 20s Turn Clock & Automatic Deployment:' : '4. Turno de 20s y Despliegue Automático:'}</strong>{' '}
+                    <strong>{isEn ? '4. 20s Turn Clock & Auto-Play (Modification 2):' : '4. Turno Fijo de 20s y Auto-Play (Modificación 2):'}</strong>{' '}
                     {isEn
-                      ? 'If the 20s timer hits 00:00, the round is NOT lost: the 1st card in hand is played face up into the valid front with the fewest cards.'
-                      : 'Si el reloj de 20s llega a 00:00, NO se pierde la ronda: se juega automáticamente la 1ª carta boca arriba en el frente válido con menos cartas.'}
+                      ? 'If the 20s timer hits 00:00, auto-plays the 1st card in hand face-up into the valid front with fewest cards.'
+                      : 'Si el reloj de 20s llega a 00:00, el sistema juega automáticamente la 1ª carta boca arriba en el frente válido con menos cartas.'}
                   </span>
                 </div>
                 <div className="flex items-start gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <span>
-                    <strong>{isEn ? '5. Direct 2-Round Overtime Tiebreaker:' : '5. Desempate Final Directo por Prórroga de 2 Rondas:'}</strong>{' '}
+                    <strong>{isEn ? '5. Direct 2-Round Overtime (Modification 3):' : '5. Desempate Directo por Prórroga (Modificación 3):'}</strong>{' '}
                     {isEn
-                      ? 'No cumulative front scores across rounds. Ties in Round Points go directly into a 2-round Overtime!'
-                      : 'Sin puntos acumulados entre rondas. Cualquier empate final en Puntos de Ronda va directo a una Prórroga de 2 rondas.'}
+                      ? 'No cumulative front scores across rounds. Tied matches go directly into a 2-Round Overtime!'
+                      : 'Sin puntos acumulados entre rondas. Si hay empate final en Puntos de Ronda, ¡se disputa una Prórroga directa de 2 rondas!'}
                   </span>
                 </div>
               </div>
@@ -1749,62 +1651,62 @@ export function InteractiveTutorial({ initialTutorialMode = 'competitive', onBac
                   <span>
                     <strong>{isEn ? '1, 2 & 3 Round Points System:' : 'Sistema de 1, 2 y 3 Puntos de Ronda:'}</strong>{' '}
                     {isEn
-                      ? 'Tie in the round (+1 pt for EACH team), Standard Victory of 2 fronts (+2 pts), and Full Sweep / "Pleno" of all 3 fronts (+3 pts).'
-                      : 'Empate en la ronda (+1 pt para CADA equipo), Victoria estándar al ganar 2 frentes (+2 pts) y Dominio Total / "Pleno" al ganar los 3 frentes (+3 pts).'}
+                      ? 'Tie in the round (+1 pt each), Standard Victory of 2 fronts (+2 pts), and Full Sweep of all 3 fronts (+3 pts).'
+                      : 'Empate en la ronda (+1 pt c/u), Victoria estándar al ganar 2 frentes (+2 pts) y Dominio Total al ganar los 3 frentes (+3 pts).'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>
-                    <strong>{isEn ? 'Formations & Synergies:' : 'Formaciones y Sinergias:'}</strong>{' '}
+                    <strong>{isEn ? 'Unified Tactical Scale (1–4):' : 'Escala Táctica Unificada (1 al 4):'}</strong>{' '}
                     {isEn
-                      ? 'Suit (+5), Pair (+10), Short Straight (+15), and Trio (+20) deepen strategic play.'
-                      : 'Palo (+5), Pareja (+10), Escalera Corta (+15) y Trío (+20) aportan máxima profundidad estratégica.'}
+                      ? 'Low Cards (2–6) = 1 pt, Medium Cards (7–10) = 2 pts, Face Cards (J, Q, K) = 3 pts, Ace = 4 pts.'
+                      : 'Cartas Bajas (2–6) = 1 pto, Cartas Medias (7–10) = 2 pts, Figuras (J, Q, K) = 3 pts, As = 4 pts.'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>
-                    <strong>{isEn ? 'Suit Synergies in 2v2:' : 'Sinergias de Palo en 2v2:'}</strong>{' '}
+                    <strong>{isEn ? 'Formation Synergies:' : 'Formaciones y Sinergias:'}</strong>{' '}
                     {isEn
-                      ? '+5 points for each repeated suit card deployed in a front.'
-                      : '+5 puntos por cada carta repetida del mismo palo en un frente.'}
+                      ? 'Suit (+1 per additional card), Pair (+2), Short Straight (+4), and Trio (+5, cancels Pair).'
+                      : 'Palo (+1 pto por carta extra), Pareja (+2), Escalera Corta (+4) y Trío (+5, anula Pareja).'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>
-                    <strong>{isEn ? 'Shadow Marker:' : 'Marcador de Sombra:'}</strong>{' '}
+                    <strong>{isEn ? 'Front Tiebreaker (Nominal Hierarchy):' : 'Desempate en Frente (Jerarquía Nominal):'}</strong>{' '}
                     {isEn
-                      ? 'Concealed deployment from rivals (visible to your own team with a purple border), bluffing opponents and coordinating team plays.'
-                      : 'Despliegue oculto para rivales (visible para tu equipo con borde morado), engañando al enemigo y coordinando jugadas aliadas.'}
+                      ? 'Ties in points are resolved by the highest nominal rank card (2 < 3 < ... < 10 < J < Q < K < A).'
+                      : 'Empates a puntos se resuelven por la carta de mayor jerarquía nominal (2 < 3 < ... < 10 < J < Q < K < A).'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>
-                    <strong>{isEn ? 'Shadow Economy:' : 'Economía de Sombras:'}</strong>{' '}
+                    <strong>{isEn ? 'Match Tiebreaker by Shadow Efficiency:' : 'Desempate de Partida por Eficiencia de Sombras:'}</strong>{' '}
                     {isEn
-                      ? 'Start with 0 markers in R1. Earn +1 on win, +2 on loss (+3 on 2+ loss streak), and +1 on tie in 2v2. Continuous saving across rounds.'
-                      : 'Inician con 0 marcadores en R1. Cobran +1 al ganar, +2 al perder (+3 en racha de 2+ derrotas) y +1 en empate en 2v2. Ahorro acumulativo continuo.'}
+                      ? '1st: Team with more unspent Shadow Markers in pool wins (no cumulative points). 2nd: 2-Round Overtime.'
+                      : '1.er Criterio: Gana el equipo con más Sombras sin gastar en su Fondo (sin puntos acumulados). 2.º Criterio: Prórroga de 2 Rondas.'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>
-                    <strong>{isEn ? 'Tactical Discard:' : 'Descarte Táctico:'}</strong>{' '}
+                    <strong>{isEn ? 'Shadow Economy (Shared Pool):' : 'Economía de Sombras (Fondo Compartido):'}</strong>{' '}
                     {isEn
-                      ? 'Placing low cards into secure or conceded sectors to boost cumulative tie-breaker points.'
-                      : 'Colocar cartas bajas en frentes perdidos o ganados para sumar puntos acumulados.'}
+                      ? 'Start with 0 in R1. Earn +1 on win, +2 on loss (+3 on 2+ defeat streak), and +1 on tie in 2v2. Carry over across rounds.'
+                      : 'Inician con 0 en R1. Cobran +1 al ganar, +2 al perder (+3 en racha de 2+ derrotas) y +1 en empate en 2v2. Ahorro continuo.'}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 text-slate-200">
                   <Check className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>
-                    <strong>{isEn ? 'Cumulative Points:' : 'Puntos Acumulados:'}</strong>{' '}
+                    <strong>{isEn ? 'Dual Team Clock & Flag Fall (00:00):' : 'Reloj Dual de Equipo y Caída de Bandera (00:00):'}</strong>{' '}
                     {isEn
-                      ? 'Break overall match ties when round points are drawn.'
-                      : 'Deciden el desempate global de la contienda.'}
+                      ? 'Clock switches on each card played. 00:00 timeout causes automatic round loss awarding +2 pts (or +3) to opponent.'
+                      : 'El reloj conmuta en cada jugada. Agotar 00:00 provoca derrota automática de ronda dando +2 pts (o +3) al rival.'}
                   </span>
                 </div>
               </div>

@@ -53,12 +53,12 @@ export const MATCH_TYPES = {
   competitive: {
     id: 'competitive',
     name: 'Modo Competitivo',
-    subtitle: 'Escala Oficial • Economía de Sombras • Reloj Dual',
+    subtitle: 'Escala Táctica Unificada (1-4) • Fondo de Sombras • Reloj Dual',
   },
   casual: {
     id: 'casual',
     name: 'Modo Casual (Party / Amigos)',
-    subtitle: 'Escala Comprimida (1-4) • 1 Sombra/Jug • 20s/Turno',
+    subtitle: '1 Sombra Fija/Jugador • Turno de 20s • Prórroga Directa',
   },
 };
 
@@ -68,39 +68,54 @@ export function getLocalizedMatchTypes(lang = 'es') {
     competitive: {
       id: 'competitive',
       name: isEn ? 'Competitive Mode' : 'Modo Competitivo',
-      badge: isEn ? 'Official Tournament' : 'Torneo Oficial',
-      subtitle: isEn ? 'Official Scale (2-14) • Shadow Economy • Dual Team Clock' : 'Escala Oficial (2-14) • Economía de Sombras • Reloj Dual',
+      badge: isEn ? 'Official Standard Base' : 'Base Estándar Oficial',
+      subtitle: isEn ? 'Unified Tactical Scale (1-4) • Shadow Pool • Dual Clock' : 'Escala Táctica Unificada (1-4) • Fondo de Sombras • Reloj Dual',
       description: isEn
-        ? 'Nominal card values (2-14) and +5/+10/+15/+20 synergies. Shared team shadow economy across rounds, dual chess clock, and cumulative score tiebreaker.'
-        : 'Valores nominales (2-14) y sinergias +5/+10/+15/+20. Fondo de sombras compartido con ahorro entre rondas, reloj dual de equipo y desempate por puntos acumulados.',
+        ? 'Unified Tactical Scale (2-6: 1 pt | 7-10: 2 pts | J-K: 3 pts | A: 4 pts) and synergies (Suit +1/extra, Pair +2, Straight +4, Trio +5). Shared team Shadow Pool across rounds, dual team clock, and tiebreaker by Shadow Efficiency.'
+        : 'Escala Táctica Unificada (2-6: 1 pt | 7-10: 2 pts | J-K: 3 pts | A: 4 pts) y sinergias (Palo +1/carta extra, Pareja +2, Escalera +4, Trío +5). Fondo de Sombras de equipo con ahorro entre rondas, reloj dual y desempate por Eficiencia de Sombras.',
     },
     casual: {
       id: 'casual',
       name: isEn ? 'Casual Mode (Party / Friends)' : 'Modo Casual (Party / Amigos)',
-      badge: isEn ? 'Fast Count & Live Score' : 'Conteo Rápido y Puntos en Vivo',
-      subtitle: isEn ? 'Compressed Scale (1-4) • Live Front Score • 1 Shadow/Player • 20s/Turn' : 'Escala Comprimida (1-4) • Marcador en Vivo • 1 Sombra/Jug • 20s/Turno',
+      badge: isEn ? '3 Exclusive Adjustments' : '3 Ajustes Exclusivos',
+      subtitle: isEn ? '1 Fixed Shadow/Player • 20s/Turn • Direct Overtime' : '1 Sombra Fija/Jug • Turno de 20s • Prórroga Directa',
       description: isEn
-        ? 'Simplified 1-4 card values and rebalanced synergies (Color +1/+3, Pair +3, Straight +4, Trio +6) with live real-time front score counters. 1 personal shadow per player/round, 20s individual turn timer (auto-play on timeout), and direct 2-round overtime tiebreaker.'
-        : 'Escala simplificada (1-4 pts) y sinergias rebalanceadas (Color +1/+3, Pareja +3, Escalera +4, Trío +6) con contador de puntos en vivo en cada frente. 1 sombra fija por jugador/ronda, turno individual de 20s (despliegue automático si se agota) y desempate directo por prórroga.',
+        ? 'Uses the exact same rules, phases, and scoring of Competitive Mode, applying only 3 adjustments: (1) 1 fixed personal Shadow Marker per player/round (non-cumulative), (2) Fixed 20s turn timer (auto-play on timeout), and (3) Direct 2-round overtime on final tie.'
+        : 'Utiliza exactamente las mismas reglas, fases y puntuación del Modo Competitivo, aplicando únicamente 3 modificaciones: (1) 1 Sombra Individual Fija por jugador/ronda (no acumulable), (2) Tiempo fijo de 20s por jugada (auto-play si se agota) y (3) Desempate directo a Prórroga de 2 rondas.',
     },
   };
 }
 
 /**
- * Obtiene el valor base de una carta en el Modo Casual ("Escala Comprimida"):
- * - Cartas del 2 al 6 = 1 punto
- * - Cartas del 7 al 10 = 2 puntos
+ * Obtiene el Valor Base en puntos de una carta en la Escala Táctica Unificada v2.1 (Todos los Modos):
+ * - Cartas Bajas (del 2 al 6) = 1 punto
+ * - Cartas Medias (del 7 al 10) = 2 puntos
  * - Figuras (J, Q, K) = 3 puntos
  * - As (A) = 4 puntos
+ * Nota: El valor nominal (`card.base`: 2 al 14) se conserva intacto para formar Escaleras,
+ * Parejas/Tríos y resolver automáticamente cualquier empate a puntos en un frente.
  */
-export function getCardCasualBase(cardOrBase) {
-  const base = typeof cardOrBase === 'object' ? (cardOrBase?.base || 0) : Number(cardOrBase || 0);
+export function getCardTacticalBase(cardOrBase) {
+  let base = 0;
+  if (typeof cardOrBase === 'object' && cardOrBase !== null) {
+    if (cardOrBase.base != null) {
+      base = Number(cardOrBase.base);
+    } else if (cardOrBase.rank != null) {
+      const match = CARD_VALUES.find(cv => cv.rank === cardOrBase.rank);
+      base = match ? match.base : 0;
+    }
+  } else {
+    base = Number(cardOrBase || 0);
+  }
   if (base >= 2 && base <= 6) return 1;
   if (base >= 7 && base <= 10) return 2;
   if (base >= 11 && base <= 13) return 3;
   if (base === 14) return 4;
   return 0;
 }
+
+// Alias de retrocompatibilidad para módulos que importan getCardCasualBase
+export const getCardCasualBase = getCardTacticalBase;
 
 /**
  * Determina el frente válido (no saturado) con menor cantidad total de cartas
@@ -563,23 +578,23 @@ export function findShortStraights(cardValues) {
 }
 
 /**
- * Calcula el desglose de puntuación de un equipo en un frente según el reglamento oficial v1.6 / v2.0.
- * Soporta tanto el Modo Competitivo como el Modo Casual ("Escala Comprimida"):
+ * Calcula el desglose de puntuación de un equipo en un frente según el Reglamento Oficial v2.1
+ * (Escala Táctica Unificada para TODOS los Modos: Competitivo, 1v1 y Casual):
  *
- * MODO COMPETITIVO (`gameMode === 'competitive'`):
- * - Valor base: 2 al 10 nominal, J=11, Q=12, K=13, A=14
- * - Sinergia de Palo: +5 Puntos (por cada carta adicional del mismo palo en el frente, a partir de 2)
- * - Pareja: +10 Puntos (2 cartas del mismo valor)
- * - Escalera Corta: +15 Puntos (3 cartas consecutivas)
- * - Trío: +20 Puntos (3 cartas del mismo valor; anula la bonificación de Pareja de esas mismas cartas)
- *
- * MODO CASUAL (`gameMode === 'casual'` - Escala Comprimida Rebalanceada):
- * - Valor base: 2-6 = 1 pt, 7-10 = 2 pts, J/Q/K = 3 pts, As (A) = 4 pts
- * - Color (Mismo palo): +1 punto al juntar exactamente 2 cartas del mismo palo, y +3 puntos totales (bonificación máxima) al alcanzar 3 o más cartas del mismo palo en el frente
- * - Pareja (2 cartas del mismo valor nominal): +3 puntos
- * - Escalera Corta (3 cartas de valor nominal consecutivo): +4 puntos
- * - Trío (3 cartas del mismo valor nominal): +6 puntos (anula la bonificación de Pareja de esas mismas cartas)
- * - Desempate en un Frente: carta individual de mayor jerarquía nominal (2 < 3 < ... < K < A)
+ * ESCALA TÁCTICA UNIFICADA (Todos los Modos):
+ * - Valor Base de las Cartas:
+ *   - Cartas Bajas (2, 3, 4, 5, 6): 1 punto
+ *   - Cartas Medias (7, 8, 9, 10): 2 puntos
+ *   - Figuras (J, Q, K): 3 puntos
+ *   - As (A): 4 puntos
+ * - Bonificaciones por Sinergia en un Frente:
+ *   - Sinergia de Palo (Color): +1 punto por cada carta adicional del mismo palo jugada por el mismo
+ *     equipo en ese frente (2 cartas = +1 pt, 3 cartas = +2 pts, 4 cartas = +3 pts, etc., sin límite máximo)
+ *   - Pareja (2 cartas del mismo valor nominal): +2 puntos
+ *   - Escalera Corta (3 cartas de valor nominal consecutivo): +4 puntos
+ *   - Trío (3 cartas del mismo valor nominal): +5 puntos (anula automáticamente la bonificación de Pareja de esas mismas cartas)
+ * - Desempate en un Frente (Jerarquía Nominal):
+ *   - Carta individual de mayor jerarquía nominal (2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < 10 < J < Q < K < A)
  *
  * @param {Array} cards - Lista de cartas del equipo en ese frente
  * @param {boolean|string} countShadowsOrTrump - Si booleano: cuenta sombras; si string (antiguo trumpSuit): retrocompatibilidad
@@ -610,7 +625,6 @@ export function calculateFrontScore(
   } else if (fifthParam === 'casual' || fifthParam === 'competitive') {
     gameMode = fifthParam;
   }
-  const isCasual = gameMode === 'casual';
 
   // Filtrar cartas activas; nunca contabilizar cartas censuradas ('?' o base <= 0)
   const activeCards = (cards || []).filter(
@@ -624,7 +638,7 @@ export function calculateFrontScore(
   const activeValues = [];
 
   activeCards.forEach(card => {
-    const cardPoints = isCasual ? getCardCasualBase(card.base) : card.base;
+    const cardPoints = getCardTacticalBase(card.base);
     baseTotal += cardPoints;
     if (card.base > highestBaseCard) {
       highestBaseCard = card.base;
@@ -635,23 +649,13 @@ export function calculateFrontScore(
     activeValues.push(card.base);
   });
 
-  // 1. Sinergia de palo / Color
-  // Competitivo: +5 pts por cada carta adicional del mismo palo (count >= 2 => (count - 1) * 5)
-  // Casual: Color (Mismo palo): +1 punto al juntar exactamente 2 cartas del mismo palo, y +3 puntos totales (bonificación máxima) al alcanzar 3 o más cartas del mismo palo en el frente
+  // 1. Sinergia de Palo (Color) — Todos los modos (Escala Unificada v2.1):
+  // +1 punto por cada carta adicional del mismo palo en el frente (2=+1, 3=+2, 4=+3, 5=+4..., sin tope máximo)
   let suitSynergyTotal = 0;
   const synergiesBySuit = {};
   Object.entries(suitCounts).forEach(([suit, count]) => {
-    if (isCasual) {
-      if (count >= 2) {
-        const bonus = count >= 3 ? 3 : 1;
-        suitSynergyTotal += bonus;
-        synergiesBySuit[suit] = {
-          count,
-          bonus,
-        };
-      }
-    } else if (count >= 2) {
-      const bonus = (count - 1) * 5;
+    if (count >= 2) {
+      const bonus = count - 1;
       suitSynergyTotal += bonus;
       synergiesBySuit[suit] = {
         count,
@@ -660,9 +664,9 @@ export function calculateFrontScore(
     }
   });
 
-  // 2. Parejas (Competitivo: +10 pts / Casual: +3 pts) y Tríos (Competitivo: +20 pts / Casual: +6 pts; anula Pareja)
-  const pairBonusValue = isCasual ? 3 : 10;
-  const trioBonusValue = isCasual ? 6 : 20;
+  // 2. Parejas (+2 pts) y Tríos (+5 pts; anula la Pareja de esas mismas cartas) — Todos los modos (Escala Unificada v2.1)
+  const pairBonusValue = 2;
+  const trioBonusValue = 5;
   let pairTotal = 0;
   let trioTotal = 0;
   const pairs = [];
@@ -695,8 +699,8 @@ export function calculateFrontScore(
     }
   });
 
-  // 3. Escalera Corta (Competitivo: +15 pts / Casual: +4 pts por 3 cartas consecutivas)
-  const straightBonusValue = isCasual ? 4 : 15;
+  // 3. Escalera Corta (+4 pts por 3 cartas de valor nominal consecutivo) — Todos los modos (Escala Unificada v2.1)
+  const straightBonusValue = 4;
   const straightTriplets = findShortStraights(activeValues);
   const straights = straightTriplets.map(triplet => {
     const isAceLow = triplet.includes(14) && triplet.includes(2) && triplet.includes(3);
@@ -825,7 +829,6 @@ export function sortFrontCards(cards = [], isRevealed = false) {
  */
 export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es', gameMode = 'competitive') {
   const isEn = lang === 'en';
-  const isCasual = gameMode === 'casual';
   const activeCards = (cards || []).filter(
     c => c && (isRevealed || !c.isShadow) && !c.isHidden && c.rank !== '?' && Number(c.base) > 0
   );
@@ -855,7 +858,7 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
     partnerSets[c.id] = new Set();
   });
 
-  // 1. Sinergias de Palo / Color (Competitivo: >=2 cartas; Casual: 2 cartas = +1 pt, 3+ cartas = +3 pts totales)
+  // 1. Sinergias de Palo (Color) — Todos los modos (v2.1): +1 pt por cada carta adicional del mismo palo
   const minSuitCards = 2;
   Object.entries(frontScore.synergiesBySuit || {}).forEach(([suit, data]) => {
     if (data.count >= minSuitCards) {
@@ -870,9 +873,7 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
           item.suitCount = data.count;
           item.suitBonus = data.bonus;
           item.synergyDescriptions.push(
-            isCasual
-              ? (isEn ? `Color ${suitName} (${data.count}) +${data.bonus}` : `Color ${suitName} (${data.count}) +${data.bonus}`)
-              : `${suitName} x${data.count}`
+            isEn ? `Suit ${suitName} (${data.count}) +${data.bonus}` : `Palo ${suitName} (${data.count}) +${data.bonus}`
           );
           suitCardIds.forEach(id => {
             if (id !== c.id) partnerSets[c.id].add(id);
@@ -882,47 +883,88 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
     }
   });
 
-  // 2. Tríos
-  (frontScore.trios || []).forEach(trio => {
-    const trioCards = activeCards.filter(c => c.base === trio.base);
-    const trioCardIds = trioCards.map(c => c.id);
-    trioCards.forEach(c => {
-      const item = cardSynergies[c.id];
-      if (item) {
-        item.inTrio = true;
-        item.trioRank = trio.rank;
-        item.synergyDescriptions.push(
-          isEn ? `Trio of ${trio.rank}s (+${trio.bonus})` : `Trío de ${trio.rank}s (+${trio.bonus})`
-        );
-        trioCardIds.forEach(id => {
-          if (id !== c.id) partnerSets[c.id].add(id);
-        });
-      }
-    });
+  // 2 y 3. Tríos (+5 pts) y Parejas (+2 pts) con Regla de Exclusión Mutua:
+  // Si hay 3 iguales => 1 trío (+5) y 0 parejas (NO +7).
+  // Si hay 5 iguales => 1 trío (+5) y 1 pareja (+2) (Total +7).
+  // Agrupamos cartas activas por valor nominal (base) y asignamos secuencialmente
+  // primero a los tríos (grupos de 3) y luego a las parejas (grupos de 2 con las restantes).
+  const cardsByBase = {};
+  activeCards.forEach(c => {
+    const base = Number(c.base);
+    if (!cardsByBase[base]) cardsByBase[base] = [];
+    cardsByBase[base].push(c);
   });
 
-  // 3. Parejas (excluyendo cartas ya asignadas a un trío)
-  (frontScore.pairs || []).forEach(pair => {
-    const pairCards = activeCards.filter(c => c.base === pair.base && !cardSynergies[c.id]?.inTrio);
-    const pairCardIds = pairCards.map(c => c.id);
-    pairCards.forEach(c => {
-      const item = cardSynergies[c.id];
-      if (item) {
-        item.inPair = true;
-        item.pairRank = pair.rank;
-        item.synergyDescriptions.push(
-          isEn ? `Pair of ${pair.rank}s (+${pair.bonus})` : `Pareja de ${pair.rank}s (+${pair.bonus})`
-        );
-        pairCardIds.forEach(id => {
-          if (id !== c.id) partnerSets[c.id].add(id);
-        });
-      }
-    });
+  Object.entries(cardsByBase).forEach(([baseStr, sameRankCards]) => {
+    const base = Number(baseStr);
+    const count = sameRankCards.length;
+    const rankLabel = getRankLabel(base);
+    const numTrios = Math.floor(count / 3);
+    const remainingAfterTrios = count % 3;
+    const numPairs = Math.floor(remainingAfterTrios / 2);
+
+    let cardIdx = 0;
+    // Asignar cartas a Tríos (+5 pts)
+    for (let i = 0; i < numTrios; i++) {
+      const trioCards = sameRankCards.slice(cardIdx, cardIdx + 3);
+      cardIdx += 3;
+      const trioCardIds = trioCards.map(c => c.id);
+      trioCards.forEach(c => {
+        const item = cardSynergies[c.id];
+        if (item) {
+          item.inTrio = true;
+          item.trioRank = rankLabel;
+          item.synergyDescriptions.push(
+            isEn ? `Trio of ${rankLabel}s (+5)` : `Trío de ${rankLabel}s (+5)`
+          );
+          trioCardIds.forEach(id => {
+            if (id !== c.id) partnerSets[c.id].add(id);
+          });
+        }
+      });
+    }
+
+    // Asignar cartas a Parejas (+2 pts) solo con las restantes
+    for (let i = 0; i < numPairs; i++) {
+      const pairCards = sameRankCards.slice(cardIdx, cardIdx + 2);
+      cardIdx += 2;
+      const pairCardIds = pairCards.map(c => c.id);
+      pairCards.forEach(c => {
+        const item = cardSynergies[c.id];
+        if (item) {
+          item.inPair = true;
+          item.pairRank = rankLabel;
+          item.synergyDescriptions.push(
+            isEn ? `Pair of ${rankLabel}s (+2)` : `Pareja de ${rankLabel}s (+2)`
+          );
+          pairCardIds.forEach(id => {
+            if (id !== c.id) partnerSets[c.id].add(id);
+          });
+        }
+      });
+    }
   });
 
-  // 4. Escaleras Cortas (3 cartas consecutivas)
+  // 4. Escaleras Cortas (+4 pts por 3 cartas consecutivas)
+  const usedForStraights = new Set();
   (frontScore.straights || []).forEach(straight => {
-    const straightCards = activeCards.filter(c => straight.values.includes(c.base));
+    const straightCards = [];
+    for (const val of straight.values) {
+      const match = activeCards.find(c => Number(c.base) === Number(val) && !usedForStraights.has(c.id));
+      if (match) {
+        straightCards.push(match);
+        usedForStraights.add(match.id);
+      }
+    }
+    if (straightCards.length < straight.values.length) {
+      straight.values.forEach(val => {
+        const fallback = activeCards.find(c => Number(c.base) === Number(val));
+        if (fallback && !straightCards.includes(fallback)) {
+          straightCards.push(fallback);
+        }
+      });
+    }
+
     const straightCardIds = straightCards.map(c => c.id);
     straightCards.forEach(c => {
       const item = cardSynergies[c.id];
@@ -974,7 +1016,11 @@ export function analyzeCardSynergies(cards = [], isRevealed = false, lang = 'es'
 }
 
 /**
- * Resuelve el ganador de un frente entre Equipo A y Equipo B
+ * Resuelve el ganador de un frente entre Equipo A y Equipo B según el Reglamento Oficial v2.1:
+ * 1º Mayor puntuación total (Base 1-4 + Sinergias +1/+2/+4/+5).
+ * 2º En caso de empate a puntos en el frente, gana quien tenga la carta individual de mayor
+ *    jerarquía nominal (2 < 3 < 4 < 5 < 6 < 7 < 8 < 9 < 10 < J < Q < K < A).
+ * 3º Si empatan también en carta máxima nominal, el frente se declara Nulo.
  */
 export function resolveFrontWinner(
   teamACards,
@@ -1004,10 +1050,18 @@ export function resolveFrontWinner(
   const isEn = lang === 'en';
 
   if (teamACalc.total > teamBCalc.total) {
-    return { winner: 'teamA', reason: isEn ? 'Higher total score' : 'Mayor puntuación total' };
+    return {
+      winner: 'teamA',
+      wonByTiebreaker: false,
+      reason: isEn ? 'Higher total score' : 'Mayor puntuación total',
+    };
   }
   if (teamBCalc.total > teamACalc.total) {
-    return { winner: 'teamB', reason: isEn ? 'Higher total score' : 'Mayor puntuación total' };
+    return {
+      winner: 'teamB',
+      wonByTiebreaker: false,
+      reason: isEn ? 'Higher total score' : 'Mayor puntuación total',
+    };
   }
 
   // Empate en puntuación: Criterio oficial de la carta individual de mayor jerarquía nominal (2 < 3 < ... < K < A)
@@ -1016,20 +1070,30 @@ export function resolveFrontWinner(
   if (teamACalc.highestBaseCard > teamBCalc.highestBaseCard) {
     return {
       winner: 'teamA',
+      wonByTiebreaker: true,
+      tiebreakerWinnerRank: rankA,
+      tiebreakerLoserRank: rankB,
       reason: isEn
-        ? `Tie-breaker by highest nominal card (${rankA} vs ${rankB})`
-        : `Desempate por carta más alta (${rankA} vs ${rankB})`
+        ? `Nominal tiebreaker: highest card (${rankA} vs ${rankB})`
+        : `Desempate nominal por carta alta (${rankA} vs ${rankB})`,
     };
   }
   if (teamBCalc.highestBaseCard > teamACalc.highestBaseCard) {
     return {
       winner: 'teamB',
+      wonByTiebreaker: true,
+      tiebreakerWinnerRank: rankB,
+      tiebreakerLoserRank: rankA,
       reason: isEn
-        ? `Tie-breaker by highest nominal card (${rankB} vs ${rankA})`
-        : `Desempate por carta más alta (${rankB} vs ${rankA})`
+        ? `Nominal tiebreaker: highest card (${rankB} vs ${rankA})`
+        : `Desempate nominal por carta alta (${rankB} vs ${rankA})`,
     };
   }
 
   // Empate absoluto: Frente Nulo
-  return { winner: 'tie', reason: isEn ? 'Void front due to exact tie' : 'Frente Nulo por empate exacto' };
+  return {
+    winner: 'tie',
+    wonByTiebreaker: false,
+    reason: isEn ? 'Void front due to exact tie' : 'Frente Nulo por empate exacto',
+  };
 }

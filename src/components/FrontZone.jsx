@@ -122,10 +122,10 @@ export function FrontZone({
   function renderSynergyChips(score, side) {
     const chips = [];
 
-    // Tríos
+    // Tríos (+5 pts en Escala Unificada v2.1)
     (score.trios || []).forEach((trio, idx) => {
       const isHovered = hoveredSynergyFilter?.side === side && hoveredSynergyFilter?.type === 'trio' && hoveredSynergyFilter?.value === trio.base;
-      const bonusVal = trio.bonus ?? (isCasual ? 6 : 20);
+      const bonusVal = trio.bonus ?? 5;
       chips.push(
         <span
           key={`trio-${trio.base}-${idx}`}
@@ -138,15 +138,15 @@ export function FrontZone({
           }`}
           title={isEn ? `Trio of ${trio.rank}s (+${bonusVal} pts)` : `Trío de ${trio.rank}s (+${bonusVal} pts)`}
         >
-          <span>✦ {isEn ? 'Trio' : 'Trío'} {trio.rank}{isCasual ? ` (+${bonusVal})` : ''}</span>
+          <span>✦ {isEn ? 'Trio' : 'Trío'} {trio.rank} (+{bonusVal})</span>
         </span>
       );
     });
 
-    // Parejas
+    // Parejas (+2 pts en Escala Unificada v2.1)
     (score.pairs || []).forEach((pair, idx) => {
       const isHovered = hoveredSynergyFilter?.side === side && hoveredSynergyFilter?.type === 'pair' && hoveredSynergyFilter?.value === pair.base;
-      const bonusVal = pair.bonus ?? (isCasual ? 3 : 10);
+      const bonusVal = pair.bonus ?? 2;
       chips.push(
         <span
           key={`pair-${pair.base}-${idx}`}
@@ -159,15 +159,15 @@ export function FrontZone({
           }`}
           title={isEn ? `Pair of ${pair.rank}s (+${bonusVal} pts)` : `Pareja de ${pair.rank}s (+${bonusVal} pts)`}
         >
-          <span>👥 {isEn ? 'Pair' : 'Par'} {pair.rank}{isCasual ? ` (+${bonusVal})` : ''}</span>
+          <span>👥 {isEn ? 'Pair' : 'Par'} {pair.rank} (+{bonusVal})</span>
         </span>
       );
     });
 
-    // Escaleras
+    // Escaleras Cortas (+4 pts en Escala Unificada v2.1)
     (score.straights || []).forEach((straight, idx) => {
       const isHovered = hoveredSynergyFilter?.side === side && hoveredSynergyFilter?.type === 'straight' && hoveredSynergyFilter?.value === straight.label;
-      const bonusVal = straight.bonus ?? (isCasual ? 4 : 15);
+      const bonusVal = straight.bonus ?? 4;
       chips.push(
         <span
           key={`straight-${straight.label}-${idx}`}
@@ -180,19 +180,19 @@ export function FrontZone({
           }`}
           title={isEn ? `Straight ${straight.label} (+${bonusVal} pts)` : `Escalera ${straight.label} (+${bonusVal} pts)`}
         >
-          <span>⚡ {isEn ? 'Str' : 'Esc'} {straight.label}{isCasual ? ` (+${bonusVal})` : ''}</span>
+          <span>⚡ {isEn ? 'Str' : 'Esc'} {straight.label} (+{bonusVal})</span>
         </span>
       );
     });
 
-    // Sinergias de Palo / Color
+    // Sinergias de Palo (Color: +1 pt por carta adicional en Escala Unificada v2.1)
     const minSuitCountForBonus = 2;
     Object.entries(score.synergiesBySuit || {}).forEach(([suit, data]) => {
       if (data.count >= minSuitCountForBonus) {
         const isRed = suit === 'hearts' || suit === 'diamonds';
         const isHovered = hoveredSynergyFilter?.side === side && hoveredSynergyFilter?.type === 'suit' && hoveredSynergyFilter?.value === suit;
         const suitSymbol = SUITS[suit]?.symbol || suit;
-        const suitBonus = data.bonus ?? (isCasual ? (data.count >= 3 ? 3 : 1) : (data.count - 1) * 5);
+        const suitBonus = data.bonus ?? (data.count - 1);
         chips.push(
           <span
             key={`suit-${suit}`}
@@ -203,14 +203,10 @@ export function FrontZone({
                 ? 'bg-stone-800 text-amber-200 border-amber-300 scale-105 shadow-md ring-1 ring-amber-300'
                 : 'bg-black/60 text-slate-300 border-amber-500/25 hover:border-amber-400/50'
             }`}
-            title={
-              isCasual
-                ? `${getLocalizedSuits(language)[suit]?.name || SUITS[suit]?.name || suit} x${data.count} (+${suitBonus} pts Color)`
-                : `${getLocalizedSuits(language)[suit]?.name || SUITS[suit]?.name || suit} x${data.count}`
-            }
+            title={`${getLocalizedSuits(language)[suit]?.name || SUITS[suit]?.name || suit} x${data.count} (+${suitBonus} pts)`}
           >
             <span className={isRed ? 'text-rose-400' : 'text-slate-200'}>
-              {suitSymbol}x{data.count}{isCasual ? ` (+${suitBonus})` : ''}
+              {suitSymbol}x{data.count} (+{suitBonus})
             </span>
           </span>
         );

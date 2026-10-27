@@ -96,7 +96,7 @@ export function ScoreBoard({
           </div>
         </div>
 
-        {/* Marcador Principal de Puntos de Ronda y Puntos Acumulados */}
+        {/* Marcador Principal de Puntos de Ronda (Sin Papel — v2.1) */}
         <div className="flex items-center gap-4 bg-black/60 border border-amber-500/25 rounded-2xl px-4 py-1.5 shadow-inner">
           {/* Puntos de Ronda (1 / 2 / 3 Pts) */}
           <div className="text-center" title={ui.game.scoreboard.roundPointsTooltip}>
@@ -109,23 +109,6 @@ export function ScoreBoard({
               <span className="text-rose-400">{teamBRoundPoints}</span>
             </div>
           </div>
-
-          {/* Puntos Acumulados (Exclusivo Modo Competitivo) */}
-          {!isCasual && (
-            <>
-              <div className="h-7 w-px bg-amber-500/20" />
-              <div className="text-center">
-                <span className="text-[9px] uppercase font-serif font-bold text-amber-200/60 tracking-wider">
-                  {ui.game.scoreboard.accumulated}
-                </span>
-                <div className="text-xs sm:text-sm font-serif font-bold text-slate-300 leading-none mt-0.5">
-                  <span className="text-emerald-300">{teamACumulativePoints}</span>
-                  <span className="text-amber-500/40 mx-1">/</span>
-                  <span className="text-rose-300">{teamBCumulativePoints}</span>
-                </div>
-              </div>
-            </>
-          )}
         </div>
 
 

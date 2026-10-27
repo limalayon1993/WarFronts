@@ -93,25 +93,25 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Welcome to the Casual Mode (Party) Tutorial!'
         : '¡Bienvenido al Tutorial del Modo Casual (Party / Amigos)!',
       subtitle: isEn
-        ? 'Guided Instruction: Compressed Scale, Live Score & 20s Turn Clock'
-        : 'Instrucción Guiada: Escala Comprimida, Puntos en Vivo y Turno de 20s',
+        ? 'Guided Instruction: Unified Tactical Scale & 3 Casual Modifications'
+        : 'Instrucción Guiada: Escala Táctica Unificada y las 3 Modificaciones Casual',
       instructor: isEn ? 'Instructor Commander' : 'Comandante Instructor',
       content: isEn
         ? [
-            'Welcome to Casual Mode (Party / Friends) — Official Rulebook v2.0 (Chapter 9). This mode keeps the full tactical essence of WarFronts (3 fronts, 1v1 to 4v4, continuous deck, and 1/2/3 Round Points) while eliminating mental math and complex resource tracking!',
-            '1. Rebalanced Compressed Scale (1 to 4 pts): Cards 2–6 = 1 pt, Cards 7–10 = 2 pts, Face Cards (J, Q, K) = 3 pts, and Ace (A) = 4 pts.',
-            '2. Rebalanced Synergies: Color (same suit) = +1 pt for 2 cards and +3 total pts (max) for 3+ cards, Pair = +3 pts, Short Straight (3 consecutive cards) = +4 pts, and Trio = +6 pts (cancels Pair).',
-            '3. Real-Time Live Score on Fronts: Each front displays the live score of both teams automatically so you never have to do mental math.',
-            '4. 1 Fixed Shadow per Player & 20s Turn Clock: Every player receives 1 personal Shadow Marker per round, and each turn has a fixed 20-second timer with automatic deployment if time runs out.',
+            'Welcome to Casual Mode (Party / Friends) — Official Rulebook v2.1 (Chapter 9). This mode uses the exact same Unified Tactical Scale and scoring as Competitive Mode, but with 3 exclusive modifications to eliminate resource tracking and keep matches fast and light!',
+            '1. Unified Tactical Scale (1 to 4 pts): Cards 2–6 = 1 pt, Cards 7–10 = 2 pts, Face Cards (J, Q, K) = 3 pts, and Ace (A) = 4 pts. Synergies: Suit (Color) = +1 pt per additional card, Pair = +2 pts, Short Straight = +4 pts, and Trio = +5 pts (cancels Pair).',
+            '2. 1 Fixed Shadow per Player (Modification 1): No team shadow pool or post-round income; every player receives exactly 1 personal Shadow Marker per round (personal, non-transferable, non-cumulative).',
+            '3. 20s Individual Turn Clock (Modification 2): No dual chess clock; each player has 20 seconds. If time expires, the system auto-plays the first available card in hand face-up into the valid front with fewest cards.',
+            '4. Direct 2-Round Overtime (Modification 3): No shadow reserve tiebreaker; if total Round Points are tied at match end, you go directly into a 2-Round Overtime!',
           ]
         : [
-            'Bienvenido al Modo Casual (Party / Amigos) — Reglamento Oficial v2.0 (Capítulo 9). Este modo conserva toda la esencia táctica de Frentes de Guerra (3 frentes, 1v1 a 4v4, mazo continuo y escala de 1/2/3 Puntos de Ronda), eliminando el cálculo mental pesado y la gestión económica compleja.',
-            '1. Escala Comprimida Rebalanceada (1 a 4 pts): Cartas del 2 al 6 = 1 pto, Cartas del 7 al 10 = 2 pts, Figuras (J, Q, K) = 3 pts y As (A) = 4 pts.',
-            '2. Sinergias Rebalanceadas: Color (mismo palo) = +1 pto al juntar 2 cartas y +3 pts totales (máximo) al alcanzar 3 o más cartas, Pareja = +3 pts, Escalera Corta (3 consecutivas) = +4 pts y Trío = +6 pts (anula Pareja).',
-            '3. Contador de Puntos en Vivo: Cada frente muestra en tiempo real la suma automática de puntos de ambos equipos para evitar cualquier cálculo mental.',
-            '4. 1 Sombra Fija por Jugador y Turno de 20s: Cada jugador recibe 1 Marcador de Sombra personal por ronda y dispone de 20 segundos fijos por turno con despliegue automático si se agota el tiempo.',
+            'Bienvenido al Modo Casual (Party / Amigos) — Reglamento Oficial v2.1 (Capítulo 9). Este modo comparte la misma Escala Táctica Unificada y reglas de puntuación que el Modo Competitivo, pero con 3 modificaciones exclusivas para agilizar la partida sin gestión compleja.',
+            '1. Escala Táctica Unificada (1 al 4 pts): Cartas del 2 al 6 = 1 pto, Cartas del 7 al 10 = 2 pts, Figuras (J, Q, K) = 3 pts y As (A) = 4 pts. Sinergias: Palo (Color) = +1 pto por cada carta adicional, Pareja = +2 pts, Escalera Corta = +4 pts y Trío = +5 pts (anula Pareja).',
+            '2. 1 Sombra Fija por Jugador (Modificación 1): Sin fondo de equipo ni ingresos posronda; cada jugador recibe exactamente 1 Marcador de Sombra personal por ronda (intransferible y no acumulable).',
+            '3. Reloj Fijo de 20s por Turno (Modificación 2): Sin reloj dual; 20 segundos por jugada. Si se agota el tiempo, el sistema ejecuta auto-play colocando tu primera carta boca arriba en el frente válido con menos cartas.',
+            '4. Desempate Directo por Prórroga (Modificación 3): Sin desempate por sombras; si hay empate final en Puntos de Ronda, se disputa directamente una Prórroga de 2 rondas.',
           ],
-      buttonText: isEn ? 'Learn the Compressed Scale' : 'Ver Escala Comprimida y Sinergias',
+      buttonText: isEn ? 'Learn Unified Scale & Synergies' : 'Ver Escala Unificada y Sinergias',
     },
 
     // PASO 1: ESCALA COMPRIMIDA Y CONTADOR EN VIVO
@@ -120,24 +120,24 @@ export function getCasualTutorialSteps(lang = 'es') {
       type: 'dialog',
       stage: 'trump_reveal',
       title: isEn
-        ? '1. Rebalanced Synergies & Live Score Counters'
-        : '1. Sinergias Rebalanceadas y Contador de Puntos en Vivo',
+        ? '1. Unified Tactical Scale & Live Score Counters'
+        : '1. Escala Táctica Unificada y Contador de Puntos en Vivo',
       subtitle: isEn
-        ? 'Color (+1/+3), Pair (+3), Straight (+4), Trio (+6) & Live Counter'
-        : 'Color (+1/+3), Pareja (+3), Escalera (+4), Trío (+6) y Marcador en Vivo',
+        ? 'Suit (+1/extra), Pair (+2), Straight (+4), Trio (+5) & Nominal Tiebreaker'
+        : 'Palo (+1/extra), Pareja (+2), Escalera (+4), Trío (+5) y Desempate Nominal',
       instructor: isEn ? 'Instructor Commander' : 'Comandante Instructor',
       content: isEn
         ? [
-            'Base Card Values (1 to 4): Every card displays a green badge (1p, 2p, 3p, 4p) with its Casual base value: 2–6 = 1 pt | 7–10 = 2 pts | J, Q, K = 3 pts | Ace (A) = 4 pts.',
-            'Color Synergy (+1 / +3 pts): Gathering exactly 2 cards of the same suit in a front grants +1 pt, and reaching 3 OR MORE cards of the same suit grants +3 total points (maximum flat suit bonus)!',
-            'Formation Synergies: Pair (2 equal ranks) now grants +3 pts (e.g. two 8s = 2p + 2p + 3 Pair = 7 pts on the live counter!) | Short Straight (3 consecutive ranks) = +4 pts | Trio (3 equal ranks) = +6 pts (cancels Pair).',
-            'Real-Time Live Score & Shadow Security: Each front shows your team\'s REAL total (including your own team\'s Shadow Cards, which teammates know) and the rival\'s VISIBLE total (counting only face-up rival cards). Enemy Shadow Cards do NOT add points to the public counter until Revelation at the end of the round!',
+            'Unified Base Card Values (1 to 4): Every card displays a badge with its tactical base value: 2–6 = 1 pt | 7–10 = 2 pts | J, Q, K = 3 pts | Ace (A) = 4 pts.',
+            'Unified Synergies: Suit (Color) = +1 pt per additional card of the same suit (2 cards = +1 pt, 3 cards = +2 pts, 4 cards = +3 pts, scaling linearly with no cap) | Pair = +2 pts | Short Straight (3 consecutive ranks) = +4 pts | Trio (3 equal ranks) = +5 pts (cancels Pair).',
+            'Nominal Hierarchy Front Tiebreaker: If both teams tie in total points on a front, the front is won by the team holding the single card of highest nominal rank (2 < 3 < ... < 10 < J < Q < K < A). If both share the exact same highest rank, the front is declared Void (Nulo).',
+            'Real-Time Live Score & Shadow Security: Each front shows your team\'s REAL total (including your team\'s Shadow Cards) and the rival\'s VISIBLE total (counting only face-up rival cards). Enemy Shadow Cards NEVER add points to the public counter until Revelation at the end of the round!',
           ]
         : [
-            'Valores Base de las Cartas (1 al 4): Cada carta muestra una insignia verde (1p, 2p, 3p, 4p) con su valor en Modo Casual: 2 al 6 = 1 pto | 7 al 10 = 2 pts | J, Q, K = 3 pts | As (A) = 4 pts.',
-            'Sinergia de Color (+1 / +3 pts): Juntar exactamente 2 cartas del mismo palo en un frente otorga +1 punto, ¡y alcanzar 3 O MÁS cartas del mismo palo otorga +3 puntos totales (bonificación única y máxima)!',
-            'Sinergias de Formación: Pareja (2 iguales) ahora suma +3 pts en el contador en vivo (ej. dos 8s = 2p + 2p + 3 Pareja = ¡7 pts!) | Escalera Corta (3 consecutivas) = +4 pts | Trío (3 iguales) = +6 pts (anula la Pareja).',
-            'Contador en Vivo y Seguridad de Sombras: Cada frente muestra en tiempo real el Total Real Aliado (incluyendo vuestras propias Cartas Sombra, conocidas por el equipo) y los Puntos Visibles del Rival. ¡Las Cartas Sombra enemigas NO suman en el marcador público hasta la Fase de Revelación!',
+            'Valores Base de las Cartas (1 al 4): Cada carta muestra una insignia con su valor táctico base: 2 al 6 = 1 pto | 7 al 10 = 2 pts | J, Q, K = 3 pts | As (A) = 4 pts.',
+            'Sinergias Unificadas: Sinergia de Palo (Color) = +1 pto por cada carta adicional del mismo palo (2 cartas = +1 pto, 3 cartas = +2 pts, 4 cartas = +3 pts, escalando sin tope) | Pareja = +2 pts | Escalera Corta (3 consecutivas) = +4 pts | Trío = +5 pts (anula Pareja).',
+            'Desempate en un Frente (Jerarquía Nominal): Si ambos equipos empatan en puntos en un frente, gana quien tenga la carta individual de mayor jerarquía nominal (2 < 3 < ... < 10 < J < Q < K < A). Si empatan en la carta más alta, el frente queda Nulo.',
+            'Contador en Vivo y Seguridad de Sombras: Cada frente muestra en tiempo real el Total Real Aliado (incluyendo vuestras Cartas Sombra) y los Puntos Visibles del Rival. ¡Las Cartas Sombra enemigas NUNCA suman en el marcador público hasta la Revelación!',
           ],
       buttonText: isEn ? 'View Personal Shadow Rule' : 'Ver Regla de 1 Sombra Personal',
     },
@@ -207,22 +207,22 @@ export function getCasualTutorialSteps(lang = 'es') {
       requiredCardId: 'card-kh',
       requiredFrontKey: 'center',
       requireShadow: false,
-      title: isEn ? 'Turn 1 (20s Clock): Compressed Scale Opening' : 'Turno 1 (Reloj 20s): Apertura con Escala Comprimida',
+      title: isEn ? 'Turn 1 (20s Clock): Unified Scale Opening' : 'Turno 1 (Reloj 20s): Apertura con Escala Unificada',
       actionPrompt: isEn
         ? 'Select your King of Hearts (K♥ = 3 pts) and deploy it to the Center Front.'
         : 'Selecciona tu Rey de Corazones (K♥ = 3 pts) y despliégalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'In Casual Mode, all Face Cards (J, Q, K) are worth 3 base points (notice the "3p" badge on K♥). Opening in the Center with K♥ puts your team ahead 3 to 0 on the live counter and starts building toward Hearts Color (+1 pt at 2 Hearts, +3 pts at 3+ Hearts).'
-        : 'En el Modo Casual, todas las Figuras (J, Q, K) valen 3 puntos base (fíjate en la insignia "3p" de tu K♥). Abrir en el Centro con K♥ coloca el contador en vivo 3 a 0 a vuestro favor e inicia el camino hacia el Color de Corazones (+1 pto con 2 cartas y +3 pts con 3 o más).',
+        ? 'All Face Cards (J, Q, K) are worth 3 base points ("3p" badge). Opening in the Center with K♥ puts your team ahead 3 to 0 on the live counter and starts building toward Hearts Color (+1 pt per additional Heart).'
+        : 'Todas las Figuras (J, Q, K) valen 3 puntos base (fíjate en la insignia "3p" de tu K♥). Abrir en el Centro con K♥ coloca el contador en vivo 3 a 0 a vuestro favor e inicia el camino hacia el Color de Corazones (+1 pto por cada carta adicional).',
       whyNotOthers: isEn
         ? [
-            { cardLabel: '4 of Clubs (4♣ = 1p)', reason: 'Cards 2 to 6 are worth only 1 point in Casual Mode.' },
-            { cardLabel: 'Ace of Diamonds (A♦ = 4p)', reason: 'The Ace is worth 4 points (the highest base value). Save it for a decisive front!' },
+            { cardLabel: '4 of Clubs (4♣ = 1p)', reason: 'Cards 2 to 6 are worth only 1 point in the Unified Scale.' },
+            { cardLabel: 'Ace of Diamonds (A♦ = 4p)', reason: 'The Ace is worth 4 points (highest base value). Save it for a decisive front!' },
             { cardLabel: '10♠ (2p) & 8♥ (2p)', reason: 'Cards 7 to 10 are worth 2 points. Better to save 8♥ for your personal Shadow play!' },
           ]
         : [
-            { cardLabel: '4 de Tréboles (4♣ = 1p)', reason: 'Las cartas del 2 al 6 valen solo 1 punto en la Escala Comprimida.' },
-            { cardLabel: 'As de Diamantes (A♦ = 4p)', reason: 'El As vale 4 puntos (el valor máximo en Modo Casual). ¡Resérvalo para decidir otro frente!' },
+            { cardLabel: '4 de Tréboles (4♣ = 1p)', reason: 'Las cartas del 2 al 6 valen solo 1 punto en la Escala Táctica Unificada.' },
+            { cardLabel: 'As de Diamantes (A♦ = 4p)', reason: 'El As vale 4 puntos (el valor máximo). ¡Resérvalo para decidir otro frente!' },
             { cardLabel: '10♠ (2p) y 8♥ (2p)', reason: 'Las cartas del 7 al 10 valen 2 puntos. ¡Guardaremos el 8♥ para jugarlo con tu Sombra personal!' },
           ],
     },
@@ -243,8 +243,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Rival B1 plays Queen of Diamonds (Q♦ = 3 pts) on the Center Front.'
         : 'Rival B1 juega la Reina de Diamantes (Q♦ = 3 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'In Casual Mode, Q♦ is also worth 3 base points. Look at the Center Front live counter: it automatically updates to 3 vs 3!'
-        : 'En Modo Casual, la Q♦ también vale 3 puntos base. Mira el contador en vivo del Frente Central: ¡se actualiza automáticamente a 3 vs 3!',
+        ? 'In the Unified Scale, Q♦ is also worth 3 base points. Look at the Center Front live counter: it automatically updates to 3 vs 3!'
+        : 'En la Escala Unificada, la Q♦ también vale 3 puntos base. Mira el contador en vivo del Frente Central: ¡se actualiza automáticamente a 3 vs 3!',
       whyNotOthers: isEn
         ? 'Even though the score is 3 vs 3, remember that front ties are broken by highest nominal card hierarchy (K♥ beats Q♦).'
         : 'Aunque el marcador en vivo indique 3 vs 3, recuerda que en caso de empate en un frente gana quien tenga la carta de mayor jerarquía nominal (tu K♥ supera a su Q♦).',
@@ -264,19 +264,19 @@ export function getCasualTutorialSteps(lang = 'es') {
       card: { id: 'card-qh', suit: 'hearts', rank: 'Q', base: 12 },
       frontKey: 'center',
       asShadow: false,
-      title: isEn ? "Ally A2's Turn: 2-Card Color (+1 pt) & Preparing +3!" : 'Turno de Aliado A2: ¡Color de 2 Cartas (+1 pto) y Camino al +3!',
+      title: isEn ? "Ally A2's Turn: 2-Card Color (+1 pt)!" : 'Turno de Aliado A2: ¡Color de 2 Cartas (+1 pto)!',
       actionSummary: isEn
         ? 'Ally A2 plays Queen of Hearts (Q♥ = 3 pts) on the Center Front.'
         : 'Aliado A2 juega la Reina de Corazones (Q♥ = 3 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'A2 adds Q♥ (3 pts) to your K♥ (3 pts). With 2 Hearts on the front, your team activates the first tier of Casual Color (+1 pt), bringing the live counter to 3 + 3 + 1 = 7 pts vs 3! And when you add a 3rd Heart, Color will jump to +3 total points!'
-        : 'A2 suma su Q♥ (3 pts) a tu K♥ (3 pts). ¡Al juntar exactamente 2 Corazones en el frente, activáis el primer escalón de Color (+1 pto), subiendo el marcador en vivo a 3 + 3 + 1 = 7 pts vs 3! Y al añadir el 3er Corazón, ¡el Color subirá al máximo de +3 puntos totales!',
+        ? 'A2 adds Q♥ (3 pts) to your K♥ (3 pts). With 2 Hearts on the front, your team activates Color (+1 pt for 1 additional Heart), bringing the live counter to 3 + 3 + 1 = 7 pts vs 3!'
+        : 'A2 suma su Q♥ (3 pts) a tu K♥ (3 pts). ¡Al juntar 2 Corazones en el frente, activáis el Color (+1 pto por 1 carta adicional), subiendo el marcador en vivo a 3 + 3 + 1 = 7 pts vs 3!',
       whyNotOthers: isEn
-        ? 'Having 2 Hearts on the table already grants +1 pt and sets up your next turn to complete the 3rd Heart (+3 pts total).'
-        : 'Tener 2 Corazones en mesa ya os da +1 pto de Color y deja listo el frente para que en tu próximo turno pongas el 3er Corazón (+3 pts totales).',
+        ? 'Having 2 Hearts on the table already grants +1 pt and sets up your next turn to add more Hearts (+1 pt per additional card).'
+        : 'Tener 2 Corazones en mesa ya os da +1 pto de Color y deja listo el frente para que sigáis sumando Corazones (+1 pto por cada carta extra).',
       tacticalInsight: isEn
-        ? 'Rebalanced Casual Color Rule: 2 cards of the same suit = +1 pt | 3 or more cards of the same suit = +3 total bonus points (max)!'
-        : 'Regla Rebalanceada de Color en Modo Casual: 2 cartas del mismo palo = +1 pto | 3 o más cartas del mismo palo = ¡+3 puntos totales (bonificación máxima)!',
+        ? 'Unified Color Rule: +1 point per additional card of the same suit played by the team on that front.'
+        : 'Regla Unificada de Color: +1 punto por cada carta adicional del mismo palo jugada por el equipo en ese frente.',
     },
 
     // PASO 6: TURNO 4 - RIVAL B2
@@ -319,16 +319,16 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Select your Ten of Spades (10♠ = 2 pts) and deploy it to the Right Front.'
         : 'Selecciona tu Diez de Picas (10♠ = 2 pts) y despliégalo en el Frente Derecho.',
       whyThisCard: isEn
-        ? 'Cards from 7 to 10 are worth 2 base points ("2p") in Casual Mode. Playing 10♠ on the Right Front puts you right behind the rival (2 vs 3 pts) while keeping your 8♥ for the Center Color combo (+3 pts) and your A♦ (4p) for the Left Front!'
-        : 'Las cartas del 7 al 10 valen 2 puntos base ("2p") en Modo Casual. Jugar el 10♠ en el Frente Derecho te deja muy cerca del rival (2 vs 3 pts), reservando tu 8♥ para alcanzar el Color máximo (+3 pts) en el Centro y tu A♦ (4p) para la Izquierda.',
+        ? 'Cards from 7 to 10 are worth 2 base points ("2p"). Playing 10♠ on the Right Front puts you right behind the rival (2 vs 3 pts) while keeping your 8♥ for the Center Color combo and your A♦ (4p) for the Left Front!'
+        : 'Las cartas del 7 al 10 valen 2 puntos base ("2p"). Jugar el 10♠ en el Frente Derecho te deja muy cerca del rival (2 vs 3 pts), reservando tu 8♥ para el Color en el Centro y tu A♦ (4p) para la Izquierda.',
       whyNotOthers: isEn
         ? [
             { cardLabel: 'Ace of Diamonds (A♦ = 4p)', reason: 'Save your 4-point Ace to dominate the Left Front!' },
-            { cardLabel: '8 of Hearts (8♥ = 2p)', reason: 'We need 8♥ in the Center to reach 3 Hearts and trigger the +3 max Color bonus!' },
+            { cardLabel: '8 of Hearts (8♥ = 2p)', reason: 'We need 8♥ in the Center to extend the Hearts Color bonus!' },
           ]
         : [
             { cardLabel: 'As de Diamantes (A♦ = 4p)', reason: '¡Guarda tu As de 4 puntos para dominar el Frente Izquierdo!' },
-            { cardLabel: '8 de Corazones (8♥ = 2p)', reason: '¡Necesitamos el 8♥ en el Centro para llegar a 3 Corazones y activar el Color máximo (+3 pts)!' },
+            { cardLabel: '8 de Corazones (8♥ = 2p)', reason: '¡Necesitamos el 8♥ en el Centro para ampliar el Color de Corazones!' },
           ],
     },
 
@@ -354,8 +354,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'B1 has two different suits (Q♦ and J♥), so they do not get the +1 Color bonus yet.'
         : 'B1 tiene dos palos distintos (Q♦ y J♥), por lo que no suma el +1 de Color.',
       tacticalInsight: isEn
-        ? 'Now it is time to break the Center wide open with your personal Shadow Card and 3-Heart Color (+3 pts)!'
-        : '¡Ahora ampliaremos la ventaja en el Centro con tu Carta Sombra personal y el Color de 3 Corazones (+3 pts)!',
+        ? 'Now it is time to break the Center wide open with your personal Shadow Card and extend the Hearts Color bonus!'
+        : '¡Ahora ampliaremos la ventaja en el Centro con tu Carta Sombra personal y sumaremos más Color de Corazones!',
     },
 
     // PASO 9: TURNO 7 - ALIADO A2
@@ -377,8 +377,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'A2 opens the Left Front with J♦ (3 pts), giving your team a 3 vs 0 lead on the Left live counter.'
         : 'A2 abre el Frente Izquierdo con su J♦ (3 pts), poniendo el contador en vivo de la Izquierda 3 a 0 a vuestro favor.',
       whyNotOthers: isEn
-        ? 'Opening Diamonds on the Left prepares a future Diamond Color combo (+1 / +3 pts) with your Ace of Diamonds!'
-        : 'Abrir con Diamantes en la Izquierda prepara una futura sinergia de Color de Diamantes (+1 / +3 pts) con tu As de Diamantes.',
+        ? 'Opening Diamonds on the Left prepares a future Diamond Color synergy (+1 pt per additional card) with your Ace of Diamonds!'
+        : 'Abrir con Diamantes en la Izquierda prepara una futura sinergia de Color de Diamantes (+1 pto por cada carta extra) con tu As de Diamantes.',
       tacticalInsight: isEn
         ? 'Look at all 3 live counters: Left (3 vs 0), Center (7 vs 6), Right (2 vs 3).'
         : 'Mira los 3 contadores en vivo: Izquierdo (3 vs 0), Central (7 vs 6), Derecho (2 vs 3).',
@@ -400,17 +400,17 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Rival B2 plays 7 of Spades (7♠ = 2 pts) on the Right Front.'
         : 'Rival B2 juega el 7 de Picas (7♠ = 2 pts) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'B2 adds 7♠ (2 pts) to K♠ (3 pts) on the Right. With 2 Spades, Team B activates the 2-card Color bonus (+1 pt), bringing the Right live counter to 2 vs 6 pts (3 + 2 + 1 Color)!'
-        : 'B2 añade el 7♠ (2 pts) a su K♠ (3 pts) en la Derecha. ¡Al juntar 2 Picas, el Equipo B activa el bono de Color de 2 cartas (+1 pto), subiendo el marcador de la Derecha a 2 vs 6 pts (3 + 2 + 1 Color)!',
+        ? 'B2 adds 7♠ (2 pts) to K♠ (3 pts) on the Right. With 2 Spades, Team B activates Color (+1 pt for 1 extra Spade), bringing the Right live counter to 2 vs 6 pts (3 + 2 + 1 Color)!'
+        : 'B2 añade el 7♠ (2 pts) a su K♠ (3 pts) en la Derecha. ¡Al juntar 2 Picas, el Equipo B activa Color (+1 pto por 1 Pica extra), subiendo el marcador de la Derecha a 2 vs 6 pts (3 + 2 + 1 Color)!',
       whyNotOthers: isEn
-        ? 'B2 is preparing to add a 3rd Spade later to upgrade their Color bonus from +1 to +3 pts on the Right.'
-        : 'B2 busca añadir una 3ª Pica más adelante para subir su bono de Color de +1 a +3 pts en la Derecha.',
+        ? 'B2 is preparing to add another Spade later to continue adding +1 pt per additional card on the Right.'
+        : 'B2 busca añadir otra Pica más adelante para seguir sumando +1 pto por cada carta extra en la Derecha.',
       tacticalInsight: isEn
         ? 'Your turn is next: let\'s use your 1 personal Shadow Marker of the round!'
         : 'Te toca tirar: ¡vamos a usar tu Marcador de Sombra personal de esta ronda!',
     },
 
-    // PASO 11: TURNO 9 - HUMANO (A1) -> 1 SOMBRA PERSONAL FIJA + COLOR 3+ (+3)
+    // PASO 11: TURNO 9 - HUMANO (A1) -> 1 SOMBRA PERSONAL FIJA
     {
       stepId: 11,
       type: 'player_turn',
@@ -419,20 +419,20 @@ export function getCasualTutorialSteps(lang = 'es') {
       requiredCardId: 'card-8h',
       requiredFrontKey: 'center',
       requireShadow: true,
-      title: isEn ? 'Turn 3: YOUR 1 PERSONAL SHADOW & MAX COLOR (+3 PTS)!' : 'Tu Turno 3: ¡TU SOMBRA PERSONAL Y COLOR MÁXIMO (+3 PTS)!',
+      title: isEn ? 'Turn 3: YOUR 1 PERSONAL SHADOW & HEARTS COLOR!' : 'Tu Turno 3: ¡TU SOMBRA PERSONAL Y COLOR DE CORAZONES!',
       actionPrompt: isEn
         ? 'Activate "Play as Shadow (1/1)", select your 8 of Hearts (8♥ = 2 pts), and deploy it to the Center Front.'
         : 'Activa el botón "Jugar como Sombra (1/1)", selecciona tu 8 de Corazones (8♥ = 2 pts) y colócalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'In Casual Mode, every player gets 1 personal Shadow Marker per round. By playing 8♥ (2 pts) as a Shadow in the Center, your team reaches 3 Hearts (K♥, Q♥, 8♥) and upgrades COLOR to its +3 pts maximum! Notice how your Allied Real Total on the Center counter immediately jumps to 11 pts (3 + 3 + 2 + 3 Color) because teammates know your Shadow, while rivals only see 7 visible pts + 1 hidden Shadow!'
-        : 'En Modo Casual, cada jugador recibe 1 Marcador de Sombra personal fijo por ronda. Al jugar tu 8♥ (2 pts) como Sombra en el Centro, vuestro equipo reúne 3 Corazones (K♥, Q♥, 8♥) y sube el bono de ¡COLOR al máximo (+3 pts)! Observa cómo vuestro Total Real Aliado en el contador del Centro sube al instante a 11 pts (3 + 3 + 2 + 3 Color) porque tu equipo conoce tu Sombra, ¡mientras que los rivales solo ven 7 pts visibles + 1 Sombra oculta!',
+        ? 'In Casual Mode, every player gets 1 personal Shadow Marker per round. By playing 8♥ (2 pts) as a Shadow in the Center, your team reaches 3 Hearts (K♥, Q♥, 8♥) and scores +2 synergy points for 2 additional Hearts! Notice how your Allied Real Total on the Center counter immediately jumps to 10 pts (3 + 3 + 2 + 2 Color) because teammates know your Shadow, while rivals only see 7 visible pts + 1 hidden Shadow!'
+        : 'En Modo Casual, cada jugador recibe 1 Marcador de Sombra personal fijo por ronda. Al jugar tu 8♥ (2 pts) como Sombra en el Centro, vuestro equipo reúne 3 Corazones (K♥, Q♥, 8♥) y suma +2 pts de sinergia por 2 cartas adicionales. Observa cómo vuestro Total Real Aliado en el contador del Centro sube al instante a 10 pts (3 + 3 + 2 + 2 Color) porque tu equipo conoce tu Sombra, ¡mientras que los rivales solo ven 7 pts visibles + 1 Sombra oculta!',
       whyNotOthers: isEn
         ? [
-            { cardLabel: '4 of Clubs (4♣ = 1p)', reason: 'Does not complete the 3-Heart Color bonus (+3 pts) in the Center.' },
+            { cardLabel: '4 of Clubs (4♣ = 1p)', reason: 'Does not extend the Hearts Color synergy in the Center.' },
             { cardLabel: 'Ace of Diamonds (A♦ = 4p)', reason: 'Reserved to win the Left Front!' },
           ]
         : [
-            { cardLabel: '4 de Tréboles (4♣ = 1p)', reason: 'No completaría los 3 Corazones para el bono máximo de Color (+3) en el Centro.' },
+            { cardLabel: '4 de Tréboles (4♣ = 1p)', reason: 'No amplía la sinergia de Color de Corazones en el Centro.' },
             { cardLabel: 'As de Diamantes (A♦ = 4p)', reason: 'Reservado para ganar el Frente Izquierdo.' },
           ],
     },
@@ -479,11 +479,11 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Ally A2 plays 9 of Hearts (9♥ = 2 pts) on the Center Front.'
         : 'Aliado A2 juega el 9 de Corazones (9♥ = 2 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'A2 adds 9♥ (2 pts) to the Center. Notice the Casual Mode rule: Color (+3 pts) is the maximum flat bonus upon reaching 3 or more cards of the same suit, so 4 Hearts gives Base (3+3+2+2 = 10) + Color (+3) = 13 real allied points!'
-        : 'A2 añade el 9♥ (2 pts) al Centro. ¡Fíjate en la regla del Modo Casual! El Color de 3+ cartas (+3 pts) es la bonificación única y máxima por palo, así que con 4 Corazones sumáis Base (3+3+2+2 = 10) + Color (+3) = ¡13 puntos reales aliados!',
+        ? 'A2 adds 9♥ (2 pts) to the Center. With 4 Hearts, Team A scores Base (3+3+2+2 = 10) + Color (+3 for 3 extra Hearts) = 13 real allied points!'
+        : 'A2 añade el 9♥ (2 pts) al Centro. Con 4 Corazones, el Equipo A suma Base (3+3+2+2 = 10) + Color (+3 por 3 cartas extra) = ¡13 puntos reales aliados!',
       whyNotOthers: isEn
-        ? '13 points in Casual Mode is an almost unbeatable fortress in the Center.'
-        : '13 puntos en la Escala Comprimida del Modo Casual es una fortaleza casi inexpugnable en el Centro.',
+        ? '13 points in the Unified Scale is an almost unbeatable fortress in the Center.'
+        : '13 puntos en la Escala Unificada es una fortaleza casi inexpugnable en el Centro.',
       tacticalInsight: isEn
         ? 'Center Live Counter: 13 Allied Real Pts (incl. Shadow) vs 6 Rival Visible Pts.'
         : 'Contador en Vivo del Centro: 13 Pts Reales Aliados (incl. Sombra) vs 6 Pts Visibles del Rival.',
@@ -529,8 +529,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Select your Ace of Diamonds (A♦ = 4 pts) and deploy it to the Left Front.'
         : 'Selecciona tu As de Diamantes (A♦ = 4 pts) y despliégalo en el Frente Izquierdo.',
       whyThisCard: isEn
-        ? 'In Casual Mode, the Ace (A) is worth 4 base points ("4p") — the highest single card value! Placing A♦ on the Left Front alongside A2\'s J♦ (3p) activates 2-Diamond Color (+1 pt), bringing your Left live counter to 8 pts (3 + 4 + 1 Color) and preparing the +3 max Color bonus when A2 plays their 3rd Diamond!'
-        : 'En el Modo Casual, el As (A) vale 4 puntos base ("4p"), ¡el valor individual más alto del juego! Colocar tu A♦ en el Frente Izquierdo junto a la J♦ (3p) de A2 activa el Color de 2 Diamantes (+1 pto), subiendo vuestro contador en vivo a 8 pts (3 + 4 + 1 Color) y dejando preparado el Color máximo de 3 Diamantes (+3 pts) para el último turno de A2.',
+        ? 'The Ace (A) is worth 4 base points ("4p") — the highest base value! Placing A♦ on the Left Front alongside A2\'s J♦ (3p) activates 2-Diamond Color (+1 pt), bringing your Left live counter to 8 pts (3 + 4 + 1 Color) and preparing further Color when A2 plays their 3rd Diamond!'
+        : 'El As (A) vale 4 puntos base ("4p"), ¡el valor individual más alto del juego! Colocar tu A♦ en el Frente Izquierdo junto a la J♦ (3p) de A2 activa el Color de 2 Diamantes (+1 pto), subiendo vuestro contador en vivo a 8 pts (3 + 4 + 1 Color) y dejando preparado más Color cuando A2 juegue su 3er Diamante.',
       whyNotOthers: isEn
         ? [
             { cardLabel: '4 of Clubs (4♣ = 1p)', reason: 'Only 1 point and does not help build Diamond Color on the Left.' },
@@ -582,8 +582,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Ally A2 plays Six of Spades (6♠ = 1 pt) on the Right Front.'
         : 'Aliado A2 juega el Seis de Picas (6♠ = 1 pto) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'A2 plays 6♠ (1 pt) on the Right, saving 3♦ for the final turn on the Left to complete your 3-Diamond Color (+3 pts)!'
-        : 'A2 juega su 6♠ (1 pto) en la Derecha, reservando su 3♦ para el último turno en la Izquierda con el que completará vuestro Color de 3 Diamantes (+3 pts).',
+        ? 'A2 plays 6♠ (1 pt) on the Right, saving 3♦ for the final turn on the Left to complete your 3-Diamond Color (+2 pts)!'
+        : 'A2 juega su 6♠ (1 pto) en la Derecha, reservando su 3♦ para el último turno en la Izquierda con el que completará vuestro Color de 3 Diamantes (+2 pts).',
       whyNotOthers: isEn
         ? 'Notice that on the Right you now have 10♠ (2p) + 6♠ (1p) + 2-Spade Color (+1) = 4 pts.'
         : 'Observa que en la Derecha tenéis ahora 10♠ (2p) + 6♠ (1p) + Color de 2 Picas (+1) = 4 pts.',
@@ -611,8 +611,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'B2 places 4♦ (1 pt) on the Left. Visible rival score on the Left is now 3 pts (5♦ + 4♦ + 1 Color for 2 visible Diamonds) plus their hidden Shadow Card!'
         : 'B2 coloca su 4♦ (1 pto) en la Izquierda. La puntuación visible del rival en la Izquierda es ahora de 3 pts (5♦ + 4♦ + 1 de Color por 2 Diamantes visibles) más su Carta Sombra oculta.',
       whyNotOthers: isEn
-        ? 'Even if their hidden card is a Diamond (giving them 3 Diamonds = +3 Color), your J♦ (3p) + A♦ (4p) + A2\'s upcoming 3♦ (1p) + Color (+3) = 11 pts will crush them!'
-        : 'Aunque su carta oculta sea otro Diamante (dándoles 3 Diamantes = +3 Color), vuestra J♦ (3p) + A♦ (4p) + el 3♦ (1p) de A2 + Color (+3) = ¡11 pts os darán la victoria!',
+        ? 'Even if their hidden card is a Diamond (giving them 3 Diamonds = +2 Color), your J♦ (3p) + A♦ (4p) + A2\'s upcoming 3♦ (1p) + Color (+2) = 10 pts will secure the win!'
+        : 'Aunque su carta oculta sea otro Diamante (dándoles 3 Diamantes = +2 Color), vuestra J♦ (3p) + A♦ (4p) + el 3♦ (1p) de A2 + Color (+2) = ¡10 pts os darán la victoria!',
       tacticalInsight: isEn
         ? 'Time for your final card of the round!'
         : '¡Hora de jugar tu última carta de la ronda!',
@@ -654,8 +654,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Deployment Complete: Watch the Final Live Counters!'
         : 'Fin del Despliegue: ¡Observa los Contadores en Vivo!',
       actionSummary: isEn
-        ? 'B1 plays 9♠ (2p) on the Right (reaching 3 Spades = +3 Color!), Ally A2 plays 3♦ (1p) on the Left (reaching 3 Diamonds = +3 Color!), and Rival B2 plays 5♥ (1p) in the Center (reaching 2 Hearts = +1 Color!).'
-        : 'B1 juega 9♠ (2p) en la Derecha (¡logrando 3 Picas = +3 Color!), Aliado A2 juega 3♦ (1p) en la Izquierda (¡logrando 3 Diamantes = +3 Color!) y Rival B2 juega 5♥ (1p) en el Centro (¡2 Corazones = +1 Color!).',
+        ? 'B1 plays 9♠ (2p) on the Right (reaching 3 Spades = +2 Color!), Ally A2 plays 3♦ (1p) on the Left (reaching 3 Diamonds = +2 Color!), and Rival B2 plays 5♥ (1p) in the Center (reaching 2 Hearts = +1 Color!).'
+        : 'B1 juega 9♠ (2p) en la Derecha (¡logrando 3 Picas = +2 Color!), Aliado A2 juega 3♦ (1p) en la Izquierda (¡logrando 3 Diamantes = +2 Color!) y Rival B2 juega 5♥ (1p) en el Centro (¡2 Corazones = +1 Color!).',
       whyPlayed: isEn
         ? 'All 20 cards are on the table! In the next step, Shadow Cards flip face-up and the live counters update with the final revealed score of both teams.'
         : '¡Las 20 cartas están en mesa! En el siguiente paso se voltean las Cartas Sombra y los contadores de cada frente se actualizan con el total definitivo de ambos equipos.',
@@ -675,8 +675,8 @@ export function getCasualTutorialSteps(lang = 'es') {
         ? 'Casual Mode Resolution: Shadows Revealed & Final Totals'
         : 'Resolución en Modo Casual: Sombras Reveladas y Totales Finales',
       subtitle: isEn
-        ? 'Compressed Scale Breakdown & Direct Overtime Rule'
-        : 'Desglose con Escala Comprimida y Regla de Prórroga Directa',
+        ? 'Unified Tactical Scale Breakdown & Direct Overtime Rule'
+        : 'Desglose con Escala Táctica Unificada y Regla de Prórroga Directa',
     },
 
     // PASO 22: GRADUACIÓN MODO CASUAL
@@ -710,12 +710,12 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
         ? 'Welcome to the WarFronts Academy!'
         : '¡Bienvenido a la Academia de Frentes de Guerra!',
       subtitle: isEn
-        ? 'Guided Tactical Instruction: 2 vs 2 Mode (2v2)'
-        : 'Instrucción Táctica Guiada: Modalidad 2 contra 2 (2v2)',
+        ? 'Guided Tactical Instruction: 2 vs 2 Mode (2v2) — v2.1'
+        : 'Instrucción Táctica Guiada: Modalidad 2 contra 2 (2v2) — v2.1',
       instructor: isEn ? 'Instructor Commander' : 'Comandante Instructor',
       content: isEn
         ? [
-            'You are about to play a guided 2v2 match with bots. Here you will learn how every rule, calculation, and tactical decision works in Official Competitive Mode v2.0.',
+            'You are about to play a guided 2v2 match with bots. Here you will learn how every rule, calculation, and tactical decision works in Official Competitive Mode v2.1 (Unified Tactical Scale).',
             'In 2v2 you play alongside your partner (Ally A2) against two opponents (B1 and B2). There are 3 battlefronts: Left, Center, and Right.',
             'Official 1, 2 & 3 Round Points System: At the end of deployment, Round Points are awarded based on how many fronts your team conquers:',
             '• Tie in the Round (e.g. 1 front each and 1 void, or all 3 void): +1 Round Point for EACH team.',
@@ -724,7 +724,7 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
             'In this tutorial we will guide you step by step: each card to play will be highlighted, we will explain why it is the optimal move and why you should not play other cards, and we will analyze responses from opponents and allies.',
           ]
         : [
-            'Estás a punto de disputar una partida guiada de 2v2 con bots. Aquí aprenderás exactamente cómo funciona cada regla, cada cálculo y cada decisión táctica del Modo Competitivo Oficial v2.0.',
+            'Estás a punto de disputar una partida guiada de 2v2 con bots. Aquí aprenderás exactamente cómo funciona cada regla, cada cálculo y cada decisión táctica del Modo Competitivo Oficial v2.1 (Escala Táctica Unificada).',
             'En 2v2 juegas junto a tu compañero (Aliado A2) frente a dos rivales (B1 y B2). Hay 3 frentes de combate: Izquierdo, Central y Derecho.',
             'Sistema Oficial de Puntuación por Ronda (1, 2 y 3 Puntos): Al finalizar el despliegue, los Puntos de Ronda se reparten según vuestro dominio:',
             '• Empate en la ronda (ej. cada equipo gana 1 frente y el otro es nulo, o todos son nulos): +1 Punto de Ronda para CADA equipo.',
@@ -741,26 +741,26 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       type: 'dialog',
       stage: 'trump_reveal',
       title: isEn
-        ? 'Phase 1: Preparation, Synergies & Initiative'
-        : 'Fase 1: Preparación, Sinergias e Iniciativa',
+        ? 'Phase 1: Unified Tactical Scale, Synergies & Tiebreakers'
+        : 'Fase 1: Escala Táctica Unificada, Sinergias y Desempates',
       subtitle: isEn
-        ? 'Official Scoring System (1/2/3 Pts) and Opening Attack'
-        : 'Sistema Oficial de Puntuación (1/2/3 Pts) y Sorteo de Ataque',
+        ? 'Base Values (1–4), Synergies & Nominal Hierarchy'
+        : 'Valores Base (1 al 4), Sinergias y Jerarquía Nominal',
       instructor: isEn ? 'Instructor Commander' : 'Comandante Instructor',
       content: isEn
         ? [
-            'Base card values run from 2 to 10 at face value, J=11, Q=12, K=13, and Ace (A) = 14 points (the highest single card in the deck!).',
-            'Four powerful formation bonuses decide battles on each front: Suit Synergy (+5 pts per additional card of the same suit in the front), Pair (+10 pts for 2 cards of same rank), Short Straight (+15 pts for 3 consecutive ranks), and Trio (+20 pts for 3 cards of same rank, which supersedes Pair).',
-            'Round Points Scale (1, 2 & 3 Pts): Winning 2 fronts grants +2 Round Points, sweeping all 3 fronts ("Pleno") grants +3 Round Points, and if the round ends tied in fronts, BOTH teams score +1 Round Point each!',
-            'Shadow Economy (Official v2.0): Teams start Round 1 with strictly 0 Shadow Markers. At round end, teams earn markers based on performance (+1 win, +2 loss, +3 loss streak of 2+, +1 tie in 2v2) which carry over and accumulate across rounds. For this training drill, we simulate an active pool of 2 markers so you can learn how to play shadow cards.',
-            'Who attacks first? The choice of which team opens Round 1 is 100% RANDOM (a deck cut on tabletop, automated digitally). From Round 2 onward, initiative rotates automatically to the opposing team. For this drill, your team (Team A) holds the initiative and you (A1) will execute the opening attack!',
+            'Unified Base Card Values (1 to 4): Low Cards (2, 3, 4, 5, 6) = 1 pt | Medium Cards (7, 8, 9, 10) = 2 pts | Face Cards (J, Q, K) = 3 pts | Ace (A) = 4 pts (the highest single card!).',
+            'Four Strategic Formation Synergies: Suit Synergy (+1 pt per additional card of the same suit in the front, scaling linearly with no cap), Pair (+2 pts for 2 equal ranks), Short Straight (+4 pts for 3 consecutive ranks), and Trio (+5 pts for 3 equal ranks, which cancels Pair).',
+            'Front Tiebreaker (Nominal Hierarchy): If both teams tie in total points on a front, the front is won by the team holding the single card of highest nominal rank (2 < 3 < ... < 10 < J < Q < K < A). If both tie on the highest nominal card, the front is Void (Nulo).',
+            'Match Tiebreakers (No Cumulative Points): Match ties in Round Points are decided first by Shadow Efficiency (the team with MORE unspent Shadow Markers in their Team Pool wins). If still tied, a 2-Round Overtime is played!',
+            'Shadow Economy: Teams start Round 1 with 0 markers and earn them at round end (+1 win, +2 loss, +3 defeat streak of 2+, +1 tie in 2v2). Markers accumulate in the shared pool. (We simulate 2 markers in this drill for practice).',
           ]
         : [
-            'Los valores base de las cartas van del 2 al 10 según su valor nominal, J=11, Q=12, K=13 y el As (A) = 14 puntos (¡la carta individual más alta de la baraja!).',
-            'Cuatro formaciones estratégicas por sinergia deciden cada frente: Sinergia de Palo (+5 pts por cada carta adicional del mismo palo en el frente), Pareja (+10 pts por 2 cartas de igual valor), Escalera Corta (+15 pts por 3 cartas consecutivas) y Trío (+20 pts por 3 cartas de igual valor, anulando la pareja de esas cartas).',
-            'Escala de Puntos de Ronda (1, 2 y 3 Pts): Ganar 2 frentes otorga +2 Puntos de Ronda, ganar los 3 frentes ("Pleno") otorga +3 Puntos de Ronda, ¡y en caso de empate en frentes AMBOS equipos suman +1 Punto de Ronda cada uno!',
-            'Economía de Sombras (Reglamento v2.0): Los equipos inician la Ronda 1 con estrictamente 0 Marcadores de Sombra. Al final de la ronda, ganan marcadores según el resultado (+1 victoria, +2 derrota, +3 racha de 2+ derrotas, +1 empate en 2v2) que se acumulan y ahorran entre rondas. En este tutorial simulamos una reserva de 2 marcadores para que aprendas su uso práctico.',
-            '¿Quién empieza atacando? La iniciativa en la Ronda 1 es 100% ALEATORIA (mediante corte de baraja en mesa o sorteo digital automático). A partir de la Ronda 2, rota al equipo rival. Para esta instrucción, ¡tu equipo (Equipo A) tiene la iniciativa y serás tú (A1) quien abra el combate!',
+            'Valores Base Unificados (1 al 4): Cartas Bajas (2, 3, 4, 5, 6) = 1 pto | Cartas Medias (7, 8, 9, 10) = 2 pts | Figuras (J, Q, K) = 3 pts | As (A) = 4 pts (¡la carta individual más alta!).',
+            'Cuatro Formaciones Estratégicas por Sinergia: Sinergia de Palo (+1 pto por cada carta adicional del mismo palo en el frente, escalando linealmente sin tope), Pareja (+2 pts por 2 de igual valor), Escalera Corta (+4 pts por 3 cartas consecutivas) y Trío (+5 pts por 3 cartas de igual valor, anulando la pareja de esas cartas).',
+            'Desempate en un Frente (Jerarquía Nominal): Si ambos equipos empatan en puntos en un frente, gana el equipo con la carta individual de mayor jerarquía nominal (2 < 3 < ... < 10 < J < Q < K < A). Si empatan en la carta más alta, el frente queda Nulo.',
+            'Desempate de Partida (Sin Puntos Acumulados): El empate final en Puntos de Ronda se decide en primer lugar por Eficiencia de Sombras (gana quien conserve más Marcadores de Sombra sin gastar en su Fondo de Equipo). ¡Si persiste el empate, se disputa una Prórroga de 2 Rondas!',
+            'Economía de Sombras: Los equipos inician la Ronda 1 con 0 marcadores y ganan ingresos al final de cada ronda (+1 victoria, +2 derrota, +3 racha de 2+ derrotas, +1 empate en 2v2). Se ahorran en el fondo de equipo. (Simulamos 2 marcadores en este tutorial para la práctica).',
           ],
       buttonText: isEn ? 'View Planning Phase' : 'Ver Fase de Planificación',
     },
@@ -809,14 +809,14 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
             'Joint time pool: Each team has a total time pool per round (e.g. in 2v2: Fast = 1m 40s, Medium = 3m 20s, Slow = 5m 00s). Seconds consumed by each player during their turn are deducted from their team\'s global clock.',
             'Clock switching: Your team\'s clock ticks while you or your ally think and make a play. The exact instant you place your card on a front, your clock stops and the opposing team\'s clock activates immediately.',
             'Per-round reset: The team clock resets to full value at the start of each new round. Unused time from a round does not carry over to subsequent ones.',
-            'Flag Fall Rule (00:00): If a team\'s clock reaches 00:00 before completing its turns, it automatically loses the round and the opponent scores +2 Round Points directly (or +3 Round Points if at that instant the opponent already led all 3 fronts with all cards played)! Cards already deployed on the table are revealed and their points are preserved for the final tie-breaker tally.',
+            'Flag Fall Rule (00:00): If a team\'s clock reaches 00:00 before completing its turns, it automatically loses the round and the opponent scores +2 Round Points directly (or +3 Round Points if at that instant the opponent already led all 3 fronts with all cards played)!',
           ]
         : [
             'En Frentes de Guerra el tiempo NO es individual por turno. El reloj es COMPARTIDO para todo el equipo.',
             'Bolsa de tiempo conjunta: Cada equipo dispone de un tiempo total por ronda (ejemplo en 2v2: Rápido = 1m 40s, Medio = 3m 20s, Lento = 5m 00s). Los segundos que consuma cada jugador durante su turno se restan al reloj global de su equipo.',
             'Conmutación del reloj: El reloj de tu equipo corre mientras tú o tu aliado pensáis y realizáis la jugada. En el instante exacto en que colocáis la carta en el frente, vuestro reloj se detiene y se activa de inmediato el reloj del equipo rival.',
             'Reseteo por ronda: El reloj de equipo se reinicia al valor completo al inicio de cada nueva ronda. El tiempo sobrante de una ronda no se acumula para las siguientes.',
-            'Regla de Caída de Bandera (00:00): Si el reloj de un equipo llega a 00:00 antes de completar sus turnos, ¡pierde automáticamente la ronda y el rival suma +2 Puntos de Ronda directos (o +3 Puntos si en ese instante el rival ya dominaba los 3 frentes habiendo jugado todas sus cartas)! Las cartas ya colocadas en la mesa se revelan y sus puntos se conservan para el cómputo de desempate final.',
+            'Regla de Caída de Bandera (00:00): Si el reloj de un equipo llega a 00:00 antes de completar sus turnos, ¡pierde automáticamente la ronda y el rival suma +2 Puntos de Ronda directos (o +3 Puntos si en ese instante el rival ya dominaba los 3 frentes habiendo jugado todas sus cartas)!',
           ],
       buttonText: isEn ? 'Understood! Start Card Deployment' : '¡Entendido! Iniciar Despliegue de Cartas',
     },
@@ -836,46 +836,46 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       requireShadow: false,
       title: isEn ? 'Your Turn 1: Initial Deployment' : 'Tu Turno 1: Despliegue Inicial',
       actionPrompt: isEn
-        ? 'Select your King of Hearts (K♥) and deploy it to the Center Front.'
-        : 'Selecciona tu Rey de Corazones (K♥) y despliégalo en el Frente Central.',
+        ? 'Select your King of Hearts (K♥ = 3 pts) and deploy it to the Center Front.'
+        : 'Selecciona tu Rey de Corazones (K♥ = 3 pts) y despliégalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'Having won the round initiative, your team attacks first and you open the match. The King of Hearts has a strong base value of 13 points. Opening with authority in the Center establishes immediate territorial control and signals to your ally A2 that we hold Hearts to coordinate suit synergies.'
-        : 'Al haber ganado la iniciativa de la ronda, tu equipo empieza atacando y abres la partida. El Rey de Corazones tiene un poderoso valor base de 13 puntos. Abrir con un golpe de autoridad en el Centro establece control territorial inmediato y le indica a tu aliado A2 que tenemos cartas de Corazones para coordinar sinergias de palo.',
+        ? 'Having won the round initiative, your team attacks first and you open the match. In the Unified Scale, the King of Hearts is a Face Card worth 3 base points ("3p" badge). Opening with authority in the Center establishes immediate territorial control and signals to your ally A2 that we hold Hearts to coordinate suit synergies.'
+        : 'Al haber ganado la iniciativa de la ronda, tu equipo empieza atacando y abres la partida. En la Escala Unificada, el Rey de Corazones es una Figura que vale 3 puntos base (insignia "3p"). Abrir con autoridad en el Centro establece control territorial inmediato y le indica a tu aliado A2 que tenemos cartas de Corazones para coordinar sinergias de palo.',
       whyNotOthers: isEn
         ? [
             {
-              cardLabel: '4 of Clubs (4♣)',
-              reason: 'It is very weak (4 pts). Opening with it surrenders front control without resistance.',
+              cardLabel: '4 of Clubs (4♣ = 1p)',
+              reason: 'Cards 2 to 6 are worth only 1 point in the Unified Scale.',
             },
             {
-              cardLabel: 'Ace of Diamonds (A♦)',
-              reason: 'The Ace is the highest card in the deck (14 pts). We must save it to answer threats or secure another front later.',
+              cardLabel: 'Ace of Diamonds (A♦ = 4p)',
+              reason: 'The Ace is the highest base card (4 pts). We must save it to answer threats or secure another front later.',
             },
             {
-              cardLabel: 'Ten of Spades (10♠)',
-              reason: 'Above-average card (10 pts). It lacks the deterrent punch we need to seize the center immediately.',
+              cardLabel: 'Ten of Spades (10♠ = 2p)',
+              reason: 'Medium card (2 pts). It lacks the initial punch we need in the center.',
             },
             {
-              cardLabel: '8 of Hearts (8♥)',
-              reason: 'Provides 8 pts. Holding it enables subsequent suit synergies or playing it concealed as a Shadow.',
+              cardLabel: '8 of Hearts (8♥ = 2p)',
+              reason: 'Provides 2 pts. Holding it enables subsequent Hearts synergy or playing it concealed as a Shadow.',
             },
           ]
         : [
             {
-              cardLabel: '4 de Tréboles (4♣)',
-              reason: 'Es una carta muy débil (4 pts). Abrir con ella regalaría el control del frente al rival sin oponer resistencia.',
+              cardLabel: '4 de Tréboles (4♣ = 1p)',
+              reason: 'Las cartas del 2 al 6 valen solo 1 punto en la Escala Unificada.',
             },
             {
-              cardLabel: 'As de Diamantes (A♦)',
-              reason: 'El As es la carta más alta de la baraja (14 pts). Es un recurso supremo que debemos reservar para contestar amenazas o asegurar otro frente más adelante.',
+              cardLabel: 'As de Diamantes (A♦ = 4p)',
+              reason: 'El As es la carta más alta (4 pts). Es un recurso supremo que debemos reservar para contestar amenazas o asegurar otro frente más adelante.',
             },
             {
-              cardLabel: 'Diez de Picas (10♠)',
-              reason: 'Es una carta media-alta (10 pts). No causa el impacto inicial disuasorio que buscamos en el centro.',
+              cardLabel: 'Diez de Picas (10♠ = 2p)',
+              reason: 'Es una carta media (2 pts). No causa el impacto inicial de una Figura en el centro.',
             },
             {
-              cardLabel: '8 de Corazones (8♥)',
-              reason: 'Aporta 8 pts. Guardarlo nos servirá para encadenar sinergias de palo posteriores o jugarlo como carta oculta (Sombra).',
+              cardLabel: '8 de Corazones (8♥ = 2p)',
+              reason: 'Aporta 2 pts. Guardarlo nos servirá para encadenar sinergia de corazones posterior o jugarlo como Sombra.',
             },
           ],
     },
@@ -893,17 +893,17 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       asShadow: false,
       title: isEn ? "Rival B1's Turn: Response in the Center" : 'Turno de Rival B1: Respuesta en el Centro',
       actionSummary: isEn
-        ? 'Rival B1 plays the Queen of Diamonds (Q♦, 12 pts) on the Center Front.'
-        : 'Rival B1 juega la Reina de Diamantes (Q♦, 12 pts) en el Frente Central.',
+        ? 'Rival B1 plays the Queen of Diamonds (Q♦ = 3 pts) on the Center Front.'
+        : 'Rival B1 juega la Reina de Diamantes (Q♦ = 3 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'Seeing your King (13 pts) in the Center, B1 refuses to concede without a fight. B1 plays Queen (12 pts) to contest closely (13 vs 12).'
-        : 'Al ver tu Rey (13 pts) en el Centro, B1 no quiere ceder la zona central sin luchar. Coloca su Reina (12 pts) para mantener el frente reñido (13 vs 12).',
+        ? 'Seeing your King (3 pts) in the Center, B1 refuses to concede without a fight. B1 plays Queen (3 pts) to contest closely (3 vs 3).'
+        : 'Al ver tu Rey (3 pts) en el Centro, B1 no quiere ceder la zona central sin luchar. Coloca su Reina (3 pts) para mantener el frente reñido (3 vs 3).',
       whyNotOthers: isEn
-        ? 'B1 opted not to play Jack of Hearts, preferring to see if partner B2 can support or saving it for another front.'
-        : 'B1 decidió no jugar su Jota de Corazones porque prefiere esperar a ver si su compañero B2 puede apoyarle o reservarla para disputar otro frente.',
+        ? 'Front Tiebreaker Rule: Even though both score 3 pts, if the round ended now, your King (nominal rank 13) would beat their Queen (nominal rank 12) on nominal hierarchy!'
+        : 'Regla de Desempate en Frente: Aunque ambos sumáis 3 pts, si la ronda terminara ahora, ¡tu Rey (rango nominal 13) ganaría a su Reina (rango nominal 12) por Jerarquía Nominal!',
       tacticalInsight: isEn
-        ? 'Notice the center score: you are leading 13 to 12. Your opening blow forced the opponent to spend one of their highest cards!'
-        : 'Fíjate en el marcador del centro: estás liderando 13 a 12. ¡Tu golpe inicial ha forzado al rival a gastar una de sus cartas más altas!',
+        ? 'Notice the center score: 3 vs 3. Both teams spent a 3-point Face Card!'
+        : 'Fíjate en el marcador del centro: 3 vs 3. ¡Ambos equipos habéis jugado una Figura de 3 puntos!',
     },
 
     // PASO 5: TURNO 3 - ALIADO A2
@@ -919,17 +919,17 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       asShadow: false,
       title: isEn ? "Ally A2's Turn: SUIT SYNERGY COMBO!" : 'Turno de Aliado A2: ¡COMBO DE SINERGIA DE PALO!',
       actionSummary: isEn
-        ? 'Ally A2 plays the Queen of Hearts (Q♥) on the Center Front.'
-        : 'Aliado A2 juega la Reina de Corazones (Q♥) en el Frente Central.',
+        ? 'Ally A2 plays the Queen of Hearts (Q♥ = 3 pts) on the Center Front.'
+        : 'Aliado A2 juega la Reina de Corazones (Q♥ = 3 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'Attention! Your ally A2 saw you played Hearts (K♥). By playing Queen of Hearts (Q♥), your team now has 2 cards of the same suit in the same front.'
-        : '¡Atención a esto! Tu aliado A2 vio que jugaste Corazones (K♥). Al jugar su Reina de Corazones (Q♥), vuestro equipo tiene ahora 2 cartas del mismo palo en el mismo frente.',
+        ? 'Attention! Your ally A2 saw you played Hearts (K♥). By playing Queen of Hearts (Q♥), your team gathers 2 cards of the same suit in the same front, scoring +1 synergy point for the additional card!'
+        : '¡Atención a esto! Tu aliado A2 vio que jugaste Corazones (K♥). Al jugar su Reina de Corazones (Q♥), vuestro equipo reúne 2 cartas del mismo palo en el frente, ¡sumando +1 pto de sinergia por la carta adicional!',
       whyNotOthers: isEn
-        ? 'A2 did not play Jack of Diamonds or spades because triggering the synergy bonus in the Center provides an overwhelming advantage.'
-        : 'A2 no jugó su Jota de Diamantes ni cartas de picas porque activar la bonificación de sinergia en el Centro da una ventaja matemática descomunal.',
+        ? 'A2 did not play Jack of Diamonds or spades because triggering suit synergy in the Center provides immediate control.'
+        : 'A2 no jugó su Jota de Diamantes ni cartas de picas porque activar la sinergia de palo en el Centro otorga control inmediato.',
       tacticalInsight: isEn
-        ? 'KEY RULE: SUIT SYNERGY! Each additional card of the same suit grants +5 BONUS POINTS. Your team totals: 13 (K♥) + 12 (Q♥) + 5 (Synergy) = 30 points in the Center against opponent\'s 12!'
-        : '¡REGLA CLAVE: SINERGIA DE PALO! Cada carta adicional del mismo palo otorga +5 PUNTOS EXTRA. Vuestro equipo suma: 13 (K♥) + 12 (Q♥) + 5 (Sinergia) = ¡30 puntos en el Centro frente a los 12 del rival!',
+        ? 'KEY RULE: SUIT SYNERGY! Each additional card of the same suit grants +1 point. Your team totals: 3 (K♥) + 3 (Q♥) + 1 (Synergy) = 7 points in the Center against opponent\'s 3!'
+        : '¡REGLA CLAVE: SINERGIA DE PALO! Cada carta adicional del mismo palo otorga +1 punto. Vuestro equipo suma: 3 (K♥) + 3 (Q♥) + 1 (Sinergia) = ¡7 puntos en el Centro frente a los 3 del rival!',
     },
 
     // PASO 6: TURNO 4 - RIVAL B2
@@ -945,11 +945,11 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       asShadow: false,
       title: isEn ? "Rival B2's Turn: Alternative Flank" : 'Turno de Rival B2: Flanco Alternativo',
       actionSummary: isEn
-        ? 'Rival B2 plays the King of Spades (K♠, 13 pts) on the Right Front.'
-        : 'Rival B2 juega el Rey de Picas (K♠, 13 pts) en el Frente Derecho.',
+        ? 'Rival B2 plays the King of Spades (K♠ = 3 pts) on the Right Front.'
+        : 'Rival B2 juega el Rey de Picas (K♠ = 3 pts) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'Rival B2 sees the Center dominated by your Hearts combo (30 vs 12). Spending troops there would be futile, so B2 opens Right Front with their top card (King = 13 pts) to secure that sector.'
-        : 'Rival B2 ve que el Centro está dominado por vuestro combo de Corazones (30 vs 12). Sabe que gastar tropas en el centro ahora sería inútil, así que abre el Frente Derecho con su carta más poderosa (Rey = 13 pts) para intentar asegurar esa zona.',
+        ? 'Rival B2 sees the Center dominated by your Hearts combo (7 vs 3). Spending troops there would be futile, so B2 opens Right Front with a top card (King = 3 pts) to secure that sector.'
+        : 'Rival B2 ve que el Centro está dominado por vuestro combo de Corazones (7 vs 3). Sabe que gastar tropas en el centro ahora sería inútil, así que abre el Frente Derecho con su carta más poderosa (Rey = 3 pts) para intentar asegurar esa zona.',
       whyNotOthers: isEn
         ? 'B2 did not play left, preferring to concentrate on an uncontested sector.'
         : 'No jugó en la izquierda porque prefiere concentrar a su equipo en un frente específico donde no haya oposición aliada.',
@@ -973,38 +973,38 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       requireShadow: false,
       title: isEn ? 'Your Turn 2: Flank Containment' : 'Tu Turno 2: Contención en el Flanco',
       actionPrompt: isEn
-        ? 'Select your Ten of Spades (10♠) and deploy it to the Right Front.'
-        : 'Selecciona tu Diez de Picas (10♠) y despliégalo en el Frente Derecho.',
+        ? 'Select your Ten of Spades (10♠ = 2 pts) and deploy it to the Right Front.'
+        : 'Selecciona tu Diez de Picas (10♠ = 2 pts) y despliégalo en el Frente Derecho.',
       whyThisCard: isEn
-        ? 'Rival B2 just deployed King of Spades (13 pts) on the right. If we surrender that sector for free, they only need one more to claim the round. Playing your 10♠ (10 pts) contests the front closely (13 vs 10) without burning your Ace.'
-        : 'El rival B2 acaba de poner su Rey de Picas (13 pts) en la derecha. Si dejamos que se lleven ese frente gratis, solo necesitarán ganar uno más para ganar la ronda. Jugando tu 10♠ (10 pts), disputas el frente quedando a tiro de piedra (13 vs 10) sin gastar tus cartas clave.',
+        ? 'Rival B2 just deployed King of Spades (3 pts) on the right. If we surrender that sector for free, they only need one more to claim the round. Playing your 10♠ (2 pts) contests the front closely (3 vs 2) without burning your Ace.'
+        : 'El rival B2 acaba de poner su Rey de Picas (3 pts) en la derecha. Si dejamos que se lleven ese frente gratis, solo necesitarán ganar uno más para ganar la ronda. Jugando tu 10♠ (2 pts), disputas el frente quedando a tiro (3 vs 2) sin gastar tu As.',
       whyNotOthers: isEn
         ? [
             {
-              cardLabel: 'Ace of Diamonds (A♦)',
-              reason: 'The Ace (14 pts) beats the King (13 pts), but expending it this early leaves us without our decisive weapon for the endgame.',
+              cardLabel: 'Ace of Diamonds (A♦ = 4p)',
+              reason: 'The Ace (4 pts) beats the King, but expending it this early leaves us without our decisive weapon for the endgame.',
             },
             {
-              cardLabel: '8 of Hearts (8♥)',
-              reason: 'It is an 8 of Hearts (8 pts). Spending it on the right without hearts synergy wastes its potential in the center or its surprise value.',
+              cardLabel: '8 of Hearts (8♥ = 2p)',
+              reason: 'It is a Heart. Spending it on the right without hearts synergy wastes its potential in the center or its surprise value.',
             },
             {
-              cardLabel: '4 of Clubs (4♣)',
-              reason: 'It is too weak (4 pts vs 13). It would leave us 9 points behind, an almost insurmountable deficit.',
+              cardLabel: '4 of Clubs (4♣ = 1p)',
+              reason: 'It provides only 1 point, leaving us behind without contesting effectively.',
             },
           ]
         : [
             {
-              cardLabel: 'As de Diamantes (A♦)',
-              reason: 'El As (14 pts) ganaría al Rey (13 pts), pero gastar el As tan temprano en el flanco nos dejaría sin nuestra carta más determinante para el momento cumbre.',
+              cardLabel: 'As de Diamantes (A♦ = 4p)',
+              reason: 'El As (4 pts) ganaría al Rey, pero gastar el As tan temprano en el flanco nos dejaría sin nuestra carta más determinante para el momento cumbre.',
             },
             {
-              cardLabel: '8 de Corazones (8♥)',
-              reason: 'Es carta de Corazones (8 pts). Gastarla en la derecha sin sinergia de corazones desaprovecha su potencial en el centro o su factor sorpresa.',
+              cardLabel: '8 de Corazones (8♥ = 2p)',
+              reason: 'Es carta de Corazones (2 pts). Gastarla en la derecha sin sinergia de corazones desaprovecha su potencial en el centro o su factor sorpresa.',
             },
             {
-              cardLabel: '4 de Tréboles (4♣)',
-              reason: 'Es demasiado baja (4 pts vs 13 del rival). Nos dejaría 9 puntos por detrás, una distancia muy difícil de recortar.',
+              cardLabel: '4 de Tréboles (4♣ = 1p)',
+              reason: 'Aporta solo 1 punto, dejándonos por detrás sin disputar eficazmente el sector.',
             },
           ],
     },
@@ -1022,17 +1022,17 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       asShadow: false,
       title: isEn ? "Rival B1's Turn: Reinforcing the Center" : 'Turno de Rival B1: Refuerzo del Centro',
       actionSummary: isEn
-        ? 'Rival B1 plays the Jack of Hearts (J♥, 11 pts) on the Center Front.'
-        : 'Rival B1 juega la Jota de Corazones (J♥, 11 pts) en el Frente Central.',
+        ? 'Rival B1 plays the Jack of Hearts (J♥ = 3 pts) on the Center Front.'
+        : 'Rival B1 juega la Jota de Corazones (J♥ = 3 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'B1 attempts to stay alive in the center and plays Jack of Hearts (11 pts base). Team B now has 23 points in the center (12 + 11).'
-        : 'B1 intenta no perder el centro definitivamente y juega su Jota de Corazones (11 pts base). Ahora el equipo B suma 23 puntos en el centro (12 + 11).',
+        ? 'B1 attempts to stay alive in the center and plays Jack of Hearts (3 pts base). Team B now has 6 points in the center (3 + 3).'
+        : 'B1 intenta no perder el centro definitivamente y juega su Jota de Corazones (3 pts base). Ahora el equipo B suma 6 puntos en el centro (3 + 3).',
       whyNotOthers: isEn
         ? 'B1 did not play 2♣ or 5♦ because they would be weak discards in a trailing sector.'
         : 'No jugó su 2♣ ni su 5♦ porque serían descartes débiles en un frente donde van perdiendo.',
       tacticalInsight: isEn
-        ? 'Even though B1 added 11 points, you still dominate the Center with 30 points thanks to your earlier synergy.'
-        : 'Aunque B1 sumó 11 puntos, vosotros seguís dominando el Centro con 30 puntos gracias a vuestra sinergia previa.',
+        ? 'Even though B1 added 3 points, you still dominate the Center with 7 points thanks to your suit synergy.'
+        : 'Aunque B1 sumó 3 puntos, vosotros seguís dominando el Centro con 7 puntos gracias a vuestra sinergia de palo.',
     },
 
     // PASO 9: TURNO 7 - ALIADO A2
@@ -1048,13 +1048,13 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       asShadow: false,
       title: isEn ? "Ally A2's Turn: Opening the Third Front" : 'Turno de Aliado A2: Apertura del Tercer Frente',
       actionSummary: isEn
-        ? 'Ally A2 plays the Jack of Diamonds (J♦, 11 pts) on the Left Front.'
-        : 'Aliado A2 juega la Jota de Diamantes (J♦, 11 pts) en el Frente Izquierdo.',
+        ? 'Ally A2 plays the Jack of Diamonds (J♦ = 3 pts) on the Left Front.'
+        : 'Aliado A2 juega la Jota de Diamantes (J♦ = 3 pts) en el Frente Izquierdo.',
       whyPlayed: isEn
-        ? 'Your team leads Center (30 vs 23) and contests Right (10 vs 13). Ally A2 takes advantage of the empty Left Front to plant their Jack (11 pts) and take a 11-0 lead.'
-        : 'Vuestro equipo lidera el Centro (30 a 23) y disputa la Derecha (10 a 13). Aliado A2 aprovecha que el Frente Izquierdo está totalmente vacío para colocar su Jota (11 pts) y tomar ventaja libre (11 a 0).',
+        ? 'Your team leads Center (7 vs 6) and contests Right (2 vs 3). Ally A2 takes advantage of the empty Left Front to plant their Jack (3 pts) and take a 3-0 lead.'
+        : 'Vuestro equipo lidera el Centro (7 a 6) y disputa la Derecha (2 a 3). Aliado A2 aprovecha que el Frente Izquierdo está totalmente vacío para colocar su Jota (3 pts) y tomar ventaja libre (3 a 0).',
       whyNotOthers: isEn
-        ? 'A2 refrained from center (already comfortable lead) and right to force opponents to stretch thin across all 3 fronts.'
+        ? 'A2 refrained from center (already leading) and right to force opponents to stretch thin across all 3 fronts.'
         : 'No jugó en el centro porque ya tenéis ventaja suficiente, ni en la derecha porque prefiere obligar a los rivales a dividirse entre los 3 frentes.',
       tacticalInsight: isEn
         ? 'Masterful reading by A2: opening Left exerts simultaneous pressure across all 3 battlefronts.'
@@ -1074,11 +1074,11 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       asShadow: false,
       title: isEn ? "Rival B2's Turn: Enemy Synergy on the Right" : 'Turno de Rival B2: Sinergia Enemiga en la Derecha',
       actionSummary: isEn
-        ? 'Rival B2 plays the 7 of Spades (7♠) on the Right Front.'
-        : 'Rival B2 juega el 7 de Picas (7♠) en el Frente Derecho.',
+        ? 'Rival B2 plays the 7 of Spades (7♠ = 2 pts) on the Right Front.'
+        : 'Rival B2 juega el 7 de Picas (7♠ = 2 pts) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'B2 bolsters the right with 7 of Spades. Combining K♠ and 7♠ triggers enemy Spades Synergy (+5 pts)! Their team totals 13 + 7 + 5 = 25 points on the right against your 10 points.'
-        : 'B2 refuerza la derecha con su 7 de Picas. ¡Al juntar K♠ y 7♠, los rivales activan su propia Sinergia de Picas (+5 pts)! Su equipo suma 13 + 7 + 5 = 25 puntos en la derecha frente a tus 10 puntos.',
+        ? 'B2 bolsters the right with 7 of Spades. Combining K♠ (3) and 7♠ (2) triggers enemy Spades Synergy (+1 pt for 1 extra Spade)! Their team totals 3 + 2 + 1 = 6 points on the right against your 2 points.'
+        : 'B2 refuerza la derecha con su 7 de Picas. ¡Al juntar K♠ (3) y 7♠ (2), los rivales activan su Sinergia de Picas (+1 pto por 1 Pica extra)! Su equipo suma 3 + 2 + 1 = 6 puntos en la derecha frente a tus 2 puntos.',
       whyNotOthers: isEn
         ? 'B2 did not play left, seizing the chance to lock down a secure front for their team.'
         : 'B2 no jugó en la izquierda porque vio la oportunidad de consolidar un frente seguro para su bando.',
@@ -1102,29 +1102,29 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       requireShadow: true,
       title: isEn ? 'Your Turn 3: SHADOW MARKER MECHANIC!' : 'Tu Turno 3: ¡MECÁNICA DEL MARCADOR DE SOMBRA!',
       actionPrompt: isEn
-        ? 'Activate the "Play as Shadow" button, select your 8 of Hearts (8♥), and deploy it to the Center Front.'
-        : 'Activa el botón "Jugar como Sombra", selecciona tu 8 de Corazones (8♥) y colócalo en el Frente Central.',
+        ? 'Activate the "Play as Shadow" button, select your 8 of Hearts (8♥ = 2 pts), and deploy it to the Center Front.'
+        : 'Activa el botón "Jugar como Sombra", selecciona tu 8 de Corazones (8♥ = 2 pts) y colócalo en el Frente Central.',
       whyThisCard: isEn
-        ? 'In official WarFronts v2.0 rules, shadow cards are part of a continuous team economy: teams start Round 1 with 0 markers and earn them at round end (+1 win, +2 loss, +3 streak of 2+ losses, +1 tie in 2v2), saving them across rounds. In this drill, we provide 2 simulated markers so you can master their use. When playing a Shadow Card, you silently show it to your teammates before placing it face-down (in the digital game, it remains fully VISIBLE to your entire team with a purple border while hidden from opponents). Your ally A2 sees your 8♥ clearly to coordinate and build suit synergy (+10 pts for 3 hearts), while opponents only see the dark back, completely intimidating them.'
-        : 'En el reglamento oficial v2.0, las cartas sombra forman parte de una economía continua de equipo: los equipos inician la Ronda 1 con 0 marcadores y los ganan al final de la ronda (+1 por ganar, +2 por perder, +3 si llevas 2+ derrotas seguidas o +1 si hay empate en 2v2), ahorrándolos entre rondas. En este tutorial te proporcionamos 2 marcadores simulados para aprender su uso. Al jugar una Carta Sombra, se enseña en silencio a los compañeros antes de bajarla BOCA ABAJO (en la versión digital permanece VISIBLE para todo tu equipo con borde morado y oculta para los rivales). Tu aliado A2 ve perfectamente tu 8♥ para coordinar la estrategia y calcular las sinergias (+10 pts por 3 corazones), mientras que los rivales solo ven el reverso oscuro, intimidándolos por completo.',
+        ? 'In official WarFronts v2.1 rules, shadow cards are part of a continuous team economy: teams start Round 1 with 0 markers and earn them at round end (+1 win, +2 loss, +3 streak of 2+ losses, +1 tie in 2v2), saving them across rounds. In this drill, we provide 2 simulated markers so you can master their use. When playing a Shadow Card, you silently show it to your teammates before placing it face-down (in the digital game, it remains fully VISIBLE to your entire team with a purple border while hidden from opponents). Your ally A2 sees your 8♥ clearly to coordinate and build suit synergy (+2 pts for 3 hearts: 3+3+2 base + 2 synergy = 10 pts), while opponents only see the dark back, completely intimidating them.'
+        : 'En el reglamento oficial v2.1, las cartas sombra forman parte de una economía continua de equipo: los equipos inician la Ronda 1 con 0 marcadores y los ganan al final de la ronda (+1 por ganar, +2 por perder, +3 si llevas 2+ derrotas seguidas o +1 si hay empate en 2v2), ahorrándolos entre rondas. En este tutorial te proporcionamos 2 marcadores simulados para aprender su uso. Al jugar una Carta Sombra, se enseña en silencio a los compañeros antes de bajarla BOCA ABAJO (en la versión digital permanece VISIBLE para todo tu equipo con borde morado y oculta para los rivales). Tu aliado A2 ve perfectamente tu 8♥ para coordinar la estrategia y calcular las sinergias (+2 pts por 3 corazones: 3+3+2 base + 2 sinergia = 10 pts), mientras que los rivales solo ven el reverso oscuro, intimidándolos por completo.',
       whyNotOthers: isEn
         ? [
             {
-              cardLabel: '4 of Clubs (4♣)',
-              reason: 'Burning a team shadow token on a weak 4 with no synergy squanders your most potent tactical asset.',
+              cardLabel: '4 of Clubs (4♣ = 1p)',
+              reason: 'Burning a team shadow token on a weak 1-point card with no synergy squanders your most potent tactical asset.',
             },
             {
-              cardLabel: 'Ace of Diamonds (A♦)',
+              cardLabel: 'Ace of Diamonds (A♦ = 4p)',
               reason: 'The Ace is a powerhouse we want to deploy face up later to claim the Left Front decisively.',
             },
           ]
         : [
             {
-              cardLabel: '4 de Tréboles (4♣)',
-              reason: 'Gastar una sombra de equipo en un 4 débil que no tiene sinergia sería un desperdicio del recurso táctico más valioso.',
+              cardLabel: '4 de Tréboles (4♣ = 1p)',
+              reason: 'Gastar una sombra de equipo en una carta de 1 punto que no tiene sinergia sería un desperdicio del recurso táctico más valioso.',
             },
             {
-              cardLabel: 'As de Diamantes (A♦)',
+              cardLabel: 'As de Diamantes (A♦ = 4p)',
               reason: 'El As es una bomba que queremos jugar visible más adelante para ganar el Frente Izquierdo de forma aplastante.',
             },
           ],
@@ -1143,11 +1143,11 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       asShadow: false,
       title: isEn ? "Rival B1's Turn: Response on the Left" : 'Turno de Rival B1: Respuesta en la Izquierda',
       actionSummary: isEn
-        ? 'Rival B1 plays the 5 of Diamonds (5♦, 5 pts) on the Left Front.'
-        : 'Rival B1 juega el 5 de Diamantes (5♦, 5 pts) en el Frente Izquierdo.',
+        ? 'Rival B1 plays the 5 of Diamonds (5♦ = 1 pt) on the Left Front.'
+        : 'Rival B1 juega el 5 de Diamantes (5♦ = 1 pto) en el Frente Izquierdo.',
       whyPlayed: isEn
-        ? 'Your ally A2 has Jack of Diamonds (11 pts) on the left. B1 cannot leave that front uncontested, playing 5♦ to start disputing it.'
-        : 'Tu aliado A2 tiene una Jota de Diamantes (11 pts) en la izquierda. B1 no puede dejar que os llevéis ese frente sin oposición, así que coloca su 5♦ para empezar a disputarlo.',
+        ? 'Your ally A2 has Jack of Diamonds (3 pts) on the left. B1 cannot leave that front uncontested, playing 5♦ (1 pt) to start disputing it.'
+        : 'Tu aliado A2 tiene una Jota de Diamantes (3 pts) en la izquierda. B1 no puede dejar que os llevéis ese frente sin oposición, así que coloca su 5♦ (1 pto) para empezar a disputarlo.',
       whyNotOthers: isEn
         ? 'B1 feared playing in the Center after watching your threatening Shadow deployment, sensing the center is out of reach.'
         : 'B1 no se atrevió a jugar en el Centro porque vio que acabas de desplegar una carta Sombra amenazante y teme que el centro sea imposible de remontar.',
@@ -1169,11 +1169,11 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       asShadow: false,
       title: isEn ? "Ally A2's Turn: Fortifying the Center" : 'Turno de Aliado A2: Blindaje Definitivo del Centro',
       actionSummary: isEn
-        ? 'Ally A2 plays the 9 of Hearts (9♥, 9 pts) on the Center Front.'
-        : 'Aliado A2 juega el 9 de Corazones (9♥, 9 pts) en el Frente Central.',
+        ? 'Ally A2 plays the 9 of Hearts (9♥ = 2 pts) on the Center Front.'
+        : 'Aliado A2 juega el 9 de Corazones (9♥ = 2 pts) en el Frente Central.',
       whyPlayed: isEn
-        ? 'A2 follows the master plan: adding another Hearts card to Center. The Center is now fortified with 4 Team A Hearts cards (+15 pts suit synergy).'
-        : 'A2 sigue vuestro plan maestro: añade otra carta de corazones al Frente Central. Con esto, el Centro queda completamente blindado con 4 cartas de Corazones del Equipo A (+15 pts de sinergia de palo).',
+        ? 'A2 follows the master plan: adding another Hearts card to Center. With 4 Team A Hearts cards, your team scores Base (3+3+2+2 = 10) + Color (+3 for 3 extra Hearts) = 13 total points!'
+        : 'A2 sigue vuestro plan maestro: añade otra carta de corazones al Frente Central. Con 4 cartas de Corazones del Equipo A, sumáis Base (3+3+2+2 = 10) + Color (+3 por 3 cartas extra) = ¡13 puntos totales!',
       whyNotOthers: isEn
         ? 'A2 holds 3♦ and 6♠ for the final turns on the flanks.'
         : 'A2 se guarda su 3♦ y 6♠ para los compases finales según convenga en los flancos.',
@@ -1223,22 +1223,22 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       requireShadow: false,
       title: isEn ? 'Your Turn 4: Masterstroke on the Decisive Front!' : 'Tu Turno 4: ¡Golpe Maestro en el Frente Decisivo!',
       actionPrompt: isEn
-        ? 'Select your Ace of Diamonds (A♦) and deploy it to the Left Front.'
-        : 'Selecciona tu As de Diamantes (A♦) y despliégalo en el Frente Izquierdo.',
+        ? 'Select your Ace of Diamonds (A♦ = 4 pts) and deploy it to the Left Front.'
+        : 'Selecciona tu As de Diamantes (A♦ = 4 pts) y despliégalo en el Frente Izquierdo.',
       whyThisCard: isEn
-        ? 'Crucial match turning point! Look at the strategic picture: Center is locked down by your Hearts combo. Right belongs to the rival. Therefore: THE ROUND IS DECIDED ON THE LEFT FRONT! Rival B2 placed a shadow card. Playing your Ace of Diamonds (14 base points, the highest card in the deck) delivers overwhelming power and triggers Diamond Synergy with Ally A2\'s J♦ (+5 bonus pts). This move seals the round!'
-        : '¡Momento crucial de la partida! Analicemos el panorama global: el Centro está ganado con creces por vuestro combo de corazones. La Derecha está en manos del rival. Por tanto: ¡LA PARTIDA SE DECIDE EN EL FRENTE IZQUIERDO! El rival B2 ha puesto una carta sombra. Al jugar tu As de Diamantes (14 puntos base, la carta más alta de la baraja), sumas una ventaja arrolladora en la izquierda y activas la Sinergia de Diamantes con la J♦ de tu aliado A2 (+5 pts adicionales). ¡Este movimiento sentencia la ronda!',
+        ? 'Crucial match turning point! Look at the strategic picture: Center is locked down by your Hearts combo. Right belongs to the rival. Therefore: THE ROUND IS DECIDED ON THE LEFT FRONT! Rival B2 placed a shadow card. Playing your Ace of Diamonds (4 base points, the highest single card) delivers supreme power and triggers Diamond Synergy with Ally A2\'s J♦ (+1 bonus pt). This move seals the round!'
+        : '¡Momento crucial de la partida! Analicemos el panorama global: el Centro está ganado con creces por vuestro combo de corazones. La Derecha está en manos del rival. Por tanto: ¡LA PARTIDA SE DECIDE EN EL FRENTE IZQUIERDO! El rival B2 ha puesto una carta sombra. Al jugar tu As de Diamantes (4 puntos base, la carta más alta de la baraja), sumas una ventaja arrolladora en la izquierda y activas la Sinergia de Diamantes con la J♦ de tu aliado A2 (+1 pto adicional). ¡Este movimiento sentencia la ronda!',
       whyNotOthers: isEn
         ? [
             {
-              cardLabel: '4 of Clubs (4♣)',
-              reason: 'The 4♣ provides only 4 points without synergy, leaving the left exposed to the enemy shadow card.',
+              cardLabel: '4 of Clubs (4♣ = 1p)',
+              reason: 'The 4♣ provides only 1 point without synergy, leaving the left exposed to the enemy shadow card.',
             },
           ]
         : [
             {
-              cardLabel: '4 de Tréboles (4♣)',
-              reason: 'El 4♣ sumaría solo 4 puntos y no activaría sinergia, dejando la izquierda a merced de la carta sombra del rival.',
+              cardLabel: '4 de Tréboles (4♣ = 1p)',
+              reason: 'El 4♣ sumaría solo 1 punto y no activaría sinergia, dejando la izquierda a merced de la carta sombra del rival.',
             },
           ],
     },
@@ -1256,17 +1256,17 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       asShadow: false,
       title: isEn ? "Rival B1's Turn: Tactical Discard" : 'Turno de Rival B1: Descarte Táctico',
       actionSummary: isEn
-        ? 'Rival B1 plays the Two of Clubs (2♣, 2 pts) on the Right Front.'
-        : 'Rival B1 juega el Dos de Tréboles (2♣, 2 pts) en el Frente Derecho.',
+        ? 'Rival B1 plays the Two of Clubs (2♣ = 1 pt) on the Right Front.'
+        : 'Rival B1 juega el Dos de Tréboles (2♣ = 1 pto) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'Seeing your Ace drop on the left, B1 realizes challenging the left or center is futile. Executing a "Tactical Discard", B1 dumps their lowest card (2♣) on the right where their team already leads, bagging 2 cumulative points safely.'
-        : 'Al ver caer tu As en la izquierda, B1 sabe que competir en la izquierda o centro es misión imposible. Realiza un "Descarte Táctico": deposita su carta más baja (2♣) en la derecha donde su equipo ya va ganando, sumando esos 2 puntos para su acumulado global sin estorbar.',
+        ? 'Seeing your Ace drop on the left, B1 realizes challenging the left or center is futile. Executing a "Tactical Discard", B1 dumps their lowest card (2♣ = 1 pt) on the right where their team already leads, avoiding crowding contested fronts.'
+        : 'Al ver caer tu As en la izquierda, B1 sabe que competir en la izquierda o centro es misión imposible. Realiza un "Descarte Táctico": deposita su carta más baja (2♣ = 1 pto) en la derecha donde su equipo ya va ganando, sin estorbar en los frentes disputados.',
       whyNotOthers: isEn
         ? 'Lacks sufficient card strength to challenge your Ace of Diamonds on the left.'
         : 'No tiene cartas con valor suficiente para desafiar vuestro As de Diamantes en la izquierda.',
       tacticalInsight: isEn
-        ? 'Tactical lesson: When a front is out of reach, dumping low cards into secure fronts to boost tie-breaker points is standard high-level play.'
-        : 'Lección táctica: Cuando un frente está perdido, colocar cartas bajas en frentes seguros para sumar puntos al acumulado es una técnica profesional de WarFronts.',
+        ? 'Tactical lesson: When a front is out of reach, dumping low cards into secure fronts is standard play.'
+        : 'Lección táctica: Cuando un frente está perdido, colocar cartas bajas en frentes seguros es una técnica táctica estándar de WarFronts.',
     },
 
     // PASO 17: TURNO 15 - ALIADO A2
@@ -1280,13 +1280,13 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       card: { id: 'card-6s', suit: 'spades', rank: '6', base: 6 },
       frontKey: 'right',
       asShadow: false,
-      title: isEn ? "Ally A2's Turn: Harvesting Cumulative Points" : 'Turno de Aliado A2: Cosecha de Puntos Acumulados',
+      title: isEn ? "Ally A2's Turn: Right Flank Containment" : 'Turno de Aliado A2: Contención en el Flanco Derecho',
       actionSummary: isEn
-        ? 'Ally A2 plays the Six of Spades (6♠, 6 pts) on the Right Front.'
-        : 'Aliado A2 juega el Seis de Picas (6♠, 6 pts) en el Frente Derecho.',
+        ? 'Ally A2 plays the Six of Spades (6♠ = 1 pt) on the Right Front.'
+        : 'Aliado A2 juega el Seis de Picas (6♠ = 1 pto) en el Frente Derecho.',
       whyPlayed: isEn
-        ? 'A2 does not need to overload the left (firmly held by Ace and Jack) and prefers adding 6 points on the right, connecting synergy with your earlier 10♠.'
-        : 'A2 no necesita sobrecargar la izquierda (ya dominada por vuestro As y Jota) y prefiere sumar 6 puntos en la derecha, aprovechando para sumar sinergia con tu 10♠ anterior.',
+        ? 'A2 does not need to overload the left (firmly held by Ace and Jack) and prefers adding 6♠ (1 pt) on the right, connecting Spades synergy (+1 pt) with your earlier 10♠ (2 pts).'
+        : 'A2 no necesita sobrecargar la izquierda (ya dominada por vuestro As y Jota) y prefiere sumar 6♠ (1 pto) en la derecha, aprovechando para sumar sinergia de Picas (+1 pto) con tu 10♠ anterior (2 pts).',
       whyNotOthers: isEn
         ? 'Reserves 3♦ for the final touch on the left.'
         : 'Se reserva su 3♦ para el remate final en la izquierda.',
@@ -1308,11 +1308,11 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       asShadow: false,
       title: isEn ? "Rival B2's Turn: Desperation Push" : 'Turno de Rival B2: Intento a la Desesperada',
       actionSummary: isEn
-        ? 'Rival B2 plays the Four of Diamonds (4♦, 4 pts) on the Left Front.'
-        : 'Rival B2 juega el Cuatro de Diamantes (4♦, 4 pts) en el Frente Izquierdo.',
+        ? 'Rival B2 plays the Four of Diamonds (4♦ = 1 pt) on the Left Front.'
+        : 'Rival B2 juega el Cuatro de Diamantes (4♦ = 1 pto) en el Frente Izquierdo.',
       whyPlayed: isEn
-        ? 'B2 desperately tries to close the gap on the left with 4♦, combining synergy with B1\'s 5♦. But your Ace and Jack maintain an insurmountable advantage.'
-        : 'B2 intenta desesperadamente recortar distancias en la izquierda con su 4♦, sumando sinergia con el 5♦ de B1. Pero vuestro As y Jota mantienen una ventaja inalcanzable.',
+        ? 'B2 desperately tries to close the gap on the left with 4♦ (1 pt), combining synergy with B1\'s 5♦ (+1 pt for 2 Diamonds). But your Ace and Jack maintain an insurmountable advantage.'
+        : 'B2 intenta desesperadamente recortar distancias en la izquierda con su 4♦ (1 pto), sumando sinergia con el 5♦ de B1 (+1 pto por 2 Diamantes). Pero vuestro As y Jota mantienen una ventaja inalcanzable.',
       whyNotOthers: isEn
         ? 'Only holds a low card (5♥) in hand.'
         : 'Solo le queda una carta baja (5♥) en mano.',
@@ -1336,11 +1336,11 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
       requireShadow: false,
       title: isEn ? 'Your Final Turn: Deployment Close' : 'Tu Turno Final: Cierre de Despliegue',
       actionPrompt: isEn
-        ? 'Deploy your final card, the Four of Clubs (4♣), to the Right Front.'
-        : 'Despliega tu última carta, el Cuatro de Tréboles (4♣), en el Frente Derecho.',
+        ? 'Deploy your final card, the Four of Clubs (4♣ = 1 pt), to the Right Front.'
+        : 'Despliega tu última carta, el Cuatro de Tréboles (4♣ = 1 pto), en el Frente Derecho.',
       whyThisCard: isEn
-        ? 'You only have the 4♣ remaining. Center and Left are mathematically won by your team (2 of 3 fronts secured = +2 Round Points!). Deploying 4♣ to the Right Front is your ideal closing move: it feeds 4 points directly into your team\'s Cumulative Points tally for tie-breakers!'
-        : 'Te queda únicamente el 4♣. El Centro y la Izquierda ya están matemáticamente ganados por vuestro equipo (¡2 de 3 frentes asegurados = +2 Puntos de Ronda!). Desplegar el 4♣ en el Frente Derecho es tu jugada de cierre perfecta: sumas 4 puntos directamente al marcador de Puntos Acumulados de tu equipo. ¡Los puntos acumulados deciden quién gana el juego en caso de empate en Puntos de Ronda!',
+        ? 'You only have the 4♣ remaining. Center and Left are mathematically won by your team (2 of 3 fronts secured = +2 Round Points!). Remember: in v2.1, front scores are NOT accumulated to break match ties; ties in Round Points are decided first by Shadow Efficiency (unspent Shadow Markers in the Team Pool) and then by a 2-Round Overtime!'
+        : 'Te queda únicamente el 4♣. El Centro y la Izquierda ya están matemáticamente ganados por vuestro equipo (¡2 de 3 frentes asegurados = +2 Puntos de Ronda!). Recuerda: en la Versión 2.1 ya NO se acumulan las puntuaciones de los frentes para desempatar la partida; los empates en Puntos de Ronda se deciden primero por Eficiencia de Sombras (más Marcadores de Sombra en el Fondo de Equipo) y después por Prórroga de 2 Rondas.',
       whyNotOthers: isEn
         ? [
             {
@@ -1404,8 +1404,8 @@ export function getTutorialSteps(lang = 'es', tutorialMode = 'competitive') {
         ? 'CONGRATULATIONS, GRADUATE COMMANDER!'
         : '¡ENHORABUENA, COMANDANTE GRADUADO!',
       subtitle: isEn
-        ? 'You have mastered all the fundamentals of WarFronts'
-        : 'Has dominado todos los fundamentos de Frentes de Guerra',
+        ? 'You have mastered all the fundamentals of WarFronts v2.1'
+        : 'Has dominado todos los fundamentos de Frentes de Guerra v2.1',
     },
   ];
 }

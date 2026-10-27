@@ -2,1047 +2,881 @@ import React, { useState } from 'react';
 import {
   X,
   BookOpen,
-  ChevronRight,
+  Printer,
   Swords,
   Layers,
-  Scale,
   Clock,
-  Sparkles,
-  Flame,
   EyeOff,
-  AlertTriangle,
-  Award,
   Trophy,
-  Users,
-  TrendingUp,
+  Scale,
+  UserCheck,
+  PartyPopper,
+  CheckCircle2,
+  AlertTriangle,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
-import { LanguageToggle } from './LanguageToggle';
 
+/**
+ * Reglamento Oficial Completo v2.1 — Frentes de Guerra
+ * Contenido íntegro y exacto del documento "REGLAMENTO OFICIAL: FRENTES DE GUERRA v2.1 (Sistema Unificado)"
+ */
 export function FullManualModal({ isOpen, onClose }) {
-  const { isEn, manualT } = useLanguage();
-  const [activeSection, setActiveSection] = useState('sec1');
+  const { manual, isEn } = useLanguage();
+  const [activeTab, setActiveTab] = useState('all');
 
   if (!isOpen) return null;
 
-  const sections = manualT.sections;
+  function handlePrint() {
+    setActiveTab('all');
+    setTimeout(() => {
+      window.print();
+    }, 100);
+  }
+
+  const tabs = [
+    { id: 'all', label: manual.tabs.all },
+    { id: 'c1', label: manual.tabs.c1 },
+    { id: 'c2', label: manual.tabs.c2 },
+    { id: 'c3', label: manual.tabs.c3 },
+    { id: 'c4', label: manual.tabs.c4 },
+    { id: 'c5', label: manual.tabs.c5 },
+    { id: 'c6', label: manual.tabs.c6 },
+    { id: 'c7', label: manual.tabs.c7 },
+    { id: 'c8', label: manual.tabs.c8 },
+    { id: 'c9', label: manual.tabs.c9 },
+  ];
+
+  const showSection = (id) => activeTab === 'all' || activeTab === id;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-md animate-fadeIn text-slate-100">
-      <div className="bg-[#07090e] border border-amber-500/30 w-full max-w-5xl rounded-3xl shadow-2xl flex flex-col h-[94vh] overflow-hidden">
-        {/* Cabecera del Manual Completo */}
-        <div className="px-6 py-4 bg-gradient-to-r from-black via-[#111622] to-black border-b border-amber-500/20 flex items-center justify-between">
+    <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 overflow-y-auto print:p-0 print:bg-white print:block">
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          #full-manual-printable,
+          #full-manual-printable * {
+            visibility: visible;
+          }
+          #full-manual-printable {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            background: white !important;
+            color: #0f172a !important;
+            padding: 16px 24px !important;
+            box-shadow: none !important;
+            border: none !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+        }
+      `}</style>
+
+      <div className="bg-slate-900 border border-slate-700/80 rounded-3xl max-w-5xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[94vh] print:max-h-none print:rounded-none print:border-none">
+        {/* Cabecera Superior */}
+        <div className="no-print px-4 sm:px-6 py-3.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between gap-2 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-[0_0_15px_rgba(212,175,55,0.15)]">
+            <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base sm:text-lg font-serif font-black tracking-widest uppercase text-gold-gradient">
-                  {manualT.headerTitle}
-                </h2>
-                <span className="text-[9px] bg-black/60 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded font-serif font-black uppercase tracking-wider">
-                  {manualT.headerVersion}
-                </span>
-              </div>
-              <p className="text-xs font-serif text-slate-400">
-                {manualT.headerSubtitle}
-              </p>
+              <h2 className="text-sm sm:text-base font-black text-white uppercase tracking-wide">
+                {manual.headerTitle}
+              </h2>
+              <p className="text-[11px] text-slate-400">{manual.headerSubtitle}</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
-            <LanguageToggle compact />
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrint}
+              className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs flex items-center gap-1.5 shadow-md transition cursor-pointer"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>{manual.printBtn}</span>
+            </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-black/60 border border-transparent hover:border-amber-500/30 transition cursor-pointer"
-              title={manualT.closeBtn}
+              className="p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer"
+              title={manual.closeBtn}
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Cuerpo del Manual con Navegación Lateral y Contenido */}
-        <div className="flex-1 flex overflow-hidden">
-          {/* Barra Lateral de Secciones */}
-          <aside className="w-64 border-r border-slate-800 bg-slate-950/80 p-3 hidden sm:flex flex-col justify-between overflow-y-auto shrink-0">
-            <div className="space-y-1">
-              <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider px-2 block mb-2">
-                {manualT.tocTitle}
-              </span>
-              {sections.map((sec) => (
-                <button
-                  key={sec.id}
-                  onClick={() => setActiveSection(sec.id)}
-                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-semibold flex items-center justify-between transition ${
-                    activeSection === sec.id
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                      : 'text-slate-400 hover:bg-slate-900 hover:text-slate-200'
-                  }`}
-                >
-                  <span className="truncate">
-                    <strong className="text-amber-400 mr-1.5">{sec.num}.</strong>
-                    {sec.title}
-                  </span>
-                  <ChevronRight className="w-3.5 h-3.5 opacity-50 shrink-0" />
-                </button>
-              ))}
-            </div>
-
-            <div className="p-3 bg-slate-900/60 rounded-xl border border-slate-800/80 text-[11px] text-slate-400 mt-4">
-              <span className="font-bold text-slate-200 block mb-1">{manualT.officialNoteTitle}</span>
-              {manualT.officialNoteText}
-            </div>
-          </aside>
-
-          {/* Selector de pestañas para móvil */}
-          <div className="sm:hidden flex overflow-x-auto border-b border-slate-800 p-2 gap-1 bg-slate-950">
-            {sections.map((sec) => (
-              <button
-                key={sec.id}
-                onClick={() => setActiveSection(sec.id)}
-                className={`px-2.5 py-1 rounded-lg text-xs font-bold whitespace-nowrap ${
-                  activeSection === sec.id ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 text-slate-400'
-                }`}
-              >
-                {isEn ? `Ch. ${sec.num}` : `Cap. ${sec.num}`}
-              </button>
-            ))}
-          </div>
-
-          {/* Área de Lectura del Contenido */}
-          <div className="flex-1 p-5 sm:p-8 overflow-y-auto space-y-6 leading-relaxed text-sm text-slate-300 bg-slate-950">
-            {/* SECCIÓN 1: INTRODUCCIÓN Y OBJETIVO */}
-            {activeSection === 'sec1' && (
-              <div className="space-y-4 animate-fadeIn">
-                <div className="border-b border-slate-800 pb-3">
-                  <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-                    {isEn ? 'Chapter 1' : 'Capítulo 1'}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">
-                    {isEn ? '1. Introduction & Objective' : '1. Introducción y Objetivo'}
-                  </h3>
-                </div>
-
-                <p className="text-slate-300">
-                  {isEn ? (
-                    <><strong className="text-slate-100">WarFronts</strong> is a tactical team card game based on zone control, imperfect information, strategic deduction, and teamwork without micromanagement.</>
-                  ) : (
-                    <><strong className="text-slate-100">Frentes de Guerra</strong> es un juego táctico de cartas por equipos basado en el control de zonas, la información imperfecta, la deducción estratégica y el trabajo en equipo sin microgestión.</>
-                  )}
-                </p>
-
-                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
-                  <h4 className="font-bold text-slate-100 flex items-center gap-2">
-                    <Award className="w-4 h-4 text-amber-400" />
-                    {isEn ? 'Match Objective' : 'Objetivo de la Partida'}
-                  </h4>
-                  <p>
-                    {isEn ? (
-                      <>The match is contested over a <strong className="text-slate-100">fixed total of Rounds</strong>. The team securing the <strong className="text-amber-400">highest total sum of Round Points</strong> at the end of those rounds is declared the victor. In the event of a tie upon completing all rounds, the match will be resolved via the <strong className="text-emerald-400">cumulative score</strong> criterion (total numerical points scored in every round).</>
-                    ) : (
-                      <>La partida se disputa a un <strong className="text-slate-100">total fijo de Rondas</strong>. El equipo que obtenga la <strong className="text-amber-400">mayor suma de Puntos de Ronda</strong> al término de las mismas se declara vencedor. En caso de empate al finalizar las rondas, la partida se resolverá mediante el criterio de <strong className="text-emerald-400">puntuación acumulada</strong> (puntos numéricos totales en cada ronda).</>
-                    )}
-                  </p>
-
-                  <div className="pt-2">
-                    <span className="text-xs font-bold text-slate-400 block mb-1">
-                      {isEn ? 'Official match durations are as follows:' : 'Las duraciones oficiales de partida son las siguientes:'}
-                    </span>
-                    <ul className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                      <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-amber-400 block">{isEn ? 'Short:' : 'Corta:'}</strong>
-                        {isEn ? '4 rounds.' : '4 rondas.'}
-                      </li>
-                      <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-amber-400 block">{isEn ? 'Medium:' : 'Mediana:'}</strong>
-                        {isEn ? '6 rounds.' : '6 rondas.'}
-                      </li>
-                      <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-amber-400 block">{isEn ? 'Long:' : 'Larga:'}</strong>
-                        {isEn ? '8 rounds.' : '8 rondas.'}
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-2">
-                  <h4 className="font-bold text-slate-100 flex items-center gap-2">
-                    <Swords className="w-4 h-4 text-emerald-400" />
-                    {isEn ? 'Round Objective' : 'Objetivo de la Ronda'}
-                  </h4>
-                  <p>
-                    {isEn ? (
-                      <>Conquer as many of the <strong className="text-emerald-400">3 War Fronts</strong> (Left, Center, and Right) as possible by achieving the highest total numerical value on them upon conclusion of deployment, earning <strong className="text-amber-400">1, 2, or up to 3 Round Points</strong> depending on the dominance achieved.</>
-                    ) : (
-                      <>Conquistar la mayor cantidad posible de los <strong className="text-emerald-400">3 Frentes de Guerra</strong> (Izquierdo, Central y Derecho) obteniendo el mayor valor numérico total en ellos al finalizar el despliegue, para sumar <strong className="text-amber-400">1, 2 o hasta 3 Puntos de Ronda</strong> según el dominio logrado.</>
-                    )}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* SECCIÓN 2: MATERIALES Y GESTIÓN DE MAZOS */}
-            {activeSection === 'sec2' && (
-              <div className="space-y-4 animate-fadeIn">
-                <div className="border-b border-slate-800 pb-3">
-                  <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-                    {isEn ? 'Chapter 2' : 'Capítulo 2'}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">
-                    {isEn ? '2. Materials & Deck Management' : '2. Materiales y Gestión de Mazos'}
-                  </h3>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="font-bold text-slate-100">
-                    {isEn ? 'Official Components:' : 'Componentes Oficiales:'}
-                  </h4>
-                  <ul className="space-y-2 text-xs sm:text-sm">
-                    <li className="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
-                      <strong>{isEn ? 'Players:' : 'Jugadores:'}</strong> {isEn ? '1v1 (see annex), 2v2, 3v3, or 4v4.' : '1v1 (ver anexo), 2v2, 3v3 o 4v4.'}
-                    </li>
-                    <li className="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
-                      <strong>{isEn ? 'Decks (Standard poker decks without jokers):' : 'Barajas (Póker estándar sin comodines/jokers):'}</strong>
-                      <div className="mt-1 text-slate-400 space-y-0.5">
-                        <div>• <strong>{isEn ? '2v2 Matches:' : 'Partidas 2v2:'}</strong> {isEn ? '1 standard deck (52 cards).' : '1 Baraja estándar (52 cartas).'}</div>
-                        <div>• <strong>{isEn ? '3v3 and 4v4 Matches:' : 'Partidas 3v3 y 4v4:'}</strong> {isEn ? '2 standard decks combined and shuffled together (104 cards).' : '2 Barajas estándar combinadas y mezcladas (104 cartas).'}</div>
-                      </div>
-                    </li>
-                    <li className="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
-                      <strong>{isEn ? 'Additional Components:' : 'Componentes Adicionales:'}</strong>
-                      <div className="mt-1 text-slate-400 space-y-0.5">
-                        <div>• <strong>{isEn ? '1 Initiative Token.' : '1 Ficha de Iniciativa.'}</strong></div>
-                        <div>• <strong>{isEn ? 'Shadow Markers:' : 'Marcadores de Sombra:'}</strong> {isEn ? 'These markers form the Team Shadow Pool, managed as a continuous economic resource. They can be coins, stones, dice, counters, or paper. They do not have to be held by the players who will use them; they can remain off the table and be placed each time the team uses one.' : 'Estos marcadores forman el Fondo de Sombras del Equipo, el cual se gestiona como un recurso económico continuo. Pueden ser monedas, piedras, dados, fichas o papel. No tienen por qué tenerlos los jugadores que van a usarlos, pueden estar fuera de la mesa y colocarse cada vez que el equipo hace uso de uno de ellos.'}</div>
-                        <div>• <strong>{isEn ? '1 Stopwatch / Dual Chess Clock:' : '1 Cronómetro / Reloj de Ajedrez Dual:'}</strong> {isEn ? 'Switched clock timing shared team time during the round.' : 'Reloj conmutado para medir el tiempo global compartido de cada equipo en la ronda.'}</div>
-                        <div>• <strong>{isEn ? 'Score Sheet / Scoreboard:' : 'Hoja de Anotación / Marcador:'}</strong> {isEn ? 'Notepad or digital interface to tally round points and cumulative front points.' : '1 bloc de papel o marcador digital para registrar tanto los puntos de ronda como la suma de puntos numéricos de cada frente por ronda.'}</div>
-                      </div>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="border-t border-slate-800 pt-4 space-y-3">
-                  <h4 className="font-bold text-slate-100 flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-indigo-400" />
-                    {isEn ? 'Draw Deck & Discard Pile Management' : 'Gestión del Mazo Principal y Pozo de Descartes'}
-                  </h4>
-                  <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
-                    <li className="bg-slate-900/60 p-3 rounded border border-slate-800">
-                      <strong className="text-slate-100">{isEn ? 'Draw Deck (Main Deck):' : 'Mazo Principal (Mazo de Robo):'}</strong> {isEn ? 'The face-down pile from which cards are dealt to players.' : 'Es la pila boca abajo de donde se reparten las cartas a los jugadores.'}
-                    </li>
-                    <li className="bg-slate-900/60 p-3 rounded border border-slate-800">
-                      <strong className="text-slate-100">{isEn ? 'Discard Pile:' : 'Pozo de Descartes:'}</strong> {isEn ? 'Face-up pile at the table edge where all cards played on fronts are placed at round end.' : 'Pila boca arriba a un lado de la mesa donde se colocan todas las cartas jugadas en los frentes al terminar una ronda.'}
-                    </li>
-                    <li className="bg-slate-900/60 p-3 rounded border border-slate-800">
-                      <strong className="text-amber-300">{isEn ? 'Continuity Rule & Card Counting:' : 'Regla de Continuidad y Conteo de Cartas:'}</strong> {isEn ? 'Cards played during a round are NOT reshuffled at round end; they remain in the discard pile. This enables players to perform strategic card counting of high cards and possible combinations.' : 'Las cartas jugadas en una ronda NO se rebarajan al finalizar dicha ronda; permanecen en el pozo de descartes. Esto permite a los jugadores realizar un conteo estratégico de cartas altas y posibles combinaciones.'}
-                    </li>
-                    <li className="bg-slate-900/60 p-3 rounded border border-slate-800">
-                      <strong className="text-rose-300">{isEn ? 'Reshuffle on Depletion:' : 'Rebarajado por Agotamiento:'}</strong> {isEn ? 'Whenever the Draw Deck lacks sufficient cards to deal hands to each player at the start of a round, the entire Discard Pile is gathered, thoroughly shuffled, and forms a new Draw Deck.' : 'Cuando el Mazo Principal no tenga suficientes cartas para repartir a cada jugador al inicio de una ronda, se toma todo el Pozo de Descartes, se baraja minuciosamente y se forma un nuevo Mazo Principal.'}
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            {/* SECCIÓN 3: DISPOSICIÓN Y DETERMINACIÓN DE INICIATIVA */}
-            {activeSection === 'sec3' && (
-              <div className="space-y-4 animate-fadeIn">
-                <div className="border-b border-slate-800 pb-3">
-                  <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-                    {isEn ? 'Chapter 3' : 'Capítulo 3'}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">
-                    {isEn ? '3. Layout, Initiative & Team Clocks' : '3. Disposición, Iniciativa y Tiempos de Equipo'}
-                  </h3>
-                </div>
-
-                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
-                  <h4 className="font-bold text-slate-100">{isEn ? 'Table Layout' : 'Disposición de la Mesa'}</h4>
-                  <p>
-                    {isEn ? (
-                      <>Three zones are designated across the center of the table: <strong className="text-slate-100">Left Front, Center Front, and Right Front</strong>. The Draw Deck and Discard Pile are placed to one side alongside the dual team chess clock.</>
-                    ) : (
-                      <>Se delimitan 3 zonas en el centro de la mesa: <strong className="text-slate-100">Frente Izquierdo, Frente Central y Frente Derecho</strong>. El Mazo Principal y el Pozo de Descartes se ubican a un costado junto con el reloj dual de equipo.</>
-                    )}
-                  </p>
-                </div>
-
-                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
-                  <h4 className="font-bold text-slate-100">{isEn ? 'Initial Initiative Determination' : 'Determinación de la Iniciativa Inicial'}</h4>
-                  <p>
-                    {isEn ? (
-                      <>Before Round 1 begins, the attacking team is determined by a <strong className="text-amber-400">100% random draw</strong> (cutting the deck for highest card in tabletop play; automatic draw in digital play). The winning team receives the <strong className="text-amber-400">Initiative Token</strong> and makes the first deployment move.</>
-                    ) : (
-                      <>Antes de iniciar la Ronda 1, se determina qué equipo empieza atacando mediante un <strong className="text-amber-400">sorteo 100% aleatorio</strong> (en el juego presencial de mesa se realiza un corte de baraja robando la carta más alta; en la versión digital el sistema ejecuta este sorteo automáticamente por código). El equipo beneficiado recibe la <strong className="text-amber-400">Ficha de Iniciativa</strong> y abre el primer turno de despliegue.</>
-                    )}
-                  </p>
-                </div>
-
-                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
-                  <h4 className="font-bold text-slate-100">{isEn ? 'Initiative Rotation' : 'Rotación de Iniciativa'}</h4>
-                  <p>
-                    {isEn ? (
-                      <>From Round 2 onward, the Initiative Token <strong className="text-emerald-400">automatically alternates to the opposing team</strong> at the start of each round, regardless of who won the previous round.</>
-                    ) : (
-                      <>A partir de la Ronda 2, la Ficha de Iniciativa <strong className="text-emerald-400">rota automáticamente al equipo contrario</strong> al inicio de cada ronda, independientemente de quién haya ganado la ronda anterior.</>
-                    )}
-                  </p>
-                </div>
-
-                {/* TABLA OFICIAL DE TIEMPOS DE EQUIPO */}
-                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
-                  <h4 className="font-bold text-amber-400 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-amber-400" />
-                    {isEn ? 'Shared Team Clock (Official Times per Mode)' : 'Reloj de Equipo Compartido (Tiempos Oficiales por Modalidad)'}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-slate-300">
-                    {isEn ? (
-                      <>Time is not individual per turn; it is a <strong>shared time pool for the entire team</strong> consumed exclusively while any of its members thinks or deploys a card. Upon card placement, the clock pauses and the opponent clock starts immediately.</>
-                    ) : (
-                      <>El tiempo ya no es individual por turno; es una <strong>bolsa de tiempo compartida para el equipo entero</strong> que se consume únicamente mientras cualquiera de sus miembros piensa o despliega una carta. Al colocar la carta, el reloj se detiene y se activa de inmediato el reloj del equipo contrario.</>
-                    )}
-                  </p>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-xs text-left border-collapse">
-                      <thead>
-                        <tr className="border-b border-slate-700 bg-slate-950 text-slate-300">
-                          <th className="p-2 font-bold">{isEn ? 'Mode' : 'Modalidad'}</th>
-                          <th className="p-2 font-bold text-emerald-400">{isEn ? 'Fast' : 'Rápido'}</th>
-                          <th className="p-2 font-bold text-amber-400">{isEn ? 'Medium' : 'Medio'}</th>
-                          <th className="p-2 font-bold text-indigo-400">{isEn ? 'Slow' : 'Lento'}</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-800 font-mono text-slate-300">
-                        <tr className="hover:bg-slate-800/40">
-                          <td className="p-2 font-sans font-semibold text-slate-100">{isEn ? '1v1 (10 cards/player)' : '1v1 (10 cartas/jugador)'}</td>
-                          <td className="p-2 text-emerald-300">1m 40s (100s)</td>
-                          <td className="p-2 text-amber-300">3m 20s (200s)</td>
-                          <td className="p-2 text-indigo-300">5m 00s (300s)</td>
-                        </tr>
-                        <tr className="hover:bg-slate-800/40">
-                          <td className="p-2 font-sans font-semibold text-slate-100">{isEn ? '2v2 (10 cards/team)' : '2v2 (10 cartas/equipo)'}</td>
-                          <td className="p-2 text-emerald-300">1m 40s (100s)</td>
-                          <td className="p-2 text-amber-300">3m 20s (200s)</td>
-                          <td className="p-2 text-indigo-300">5m 00s (300s)</td>
-                        </tr>
-                        <tr className="hover:bg-slate-800/40">
-                          <td className="p-2 font-sans font-semibold text-slate-100">{isEn ? '3v3 (15 cards/team)' : '3v3 (15 cartas/equipo)'}</td>
-                          <td className="p-2 text-emerald-300">2m 30s (150s)</td>
-                          <td className="p-2 text-amber-300">5m 00s (300s)</td>
-                          <td className="p-2 text-indigo-300">7m 30s (450s)</td>
-                        </tr>
-                        <tr className="hover:bg-slate-800/40">
-                          <td className="p-2 font-sans font-semibold text-slate-100">{isEn ? '4v4 (20 cards/team)' : '4v4 (20 cartas/equipo)'}</td>
-                          <td className="p-2 text-emerald-300">3m 20s (200s)</td>
-                          <td className="p-2 text-amber-300">6m 40s (400s)</td>
-                          <td className="p-2 text-indigo-300">10m 00s (600s)</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-[11px] text-slate-400 space-y-1">
-                    <div>• <strong>{isEn ? 'Round Reset:' : 'Reseteo por Ronda:'}</strong> {isEn ? 'At the start of each new round, both team clocks reset to 100%. Unused time from prior rounds is forfeited and never accumulates.' : 'Al inicio de cada nueva ronda, el reloj de ambos equipos se restablece íntegramente al 100% del tiempo estipulado. El tiempo no consumido en rondas anteriores se pierde y nunca se acumula.'}</div>
-                    <div>• <strong>{isEn ? 'Average Time per Play:' : 'Promedio de Tiempo por Jugada:'}</strong> {isEn ? 'Fast allows an average of 10s per card; Medium 20s per card; Slow 30s per card. Time distribution between teammates is flexible and strategic.' : 'Rápido permite una media de 10 seg por carta; Medio 20 seg por carta; Lento 30 seg por carta. La distribución entre jugadores del equipo es libre y estratégica.'}</div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* SECCIÓN 4: CONCEPTOS CLAVE Y VALORES */}
-            {activeSection === 'sec4' && (
-              <div className="space-y-4 animate-fadeIn">
-                <div className="border-b border-slate-800 pb-3">
-                  <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-                    {isEn ? 'Chapter 4' : 'Capítulo 4'}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">
-                    {isEn ? '4. Key Concepts & Card Values' : '4. Conceptos Clave y Valores'}
-                  </h3>
-                </div>
-
-                <p className="text-slate-300">
-                  {isEn ? 'To conquer a front, add up the value of all cards played on it by each team.' : 'Para ganar un frente, se suma el valor de las cartas jugadas en él por cada equipo.'}
-                </p>
-
-                {/* Valores Base */}
-                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-2">
-                  <h4 className="font-bold text-slate-100">{isEn ? 'Base Numerical Card Values:' : 'Valor Numérico Base de las Cartas:'}</h4>
-                  <ul className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs">
-                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800">{isEn ? 'Cards 2 to 10 = Nominal face value.' : 'Cartas del 2 al 10 = Su valor nominal.'}</li>
-                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800"><strong className="text-amber-400">{isEn ? 'J (Jack)' : 'J (Jota)'}</strong> = 11 pts.</li>
-                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800"><strong className="text-amber-400">{isEn ? 'Q (Queen)' : 'Q (Reina)'}</strong> = 12 pts.</li>
-                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800"><strong className="text-amber-400">{isEn ? 'K (King)' : 'K (Rey)'}</strong> = 13 pts.</li>
-                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800"><strong className="text-emerald-400">{isEn ? 'A (Ace)' : 'A (As)'}</strong> = 14 pts.</li>
-                  </ul>
-                </div>
-
-                {/* Sinergia */}
-                <div className="bg-indigo-950/30 border border-indigo-800/60 p-4 rounded-xl space-y-2">
-                  <h4 className="font-bold text-indigo-300 flex items-center gap-2">
-                    <Sparkles className="w-4 h-4 text-indigo-400" />
-                    {isEn ? 'Suit Synergy (+5 Points)' : 'Sinergia de Palo (+5 Puntos)'}
-                  </h4>
-                  <p className="text-xs sm:text-sm">
-                    {isEn ? (
-                      <>For each additional card of the same suit that a team deploys on the same Front, that team scores a <strong className="text-indigo-300">5-point bonus</strong>.</>
-                    ) : (
-                      <>Por cada carta adicional del mismo palo que un equipo coloque en un mismo Frente, ese equipo suma un <strong className="text-indigo-300">bono de 5 puntos</strong>.</>
-                    )}
-                  </p>
-                  <div className="bg-slate-950/80 p-3 rounded border border-slate-800 text-xs text-slate-300">
-                    <strong>{isEn ? 'Official Example:' : 'Ejemplo Oficial:'}</strong> {isEn ? 'A team plays a 10 of Hearts and King of Hearts in Center Front. Sum: 23 base points + 5 synergy = ' : 'Un equipo juega un 10 de Corazones y un Rey de Corazones en el Frente Central. Suma: 23 puntos base + 5 de sinergia = '}<strong className="text-emerald-400">{isEn ? '28 points' : '28 puntos'}</strong>.
-                  </div>
-                </div>
-
-                {/* Formaciones por Sinergia: Pareja, Escalera Corta, Trío */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {/* Pareja */}
-                  <div className="bg-sky-950/30 border border-sky-800/60 p-4 rounded-xl space-y-2">
-                    <h4 className="font-bold text-sky-300 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-sky-400" />
-                      {isEn ? 'Pair (+10 Points)' : 'Pareja (+10 Puntos)'}
-                    </h4>
-                    <p className="text-xs sm:text-sm">
-                      {isEn ? (
-                        <>2 cards of the <strong className="text-sky-300">same numerical value</strong> on the Front.</>
-                      ) : (
-                        <>2 cartas del <strong className="text-sky-300">mismo valor numérico</strong> en el Frente.</>
-                      )}
-                    </p>
-                    <div className="bg-slate-950/80 p-2.5 rounded border border-slate-800 text-[11px] text-slate-300">
-                      <strong>{isEn ? 'Official Example:' : 'Ejemplo Oficial:'}</strong> {isEn ? 'Two 7s = 14 base + 10 pair = ' : 'Dos 7s = 14 base + 10 pareja = '}<strong className="text-sky-400">24 pts</strong>.
-                    </div>
-                  </div>
-
-                  {/* Escalera Corta */}
-                  <div className="bg-emerald-950/30 border border-emerald-800/60 p-4 rounded-xl space-y-2">
-                    <h4 className="font-bold text-emerald-300 flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-emerald-400" />
-                      {isEn ? 'Short Straight (+15 Points)' : 'Escalera Corta (+15 Puntos)'}
-                    </h4>
-                    <p className="text-xs sm:text-sm">
-                      {isEn ? (
-                        <>3 cards of <strong className="text-emerald-300">consecutive numerical values</strong> on the Front.</>
-                      ) : (
-                        <>3 cartas de <strong className="text-emerald-300">valores numéricos consecutivos</strong> en el Frente.</>
-                      )}
-                    </p>
-                    <div className="bg-slate-950/80 p-2.5 rounded border border-slate-800 text-[11px] text-slate-300">
-                      <strong>{isEn ? 'Official Example:' : 'Ejemplo Oficial:'}</strong> 8-9-10 = 27 base + 15 = <strong className="text-emerald-400">42 pts</strong>. {isEn ? '(Q-K-A = 54 pts)' : '(Q-K-A = 54 pts)'}.
-                    </div>
-                  </div>
-
-                  {/* Trío */}
-                  <div className="bg-rose-950/30 border border-rose-800/60 p-4 rounded-xl space-y-2">
-                    <h4 className="font-bold text-rose-300 flex items-center gap-2">
-                      <Flame className="w-4 h-4 text-rose-400" />
-                      {isEn ? 'Trio (+20 Points)' : 'Trío (+20 Puntos)'}
-                    </h4>
-                    <p className="text-xs sm:text-sm">
-                      {isEn ? (
-                        <>3 cards of the <strong className="text-rose-300">same numerical value</strong> on the Front.</>
-                      ) : (
-                        <>3 cartas del <strong className="text-rose-300">mismo valor numérico</strong> en el Frente.</>
-                      )}
-                    </p>
-                    <p className="text-[11px] text-rose-300/90 bg-rose-950/40 p-2 rounded border border-rose-900/50">
-                      {isEn
-                        ? 'Clarification: Forming a Trio automatically annuls the Pair bonus; you cannot sum the +20 of the Trio and the +10 of the Pair for the same cards.'
-                        : 'Aclaración: Formar un Trío anula automáticamente la bonificación de la Pareja; no se pueden sumar los +20 del Trío y los +10 de la Pareja por las mismas cartas.'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Carta y Marcador de Sombra */}
-                <div className="bg-purple-950/30 border border-purple-800/60 p-4 rounded-xl space-y-2">
-                  <h4 className="font-bold text-purple-300 flex items-center gap-2">
-                    <EyeOff className="w-4 h-4 text-purple-400" />
-                    {isEn ? 'Shadow Cards & Team Pool' : 'Las Cartas de Sombra y el Fondo de Equipo'}
-                  </h4>
-                  <p className="text-xs sm:text-sm">
-                    {isEn ? (
-                      <>Both teams begin the first round of the match with <strong className="text-purple-300">zero (0) markers</strong> in their Team Shadow Pool. During the Tactics Phase, the team decides how many markers from its accumulated reserve to spend and distributes them freely among its players according to strategy. <strong className="text-purple-300">Unused markers are preserved for future rounds</strong>. A player may receive multiple markers (being able to play multiple face-down cards in that round) or receive none.</>
-                    ) : (
-                      <>Ambos equipos inician la primera ronda de la partida con <strong className="text-purple-300">cero (0) marcadores</strong> en su Fondo de Sombras. Durante la Fase de Táctica, el equipo decide cuántos marcadores de su reserva acumulada desea gastar y los reparte libremente entre sus jugadores según su estrategia. <strong className="text-purple-300">Los marcadores no utilizados se conservan para rondas futuras</strong>. Un jugador puede recibir múltiples marcadores (pudiendo jugar varias cartas boca abajo en esa ronda) o no recibir ninguno.</>
-                    )}
-                  </p>
-                  <div className="bg-slate-950/80 p-3 rounded border border-slate-800 text-xs text-slate-300 mt-2">
-                    <strong>{isEn ? 'Silent Show to Teammates (Teammate Peek):' : 'Muestra en Silencio al Equipo (Vistazo de Compañero):'}</strong> {isEn ? 'Cards played as Shadows remain concealed solely from the opposing team. At the exact moment a player decides to play a Shadow Card, before placing it face-down on the chosen front, they must silently show it to their teammates so they know its value and suit, without speaking or making additional gestures (in the digital version, allied Shadow Cards are automatically visible to your entire team with a purple border).' : 'Las cartas jugadas como Sombra permanecerán ocultas únicamente para el equipo rival. En el instante exacto en que un jugador decide jugar una Carta de Sombra, antes de depositarla boca abajo en el frente elegido, debe mostrársela en silencio a sus compañeros de equipo para que conozcan su valor y palo, sin pronunciar palabra ni hacer gestos adicionales (en la versión digital, las Cartas Sombra aliadas son visibles automáticamente para todo tu equipo con borde morado).'}
-                  </div>
-                  <div className="bg-slate-950/80 p-3 rounded border border-slate-800 text-xs text-slate-300 mt-2">
-                    <strong>{isEn ? 'Use of Shadow Marker (Anti-Cheat Control):' : 'Uso del Marcador de Sombra (Control Anti-trampas):'}</strong> {isEn ? 'The moment a player decides to play a card face-down, one of the Shadow Markers previously assigned to the team must be placed on the table. This guarantees total transparency regarding how many concealed cards remain available for each team member.' : 'En el momento en que un jugador decide jugar una carta boca abajo, debe colocarse en la mesa uno de los Marcadores de Sombra que se le asignaron al equipo previamente. Esto garantiza transparencia total sobre cuántas cartas ocultas le quedan por jugar a cada miembro del equipo.'}
-                  </div>
-                </div>
-
-                {/* Límite Territorial Compartido */}
-                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-2">
-                  <h4 className="font-bold text-slate-100 flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-rose-400" />
-                    {isEn ? 'Shared Territorial Front Limit' : 'Límite Territorial Compartido por Frente'}
-                  </h4>
-                  <p className="text-xs sm:text-sm">
-                    {isEn ? 'A maximum number of total cards is set per Front across both teams combined:' : 'Se establece un número máximo de casillas en total por Frente para la suma de las cartas de ambos equipos:'}
-                  </p>
-                  <ul className="text-xs text-slate-300 space-y-1 my-2">
-                    <li>• <strong>{isEn ? '1v1 and 2v2 Matches:' : 'Partidas 1v1 y 2v2:'}</strong> {isEn ? 'Max 8 cards total per Front.' : 'Máximo 8 cartas en total por Frente.'}</li>
-                    <li>• <strong>{isEn ? '3v3 Matches:' : 'Partidas 3v3:'}</strong> {isEn ? 'Max 12 cards total per Front.' : 'Máximo 12 cartas en total por Frente.'}</li>
-                    <li>• <strong>{isEn ? '4v4 Matches:' : 'Partidas 4v4:'}</strong> {isEn ? 'Max 16 cards total per Front.' : 'Máximo 16 cartas en total por Frente.'}</li>
-                  </ul>
-                  <p className="text-xs text-rose-300 font-semibold bg-rose-950/30 p-2.5 rounded border border-rose-900/50">
-                    {isEn ? 'Closure Rule (Saturation): As soon as a Front reaches this limit with the combined cards of both teams, it becomes saturated and no further cards may be played on it for the rest of the round.' : 'Regla de Cierre (Saturación): En cuanto un Frente alcanza dicho límite con la suma de las cartas de ambos equipos, queda saturado y no se pueden colocar más cartas en él durante el resto de la ronda.'}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* SECCIÓN 5: ESTRUCTURA PASO A PASO DE LA RONDA */}
-            {activeSection === 'sec5' && (
-              <div className="space-y-4 animate-fadeIn">
-                <div className="border-b border-slate-800 pb-3">
-                  <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-                    {isEn ? 'Chapter 5' : 'Capítulo 5'}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">
-                    {isEn ? '5. Step-by-Step Round Flow' : '5. Estructura Paso a Paso de la Ronda'}
-                  </h3>
-                </div>
-
-                <p className="text-slate-300 text-xs sm:text-sm">
-                  {isEn ? 'Each round is strictly divided into the following sequential phases:' : 'Cada ronda se divide strictly en las siguientes fases secuenciales:'}
-                </p>
-
-                <div className="space-y-3">
-                  {/* FASE 1 */}
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-bold text-amber-400">{isEn ? 'PHASE 1: Preparation & Initiative' : 'FASE 1: Preparación e Iniciativa'}</h4>
-                      <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase">Setup</span>
-                    </div>
-                    <ol className="list-decimal list-inside text-xs sm:text-sm space-y-1 text-slate-300">
-                      <li>{isEn ? 'If the Draw Deck lacks cards, reshuffle the Discard Pile to form a new deck.' : 'Si el Mazo Principal no tiene suficientes cartas, se rebaraja el Pozo de Descartes para formar el nuevo mazo.'}</li>
-                      <li>{isEn ? 'Teams review their accumulated Shadow Pool. In Round 1, this pool is strictly zero (0) for both sides.' : 'Los equipos revisan su Fondo de Sombras acumulado. En la Ronda 1, este fondo es estrictamente cero (0) para ambos bandos.'}</li>
-                      <li>{isEn ? 'The Initiative token rotates clockwise to the opposing team (or is drawn randomly in Round 1).' : 'La Ficha de Iniciativa rota al equipo rival (o se sortea aleatoriamente en la Ronda 1).'}</li>
-                    </ol>
-                  </div>
-
-                  {/* FASE 2 */}
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-bold text-amber-400">{isEn ? 'PHASE 2: Team Tactics (Clock: 30s Strict - NO CARDS IN HAND)' : 'FASE 2: Táctica de Equipo (Reloj: 30s Estrictos - SIN CARTAS EN MANO)'}</h4>
-                      <span className="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-mono">30s</span>
-                    </div>
-                    <ul className="text-xs sm:text-sm space-y-1.5 text-slate-300">
-                      <li>• <strong>{isEn ? 'Total Free Communication:' : 'Comunicación Total Libre:'}</strong> {isEn ? 'Teams have 30 seconds to talk and coordinate macro strategy before cards are dealt.' : 'Los equipos disponen de un tiempo de 30 segundos para hablar y coordinar su estrategia general antes de recibir sus cartas.'}</li>
-                      <li>• <strong>{isEn ? 'Macro Strategy:' : 'Estrategia Macro:'}</strong> {isEn ? 'Plan sector distribution ("Attack Center and Left", "Let\'s build a straight in Center", "Let\'s push for the 3-front Sweep") and decide how many shadow markers from the accumulated pool will be invested this round or saved for future rounds.' : 'Se planifica la distribución de las zonas ("Ataquemos fuerte Centro e Izquierda", "Intentemos armar una escalera en el centro", "Busquemos el Pleno de 3 frentes") y se decide cuántos marcadores de sombra del fondo acumulado se invertirán en esta ronda o cuántos se ahorrarán para futuras rondas.'}</li>
-                      <li>• <strong>{isEn ? 'Time Budget:' : 'Presupuesto Temporal:'}</strong> {isEn ? 'Teams can agree on clock distribution (e.g. initial players play in 3-5 seconds to save time for endgame calculations).' : 'Los equipos pueden pactar la distribución de su reloj compartido (ejemplo: acordar que los jugadores iniciales jueguen en 3–5 segundos para reservar tiempo de cálculo al cierre de la ronda).'}</li>
-                      <li className="text-emerald-300 font-semibold">• <strong>{isEn ? 'Anti-Alpha Player Guarantee:' : 'Garantía Anti-Jugador Alfa:'}</strong> {isEn ? 'Having no cards in hand prevents any single player from dictating teammate actions.' : 'Al no tener aún las cartas en mano, es imposible que un jugador ordene las jugadas exactas a sus compañeros.'}</li>
-                    </ul>
-                  </div>
-
-                  {/* FASE 3 */}
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-bold text-amber-400">{isEn ? 'PHASE 3: Dealing Cards' : 'FASE 3: Reparto de Cartas'}</h4>
-                      <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded uppercase">{isEn ? 'Deal' : 'Reparto'}</span>
-                    </div>
-                    <ul className="text-xs sm:text-sm space-y-1.5 text-slate-300">
-                      <li>• {isEn ? 'Immediately upon concluding the 30-second Tactical Phase, the dealer deals 5 cards face-down to each player from the Draw Deck.' : 'Inmediatamente al terminar los 30 segundos de la Fase de Táctica, el repartidor entrega 5 cartas boca abajo a cada jugador del Mazo Principal.'}</li>
-                      <li className="text-purple-300 font-bold">• {isEn ? 'Speaking or signaling is strictly forbidden from this instant forward.' : 'Está estrictamente prohibido hablar desde este instante.'}</li>
-                    </ul>
-                  </div>
-
-                  {/* FASE 4 */}
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
-                    <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-bold text-amber-400">{isEn ? 'PHASE 4: Deployment (Absolute Silence & Shared Team Clock)' : 'FASE 4: Despliegue (Silencio Absoluto y Reloj de Equipo Compartido)'}</h4>
-                      <span className="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-mono">{isEn ? 'Team Clock' : 'Reloj de Equipo'}</span>
-                    </div>
-                    <ul className="text-xs sm:text-sm space-y-1.5 text-slate-300">
-                      <li>• <strong>{isEn ? 'Communication Ban:' : 'Prohibición de Comunicación:'}</strong> {isEn ? 'All spoken, written, or gestured communication is prohibited during deployment.' : 'Queda prohibida toda comunicación hablada, escrita o mediante señas durante el despliegue.'}</li>
-                      <li>• <strong>{isEn ? 'Clock Start:' : 'Inicio del Reloj:'}</strong> {isEn ? 'The clock for the team holding the Initiative Token starts immediately when the phase begins.' : 'El reloj del equipo con la Ficha de Iniciativa se activa en el instante en que comienza la fase.'}</li>
-                      <li>• <strong>{isEn ? 'Turn Order & Alternation:' : 'Orden de Turnos e Intercalado:'}</strong> {isEn ? 'Starts with the Initiative team. Turns strictly alternate 1-by-1 (e.g., A1 ➔ B1 ➔ A2 ➔ B2) until all players have deployed all cards.' : 'Inicia un jugador del equipo con la Ficha de Iniciativa. Los turnos se alternan estrictamente 1 a 1 entre jugadores de ambos equipos de forma fija (ej: A1 ➔ B1 ➔ A2 ➔ B2) hasta que todos los jugadores hayan colocado todas sus cartas.'}</li>
-                      <li>• <strong>{isEn ? 'Unique Turn Action:' : 'Acción Única del Turno:'}</strong> {isEn ? 'On their turn, the player MUST place exactly ONE (1) card on any unsaturated front. Passing or playing 2 cards is forbidden. Placing the card switches the clock to the other team.' : 'En su turno, el jugador DEBE colocar exactamente UNA (1) carta en cualquiera de los 3 Frentes que no haya alcanzado el Límite Territorial Compartido. No se permite jugar 2 cartas en un mismo turno ni pasar el turno. Cuando se coloca la carta el cronómetro empieza a contar para el otro equipo.'}</li>
-                      <li>• {isEn ? 'If choosing to play face-down (Shadow Card), one of the Shadow Markers belonging to the team must be flipped/turned in, the card is silently shown to teammates, and then placed face-down on the chosen front. If the team has no markers left, the card must obligatorily be played face-up.' : 'Si decide jugarla boca abajo (Carta de Sombra), debe voltear/entregar uno de los Marcadores de Sombra que le pertenecen al equipo, enseñar la carta en silencio a sus compañeros de equipo y colocarla boca abajo en el frente elegido. Si el equipo no tiene marcadores, debe jugar su carta obligatoriamente boca arriba.'}</li>
-                      <li>• <strong>{isEn ? 'Territorial Front Limit:' : 'Restricción del Límite Territorial Compartido:'}</strong> {isEn ? 'Cards cannot be played on fronts where total cards have reached the limit (8 in 1v1/2v2; 12 in 3v3; 16 in 4v4).' : 'No se puede colocar una carta en un Frente donde la suma total de cartas de ambos equipos ya haya alcanzado el límite permitido (8 cartas en 1v1 y 2v2; 12 cartas en 3v3; 16 cartas en 4v4).'}</li>
-                      <li className="text-rose-300 font-semibold bg-rose-950/30 p-2.5 rounded border border-rose-900/60">
-                        <strong>{isEn ? 'Loss on Time (Flag Fall):' : 'Derrota por Tiempo (Caída de Bandera):'}</strong> {isEn ? 'If a team clock reaches 00:00 before completing turns:' : 'Si el reloj de un equipo llega a 00:00 antes de completar sus turnos:'}
-                        <div className="mt-1 pl-2 space-y-0.5 font-normal text-slate-300 text-xs">
-                          <div>- {isEn ? 'The round ends instantaneously.' : 'La ronda finaliza de manera instantánea.'}</div>
-                          <div>- {isEn ? 'The offending team automatically loses the round and the opponent scores +2 Round Points directly (standard victory), unless at that exact instant the opponent already held a higher score on all 3 fronts with all cards played, in which case they score +3 Round Points.' : 'El equipo infractor pierde la ronda automáticamente y el equipo rival suma 2 Puntos de Ronda de forma directa (victoria estándar), salvo que en ese instante ya tuviera mayor puntuación en los 3 frentes habiéndose jugado todas las cartas del rival, en cuyo caso sumará 3 Puntos de Ronda.'}</div>
-                          <div>- <strong>{isEn ? 'Cumulative Score Conservation:' : 'Conservación de Puntos Acumulados:'}</strong> {isEn ? 'Cards played on fronts up to flag fall are revealed and tallied (base value + synergy bonuses) for overall match tiebreakers.' : 'Se voltean las cartas jugadas hasta ese instante en la mesa y se suman los valores base y bonificaciones por sinergia ya colocadas por ambos bandos. Esos puntos se registran obligatoriamente en la Hoja de Anotación para el criterio de desempate final de la partida.'}</div>
-                        </div>
-                      </li>
-                      <li>• <strong>{isEn ? 'Automatic Deployment Closure:' : 'Cierre Automático de la Fase de Despliegue:'}</strong> {isEn ? 'Deployment ends automatically when all players have deployed all 5 cards. Clock stops and scoring begins across all 3 Fronts.' : 'La Fase de Despliegue concluye de manera instantánea y automática en el segundo exacto en que todos los jugadores de ambos equipos hayan colocado las 5 cartas de su mano en la mesa.'}</li>
-                    </ul>
-                  </div>
-                </div>
-
-                <div className="bg-slate-900 border border-slate-700 p-4 rounded-xl space-y-2 text-xs sm:text-sm">
-                  <h4 className="font-bold text-amber-400 mb-2">{isEn ? 'UPON COMPLETING DEPLOYMENT:' : 'TRAS COMPLETAR EL DESPLIEGUE:'}</h4>
-                  <div>1. <strong>{isEn ? 'Revelation:' : 'Revelación:'}</strong> {isEn ? 'Flip all Shadow Cards (making them publicly visible to the rival team and spectators).' : 'Voltear todas las Cartas Sombra (haciéndolas visibles al equipo rival y espectadores).'}</div>
-                  <div>2. <strong>{isEn ? 'Sum:' : 'Suma:'}</strong> {isEn ? 'Base Value + Synergy Bonuses (Suit +5, Pair +10, Straight +15, Trio +20).' : 'Valor Base + Bonificaciones por Sinergia (Palo +5, Pareja +10, Escalera +15, Trío +20).'}</div>
-                  <div className="pt-2 border-t border-slate-800">
-                    3. <strong className="text-emerald-400">{isEn ? 'Round Points Allocation (1, 2 & 3 Points):' : 'Asignación de Puntos de Ronda (1, 2 y 3 Puntos):'}</strong>
-                    <div className="mt-1.5 pl-3 space-y-1 text-slate-300">
-                      <div>• <strong className="text-sky-300">{isEn ? 'Tie in the round' : 'Empate en la ronda'}</strong> {isEn ? '(e.g. each team wins 1 front and the 3rd is void, or all 3 are void):' : '(ej. cada equipo gana 1 frente y el otro es nulo, o todos son nulos):'} <strong className="text-slate-100">{isEn ? '+1 Round Point for EACH team.' : '1 Punto de Ronda para CADA equipo.'}</strong></div>
-                      <div>• <strong className="text-emerald-300">{isEn ? 'Standard Victory' : 'Victoria estándar'}</strong> {isEn ? '(winning 2 fronts and losing or tying the 3rd):' : '(ganar 2 frentes y perder o empatar el 3º):'} <strong className="text-slate-100">{isEn ? '+2 Round Points for the winning team (0 for the loser).' : '2 Puntos de Ronda para el equipo ganador (0 para el perdedor).'}</strong></div>
-                      <div>• <strong className="text-amber-300">{isEn ? 'Total Dominance / "Sweep"' : 'Dominio Total / "Pleno"'}</strong> {isEn ? '(winning all 3 fronts):' : '(ganar los 3 frentes):'} <strong className="text-slate-100">{isEn ? '+3 Round Points for the winning team (0 for the loser).' : '3 Puntos de Ronda para el equipo ganador (0 para el perdedor).'}</strong></div>
-                      <div className="text-[11px] text-slate-400 italic">{isEn ? '*Note: In all cases, cumulative numerical points across all fronts are also recorded on the Score Sheet.' : '*Nota: En todos los casos se registran también los puntos numéricos acumulados en la Hoja de Anotación.'}</div>
-                    </div>
-                  </div>
-                  <div className="pt-2 border-t border-slate-800">
-                    4. <strong className="text-purple-300">{isEn ? 'Economy Income (Shadows):' : 'Ingresos de Economía (Sombras):'}</strong> {isEn ? 'After determining the round winner, each team receives new Shadow Markers added immediately to their Team Pool for subsequent rounds. The amount depends on format and round outcome:' : 'Tras determinar al ganador de la ronda, cada equipo recibe nuevos Marcadores de Sombra que se añaden inmediatamente a su Fondo de Equipo para las siguientes rondas. La cantidad depende del formato y del resultado de la ronda:'}
-                    <div className="mt-1.5 pl-3 space-y-1 text-slate-300">
-                      <div>• <strong>{isEn ? '1v1 & 2v2 Format:' : 'Formato 1v1 y 2v2:'}</strong> {isEn ? 'Winning Team (+1), Losing Team (+2), Loser on streak of 2+ consecutive losses (+3). Tied Round (+1 to both).' : 'Equipo Ganador (+1), Equipo Perdedor (+2), Perdedor en racha de 2 o más derrotas consecutivas (+3). Empate de Ronda (+1 a ambos).'}</div>
-                      <div>• <strong>{isEn ? '3v3 Format:' : 'Formato 3v3:'}</strong> {isEn ? 'Winning Team (+2), Losing Team (+3), Loser on streak of 2+ consecutive losses (+4). Tied Round (+2 to both).' : 'Equipo Ganador (+2), Equipo Perdedor (+3), Perdedor en racha de 2 o más derrotas consecutivas (+4). Empate de Ronda (+2 a ambos).'}</div>
-                      <div>• <strong>{isEn ? '4v4 Format:' : 'Formato 4v4:'}</strong> {isEn ? 'Winning Team (+2), Losing Team (+4), Loser on streak of 2+ consecutive losses (+5). Tied Round (+2 to both).' : 'Equipo Ganador (+2), Equipo Perdedor (+4), Perdedor en racha de 2 o más derrotas consecutivas (+5). Empate de Ronda (+2 a ambos).'}</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* SECCIÓN 6: RESOLUCIÓN DE EMPATES Y VACÍOS LEGALES */}
-            {activeSection === 'sec6' && (
-              <div className="space-y-4 animate-fadeIn">
-                <div className="border-b border-slate-800 pb-3">
-                  <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-                    {isEn ? 'Chapter 6' : 'Capítulo 6'}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">
-                    {isEn ? '6. Tie Resolution & Edge Cases' : '6. Resolución de Empates y Vacíos Legales'}
-                  </h3>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-1.5">
-                    <h4 className="font-bold text-slate-100 flex items-center gap-2">
-                      <Scale className="w-4 h-4 text-amber-400" />
-                      {isEn ? 'Tie on a Front' : 'Empate en un Frente'}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-slate-300">
-                      {isEn ? (
-                        <>If both teams tie in exact score on a Front, the front tiebreaker goes to the team holding the <strong className="text-amber-300">highest base-value individual card</strong> played on it (following nominal order from 2 to Ace: 2 &lt; 3 &lt; ... &lt; 10 &lt; J &lt; Q &lt; K &lt; A). If the exact tie persists, the Front is declared <strong className="text-slate-100">Void</strong> (neither team wins that front).</>
-                      ) : (
-                        <>Si ambos equipos igualan en puntaje exacto en un Frente, el desempate en ese frente lo gana el equipo que posea la <strong className="text-amber-300">carta individual de mayor valor base</strong> jugada en él (siguiendo su valor nominal del 2 al As: 2 &lt; 3 &lt; ... &lt; 10 &lt; J &lt; Q &lt; K &lt; A). Si el empate persiste, el Frente se declara <strong className="text-slate-100">Nulo</strong> (nadie gana ese frente).</>
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-1.5">
-                    <h4 className="font-bold text-slate-100 flex items-center gap-2">
-                      <Scale className="w-4 h-4 text-amber-400" />
-                      {isEn ? 'Tie in the Round' : 'Empate en la Ronda'}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-slate-300">
-                      {isEn ? (
-                        <>If the round ends tied in conquered fronts (e.g., Team A wins Left, Team B wins Right, and Center is Void; or all 3 fronts are Void), a <strong className="text-sky-300">Round Tie</strong> occurs. In this case, <strong className="text-amber-300">both teams score 1 Round Point each</strong>, and the numerical points obtained by each team across the fronts of that round <strong className="text-emerald-400">must be recorded</strong> on the score sheet for cumulative scoring. <em className="text-slate-400">(Note: If two fronts are Void and one team wins the remaining front 1 to 0, it is considered a standard victory of <strong>+2 Round Points</strong>).</em></>
-                      ) : (
-                        <>Si la ronda concluye igualada en frentes conquistados (ejemplo: Equipo A gana Izquierda, Equipo B gana Derecha y el Centro es Nulo; o los 3 frentes resultan Nulos), se produce un <strong className="text-sky-300">Empate de Ronda</strong>. En este caso, <strong className="text-amber-300">ambos equipos suman 1 Punto de Ronda cada uno</strong>, y los puntos numéricos obtenidos por cada equipo en los frentes de esa ronda <strong className="text-emerald-400">sí deben registrarse</strong> en la hoja de anotación para el cálculo de puntos acumulados. <em className="text-slate-400">(Nota: Si dos frentes resultan Nulos y un equipo gana el frente restante 1 a 0, se considera victoria estándar de <strong>2 Puntos de Ronda</strong>).</em></>
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-1.5">
-                    <h4 className="font-bold text-rose-400 flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-rose-400" />
-                      {isEn ? 'Shadow Card Infraction' : 'Infracción de Carta de Sombra'}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-slate-300">
-                      {isEn ? (
-                        <>If a player attempts to play a card face-down after exhausting their team's Shadow Markers, the card must be flipped immediately and remain exposed face-up on the table.</>
-                      ) : (
-                        <>Si un jugador intenta jugar una carta boca abajo tras haber consumido los Marcadores de Sombra de su equipo, la carta debe voltearse inmediatamente y quedar expuesta boca arriba en la mesa.</>
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-1.5">
-                    <h4 className="font-bold text-amber-400 flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-amber-400" />
-                      {isEn ? 'Irregular Clock Press' : 'Pulsación Irregular del Reloj'}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-slate-300">
-                      {isEn ? (
-                        <>A player cannot press the clock before completely releasing the card on the designated front. If attempted, the clock continues running until the card is properly placed.</>
-                      ) : (
-                        <>Un jugador no puede pulsar el cronómetro antes de haber soltado la carta de forma definitiva en el frente elegido. Si lo hace, el rival o el árbitro pueden exigir que retire la mano del reloj; el tiempo seguirá corriendo para su equipo hasta que la carta esté correctamente depositada en la mesa.</>
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-1.5">
-                    <h4 className="font-bold text-amber-400 flex items-center gap-2">
-                      <Flame className="w-4 h-4 text-amber-400" />
-                      {isEn ? 'Loss Streak Reset' : 'Reinicio de Racha de Derrotas'}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-slate-300">
-                      {isEn ? (
-                        <>If a team collecting the maximum shadow bonus from a loss streak manages to win a round (scoring 2 or 3 points) or tie it (scoring 1 point each), its streak resets instantaneously. Their subsequent defeat will count as the first.</>
-                      ) : (
-                        <>Si un equipo que está cobrando el bono máximo de sombras por racha de derrotas logra ganar una ronda (sumando 2 o 3 puntos) o empatarla (sumando 1 punto cada uno), su racha se reinicia instantáneamente. Su siguiente derrota contará como la primera.</>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* SECCIÓN 7: FIN DE LA PARTIDA Y CRITERIOS DE DESEMPATE */}
-            {activeSection === 'sec7' && (
-              <div className="space-y-4 animate-fadeIn">
-                <div className="border-b border-slate-800 pb-3">
-                  <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-                    {isEn ? 'Chapter 7' : 'Capítulo 7'}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">
-                    {isEn ? '7. End of Match & Tiebreakers' : '7. Fin de la Partida y Criterios de Desempate'}
-                  </h3>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-1.5">
-                    <h4 className="font-bold text-emerald-400 flex items-center gap-2">
-                      <Trophy className="w-4 h-4 text-emerald-400" />
-                      {isEn ? 'Direct Victory' : 'Victoria Directa'}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-slate-300">
-                      {isEn ? (
-                        <>After playing the scheduled rounds (4, 6, or 8), the team that has accumulated the <strong className="text-emerald-400">highest total amount of Round Points</strong> takes the victory.</>
-                      ) : (
-                        <>Tras disputar las rondas reglamentarias (4, 6 u 8), el equipo que haya acumulado la <strong className="text-emerald-400">mayor cantidad total de Puntos de Ronda</strong> obtiene la victoria.</>
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-1.5">
-                    <h4 className="font-bold text-amber-400 flex items-center gap-2">
-                      <Award className="w-4 h-4 text-amber-400" />
-                      {isEn ? 'First Tiebreaker (Cumulative Points)' : 'Primer Criterio de Desempate (Puntos Acumulados)'}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-slate-300">
-                      {isEn ? (
-                        <>If the match concludes tied in Round Points, <strong className="text-slate-100">total numerical points scored by each team across all fronts</strong> over all regular rounds are summed. The team with higher cumulative points wins.</>
-                      ) : (
-                        <>Si la partida concluye empatada en Puntos de Ronda, se sumarán los <strong className="text-slate-100">puntos numéricos totales obtenidos por cada equipo en todos los frentes</strong> a lo largo de las rondas reglamentarias. El equipo con mayor puntuación acumulada se declara vencedor.</>
-                      )}
-                    </p>
-                  </div>
-
-                  <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-1.5">
-                    <h4 className="font-bold text-indigo-400 flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-indigo-400" />
-                      {isEn ? 'Second Tiebreaker (2-Round Overtime)' : 'Segundo Criterio de Desempate (Prórroga de 2 Rondas)'}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-slate-300">
-                      {isEn ? (
-                        <>If an exact tie persists in cumulative points (or in <strong className="text-amber-300">Casual Mode</strong>, where cumulative numerical front sums are not recorded), <strong className="text-slate-100">2 Overtime Rounds</strong> are played (preserving initiative rotation and the 1, 2, and 3 Round Points system) to guarantee equal starting opportunity.</>
-                      ) : (
-                        <>En el caso de que persista el empate exacto en puntos acumulados (o en el <strong className="text-amber-300">Modo Casual</strong>, donde no se anotan las sumas numéricas de cada frente), se jugarán <strong className="text-slate-100">2 Rondas de Prórroga adicionales</strong> (manteniendo la rotación de iniciativa y el sistema de 1, 2 y 3 Puntos de Ronda) para garantizar igualdad de salida.</>
-                      )}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* SECCIÓN 8: ANEXO: MODO DE JUEGO 1v1 */}
-            {activeSection === 'sec8' && (
-              <div className="space-y-4 animate-fadeIn">
-                <div className="border-b border-slate-800 pb-3">
-                  <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-                    {isEn ? 'Chapter 8' : 'Capítulo 8'}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">
-                    {isEn ? '8. Annex: 1v1 Duel Mode' : '8. Anexo: Modo de Juego 1v1'}
-                  </h3>
-                </div>
-
-                <p className="text-slate-300 text-xs sm:text-sm">
-                  {isEn ? (
-                    <>General rules apply, with the following specific adaptations for 1-on-1 matches:</>
-                  ) : (
-                    <>Las reglas generales del juego se mantienen, con las siguientes adaptaciones específicas para partidas de 1 contra 1:</>
-                  )}
-                </p>
-
-                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
-                  <h4 className="font-bold text-amber-400">
-                    {isEn ? '1. Mathematical & Mechanical Adjustments (The Mirror of 2v2)' : '1. Ajustes Matemáticos y Mecánicos (El Espejo del 2v2)'}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-slate-300">
-                    {isEn ? (
-                      <>To maintain territorial tension and mathematical balance, 1v1 mechanically simulates a 2v2. Instead of two minds controlling 10 cards, one mind controls all 10 cards.</>
-                    ) : (
-                      <>Para mantener la tensión de los espacios y la viabilidad matemática, el modo 1v1 debe "simular" mecánicamente un 2v2. En lugar de que un equipo sean dos mentes controlando 10 cartas en total, un equipo será una sola mente controlando las 10 cartas.</>
-                    )}
-                  </p>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300 pt-1">
-                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                      <strong>{isEn ? 'Deck:' : 'Baraja:'}</strong> {isEn ? '1 standard deck (52 cards).' : '1 Baraja estándar (52 cartas).'}
-                    </li>
-                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                      <strong>{isEn ? 'Player Hand:' : 'Mano del Jugador:'}</strong> {isEn ? '10 cards per player (instead of 5).' : '10 cartas por jugador (en lugar de 5).'}
-                    </li>
-                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                      <strong>{isEn ? 'Shared Front Limit:' : 'Límite Territorial Compartido:'}</strong> {isEn ? 'Max 8 cards total per Front summing both duelists.' : 'Máximo 8 cartas en total por Frente sumando las cartas de ambos jugadores.'}
-                    </li>
-                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                      <strong>{isEn ? 'Shadow Economy:' : 'Economía de Sombras:'}</strong> {isEn ? 'Starts at 0. Win (+1), Loss (+2), Loss Streak 2+ (+3), Tied Round (+1). Continuous saving across rounds.' : 'Inician con 0. Gana (+1), Pierde (+2), Racha 2+ (+3), Empate de Ronda (+1). Ahorro continuo entre rondas.'}
-                    </li>
-                    <li className="bg-slate-950 p-2.5 rounded border border-slate-800 sm:col-span-2">
-                      <strong>{isEn ? 'Clock Management in 1v1:' : 'Gestión del Reloj en 1v1:'}</strong> {isEn ? 'The solo player assumes all 10 turns, having the full 10-turn clock pool (e.g. 3m 20s in Medium speed), switching the clock after each card.' : 'El jugador individual asume los 10 turnos de su equipo, disponiendo de la bolsa de tiempo completa de 10 turnos (ej. 3 min 20 s en Ritmo Medio) para alternar sus jugadas frente al rival, pulsando el reloj tras cada una de sus 10 cartas colocadas.'}
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="bg-slate-900/80 border border-slate-800 p-4 rounded-xl space-y-3">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                    <h4 className="font-bold text-amber-400">{isEn ? '2. The 4 Round Phases' : '2. Las 4 Fases de la Ronda'}</h4>
-                    <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded font-mono font-bold">
-                      {isEn ? 'Identical to Team Mode' : 'Fases Idénticas al Modo Equipos'}
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-slate-300 bg-amber-950/20 border border-amber-800/40 p-3 rounded-lg leading-relaxed">
-                    {isEn ? (
-                      <>Phases proceed identically, using the <strong>tactical phase (30s)</strong> to plan your own attacks and counter-moves mentally.</>
-                    ) : (
-                      <>Las fases se desarrollan completamente igual que en los otros modos, pero usando la <strong>fase de táctica (30s)</strong> para planear cómo vas a atacar en la siguiente ronda (en vez de para comunicarse).</>
-                    )}
-                  </p>
-                  <div className="space-y-2 text-xs sm:text-sm text-slate-300">
-                    <div className="bg-slate-950 p-3 rounded border border-slate-800">
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-slate-100 font-bold">{isEn ? 'PHASE 1: Preparation & Initiative' : 'FASE 1: Preparación e Iniciativa'}</strong>
-                        <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded uppercase">Setup</span>
-                      </div>
-                      <p className="text-slate-400">
-                        {isEn ? 'Round 1 starts with 0 Shadows. Duelists review their accumulated Shadow Pool. Initiative rotates automatically to the opponent (or is drawn randomly in Round 1). The Trump Card mechanic has been completely eliminated.' : 'Ronda 1 inician con 0 Sombras. Cada duelista revisa su fondo acumulado de Sombras. La Iniciativa rota automáticamente al rival respecto a la ronda previa (o se determina por sorteo aleatorio en Ronda 1). La mecánica de la carta de triunfo ha sido completamente eliminada.'}
-                      </p>
-                    </div>
-
-                    <div className="bg-slate-950 p-3 rounded border border-slate-800">
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-slate-100 font-bold">{isEn ? 'PHASE 2: Tactical Phase (Clock: 30s Strict — NO CARDS IN HAND)' : 'FASE 2: Fase Táctica (Reloj: 30s Estrictos — SIN CARTAS EN MANO)'}</strong>
-                        <span className="text-[10px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-mono">30s</span>
-                      </div>
-                      <p className="text-slate-400">
-                        <strong className="text-amber-300">{isEn ? 'Individual Tactical Planning:' : 'Planificación Táctica Individual:'}</strong> {isEn ? '30 seconds without cards in hand to reflect, plan front priorities, and decide how many shadow markers to spend or save.' : 'En lugar de comunicación entre compañeros, cada jugador dispone de 30 segundos sin cartas en mano para reflexionar, planificar mentalmente el enfoque de los 3 frentes y decidir cuántas sombras gastar o ahorrar.'}
-                      </p>
-                    </div>
-
-                    <div className="bg-slate-950 p-3 rounded border border-slate-800">
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-slate-100 font-bold">{isEn ? 'PHASE 3: Dealing Cards (Absolute Silence)' : 'FASE 3: Reparto de Cartas (Silencio Absoluto)'}</strong>
-                        <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded uppercase">{isEn ? 'Deal' : 'Reparto'}</span>
-                      </div>
-                      <p className="text-slate-400">
-                        {isEn ? '10 cards dealt face-down to each duelist. Absolute silence and focus.' : 'Inmediatamente al terminar los 30 segundos de la Fase Táctica, el repartidor entrega 10 cartas boca abajo a cada duelista. Silencio absoluto y concentración estricta desde este instante.'}
-                      </p>
-                    </div>
-
-                    <div className="bg-slate-950 p-3 rounded border border-slate-800">
-                      <div className="flex items-center justify-between mb-1">
-                        <strong className="text-slate-100 font-bold">{isEn ? 'PHASE 4: Tactical Deployment (Dual Player Clock)' : 'FASE 4: Despliegue Táctico (Silencio Absoluto — Reloj de Jugador Compartido)'}</strong>
-                        <span className="text-[10px] bg-rose-500/20 text-rose-300 px-1.5 py-0.5 rounded font-mono">{isEn ? 'Dual Clock' : 'Reloj Dual'}</span>
-                      </div>
-                      <p className="text-slate-400">
-                        {isEn ? '1-by-1 alternating turns. 1 card per turn on an unsaturated front (max 8 cards combined). Play face-down directly by spending 1 shadow marker from the accumulated pool. Clock matches mode speed (Fast: 1:40, Medium: 3:20, Slow: 5:00). Flag Fall awards +2 Round Points to the opponent while conserving table points. Upon playing all 10 cards, the 1, 2, and 3 Round Points scale is applied (Tie: +1 each; 2 fronts: +2 pts; all 3 fronts: +3 pts), followed by economy payout.' : 'Turnos 1 a 1 alternados (Jugador A ➔ Jugador B ➔ Jugador A...) comenzando por quien tenga la Iniciativa. Se coloca exactamente una carta por turno en un frente no saturado (máximo 8 cartas sumando ambos duelistas). Para jugar boca abajo se gasta 1 marcador del fondo acumulado (al no haber compañero, se coloca directamente boca abajo). En 1v1 el reloj de equipo equivale al reloj de cada duelista (Rápido: 1m 40s, Medio: 3m 20s, Lento: 5m 00s). La Caída de Bandera a 00:00 otorga automáticamente la ronda (+2 Puntos de Ronda) al contrincante conservando los puntos acumulados en mesa. Al terminar el despliegue de las 10 cartas, se aplica el mismo sistema de 1, 2 y 3 Puntos de Ronda (Empate: +1 c/u; Ganar 2 frentes: +2 pts; Ganar los 3 frentes: +3 pts) y se cobra la economía.'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* SECCIÓN 9: ANEXO: MODO CASUAL (PARTY / AMIGOS) */}
-            {activeSection === 'sec9' && (
-              <div className="space-y-4 animate-fadeIn">
-                <div className="border-b border-slate-800 pb-3">
-                  <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
-                    {isEn ? 'Chapter 9' : 'Capítulo 9'}
-                  </span>
-                  <h3 className="text-xl sm:text-2xl font-black text-slate-100">
-                    {isEn ? '9. Annex: Casual Mode (Party / Friends)' : '9. Anexo: Modo Casual (Party / Amigos)'}
-                  </h3>
-                </div>
-
-                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-                  {isEn ? (
-                    <>The general rules of Competitive Mode (including the <strong className="text-amber-300">1, 2, and 3 Round Points</strong> scoring system and the rule of <strong className="text-purple-300">silently showing your Shadow Card to teammates before placing it</strong>) remain intact, applying only the following 3 adaptations designed to maximize dynamism, eliminate pen-and-paper tracking, and speed up calculations at parties or gatherings with friends:</>
-                  ) : (
-                    <>Las reglas generales del Modo Competitivo (incluyendo el sistema de puntuación de <strong className="text-amber-300">1, 2 y 3 Puntos de Ronda</strong> y la regla de <strong className="text-purple-300">mostrar en silencio la Carta Sombra a los compañeros antes de colocarla</strong>) se mantienen intactas, aplicando únicamente las siguientes 3 adaptaciones diseñadas para maximizar el dinamismo, eliminar el uso de papel y lápiz y agilizar el cálculo en fiestas o reuniones con amigos:</>
-                  )}
-                </p>
-
-                {/* 1. Conteo Rápido de Frentes ("Escala Comprimida Rebalanceada") */}
-                <div className="bg-slate-900/80 border border-amber-500/30 p-4 rounded-xl space-y-3">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                    <h4 className="font-bold text-amber-400">
-                      {isEn ? '1. Fast Front Counting ("Rebalanced Compressed Scale")' : '1. Conteo Rápido de Frentes ("Escala Comprimida Rebalanceada")'}
-                    </h4>
-                    <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded font-mono font-bold">
-                      {isEn ? 'Scale 1 to 4' : 'Escala 1 al 4'}
-                    </span>
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-slate-300">
-                    {isEn ? (
-                      <>So that any player can calculate at a glance who dominates each front without doing two-digit additions, while preserving the full strategic weight of team combinations, Competitive Mode values are replaced by the following simplified scale:</>
-                    ) : (
-                      <>Para que cualquier jugador pueda calcular de un vistazo quién domina cada frente sin hacer sumas de dos dígitos, pero manteniendo intacto el peso estratégico de las combinaciones en equipo, se sustituyen los valores del Modo Competitivo por la siguiente escala simplificada:</>
-                    )}
-                  </p>
-
-                  <div className="space-y-2">
-                    <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                      {isEn ? 'Simplified Base Card Values:' : 'Valor Base Simplificado de las Cartas:'}
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-center">
-                        <span className="text-slate-400 block">{isEn ? 'Low Cards (2 to 6)' : 'Cartas Bajas (2 al 6)'}</span>
-                        <strong className="text-sm text-amber-300 font-black">{isEn ? '1 point' : '1 punto'}</strong>
-                      </div>
-                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-center">
-                        <span className="text-slate-400 block">{isEn ? 'Mid Cards (7 to 10)' : 'Cartas Medias (7 al 10)'}</span>
-                        <strong className="text-sm text-amber-300 font-black">{isEn ? '2 points' : '2 puntos'}</strong>
-                      </div>
-                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-center">
-                        <span className="text-slate-400 block">{isEn ? 'Figures (J, Q, K)' : 'Figuras (J, Q, K)'}</span>
-                        <strong className="text-sm text-amber-300 font-black">{isEn ? '3 points' : '3 puntos'}</strong>
-                      </div>
-                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800 text-center">
-                        <span className="text-slate-400 block">{isEn ? 'Ace (A)' : 'As (A)'}</span>
-                        <strong className="text-sm text-emerald-400 font-black">{isEn ? '4 points' : '4 puntos'}</strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 pt-1">
-                    <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                      {isEn ? 'Rebalanced Synergy Bonuses:' : 'Bonificaciones por Sinergia Rebalanceadas:'}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
-                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-emerald-400">{isEn ? 'Color (Same suit):' : 'Color (Mismo palo):'}</strong>{' '}
-                        {isEn
-                          ? '+1 point (when gathering exactly 2 cards of the same suit on the front) and +3 total points (single maximum bonus upon reaching 3 or more cards of the same suit).'
-                          : '+1 punto (al juntar exactamente 2 cartas del mismo palo en el frente) y +3 puntos totales (bonificación única y máxima al alcanzar 3 o más cartas del mismo palo).'}
-                      </div>
-                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-sky-400">{isEn ? 'Pair (2 cards of the same rank):' : 'Pareja (2 cartas del mismo número/letra):'}</strong>{' '}
-                        {isEn ? '+3 points.' : '+3 puntos.'}
-                      </div>
-                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-purple-400">{isEn ? 'Short Straight (3 consecutive nominal rank cards):' : 'Escalera Corta (3 cartas de valor nominal consecutivo):'}</strong>{' '}
-                        {isEn ? '+4 points.' : '+4 puntos.'}
-                      </div>
-                      <div className="bg-slate-950 p-2.5 rounded border border-slate-800">
-                        <strong className="text-rose-400">{isEn ? 'Trio (3 cards of the same rank):' : 'Trío (3 cartas del mismo número/letra):'}</strong>{' '}
-                        {isEn ? '+6 points (cancels the Pair bonus for those same cards).' : '+6 puntos (anula la bonificación de Pareja de esas mismas cartas).'}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-slate-950 p-3 rounded border border-slate-800 text-xs text-slate-300 space-y-1.5">
-                    <strong className="text-amber-300 block">{isEn ? 'Front & Match Tiebreakers:' : 'Desempate en un Frente y en la Partida:'}</strong>
-                    <p>
-                      • {isEn ? (
-                        <>If a front is tied in points, the team holding the <strong className="text-slate-100">single highest nominal rank card (2 &lt; 3 &lt; ... &lt; K &lt; A)</strong> played on that front still wins it.</>
-                      ) : (
-                        <>Si un frente empata a puntos, sigue ganando el equipo que tenga la <strong className="text-slate-100">carta individual de mayor jerarquía nominal (2 &lt; 3 &lt; ... &lt; K &lt; A)</strong> jugada en ese frente.</>
-                      )}
-                    </p>
-                    <p>
-                      • {isEn ? (
-                        <><strong>No Score Sheet for Front Sums:</strong> In Casual Mode, numerical front points are not recorded across rounds; only <strong className="text-emerald-300">Round Points (1, 2, or 3 pts)</strong> are tracked. If Round Points are tied after the scheduled rounds, the match goes directly into a <strong className="text-amber-300">2-round Overtime</strong> (one with initiative for each team).</>
-                      ) : (
-                        <><strong>Sin Hoja de Anotación de Sumas:</strong> En el Modo Casual no se anotan los puntos numéricos de los frentes entre rondas; únicamente se llevan los <strong className="text-emerald-300">Puntos de Ronda (1, 2 o 3 pts)</strong> con fichas, monedas o marcador. Si al terminar las rondas reglamentarias hay empate en Puntos de Ronda, se juega directamente una <strong className="text-amber-300">Prórroga de 2 rondas</strong> (una con iniciativa para cada equipo).</>
-                      )}
-                    </p>
-                  </div>
-                </div>
-
-                {/* 2. Gestión Individual de Cartas Sombra */}
-                <div className="bg-slate-900/80 border border-purple-500/30 p-4 rounded-xl space-y-2 text-xs sm:text-sm text-slate-300">
-                  <h4 className="font-bold text-purple-400">
-                    {isEn ? '2. Individual Shadow Card Management' : '2. Gestión Individual de Cartas Sombra'}
-                  </h4>
-                  <p>
-                    • <strong className="text-slate-100">{isEn ? 'Fixed & Individual Marker:' : 'Marcador Fijo e Individual:'}</strong>{' '}
-                    {isEn ? (
-                      <>The shared Team Shadow Pool and post-round income are removed. Each player receives <strong className="text-purple-300">exactly one (1) Shadow Marker per round</strong> to play one card face-down (showing it silently to teammates beforehand).</>
-                    ) : (
-                      <>Se suprime el Fondo de Sombras compartido del equipo y los ingresos posronda. Cada jugador dispone <strong className="text-purple-300">exactamente de un (1) Marcador de Sombra por ronda</strong> para jugar una carta boca abajo (mostrándosela previamente en silencio a sus compañeros).</>
-                    )}
-                  </p>
-                  <p>
-                    • <strong className="text-slate-100">{isEn ? 'Non-Transferable & Non-Cumulative Use:' : 'Uso Intransferible y No Acumulable:'}</strong>{' '}
-                    {isEn ? (
-                      <>The marker is strictly personal and cannot be given or distributed among teammates. If a player does not use their face-down card during the current round, the marker does not carry over to future rounds. At the start of each new round, every player has their single marker again.</>
-                    ) : (
-                      <>El marcador es de uso estrictamente personal y no puede cederse ni repartirse entre los miembros del equipo. Si un jugador no utiliza su carta boca abajo durante la ronda en curso, el marcador no se acumula para rondas posteriores. Al inicio de cada nueva ronda, cada jugador vuelve a disponer de su único marcador.</>
-                    )}
-                  </p>
-                </div>
-
-                {/* 3. Tiempo de Turno Individual */}
-                <div className="bg-slate-900/80 border border-amber-500/30 p-4 rounded-xl space-y-2 text-xs sm:text-sm text-slate-300">
-                  <h4 className="font-bold text-amber-400">
-                    {isEn ? '3. Individual Turn Clock (20s)' : '3. Tiempo de Turno Individual (20s)'}
-                  </h4>
-                  <p>
-                    • <strong className="text-slate-100">{isEn ? 'Team Clock Removed:' : 'Supresión del Reloj de Equipo:'}</strong>{' '}
-                    {isEn ? 'The dual chess clock and shared time bank are eliminated.' : 'Se elimina el cronómetro dual y la bolsa de tiempo compartida.'}
-                  </p>
-                  <p>
-                    • <strong className="text-slate-100">{isEn ? 'Fixed Time per Play:' : 'Tiempo Fijo por Jugada:'}</strong>{' '}
-                    {isEn ? (
-                      <>Each player has an individual time limit of <strong className="text-amber-300">20 seconds per turn</strong> to place their card on a valid front.</>
-                    ) : (
-                      <>Cada jugador dispone de un tiempo límite individual de <strong className="text-amber-300">20 segundos por turno</strong> para colocar su carta en un frente válido.</>
-                    )}
-                  </p>
-                  <p>
-                    • <strong className="text-slate-100">{isEn ? 'Timeout Infraction (Auto-Play):' : 'Infracción por Tiempo (Auto-Play):'}</strong>{' '}
-                    {isEn ? (
-                      <>If a player runs out of their 20-second turn time without placing a card, they do NOT lose the round; instead, the system automatically plays the <strong className="text-rose-300">first available card in their hand face-up</strong> into the valid front with the fewest total cards at that moment.</>
-                    ) : (
-                      <>Si el jugador agota su tiempo reglamentario de 20 segundos sin haber colocado una carta, NO se pierde la ronda; en su lugar, deberá jugar de manera inmediata (automáticamente en la app) la <strong className="text-rose-300">primera carta de su mano boca arriba</strong> en el frente válido que contenga menos cartas en ese momento.</>
-                    )}
-                  </p>
-                </div>
-
-                {/* Nota de Versión Digital */}
-                <div className="bg-emerald-950/30 border border-emerald-500/40 p-4 rounded-xl text-xs sm:text-sm text-slate-200 space-y-1">
-                  <h4 className="font-bold text-emerald-400 flex items-center gap-2">
-                    <span>💻</span>
-                    {isEn ? 'Digital Edition Note: Real-Time Front Score Counters' : 'Nota de la Versión Digital: Marcador de Puntos en Tiempo Real'}
-                  </h4>
-                  <p className="text-slate-300 leading-relaxed">
-                    {isEn ? (
-                      <>In the digital version of Casual Mode, the point sum (Base + Synergies) of each of the 3 fronts is automatically displayed on screen in real time so players never have to do mental math. For information security, your team sees its true score (including allied Shadow Cards), while enemy Shadow Cards do not add points to the public counter until the Revelation Phase at the end of deployment.</>
-                    ) : (
-                      <>En la versión digital del Modo Casual, la suma de puntos (Base + Sinergias) de cada uno de los 3 frentes se muestra automáticamente en pantalla en tiempo real para evitar el cálculo mental. Por seguridad de información oculta, el equipo aliado ve su suma real (incluyendo sus propias Cartas Sombra), mientras que las Cartas Sombra rivales no suman puntos en el marcador público hasta la Fase de Revelación al final del despliegue.</>
-                    )}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
+        {/* Pestañas de Navegación por Capítulos */}
+        <div className="no-print px-4 sm:px-6 py-2 bg-slate-950/80 border-b border-slate-800 flex items-center gap-1.5 overflow-x-auto shrink-0">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition cursor-pointer ${
+                activeTab === t.id
+                  ? 'bg-amber-500 text-slate-950 shadow-sm'
+                  : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
         </div>
 
-        {/* Pie del Manual */}
-        <div className="px-6 py-3 border-t border-slate-800 bg-slate-900 flex items-center justify-between">
-          <div className="text-xs text-slate-500">
-            {manualT.footerText}
+        {/* Documento Oficial v2.1 */}
+        <div
+          id="full-manual-printable"
+          className="p-5 sm:p-8 overflow-y-auto space-y-7 text-slate-200 text-xs sm:text-sm leading-relaxed"
+        >
+          {/* Portada del Documento */}
+          <div className="border-b border-slate-800 pb-5">
+            <h1 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight">
+              {manual.coverTitle}
+            </h1>
+            <p className="text-xs sm:text-sm font-bold text-amber-400 mt-1">
+              {manual.coverVersion}
+            </p>
           </div>
+
+          {/* 1. INTRODUCCIÓN Y OBJETIVO */}
+          {showSection('c1') && (
+            <section className="space-y-3 bg-slate-950/60 border border-slate-800/90 rounded-2xl p-5">
+              <h2 className="text-base sm:text-lg font-black text-sky-400 uppercase tracking-wide border-l-4 border-sky-500 pl-3">
+                {isEn ? '1. INTRODUCTION AND OBJECTIVE' : '1. INTRODUCCIÓN Y OBJETIVO'}
+              </h2>
+              <p>
+                {isEn ? (
+                  <>
+                    <strong>WarFronts</strong> is a tactical team card game (2v2, 3v3, and 4v4, plus 1v1 mode in annex) based on zone control, imperfect information, strategic deduction, and teamwork without micromanagement.
+                  </>
+                ) : (
+                  <>
+                    <strong>Frentes de Guerra</strong> es un juego táctico de cartas por equipos (2v2, 3v3 y 4v4, además de modo 1v1 en anexo) basado en el control de zonas, la información imperfecta, la deducción estratégica y el trabajo en equipo sin microgestión.
+                  </>
+                )}
+              </p>
+              <ul className="space-y-2 list-disc list-inside text-slate-300">
+                <li>
+                  <strong className="text-white">
+                    {isEn ? 'Match Objective:' : 'Objetivo de la Partida:'}
+                  </strong>{' '}
+                  {isEn ? (
+                    <>
+                      The match is played over a fixed even number of Rounds to guarantee equal opportunity in initiative rotation. The team that obtains the highest total of <strong>Round Points</strong> at the end of all rounds is declared the winner. In case of a tie in Round Points at the end of the match, the winner is decided by the reserve of leftover Shadow Markers or, if the tie persists, by a 2-round Overtime (see Section 7).
+                    </>
+                  ) : (
+                    <>
+                      La partida se disputa a un total fijo de Rondas pares para garantizar la igualdad de oportunidades en la rotación de iniciativa. El equipo que obtenga la mayor cantidad de <strong>Puntos de Ronda</strong> al finalizar todas las rondas se declara vencedor. En caso de empate en Puntos de Ronda al término de la partida, el ganador se resolverá mediante la reserva de Marcadores de Sombra sobrantes o, de persistir la igualdad, mediante una Prórroga de 2 rondas (ver Sección 7).
+                    </>
+                  )}
+                </li>
+                <li>
+                  <strong className="text-white">
+                    {isEn ? 'Official Durations:' : 'Duraciones Oficiales:'}
+                  </strong>
+                  <ul className="pl-6 mt-1 space-y-1 list-circle text-slate-300">
+                    <li>{isEn ? 'Short: 4 rounds.' : 'Corta: 4 rondas.'}</li>
+                    <li>{isEn ? 'Medium: 6 rounds.' : 'Mediana: 6 rondas.'}</li>
+                    <li>{isEn ? 'Long: 8 rounds.' : 'Larga: 8 rondas.'}</li>
+                  </ul>
+                </li>
+                <li>
+                  <strong className="text-white">
+                    {isEn ? 'Round Objective:' : 'Objetivo de la Ronda:'}
+                  </strong>{' '}
+                  {isEn
+                    ? 'Outscore the rival team in the total score of the War Fronts (Left, Center, and Right) at the end of deployment to earn as many Round Points as possible (1, 2, or 3 points depending on conquered fronts).'
+                    : 'Superar al equipo rival en la puntuación total de los Frentes de Guerra (Izquierdo, Central y Derecho) al finalizar el despliegue para obtener la mayor cantidad de Puntos de Ronda posibles (1, 2 o 3 puntos según los frentes conquistados).'}
+                </li>
+              </ul>
+            </section>
+          )}
+
+          {/* 2. MATERIALES Y GESTIÓN DE MAZOS */}
+          {showSection('c2') && (
+            <section className="space-y-3 bg-slate-950/60 border border-slate-800/90 rounded-2xl p-5">
+              <h2 className="text-base sm:text-lg font-black text-sky-400 uppercase tracking-wide border-l-4 border-sky-500 pl-3">
+                {isEn ? '2. MATERIALS AND DECK MANAGEMENT' : '2. MATERIALES Y GESTIÓN DE MAZOS'}
+              </h2>
+              <ul className="space-y-2 list-disc list-inside text-slate-300">
+                <li>
+                  <strong className="text-white">{isEn ? 'Players:' : 'Jugadores:'}</strong>{' '}
+                  {isEn ? '1v1 (see Annex 8), 2v2, 3v3, or 4v4.' : '1v1 (ver Anexo 8), 2v2, 3v3 o 4v4.'}
+                </li>
+                <li>
+                  <strong className="text-white">
+                    {isEn ? 'Decks (Standard Poker without jokers):' : 'Barajas (Póker estándar sin comodines/jokers):'}
+                  </strong>
+                  <ul className="pl-6 mt-1 space-y-1">
+                    <li>
+                      <strong className="text-slate-200">{isEn ? '1v1 and 2v2 Matches:' : 'Partidas 1v1 y 2v2:'}</strong>{' '}
+                      {isEn ? '1 Standard Deck (52 cards).' : '1 Baraja estándar (52 cartas).'}
+                    </li>
+                    <li>
+                      <strong className="text-slate-200">{isEn ? '3v3 and 4v4 Matches:' : 'Partidas 3v3 y 4v4:'}</strong>{' '}
+                      {isEn ? '2 Standard Decks combined and shuffled (104 cards).' : '2 Barajas estándar combinadas y mezcladas (104 cartas).'}
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong className="text-white">{isEn ? 'Additional Components:' : 'Componentes Adicionales:'}</strong>
+                  <ul className="pl-6 mt-1 space-y-1.5">
+                    <li>
+                      <strong className="text-slate-200">{isEn ? '1 Initiative Token.' : '1 Ficha de Iniciativa.'}</strong>
+                    </li>
+                    <li>
+                      <strong className="text-slate-200">{isEn ? 'Shadow Markers:' : 'Marcadores de Sombra:'}</strong>{' '}
+                      {isEn
+                        ? 'These markers form the Team Shadow Pool, managed as a continuous economic resource. They can be coins, stones, dice, tokens, or paper. Players do not need to hold them physically; they can stay in the shared team reserve and be placed whenever a member uses one.'
+                        : 'Estos marcadores forman el Fondo de Sombras del Equipo, el cual se gestiona como un recurso económico continuo. Pueden ser monedas, piedras, dados, fichas o papel. No tienen por qué tenerlos físicamente los jugadores que van a usarlos; pueden estar en la reserva común del equipo y colocarse cada vez que un miembro hace uso de uno de ellos.'}
+                    </li>
+                    <li>
+                      <strong className="text-slate-200">{isEn ? 'Round Points Marker:' : 'Marcador de Puntos de Ronda:'}</strong>{' '}
+                      {isEn
+                        ? 'Tokens, dice, or digital scoreboard to track only the Round Points won by each team (1, 2, or 3 points per round). There is no need to write down numerical front sums on paper.'
+                        : 'Fichas, dados o marcador digital para llevar únicamente el conteo de los Puntos de Ronda ganados por cada equipo (1, 2 o 3 puntos por ronda). No es necesario anotar sumas numéricas de los frentes en papel.'}
+                    </li>
+                    <li>
+                      <strong className="text-slate-200">{isEn ? '1 Dual Timer (Physical or Digital):' : '1 Cronómetro dual (Físico o Digital):'}</strong>{' '}
+                      {isEn
+                        ? 'A standard dual timer with two buttons (Team A vs. Team B) capable of independent countdown per team.'
+                        : 'Un cronómetro dual estándar con dos pulsadores (Equipo A vs. Equipo B) capaz de realizar cuenta regresiva independiente por equipo.'}
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+
+              <div className="pt-2 border-t border-slate-800/80 space-y-1.5">
+                <h3 className="text-xs sm:text-sm font-black text-teal-400 uppercase">
+                  {isEn ? 'Main Deck & Discard Pile Management' : 'Gestión del Mazo Principal y Pozo de Descartes'}
+                </h3>
+                <ul className="space-y-1.5 list-disc list-inside text-slate-300">
+                  <li>
+                    <strong className="text-white">{isEn ? 'Main Deck (Draw Pile):' : 'Mazo Principal (Mazo de Robo):'}</strong>{' '}
+                    {isEn
+                      ? 'The face-down pile from which cards are dealt to players.'
+                      : 'Es la pila boca abajo de donde se reparten las cartas a los jugadores.'}
+                  </li>
+                  <li>
+                    <strong className="text-white">{isEn ? 'Discard Pile:' : 'Pozo de Descartes:'}</strong>{' '}
+                    {isEn
+                      ? 'Face-up pile on the side of the table where all cards played on the fronts are placed at the end of a round.'
+                      : 'Pila boca arriba a un lado de la mesa donde se colocan todas las cartas jugadas en los frentes al terminar una ronda.'}
+                  </li>
+                  <li>
+                    <strong className="text-white">{isEn ? 'Continuity & Card Counting Rule:' : 'Regla de Continuidad y Conteo de Cartas:'}</strong>{' '}
+                    {isEn
+                      ? 'Cards played in a round are NOT reshuffled at the end of that round; they remain in the discard pile. This allows players to perform strategic counting of high cards and potential combinations.'
+                      : 'Las cartas jugadas en una ronda NO se rebarajan al finalizar dicha ronda; permanecen en el pozo de descartes. Esto permite a los jugadores realizar un conteo estratégico de cartas altas y posibles combinaciones.'}
+                  </li>
+                  <li>
+                    <strong className="text-white">{isEn ? 'Reshuffle on Exhaustion:' : 'Rebarajado por Agotamiento:'}</strong>{' '}
+                    {isEn
+                      ? 'When the Main Deck does not have enough cards to deal to each player at the start of a round, take the entire Discard Pile, shuffle thoroughly, and form a new Main Deck.'
+                      : 'Cuando el Mazo Principal no tenga suficientes cartas para repartir a cada jugador al inicio de una ronda, se toma todo el Pozo de Descartes, se baraja minuciosamente y se forma un nuevo Mazo Principal.'}
+                  </li>
+                </ul>
+              </div>
+            </section>
+          )}
+
+          {/* 3. DISPOSICIÓN, TIEMPO Y DETERMINACIÓN DE INICIATIVA */}
+          {showSection('c3') && (
+            <section className="space-y-3 bg-slate-950/60 border border-slate-800/90 rounded-2xl p-5">
+              <h2 className="text-base sm:text-lg font-black text-sky-400 uppercase tracking-wide border-l-4 border-sky-500 pl-3">
+                {isEn ? '3. TABLE LAYOUT, TIMERS AND INITIATIVE' : '3. DISPOSICIÓN, TIEMPO Y DETERMINACIÓN DE INICIATIVA'}
+              </h2>
+              <ul className="space-y-2 list-disc list-inside text-slate-300">
+                <li>
+                  <strong className="text-white">{isEn ? 'Table Layout:' : 'Disposición de la Mesa:'}</strong>{' '}
+                  {isEn
+                    ? '3 zones are delimited in the center of the table: Left Front, Center Front, and Right Front. The Main Deck and Discard Pile are placed to the side.'
+                    : 'Se delimitan 3 zonas en el centro de la mesa: Frente Izquierdo, Frente Central y Frente Derecho. El Mazo Principal y el Pozo de Descartes se ubican a un costado.'}
+                </li>
+                <li>
+                  <strong className="text-white">{isEn ? 'Timers by Format:' : 'Tiempos por Formato:'}</strong>{' '}
+                  {isEn
+                    ? 'Time is shared by the entire team, not individual, so the seconds used by each team member during their turn are subtracted from the team clock. There are three game paces (Fast, Medium, and Slow):'
+                    : 'El tiempo es compartido para todo el equipo, no individual, por lo que los segundos que consuma cada componente del equipo durante su turno se restan al reloj de equipo. Existen tres ritmos de juego (Rápido, Medio y Lento):'}
+                  <ul className="pl-6 mt-1.5 space-y-1 font-mono text-xs text-amber-200">
+                    <li>• 1v1: {isEn ? 'Fast' : 'Rápido'} = 1m 40s (100s) / {isEn ? 'Medium' : 'Medio'} = 3m 20s (200s) / {isEn ? 'Slow' : 'Lento'} = 5m 00s (300s)</li>
+                    <li>• 2v2: {isEn ? 'Fast' : 'Rápido'} = 1m 40s (100s) / {isEn ? 'Medium' : 'Medio'} = 3m 20s (200s) / {isEn ? 'Slow' : 'Lento'} = 5m 00s (300s)</li>
+                    <li>• 3v3: {isEn ? 'Fast' : 'Rápido'} = 2m 30s (150s) / {isEn ? 'Medium' : 'Medio'} = 5m 00s (300s) / {isEn ? 'Slow' : 'Lento'} = 7m 30s (450s)</li>
+                    <li>• 4v4: {isEn ? 'Fast' : 'Rápido'} = 3m 20s (200s) / {isEn ? 'Medium' : 'Medio'} = 6m 40s (400s) / {isEn ? 'Slow' : 'Lento'} = 10m 00s (600s)</li>
+                    <li className="font-sans text-slate-400 italic">
+                      {isEn
+                        ? '• Management Note: The team clock resets to its full value at the start of each new round. Leftover time from a round does not carry over.'
+                        : '• Nota de Gestión: El reloj de equipo se reinicia al valor completo al inicio de cada nueva ronda. El tiempo sobrante de una ronda no se acumula para las siguientes.'}
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong className="text-white">{isEn ? 'Initial Initiative (Deck Cut):' : 'Determinación de la Iniciativa Inicial (Corte de Baraja):'}</strong>{' '}
+                  {isEn
+                    ? 'Before starting Round 1, one representative from each team draws a card from the deck. The team that draws the card of higher nominal hierarchy (2 < 3 < … < K < A) receives the Initiative Token. The drawn cards are then returned to the deck and it is shuffled completely.'
+                    : 'Antes de iniciar la Ronda 1, un representante de cada equipo roba una carta del mazo. El equipo que obtenga la carta de mayor jerarquía nominal (2 < 3 < … < K < A) recibe la Ficha de Iniciativa. A continuación, las cartas utilizadas se devuelven al mazo y este se vuelve a barajar completamente.'}
+                </li>
+                <li>
+                  <strong className="text-white">{isEn ? 'Initiative Rotation:' : 'Rotación de Iniciativa:'}</strong>{' '}
+                  {isEn
+                    ? 'Starting from Round 2, the Initiative Token rotates automatically to the opposing team at the start of each round, regardless of who won the previous round.'
+                    : 'A partir de la Ronda 2, la Ficha de Iniciativa rota automáticamente al equipo contrario al inicio de cada ronda, independientemente de quién haya ganado la ronda anterior.'}
+                </li>
+              </ul>
+            </section>
+          )}
+
+          {/* 4. CONCEPTOS CLAVE Y VALORES (ESCALA TÁCTICA UNIFICADA) */}
+          {showSection('c4') && (
+            <section className="space-y-4 bg-slate-950/60 border border-emerald-500/35 rounded-2xl p-5">
+              <h2 className="text-base sm:text-lg font-black text-emerald-400 uppercase tracking-wide border-l-4 border-emerald-500 pl-3">
+                {isEn
+                  ? '4. KEY CONCEPTS AND VALUES (UNIFIED TACTICAL SCALE)'
+                  : '4. CONCEPTOS CLAVE Y VALORES (ESCALA TÁCTICA UNIFICADA)'}
+              </h2>
+              <p>
+                {isEn
+                  ? 'To win a front, each team sums the Base Value of the cards played on it plus Synergy Bonuses. This scale is designed to offer maximum strategic depth with instant mental calculation at the table.'
+                  : 'Para ganar un frente, se suma el Valor Base de las cartas jugadas en él por cada equipo más las Bonificaciones por Sinergia. Esta escala está diseñada para ofrecer máxima profundidad estratégica con un cálculo mental instantáneo en mesa.'}
+              </p>
+
+              {/* Valor Base de las Cartas (Todos los Modos) */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-2">
+                <h3 className="text-xs sm:text-sm font-black text-sky-400 uppercase">
+                  {isEn ? 'Base Card Values (All Modes)' : 'Valor Base de las Cartas (Todos los Modos)'}
+                </h3>
+                <ul className="space-y-1 list-disc list-inside text-slate-200 font-medium">
+                  <li>
+                    <strong>{isEn ? 'Low Cards (2 to 6):' : 'Cartas Bajas (del 2 al 6):'}</strong>{' '}
+                    <span className="text-emerald-400 font-bold">{isEn ? 'Worth 1 point.' : 'Valen 1 punto.'}</span>
+                  </li>
+                  <li>
+                    <strong>{isEn ? 'Mid Cards (7 to 10):' : 'Cartas Medias (del 7 al 10):'}</strong>{' '}
+                    <span className="text-emerald-400 font-bold">{isEn ? 'Worth 2 points.' : 'Valen 2 puntos.'}</span>
+                  </li>
+                  <li>
+                    <strong>{isEn ? 'Figures (J, Q, K):' : 'Figuras (J, Q, K):'}</strong>{' '}
+                    <span className="text-emerald-400 font-bold">{isEn ? 'Worth 3 points.' : 'Valen 3 puntos.'}</span>
+                  </li>
+                  <li>
+                    <strong>{isEn ? 'Ace (A):' : 'As (A):'}</strong>{' '}
+                    <span className="text-emerald-400 font-bold">{isEn ? 'Worth 4 points.' : 'Vale 4 puntos.'}</span>
+                  </li>
+                </ul>
+                <p className="text-xs text-amber-200/90 italic pt-1">
+                  <strong>
+                    {isEn
+                      ? '• Importance of Nominal Hierarchy (2 < 3 < … < K < A):'
+                      : '• Importancia de la Jerarquía Nominal (2 < 3 < … < K < A):'}
+                  </strong>{' '}
+                  {isEn
+                    ? 'Even though several cards share the same Base Value in points (for example, a 6 and a 2 are both worth 1 point, or a King and a Jack are both worth 3 points), they keep their nominal hierarchy intact to form Straights, Pairs/Trios, and automatically decide any point tie on a front in favor of the highest card (see Section 6).'
+                    : 'Aunque varias cartas compartan el mismo Valor Base en puntos (por ejemplo, un 6 y un 2 valen 1 punto, o un Rey y una Jota valen 3 puntos), conservan intacta su jerarquía nominal para formar Escaleras, Parejas/Tríos y decidir automáticamente a favor de la carta más alta cualquier empate a puntos en un frente (ver Sección 6).'}
+                </p>
+              </div>
+
+              {/* Bonificaciones por Sinergia (Todos los Modos) */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-2">
+                <h3 className="text-xs sm:text-sm font-black text-sky-400 uppercase">
+                  {isEn ? 'Synergy Bonuses (All Modes)' : 'Bonificaciones por Sinergia (Todos los Modos)'}
+                </h3>
+                <ul className="space-y-1.5 list-disc list-inside text-slate-200">
+                  <li>
+                    <strong>{isEn ? 'Suit Synergy (Color):' : 'Sinergia de Palo (Color):'}</strong>{' '}
+                    <strong className="text-emerald-400">{isEn ? '+1 Point' : '+1 Punto'}</strong>{' '}
+                    {isEn
+                      ? 'for each additional card of the same suit on the front (e.g., 2 cards of the same suit add +1 point; 3 cards add +2 points; 4 cards add +3 points, with no maximum cap).'
+                      : 'por cada carta adicional del mismo palo en el frente (ej. 2 cartas del mismo palo suman +1 punto; 3 cartas suman +2 puntos; 4 cartas suman +3 puntos, sin límite máximo).'}
+                  </li>
+                  <li>
+                    <strong>{isEn ? 'Pair:' : 'Pareja:'}</strong>{' '}
+                    <strong className="text-emerald-400">{isEn ? '+2 Points' : '+2 Puntos'}</strong>{' '}
+                    {isEn ? '(2 cards of the same number or letter).' : '(2 cartas del mismo número o letra).'}
+                  </li>
+                  <li>
+                    <strong>{isEn ? 'Short Straight:' : 'Escalera Corta:'}</strong>{' '}
+                    <strong className="text-emerald-400">{isEn ? '+4 Points' : '+4 Puntos'}</strong>{' '}
+                    {isEn ? '(3 cards of consecutive nominal rank, e.g., 5-6-7 or J-Q-K).' : '(3 cartas de valor nominal consecutivo, ej. 5-6-7 o J-Q-K).'}
+                  </li>
+                  <li>
+                    <strong>{isEn ? 'Trio:' : 'Trío:'}</strong>{' '}
+                    <strong className="text-emerald-400">{isEn ? '+5 Points' : '+5 Puntos'}</strong>{' '}
+                    {isEn
+                      ? '(3 cards of the same number or letter). Clarification: Forming a Trio automatically cancels the Pair bonus for those same cards; you cannot add +5 from the Trio and +2 from the Pair for the same three cards.'
+                      : '(3 cartas del mismo número o letra). Aclaración: Formar un Trío anula automáticamente la bonificación de la Pareja de esas mismas cartas; no se pueden sumar los +5 del Trío y los +2 de la Pareja por las mismas tres cartas.'}
+                  </li>
+                </ul>
+              </div>
+
+              {/* Las Cartas de Sombra y el Fondo de Equipo */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-2">
+                <h3 className="text-xs sm:text-sm font-black text-purple-400 uppercase">
+                  {isEn ? 'Shadow Cards and the Team Pool' : 'Las Cartas de Sombra y el Fondo de Equipo'}
+                </h3>
+                <ul className="space-y-1.5 list-disc list-inside text-slate-300">
+                  <li>
+                    {isEn
+                      ? 'Both teams start the first round of the match with zero (0) markers in their Shadow Pool.'
+                      : 'Ambos equipos inician la primera ronda de la partida con cero (0) marcadores en su Fondo de Sombras.'}
+                  </li>
+                  <li>
+                    {isEn
+                      ? 'During the Tactical Phase, the team decides how many markers from its accumulated reserve it wants to spend that round and distributes them freely among its players according to strategy. Unused markers are kept in the Team Pool for future rounds. A player may receive multiple markers (playing several face-down cards that round) or none.'
+                      : 'Durante la Fase de Táctica, el equipo decide cuántos marcadores de su reserva acumulada desea gastar en esa ronda y los reparte libremente entre sus jugadores según su estrategia. Los marcadores no utilizados se conservan en el Fondo de Equipo para rondas futuras. Un jugador puede recibir múltiples marcadores (pudiendo jugar varias cartas boca abajo en esa ronda) o no recibir ninguno.'}
+                  </li>
+                  <li>
+                    <strong className="text-white">
+                      {isEn ? 'Silent Show to Teammates (Teammate Peek):' : 'Muestra en Silencio al Equipo (Vistazo de Compañero):'}
+                    </strong>{' '}
+                    {isEn
+                      ? 'Cards played as Shadow remain hidden only from the rival team. When a player decides to play a Shadow Card, before placing it face-down on the chosen front, they must silently show it to their teammates (ensuring the rival team does not see it). Additionally, any player may secretly check the value and suit of Shadow Cards already played by their teammates on the table.'
+                      : 'Las cartas jugadas como Sombra permanecerán ocultas únicamente para el equipo rival. En el momento en que un jugador decide jugar una Carta de Sombra, antes de colocarla boca abajo en el frente elegido, debe mostrársela en silencio a sus compañeros de equipo (cuidando de que el equipo rival no la vea). Adicionalmente, cualquier jugador podrá consultar en secreto el valor y palo de las Cartas Sombra ya jugadas por sus compañeros en la mesa si necesita recordarlas.'}
+                  </li>
+                  <li>
+                    <strong className="text-white">
+                      {isEn ? 'Using the Shadow Marker (Anti-Cheat Control):' : 'Uso del Marcador de Sombra (Control Anti-trampas):'}
+                    </strong>{' '}
+                    {isEn
+                      ? 'When a player places a card face-down, they must place on top of it or hand over one of the Shadow Markers previously assigned to the team. This guarantees full transparency over how many hidden cards the team has left to play.'
+                      : 'En el momento en que un jugador coloca una carta boca abajo, debe situar sobre ella o entregar uno de los Marcadores de Sombra asignados al equipo previamente. Esto garantiza transparencia total sobre cuántas cartas ocultas le quedan por jugar al equipo.'}
+                  </li>
+                </ul>
+              </div>
+
+              {/* Límite Territorial Compartido por Frente */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-1.5">
+                <h3 className="text-xs sm:text-sm font-black text-teal-400 uppercase">
+                  {isEn ? 'Shared Territorial Limit per Front' : 'Límite Territorial Compartido por Frente'}
+                </h3>
+                <p className="text-slate-300">
+                  {isEn
+                    ? 'A maximum total number of slots per Front is established for the sum of cards from both teams: • 1v1 and 2v2 Matches: Maximum 8 cards total per Front. • 3v3 Matches: Maximum 12 cards total per Front. • 4v4 Matches: Maximum 16 cards total per Front. • Closure Rule (Saturation): As soon as a Front reaches this limit with the sum of cards from both teams, it becomes saturated and no more cards can be placed on it for the rest of the round.'
+                    : 'Se establece un número máximo de casillas en total por Frente para la suma de las cartas de ambos equipos: • Partidas 1v1 y 2v2: Máximo 8 cartas en total por Frente. • Partidas 3v3: Máximo 12 cartas en total por Frente. • Partidas 4v4: Máximo 16 cartas en total por Frente. • Regla de Cierre (Saturación): En cuanto un Frente alcanza dicho límite con la suma de las cartas de ambos equipos, queda saturado y no se pueden colocar más cartas en él durante el resto de la ronda.'}
+                </p>
+              </div>
+            </section>
+          )}
+
+          {/* 5. ESTRUCTURA PASO A PASO DE LA RONDA */}
+          {showSection('c5') && (
+            <section className="space-y-4 bg-slate-950/60 border border-slate-800/90 rounded-2xl p-5">
+              <h2 className="text-base sm:text-lg font-black text-sky-400 uppercase tracking-wide border-l-4 border-sky-500 pl-3">
+                {isEn ? '5. STEP-BY-STEP ROUND STRUCTURE' : '5. ESTRUCTURA PASO A PASO DE LA RONDA'}
+              </h2>
+              <p>
+                {isEn
+                  ? 'Each round is strictly divided into the following sequential phases:'
+                  : 'Cada ronda se divide estrictamente en las siguientes fases secuenciales:'}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                {/* FASE 1 */}
+                <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-1.5">
+                  <h3 className="text-xs sm:text-sm font-black text-sky-300 uppercase">
+                    {isEn ? 'PHASE 1: Preparation and Initiative' : 'FASE 1: Preparación e Iniciativa'}
+                  </h3>
+                  <ol className="list-decimal list-inside space-y-1 text-slate-300">
+                    <li>
+                      {isEn
+                        ? 'If the Main Deck does not have enough cards, reshuffle the Discard Pile to form the new deck.'
+                        : 'Si el Mazo Principal no tiene suficientes cartas, se rebaraja el Pozo de Descartes para formar el nuevo mazo.'}
+                    </li>
+                    <li>
+                      {isEn
+                        ? 'Teams check their accumulated Shadow Pool. In Round 1, this pool is strictly zero (0) for both sides.'
+                        : 'Los equipos revisan su Fondo de Sombras acumulado. En la Ronda 1, este fondo es estrictamente cero (0) para ambos bandos.'}
+                    </li>
+                    <li>
+                      {isEn
+                        ? 'The Initiative Token is handed to the corresponding team and clocks are reset.'
+                        : 'Se entrega la Ficha de Iniciativa al equipo correspondiente y se reinician los relojes.'}
+                    </li>
+                  </ol>
+                </div>
+
+                {/* FASE 2 */}
+                <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-1.5">
+                  <h3 className="text-xs sm:text-sm font-black text-amber-300 uppercase">
+                    {isEn ? 'PHASE 2: Team Tactics (Clock: Strict 30s - NO CARDS IN HAND)' : 'FASE 2: Táctica de Equipo (Reloj: 30s Estrictos - SIN CARTAS EN MANO)'}
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-slate-300">
+                    <li>
+                      <strong className="text-white">{isEn ? 'Full Free Communication:' : 'Comunicación Total Libre:'}</strong>{' '}
+                      {isEn
+                        ? 'Teams have 30 seconds to talk and coordinate general strategy before receiving cards.'
+                        : 'Los equipos disponen de 30 segundos para hablar y coordinar su estrategia general antes de recibir sus cartas.'}
+                    </li>
+                    <li>
+                      <strong className="text-white">{isEn ? 'Macro Strategy:' : 'Estrategia Macro:'}</strong>{' '}
+                      {isEn
+                        ? 'Plan zone priorities and decide how many shadow markers from the accumulated pool to invest this round or save for future rounds.'
+                        : 'Se planifica la distribución de las zonas (“Ataquemos fuerte Centro e Izquierda”, “Busquemos el Pleno de 3 frentes”) y se decide cuántos marcadores de sombra del fondo acumulado se invertirán en esta ronda o cuántos se ahorrarán para futuras rondas.'}
+                    </li>
+                    <li>
+                      <strong className="text-white">{isEn ? 'Anti-Alpha Player Guarantee:' : 'Garantía Anti-Jugador Alfa:'}</strong>{' '}
+                      {isEn
+                        ? 'With no cards in hand yet, it is impossible for one player to dictate exact plays to teammates.'
+                        : 'Al no tener aún las cartas en mano, es imposible que un jugador ordene las jugadas exactas a sus compañeros.'}
+                    </li>
+                  </ul>
+                </div>
+
+                {/* FASE 3 */}
+                <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-1.5">
+                  <h3 className="text-xs sm:text-sm font-black text-rose-300 uppercase">
+                    {isEn ? 'PHASE 3: Dealing Cards' : 'FASE 3: Reparto de Cartas'}
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-slate-300">
+                    <li>
+                      {isEn
+                        ? 'Immediately after the Tactical Phase ends, the dealer deals 5 cards face-down to each player from the Main Deck.'
+                        : 'Inmediatamente al terminar la Fase de Táctica, el repartidor entrega 5 cartas boca abajo a cada jugador del Mazo Principal.'}
+                    </li>
+                    <li className="text-rose-200 font-semibold">
+                      {isEn
+                        ? 'Speaking or making signals is strictly forbidden from this instant.'
+                        : 'Está estrictamente prohibido hablar o hacer señas desde este instante.'}
+                    </li>
+                  </ul>
+                </div>
+
+                {/* FASE 4 */}
+                <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-1.5">
+                  <h3 className="text-xs sm:text-sm font-black text-emerald-300 uppercase">
+                    {isEn ? 'PHASE 4: Deployment (Absolute Silence)' : 'FASE 4: Despliegue (Silencio Absoluto)'}
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-slate-300">
+                    <li>
+                      <strong className="text-white">{isEn ? 'Turn Order & Interleaving:' : 'Orden de Turnos e Intercalado:'}</strong>{' '}
+                      {isEn
+                        ? 'Starts with a player from the team holding Initiative. Turns alternate strictly 1 by 1 between both teams (A1 → B1 → A2 → B2…) until all players have placed their 5 cards.'
+                        : 'Inicia un jugador del equipo con la Ficha de Iniciativa. Los turnos se alternan estrictamente 1 a 1 entre jugadores de ambos equipos de forma fija (A1 → B1 → A2 → B2…) hasta que todos los jugadores hayan colocado sus 5 cartas.'}
+                    </li>
+                    <li>
+                      <strong className="text-white">{isEn ? 'Single Turn Action:' : 'Acción Única del Turno:'}</strong>{' '}
+                      {isEn
+                        ? 'On their turn, the player MUST place exactly ONE (1) card on any of the 3 Fronts that has not reached the Shared Territorial Limit, then press the clock.'
+                        : 'En su turno, el jugador DEBE colocar exactamente UNA (1) carta en cualquiera de los 3 Frentes que no haya alcanzado el Límite Territorial Compartido. No se permite jugar 2 cartas en un mismo turno ni pasar el turno. Cuando se coloca la carta, se pulsa el cronómetro para activar el tiempo del equipo rival.'}
+                    </li>
+                    <li>
+                      <strong className="text-white">{isEn ? 'Loss on Time (Flag Fall):' : 'Derrota por Tiempo (Caída de Bandera):'}</strong>{' '}
+                      {isEn
+                        ? 'If a team’s clock reaches 00:00 before completing its turns, the round ends instantaneously. The infringing team loses the round automatically and the rival team scores +2 Round Points directly, unless at that instant the rival already had a higher score on all 3 fronts and had played all its cards, in which case it scores +3 Round Points.'
+                        : 'Si el reloj de un equipo llega a 00:00 antes de completar sus turnos: la ronda finaliza de manera instantánea. El equipo infractor pierde la ronda automáticamente y el equipo rival suma +2 Puntos de Ronda (victoria estándar) de forma directa, salvo que en ese instante ya tuviera mayor puntuación en los 3 frentes y el rival hubiera jugado todas sus cartas, en cuyo caso sumaría +3 Puntos de Ronda.'}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* TRAS COMPLETAR EL DESPLIEGUE */}
+              <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-2">
+                <h3 className="text-xs sm:text-sm font-black text-teal-400 uppercase">
+                  {isEn ? 'AFTER COMPLETING DEPLOYMENT:' : 'TRAS COMPLETAR EL DESPLIEGUE:'}
+                </h3>
+                <ol className="list-decimal list-inside space-y-2 text-slate-300">
+                  <li>
+                    <strong className="text-white">{isEn ? 'Revelation:' : 'Revelación:'}</strong>{' '}
+                    {isEn
+                      ? 'Flip all Shadow Cards face-up to make them visible to the rival team and spectators.'
+                      : 'Voltear todas las Cartas Sombra para hacerlas visibles al equipo rival y a los espectadores.'}
+                  </li>
+                  <li>
+                    <strong className="text-white">
+                      {isEn ? 'Fast Sum per Front (2-Step Visual Grouping):' : 'Suma Rápida por Frente (Agrupación Visual en 2 Pasos):'}
+                    </strong>{' '}
+                    {isEn
+                      ? 'On each of the 3 Fronts, each team first sums the Base Value of its cards (1, 2, 3, or 4 points) and then slightly slides forward the cards that trigger Synergy Bonuses (+1 per additional suit card, +2 per Pair, +4 per Short Straight, or +5 per Trio) to sum the total at a glance.'
+                      : 'En cada uno de los 3 Frentes, cada equipo suma primero el Valor Base de sus cartas (1, 2, 3 o 4 puntos) y a continuación desliza ligeramente hacia delante las cartas que activen Bonificaciones por Sinergia (+1 por palo adicional, +2 por Pareja, +4 por Escalera Corta o +5 por Trío) para sumar el total de un vistazo.'}
+                  </li>
+                  <li>
+                    <strong className="text-white">{isEn ? 'Round Points Allocation:' : 'Asignación de Puntos de Ronda:'}</strong>
+                    <ul className="pl-6 mt-1 space-y-1 list-disc text-slate-300">
+                      <li>
+                        <strong className="text-sky-300">{isEn ? 'Round Tie:' : 'Empate en la Ronda'}</strong>{' '}
+                        {isEn
+                          ? '(e.g., each team wins 1 front and the third is Void, or all 3 fronts are Void): +1 Round Point for each team.'
+                          : '(ej. cada equipo gana 1 frente y el tercero queda Nulo, o los 3 frentes quedan Nulos): +1 Punto de Ronda para cada equipo.'}
+                      </li>
+                      <li>
+                        <strong className="text-emerald-300">{isEn ? '2-Front Victory:' : 'Victoria por 2 Frentes'}</strong>{' '}
+                        {isEn
+                          ? '(win 2 of the 3 fronts): +2 Round Points for the winning team (0 for the loser).'
+                          : '(ganar 2 de los 3 frentes): +2 Puntos de Ronda para el equipo ganador (0 para el perdedor).'}
+                      </li>
+                      <li>
+                        <strong className="text-amber-300">{isEn ? '3-Front Victory / “Sweep”:' : 'Victoria por 3 Frentes / “Pleno”'}</strong>{' '}
+                        {isEn
+                          ? '(win all 3 fronts simultaneously): +3 Round Points for the winning team (0 for the loser).'
+                          : '(ganar los 3 frentes simultáneamente): +3 Puntos de Ronda para el equipo ganador (0 para el perdedor).'}
+                      </li>
+                    </ul>
+                  </li>
+                  <li>
+                    <strong className="text-white">{isEn ? 'Economy Income (Shadows):' : 'Ingresos de Economía (Sombras):'}</strong>{' '}
+                    {isEn
+                      ? 'After determining the round result, each team receives new Shadow Markers added immediately to its Team Pool for subsequent rounds:'
+                      : 'Tras determinar el resultado de la ronda, cada equipo recibe nuevos Marcadores de Sombra que se añaden inmediatamente a su Fondo de Equipo para las siguientes rondas:'}
+                    <ul className="pl-6 mt-1 space-y-1 list-disc text-purple-200">
+                      <li>
+                        <strong>{isEn ? '1v1 and 2v2 Format:' : 'Formato 1v1 y 2v2:'}</strong>{' '}
+                        {isEn
+                          ? 'Winning Team (+1), Losing Team (+2), Loser on a streak of 2 or more consecutive losses (+3). Round Tie (+1 to both).'
+                          : 'Equipo Ganador (+1), Equipo Perdedor (+2), Perdedor en racha de 2 o más derrotas consecutivas (+3). Empate de Ronda (+1 a ambos).'}
+                      </li>
+                      <li>
+                        <strong>{isEn ? '3v3 Format:' : 'Formato 3v3:'}</strong>{' '}
+                        {isEn
+                          ? 'Winning Team (+2), Losing Team (+3), Loser on a streak of 2 or more consecutive losses (+4). Round Tie (+2 to both).'
+                          : 'Equipo Ganador (+2), Equipo Perdedor (+3), Perdedor en racha de 2 o más derrotas consecutivas (+4). Empate de Ronda (+2 a ambos).'}
+                      </li>
+                      <li>
+                        <strong>{isEn ? '4v4 Format:' : 'Formato 4v4:'}</strong>{' '}
+                        {isEn
+                          ? 'Winning Team (+2), Losing Team (+4), Loser on a streak of 2 or more consecutive losses (+5). Round Tie (+2 to both).'
+                          : 'Equipo Ganador (+2), Equipo Perdedor (+4), Perdedor en racha de 2 o más derrotas consecutivas (+5). Empate de Ronda (+2 a ambos).'}
+                      </li>
+                    </ul>
+                  </li>
+                </ol>
+              </div>
+            </section>
+          )}
+
+          {/* 6. RESOLUCIÓN DE EMPATES Y VACÍOS LEGALES */}
+          {showSection('c6') && (
+            <section className="space-y-3 bg-slate-950/60 border border-slate-800/90 rounded-2xl p-5">
+              <h2 className="text-base sm:text-lg font-black text-sky-400 uppercase tracking-wide border-l-4 border-sky-500 pl-3">
+                {isEn ? '6. TIE RESOLUTION AND EDGE CASES' : '6. RESOLUCIÓN DE EMPATES Y VACÍOS LEGALES'}
+              </h2>
+              <ul className="space-y-2 list-disc list-inside text-slate-300">
+                <li>
+                  <strong className="text-white">{isEn ? 'Tie on a Front:' : 'Empate en un Frente:'}</strong>{' '}
+                  {isEn ? (
+                    <>
+                      If both teams tie in exact score on a Front, the tiebreaker on that front is won by the team holding the <strong>single card of highest nominal hierarchy (2 &lt; 3 &lt; … &lt; K &lt; A)</strong> played on it. If the tie persists (both teams have the exact same highest card on that front), the Front is declared <strong>Void</strong> (nobody wins that front).
+                    </>
+                  ) : (
+                    <>
+                      Si ambos equipos igualan en puntaje exacto en un Frente, el desempate en ese frente lo gana el equipo que posea la <strong>carta individual de mayor jerarquía nominal (2 &lt; 3 &lt; … &lt; K &lt; A)</strong> jugada en él. Si el empate persiste (ambos equipos tienen exactamente la misma carta máxima en ese frente), el Frente se declara <strong>Nulo</strong> (nadie gana ese frente).
+                    </>
+                  )}
+                </li>
+                <li>
+                  <strong className="text-white">{isEn ? 'Tie in the Round:' : 'Empate en la Ronda:'}</strong>{' '}
+                  {isEn
+                    ? 'If the round ends tied in conquered fronts (e.g., Team A wins Left, Team B wins Right, and Center is Void), both teams receive +1 Round Point and collect the shadow economy corresponding to a Round Tie. (Note: If due to a double void front one team wins 1 to 0, it counts as a standard victory of +2 Round Points).'
+                    : 'Si la ronda concluye igualada en frentes conquistados (ej. Equipo A gana Izquierda, Equipo B gana Derecha y el Centro es Nulo), ambos equipos reciben +1 Punto de Ronda y cobran la economía de sombras correspondiente a Empate de Ronda. (Nota: Si por doble frente nulo un equipo gana 1 a 0, se considera victoria estándar de +2 Puntos de Ronda).'}
+                </li>
+                <li>
+                  <strong className="text-white">{isEn ? 'Shadow Card Infraction:' : 'Infracción de Carta de Sombra:'}</strong>{' '}
+                  {isEn
+                    ? 'If a player attempts to play a card face-down when no Shadow Markers are available, the card must be flipped immediately and remain exposed face-up on the table.'
+                    : 'Si un jugador intenta jugar una carta boca abajo cuando no le corresponden Marcadores de Sombra, la carta debe voltearse inmediatamente y quedar expuesta boca arriba en la mesa.'}
+                </li>
+                <li>
+                  <strong className="text-white">{isEn ? 'Irregular Clock Press:' : 'Pulsación Irregular del Reloj:'}</strong>{' '}
+                  {isEn
+                    ? 'A player cannot press the timer before definitively releasing the card onto the chosen front.'
+                    : 'Un jugador no puede pulsar el cronómetro antes de haber soltado la carta de forma definitiva en el frente elegido. Si lo hace, el tiempo seguirá corriendo para su equipo hasta que la carta esté correctamente depositada.'}
+                </li>
+                <li>
+                  <strong className="text-white">{isEn ? 'Loss Streak Reset:' : 'Reinicio de Racha de Derrotas:'}</strong>{' '}
+                  {isEn
+                    ? 'If a team collecting the maximum shadow bonus from a loss streak wins a round (2 or 3 points) or ties it (1 point each), its streak resets immediately. Its next loss counts as the first.'
+                    : 'Si un equipo que está cobrando el bono máximo de sombras por racha de derrotas logra ganar una ronda (2 o 3 puntos) o empatarla (1 punto para cada equipo), su racha se reinicia instantáneamente. Su siguiente derrota contará como la primera.'}
+                </li>
+              </ul>
+            </section>
+          )}
+
+          {/* 7. FIN DE LA PARTIDA Y CRITERIOS DE DESEMPATE */}
+          {showSection('c7') && (
+            <section className="space-y-3 bg-slate-950/60 border border-amber-500/40 rounded-2xl p-5">
+              <h2 className="text-base sm:text-lg font-black text-amber-400 uppercase tracking-wide border-l-4 border-amber-500 pl-3">
+                {isEn ? '7. END OF MATCH AND TIEBREAKER CRITERIA' : '7. FIN DE LA PARTIDA Y CRITERIOS DE DESEMPATE'}
+              </h2>
+              <ul className="space-y-2.5 list-disc list-inside text-slate-300">
+                <li>
+                  <strong className="text-white">{isEn ? 'Direct Victory:' : 'Victoria Directa:'}</strong>{' '}
+                  {isEn
+                    ? 'After playing the agreed even number of rounds (4, 6, or 8 rounds), all Round Points obtained are summed. The team with the higher total score wins the match.'
+                    : 'Tras disputar el total de rondas pares acordadas (4, 6 u 8 rondas), se suman todos los Puntos de Ronda obtenidos. El equipo con mayor puntuación total obtiene la victoria.'}
+                </li>
+                <li>
+                  <strong className="text-purple-300">
+                    {isEn ? 'First Tiebreaker Criterion (Shadow Efficiency):' : 'Primer Criterio de Desempate (Eficiencia de Sombras):'}
+                  </strong>{' '}
+                  {isEn ? (
+                    <>
+                      If the match ends tied in total Round Points, the winner is the team that retains <strong>more unspent Shadow Markers in its Team Pool</strong> at the end of the final round (rewarding resource management efficiency).
+                    </>
+                  ) : (
+                    <>
+                      Si la partida concluye empatada en Puntos de Ronda totales, se declara vencedor al equipo que conserve <strong>mayor cantidad de Marcadores de Sombra sin gastar en su Fondo de Equipo</strong> al término de la última ronda (premiando la eficiencia en la gestión de recursos).
+                    </>
+                  )}
+                </li>
+                <li>
+                  <strong className="text-amber-300">
+                    {isEn ? 'Second Tiebreaker Criterion (2-Round Overtime):' : 'Segundo Criterio de Desempate (Prórroga de 2 Rondas):'}
+                  </strong>{' '}
+                  {isEn ? (
+                    <>
+                      If the tie persists in Shadow Markers (or in Casual Mode where there is no cumulative Team Pool), <strong>2 additional Overtime Rounds</strong> are played (maintaining initiative rotation) to guarantee equal starting opportunity.
+                    </>
+                  ) : (
+                    <>
+                      En el caso de que persista el empate en Marcadores de Sombra (o en el Modo Casual donde no existe Fondo de Equipo acumulable), se jugarán <strong>2 Rondas de Prórroga</strong> adicionales (manteniendo la rotación de iniciativa) para garantizar igualdad de salida.
+                    </>
+                  )}
+                </li>
+              </ul>
+            </section>
+          )}
+
+          {/* 8. ANEXO: MODO DE JUEGO 1v1 */}
+          {showSection('c8') && (
+            <section className="space-y-3 bg-slate-950/60 border border-slate-800/90 rounded-2xl p-5">
+              <h2 className="text-base sm:text-lg font-black text-sky-400 uppercase tracking-wide border-l-4 border-sky-500 pl-3">
+                {isEn ? '8. ANNEX: 1v1 GAME MODE' : '8. ANEXO: MODO DE JUEGO 1v1'}
+              </h2>
+              <p>
+                {isEn
+                  ? 'The general rules of Competitive Mode remain intact, applying only the following specific adaptations for 1 vs 1 matches:'
+                  : 'Las reglas generales del Modo Competitivo se mantienen intactas, aplicando únicamente las siguientes adaptaciones específicas para partidas de 1 contra 1:'}
+              </p>
+              <ol className="list-decimal list-inside space-y-2 text-slate-300">
+                <li>
+                  <strong className="text-white">
+                    {isEn ? 'Mathematical and Mechanical Adjustments (The 2v2 Mirror):' : 'Ajustes Matemáticos y Mecánicos (El Espejo del 2v2):'}
+                  </strong>{' '}
+                  {isEn
+                    ? 'To maintain slot tension and mathematical viability, 1v1 mode mechanically simulates a 2v2:'
+                    : 'Para mantener la tensión de los espacios y la viabilidad matemática, el modo 1v1 simula mecánicamente un 2v2:'}
+                  <ul className="pl-6 mt-1 space-y-1 list-disc text-slate-300">
+                    <li>
+                      <strong className="text-white">{isEn ? 'Deck:' : 'Baraja:'}</strong>{' '}
+                      {isEn ? '1 Standard Deck (52 cards).' : '1 Baraja estándar (52 cartas).'}
+                    </li>
+                    <li>
+                      <strong className="text-white">{isEn ? 'Player Hand:' : 'Mano del Jugador:'}</strong>{' '}
+                      {isEn ? '10 cards per player (instead of 5).' : '10 cartas por jugador (en lugar de 5).'}
+                    </li>
+                    <li>
+                      <strong className="text-white">{isEn ? 'Shared Territorial Limit:' : 'Límite Territorial Compartido:'}</strong>{' '}
+                      {isEn ? 'Maximum 8 cards total per Front summing both players’ cards.' : 'Máximo 8 cartas en total por Frente sumando las cartas de ambos jugadores.'}
+                    </li>
+                    <li>
+                      <strong className="text-white">{isEn ? 'Clock Management in 1v1:' : 'Gestión del Reloj en 1v1:'}</strong>{' '}
+                      {isEn
+                        ? 'The individual player assumes all 10 turns of their side, using the full time pool (1m 40s Fast / 3m 20s Medium / 5m 00s Slow) to alternate plays against the rival, pressing the clock after each of their 10 placed cards.'
+                        : 'El jugador individual asume los 10 turnos de su bando, disponiendo de la bolsa de tiempo completa (1m 40s Rápido / 3m 20s Medio / 5m 00s Lento) para alternar sus jugadas frente al rival, pulsando el reloj tras cada una de sus 10 cartas colocadas.'}
+                    </li>
+                  </ul>
+                </li>
+                <li>
+                  <strong className="text-white">{isEn ? 'The 4 Round Phases:' : 'Las 4 Fases de la Ronda:'}</strong>{' '}
+                  {isEn
+                    ? 'Played identically to other modes, using the 30 seconds of the Tactical Phase to mentally plan strategy and Shadow Pool management before receiving the 10 cards.'
+                    : 'Se desarrollan igual que en los otros modos, utilizando los 30 segundos de la Fase de Táctica para planificar mentalmente la estrategia y la gestión del Fondo de Sombras antes de recibir las 10 cartas.'}
+                </li>
+              </ol>
+            </section>
+          )}
+
+          {/* 9. ANEXO: MODO CASUAL (PARTY / AMIGOS) — SOLO LAS 3 DIFERENCIAS EXCLUSIVAS */}
+          {showSection('c9') && (
+            <section className="space-y-4 bg-slate-950/60 border border-emerald-500/40 rounded-2xl p-5">
+              <h2 className="text-base sm:text-lg font-black text-emerald-400 uppercase tracking-wide border-l-4 border-emerald-500 pl-3">
+                {isEn ? '9. ANNEX: CASUAL MODE (PARTY / FRIENDS)' : '9. ANEXO: MODO CASUAL (PARTY / AMIGOS)'}
+              </h2>
+              <p className="text-slate-200">
+                {isEn ? (
+                  <>
+                    Casual Mode uses the exact <strong>same rules, phases, card values (1 to 4 points), synergy bonuses (+1, +2, +4, +5), and round scoring (1, 2, and 3 points)</strong> of Competitive Mode, applying <strong>only the following 3 modifications</strong> to simplify resource management and turn tempo:
+                  </>
+                ) : (
+                  <>
+                    El Modo Casual utiliza exactamente las <strong>mismas reglas, fases, valores de cartas (1 a 4 puntos), bonificaciones de sinergia (+1, +2, +4, +5) y puntuación de ronda (1, 2 y 3 puntos)</strong> del Modo Competitivo, aplicando <strong>únicamente las siguientes 3 modificaciones</strong> para simplificar la gestión de recursos y el ritmo de turno:
+                  </>
+                )}
+              </p>
+
+              <div className="space-y-3">
+                <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-1.5">
+                  <h3 className="text-xs sm:text-sm font-black text-teal-400">
+                    {isEn ? '1. Fixed Individual Shadow Card Management' : '1. Gestión Individual Fija de Cartas Sombra'}
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-slate-300">
+                    <li>
+                      <strong className="text-white">{isEn ? 'Fixed Marker per Round:' : 'Marcador Fijo por Ronda:'}</strong>{' '}
+                      {isEn
+                        ? 'The shared Team Shadow Pool and post-round income are removed. Instead, each player has exactly one (1) Shadow Marker per round to play one card face-down (keeping the rule of silently showing it to teammates before placing it).'
+                        : 'Se suprime el Fondo de Sombras compartido del equipo y los ingresos posronda. En su lugar, cada jugador dispone exactamente de un (1) Marcador de Sombra por ronda para jugar una carta boca abajo (manteniendo la regla de mostrársela en silencio a sus compañeros antes de colocarla).'}
+                    </li>
+                    <li>
+                      <strong className="text-white">{isEn ? 'Non-Transferable and Non-Cumulative:' : 'Uso Intransferible y No Acumulable:'}</strong>{' '}
+                      {isEn
+                        ? 'The marker is strictly personal and cannot be given to a teammate or saved for later rounds. At the start of each new round, each player again has their single marker.'
+                        : 'El marcador es estrictamente personal y no puede cederse a otro compañero ni acumularse para rondas posteriores. Al inicio de cada nueva ronda, cada jugador vuelve a disponer de su único marcador.'}
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-1.5">
+                  <h3 className="text-xs sm:text-sm font-black text-teal-400">
+                    {isEn ? '2. Individual Turn Timer (No Team Clock)' : '2. Tiempo de Turno Individual (Sin Reloj de Equipo)'}
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-slate-300">
+                    <li>
+                      <strong className="text-white">{isEn ? 'Fixed 20 Seconds per Play:' : 'Tiempo Fijo de 20 Segundos por Jugada:'}</strong>{' '}
+                      {isEn
+                        ? 'The shared dual team timer is eliminated. Each player has a fixed limit of 20 seconds per turn to place their card.'
+                        : 'Se elimina el cronómetro dual compartido. Cada jugador dispone de un límite fijo de 20 segundos por turno para colocar su carta.'}
+                    </li>
+                    <li>
+                      <strong className="text-white">{isEn ? 'Time Infraction (Auto-play):' : 'Infracción por Tiempo (Auto-play):'}</strong>{' '}
+                      {isEn
+                        ? 'If a player exhausts their 20 seconds without placing a card, they must immediately play (or the system automatically plays in the digital version) the first available card in their hand, placing it face-up on the valid (unsaturated) front that currently has the fewest cards.'
+                        : 'Si un jugador agota sus 20 segundos sin haber colocado una carta, debe jugar de manera inmediata (o el sistema jugará automáticamente en la versión digital) la primera carta disponible de su mano, colocándola boca arriba en el frente válido (no saturado) que contenga menos cartas en ese momento.'}
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-1.5">
+                  <h3 className="text-xs sm:text-sm font-black text-teal-400">
+                    {isEn ? '3. Direct Match Tiebreaker' : '3. Desempate Directo de Partida'}
+                  </h3>
+                  <ul className="list-disc list-inside space-y-1 text-slate-300">
+                    <li>
+                      {isEn ? (
+                        <>
+                          Since there is no cumulative Team Shadow Pool, if there is a tie in Round Points at the end of the regulation rounds, the match goes directly to a <strong>2-Round Overtime</strong>.
+                        </>
+                      ) : (
+                        <>
+                          Al no existir un Fondo de Sombras acumulable de equipo, si al finalizar las rondas reglamentarias hay empate en Puntos de Ronda, se pasa directamente a disputar la <strong>Prórroga de 2 Rondas</strong>.
+                        </>
+                      )}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+          )}
+        </div>
+
+        {/* Pie del Modal */}
+        <div className="no-print px-6 py-3.5 bg-slate-950 border-t border-slate-800 flex items-center justify-between shrink-0">
+          <span className="text-xs text-slate-400">{manual.footerInfo}</span>
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition shadow"
+            className="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider transition cursor-pointer"
           >
-            {manualT.footerBackBtn}
+            {manual.footerBtn}
           </button>
         </div>
       </div>

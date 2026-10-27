@@ -9,17 +9,17 @@ import { calculateFrontScore } from '../constants/rules.js';
  *    prioriza asegurar 2 frentes y busca el Pleno de 3 frentes o evitar el Pleno rival sin desperdiciar
  *    recursos en frentes ya decididos.
  * 2. Prevención de Overkill y Ofuscación: Si el rival no está compitiendo en un frente (0 tropas)
- *    o ya se tiene una ventaja segura (>=15 pts), la IA NO sigue acumulando cartas allí.
- *    Reserva sus cartas para frentes disputados.
+ *    o ya se tiene una ventaja segura (>=6 pts en solitario, +8 pts en disputa o +5 pts con <=2 huecos),
+ *    la IA NO sigue acumulando cartas allí. Reserva sus cartas para frentes disputados.
  * 3. Niebla de Guerra Absoluta (Anti-Trampas para Carta Sombra Rival):
  *    La IA NUNCA inspecciona el palo, valor o rango de las cartas sombras no reveladas del rival.
  *    Se censuran completamente (rank: '?', suit: null, base: 0).
  *    En lugar de ignorarlas (lo que crearía la falsa ilusión de que el frente está vacío),
- *    la IA estima de forma realista una amenaza ponderada (~11 pts) por cada sombra rival.
+ *    la IA estima de forma realista una amenaza ponderada (~3 pts) por cada sombra rival.
  * 4. Preservación de Cartas de Alto Impacto: Ases (14), Reyes (13) y Reinas (12) se reservan
  *    para decantar frentes disputados o lograr remontadas, nunca para frentes sin rival.
- * 5. Corte de Pérdidas (Cut Losses): Si un frente está matemáticamente perdido o con desventaja
- *    irrecuperable, la IA no tira cartas de alto calibre allí; se enfoca en ganar los otros 2 frentes.
+ * 5. Corte de Pérdidas (Cut Losses): Si un frente está prácticamente perdido (desventaja de -6 pts con
+ *    <=2 huecos o -10 pts en cualquier momento), la IA no tira cartas de alto calibre allí; se enfoca en ganar los otros 2 frentes.
  * 6. Marcador de Sombra Táctico: Utiliza la carta sombra estratégicamente en cartas altas en
  *    frentes disputados para ocultar la fuerza real e impedir que el rival calcule su respuesta.
  */
@@ -40,8 +40,6 @@ export function chooseBotMove({
   if (!botHand || botHand.length === 0) return null;
 
   const isCasual = gameMode === 'casual';
-  // Factor de escala: en Modo Casual (1-4 pts) los umbrales equivalen a ~0.22x de la escala Competitiva
-  const scale = isCasual ? 0.22 : 1;
 
   const enemyTeam = botTeam === 'teamA' ? 'teamB' : 'teamA';
   const frontKeys = Object.keys(fronts);
@@ -104,9 +102,8 @@ export function chooseBotMove({
     // Detección de cartas sombra rivales sin filtrar su contenido
     const enemyShadowCount = enemyCards.filter(c => c.isShadow && !c.isRevealed).length;
     
-    // Estimación táctica de amenaza: una sombra rival suele ser una carta alta o combo clave.
-    // Competitivo: ~11 puntos por sombra; Casual: ~3 puntos por sombra.
-    const enemyEstimatedShadowScore = enemyShadowCount * (isCasual ? 3 : 11);
+    // Estimación táctica de amenaza en la Escala Unificada (1-4 pts): ~3 puntos por sombra rival.
+    const enemyEstimatedShadowScore = enemyShadowCount * 3;
     const enemyEstimatedTotal = enemyVisibleScore + enemyEstimatedShadowScore;
 
     const totalCards = myCards.length + enemyCards.length;
@@ -118,15 +115,18 @@ export function chooseBotMove({
     const isEmpty = myCards.length === 0 && enemyCards.length === 0;
 
     // Frente ya asegurado:
+    // - Ventaja segura en frente solitario: Puntuación propia >= 6 puntos sin oposición rival.
+    // - Con rival: Ventaja de +5 puntos con 2 o menos huecos restantes, o ventaja de +8 puntos en cualquier momento.
     const isSecured = 
-      (isMineUncontested && myScore >= 15 * scale) ||
-      (enemyCards.length > 0 && diff >= 22 * scale) ||
-      (enemyCards.length > 0 && diff >= 14 * scale && remainingSlots <= 2);
+      (isMineUncontested && myScore >= 6) ||
+      (enemyCards.length > 0 && diff >= 8) ||
+      (enemyCards.length > 0 && diff >= 5 && remainingSlots <= 2);
 
     // Frente prácticamente perdido:
+    // Desventaja de -6 puntos con 2 o menos huecos restantes, o desventaja de -10 puntos en cualquier momento.
     const isLost = 
-      (diff <= -22 * scale && remainingSlots <= 2) ||
-      (diff <= -34 * scale);
+      (diff <= -6 && remainingSlots <= 2) ||
+      (diff <= -10);
 
     // Frente en disputa activa
     const isContested = !isSecured && !isLost && !isEmpty && !isMineUncontested;
@@ -175,8 +175,8 @@ export function chooseBotMove({
       const newScoreObj = calculateFrontScore(hypoCards, true, gameMode);
       const pointsGained = newScoreObj.total - fa.myScore;
 
-      // Base: puntos aportados (normalizado en modo casual para mantener pesos equivalentes)
-      let rating = pointsGained * (isCasual ? 4.5 : 1.2);
+      // Base: puntos aportados en la Escala Unificada (1-4 pts base + sinergias +1/+2/+4/+5)
+      let rating = pointsGained * 4.5;
 
       // =========================================================================
       // REGLA 1: ANTI-OVERKILL Y COMBATE A LA OFUSCACIÓN
@@ -184,20 +184,20 @@ export function chooseBotMove({
       // =========================================================================
       if (fa.isMineUncontested) {
         // El rival no ha puesto NINGUNA tropa en este frente (0 cartas)
-        if (fa.myScore >= 24 * scale) {
-          // Ya tenemos puntos sobrados frente a la nada. Castigo masivo para frenar el amontonamiento.
+        if (fa.myScore >= 6) {
+          // Ya tenemos puntos sobrados frente a la nada (frente solitario asegurado >= 6 pts). Castigo masivo para frenar el amontonamiento.
           rating -= 60;
-        } else if (fa.myScore >= 15 * scale) {
-          // Ventaja cómoda sin resistencia enemiga:
+        } else if (fa.myScore >= 4) {
+          // Ventaja cómoda sin resistencia enemiga (4-5 pts):
           // Muy mala idea gastar una carta alta, y desaconsejado jugar cualquier otra
           rating -= isHighCard ? 45 : 30;
-        } else if (fa.myScore >= 8 * scale) {
-          // Ya tenemos 1 carta sólida. Si aún no hay rival, NO gastar As ni Rey.
+        } else if (fa.myScore >= 2) {
+          // Ya tenemos 1 carta sólida (>= 2 pts). Si aún no hay rival, NO gastar As ni Rey.
           if (isHighCard) rating -= 25;
         }
       } else if (fa.isSecured) {
         // Hay tropas rivales, pero la ventaja es decisiva
-        if (fa.diff >= 28 * scale) {
+        if (fa.diff >= 10) {
           rating -= 50; // Overkill total
         } else {
           rating -= isHighCard ? 35 : 20;
@@ -229,7 +229,7 @@ export function chooseBotMove({
         if (fa.diff <= 0 && newEstimatedDiff > 0) {
           // ¡Remontada! Cambia el frente de derrota/empate a victoria
           rating += 26;
-        } else if (fa.diff > 0 && fa.diff <= 8 * scale && newEstimatedDiff >= 12 * scale) {
+        } else if (fa.diff > 0 && fa.diff <= 2 && newEstimatedDiff >= 4) {
           // Convierte una ventaja frágil en una ventaja sólida
           rating += 18;
         } else if (fa.diff < 0 && newEstimatedDiff > fa.diff) {
@@ -262,27 +262,25 @@ export function chooseBotMove({
       // REGLA 5: SINERGIAS Y COMBOS CON SENTIDO ESTRATÉGICO
       // =========================================================================
       // Solo premiar sinergias si el frente no está ya sobrecargado o asegurado
-      const shouldRewardSynergies = !fa.isSecured && !(fa.isMineUncontested && fa.myScore >= 16 * scale);
+      const shouldRewardSynergies = !fa.isSecured && !(fa.isMineUncontested && fa.myScore >= 4);
 
       if (shouldRewardSynergies) {
-        // Trío (+20 competitivo / +6 casual)
+        // Prioridad 1: Trío (+5 pts)
         if (newScoreObj.trioTotal > fa.myScoreObj.trioTotal) {
           rating += 16;
         }
-        // Escalera (+15 competitivo / +4 casual)
+        // Prioridad 2: Escalera Corta (+4 pts)
         else if (newScoreObj.straightTotal > fa.myScoreObj.straightTotal) {
           rating += 14;
         }
-        // Pareja (+10 competitivo / +3 casual)
+        // Prioridad 3: Pareja (+2 pts)
         else if (newScoreObj.pairTotal > fa.myScoreObj.pairTotal) {
           rating += 10;
         }
 
-        // Sinergia de palo / Color
+        // Prioridad 4: Sinergia de Palo (Color: +1 pt por carta adicional)
         if (newScoreObj.suitSynergyTotal > fa.myScoreObj.suitSynergyTotal) {
-          rating += isCasual ? 10 : 6;
-        } else if (fa.mySuits.includes(card.suit)) {
-          rating += isCasual ? 4 : 6;
+          rating += 6;
         }
       }
 

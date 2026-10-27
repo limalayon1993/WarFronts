@@ -168,6 +168,7 @@ export default function App() {
   const [teamBLossStreak, setTeamBLossStreak] = useState(0);
   const [lastRoundEconomy, setLastRoundEconomy] = useState(null);
   const [roundHistory, setRoundHistory] = useState([]);
+  const [isOvertimeMatch, setIsOvertimeMatch] = useState(false);
 
   // Jugador local y perspectiva de equipo
   const localPlayer = players.find(p => p.id === mySlotId) || (!isMultiplayer ? players.find(p => p.isHuman) : null);
@@ -216,6 +217,7 @@ export default function App() {
     teamBLossStreak,
     lastRoundEconomy,
     roundHistory,
+    isOvertimeMatch,
   };
 
   // Detectar parámetro ?room=WF-XXXX en la URL
@@ -275,6 +277,7 @@ export default function App() {
       teamBLossStreak: base.teamBLossStreak ?? teamBLossStreak,
       lastRoundEconomy: base.lastRoundEconomy ?? lastRoundEconomy,
       roundHistory: base.roundHistory ?? roundHistory,
+      isOvertimeMatch: Boolean(base.isOvertimeMatch ?? isOvertimeMatch),
     };
 
     mp.connections.forEach((conn, peerId) => {
@@ -370,6 +373,7 @@ export default function App() {
     if (syncData.teamBLossStreak !== undefined) setTeamBLossStreak(syncData.teamBLossStreak);
     if (syncData.lastRoundEconomy !== undefined) setLastRoundEconomy(syncData.lastRoundEconomy);
     if (syncData.roundHistory !== undefined) setRoundHistory(syncData.roundHistory);
+    if (syncData.isOvertimeMatch !== undefined) setIsOvertimeMatch(Boolean(syncData.isOvertimeMatch));
 
     if (syncData.phase === 'roundOver' && prevPhase !== 'roundOver') {
       sound.playReveal();
@@ -403,6 +407,7 @@ export default function App() {
       teamBLossStreak: syncData.teamBLossStreak ?? stateRef.current.teamBLossStreak,
       lastRoundEconomy: syncData.lastRoundEconomy ?? stateRef.current.lastRoundEconomy,
       roundHistory: syncData.roundHistory ?? stateRef.current.roundHistory ?? [],
+      isOvertimeMatch: syncData.isOvertimeMatch ?? stateRef.current.isOvertimeMatch ?? false,
     };
   }
 
@@ -586,8 +591,25 @@ export default function App() {
 
     let teamARoundScoreSum = 0;
     let teamBRoundScoreSum = 0;
+    let teamABaseSum = 0;
+    let teamBBaseSum = 0;
+    let teamASynergySum = 0;
+    let teamBSynergySum = 0;
+    let teamASuitSum = 0;
+    let teamBSuitSum = 0;
+    let teamAPairSum = 0;
+    let teamBPairSum = 0;
+    let teamAStraightSum = 0;
+    let teamBStraightSum = 0;
+    let teamATrioSum = 0;
+    let teamBTrioSum = 0;
     let teamAFrontWins = 0;
     let teamBFrontWins = 0;
+    let teamANominalTieWins = 0;
+    let teamBNominalTieWins = 0;
+    let teamAShadowsSpent = 0;
+    let teamBShadowsSpent = 0;
+    const frontBreakdowns = {};
 
     FRONTS.forEach(front => {
       const teamACards = activeFronts[front.id].teamA;
@@ -597,22 +619,63 @@ export default function App() {
 
       teamARoundScoreSum += teamAScore.total;
       teamBRoundScoreSum += teamBScore.total;
+      teamABaseSum += teamAScore.baseTotal;
+      teamBBaseSum += teamBScore.baseTotal;
+      teamASynergySum += teamAScore.synergyTotal;
+      teamBSynergySum += teamBScore.synergyTotal;
+      teamASuitSum += teamAScore.suitSynergyTotal;
+      teamBSuitSum += teamBScore.suitSynergyTotal;
+      teamAPairSum += teamAScore.pairTotal;
+      teamBPairSum += teamBScore.pairTotal;
+      teamAStraightSum += teamAScore.straightTotal;
+      teamBStraightSum += teamBScore.straightTotal;
+      teamATrioSum += teamAScore.trioTotal;
+      teamBTrioSum += teamBScore.trioTotal;
+      teamAShadowsSpent += teamACards.filter(c => c && c.isShadow).length;
+      teamBShadowsSpent += teamBCards.filter(c => c && c.isShadow).length;
 
       const resolution = resolveFrontWinner(teamACards, teamBCards, language, activeGameMode);
-      if (resolution.winner === 'teamA') teamAFrontWins++;
-      if (resolution.winner === 'teamB') teamBFrontWins++;
+      if (resolution.winner === 'teamA') {
+        teamAFrontWins++;
+        if (resolution.wonByTiebreaker) teamANominalTieWins++;
+      }
+      if (resolution.winner === 'teamB') {
+        teamBFrontWins++;
+        if (resolution.wonByTiebreaker) teamBNominalTieWins++;
+      }
+
+      frontBreakdowns[front.id] = {
+        teamATotal: teamAScore.total,
+        teamABase: teamAScore.baseTotal,
+        teamASynergy: teamAScore.synergyTotal,
+        teamASuit: teamAScore.suitSynergyTotal,
+        teamAPair: teamAScore.pairTotal,
+        teamAStraight: teamAScore.straightTotal,
+        teamATrio: teamAScore.trioTotal,
+        teamAHighestRank: teamAScore.highestRankLabel,
+        teamBTotal: teamBScore.total,
+        teamBBase: teamBScore.baseTotal,
+        teamBSynergy: teamBScore.synergyTotal,
+        teamBSuit: teamBScore.suitSynergyTotal,
+        teamBPair: teamBScore.pairTotal,
+        teamBStraight: teamBScore.straightTotal,
+        teamBTrio: teamBScore.trioTotal,
+        teamBHighestRank: teamBScore.highestRankLabel,
+        winner: resolution.winner,
+        wonByTiebreaker: Boolean(resolution.wonByTiebreaker),
+        tiebreakerWinnerRank: resolution.tiebreakerWinnerRank || null,
+        tiebreakerLoserRank: resolution.tiebreakerLoserRank || null,
+      };
     });
 
-    const prevTeamACumulative = stateRef.current.teamACumulativePoints ?? teamACumulativePoints;
-    const prevTeamBCumulative = stateRef.current.teamBCumulativePoints ?? teamBCumulativePoints;
     let prevTeamARoundPts = stateRef.current.teamARoundPoints ?? teamARoundPoints;
     let prevTeamBRoundPts = stateRef.current.teamBRoundPoints ?? teamBRoundPoints;
 
-    // En Modo Casual NO se registran ni usan puntos acumulados entre rondas
-    const newTeamACumulative = isCasualMode ? 0 : (prevTeamACumulative + teamARoundScoreSum);
-    const newTeamBCumulative = isCasualMode ? 0 : (prevTeamBCumulative + teamBRoundScoreSum);
+    // En v2.1 ya NO se utilizan puntos numéricos acumulados de frentes para desempatar partidas
+    const newTeamACumulative = 0;
+    const newTeamBCumulative = 0;
 
-    // Nuevo sistema oficial de Puntos de Ronda (1, 2 y 3 Puntos):
+    // Sistema oficial de Puntos de Ronda (1, 2 y 3 Puntos):
     // - Empate en frentes conquistados (ej. 1-1 y 1 Nulo, o 3 Nulos): +1 Punto para CADA equipo
     // - Victoria Estándar (ganar 2 frentes, o ganar 1-0 por doble frente nulo): +2 Puntos al ganador
     // - Dominio Total / "Pleno" (ganar los 3 frentes): +3 Puntos al ganador
@@ -629,10 +692,18 @@ export default function App() {
       ? { teamAEarned: 0, teamBEarned: 0, teamANewStreak: 0, teamBNewStreak: 0, teamAReason: 'casual', teamBReason: 'casual' }
       : calculateRoundEconomy(activeModeId, roundWinner, currentAStreak, currentBStreak);
 
+    const currentRoundNum = stateRef.current.round ?? round ?? 1;
+    const currentTotalRounds = stateRef.current.totalMatchRounds ?? totalMatchRounds ?? 4;
+    const isFinalMatchRound = currentRoundNum >= currentTotalRounds;
+
     const prevTeamAShadows = stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft;
     const prevTeamBShadows = stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft;
-    const updatedTeamAShadows = isCasualMode ? 0 : (prevTeamAShadows + econResult.teamAEarned);
-    const updatedTeamBShadows = isCasualMode ? 0 : (prevTeamBShadows + econResult.teamBEarned);
+    // En la última ronda de la partida, el Fondo de Equipo conserva los Marcadores de Sombra sin gastar
+    // al término de la última ronda (Sección 7: Eficiencia de Sombras). Si se activa Prórroga, se suma el ingreso pendiente.
+    const effectiveAEarnedNow = (isCasualMode || isFinalMatchRound) ? 0 : econResult.teamAEarned;
+    const effectiveBEarnedNow = (isCasualMode || isFinalMatchRound) ? 0 : econResult.teamBEarned;
+    const updatedTeamAShadows = isCasualMode ? 0 : (prevTeamAShadows + effectiveAEarnedNow);
+    const updatedTeamBShadows = isCasualMode ? 0 : (prevTeamBShadows + effectiveBEarnedNow);
 
     const roundEconomyData = isCasualMode
       ? null
@@ -644,17 +715,18 @@ export default function App() {
           teamBPointsEarned: roundPtsResult.teamBPoints,
           teamAEarned: econResult.teamAEarned,
           teamBEarned: econResult.teamBEarned,
+          pendingOvertimeAEarned: isFinalMatchRound ? econResult.teamAEarned : 0,
+          pendingOvertimeBEarned: isFinalMatchRound ? econResult.teamBEarned : 0,
           teamAReason: econResult.teamAReason,
           teamBReason: econResult.teamBReason,
           teamAPrevBank: prevTeamAShadows,
           teamBPrevBank: prevTeamBShadows,
-          teamATotalBank: updatedTeamAShadows,
-          teamBTotalBank: updatedTeamBShadows,
+          teamATotalBank: isFinalMatchRound ? (prevTeamAShadows + econResult.teamAEarned) : updatedTeamAShadows,
+          teamBTotalBank: isFinalMatchRound ? (prevTeamBShadows + econResult.teamBEarned) : updatedTeamBShadows,
           teamANewStreak: econResult.teamANewStreak,
           teamBNewStreak: econResult.teamBNewStreak,
         };
 
-    const currentRoundNum = stateRef.current.round ?? round ?? 1;
     const prevHistory = stateRef.current.roundHistory ?? roundHistory ?? [];
     const roundEntry = {
       round: currentRoundNum,
@@ -664,6 +736,29 @@ export default function App() {
       teamBPoints: roundPtsResult.teamBPoints,
       teamAScoreSum: teamARoundScoreSum,
       teamBScoreSum: teamBRoundScoreSum,
+      teamABasePts: teamABaseSum,
+      teamBBasePts: teamBBaseSum,
+      teamASynergyPts: teamASynergySum,
+      teamBSynergyPts: teamBSynergySum,
+      teamASuitPts: teamASuitSum,
+      teamBSuitPts: teamBSuitSum,
+      teamAPairPts: teamAPairSum,
+      teamBPairPts: teamBPairSum,
+      teamAStraightPts: teamAStraightSum,
+      teamBStraightPts: teamBStraightSum,
+      teamATrioPts: teamATrioSum,
+      teamBTrioPts: teamBTrioSum,
+      teamANominalTieWins,
+      teamBNominalTieWins,
+      teamAShadowsSpent,
+      teamBShadowsSpent,
+      teamAShadowsEarned: effectiveAEarnedNow,
+      teamBShadowsEarned: effectiveBEarnedNow,
+      pendingOvertimeAEarned: (!isCasualMode && isFinalMatchRound) ? econResult.teamAEarned : 0,
+      pendingOvertimeBEarned: (!isCasualMode && isFinalMatchRound) ? econResult.teamBEarned : 0,
+      teamAShadowsBank: updatedTeamAShadows,
+      teamBShadowsBank: updatedTeamBShadows,
+      frontBreakdowns,
       roundWinner,
       winType: roundPtsResult.winType,
       flagFallTeam: null,
@@ -910,7 +1005,7 @@ export default function App() {
     executePlayerMove(activePlayer.id, autoCard, targetFrontKey, false);
   }
 
-  // Manejo oficial de Caída de Bandera (Derrota por Tiempo al llegar a 00:00 el reloj de equipo)
+  // Manejo oficial de Caída de Bandera (Derrota por Tiempo al llegar a 00:00 el reloj de equipo en Modo Competitivo)
   function handleFlagFallTimeout(infringingTeam) {
     if (stateRef.current.phase !== 'deployment' && phase !== 'deployment') return;
 
@@ -920,12 +1015,27 @@ export default function App() {
     const activeFronts = stateRef.current.fronts || fronts;
     const activeGameMode = stateRef.current.selectedGameMode || selectedGameMode || 'competitive';
 
-    // 1. Conservación de Puntos Acumulados: Se voltean las cartas jugadas hasta ese instante en la mesa
-    // y se suman los valores base y sinergias ya colocados por ambos bandos.
     let teamARoundScoreSum = 0;
     let teamBRoundScoreSum = 0;
+    let teamABaseSum = 0;
+    let teamBBaseSum = 0;
+    let teamASynergySum = 0;
+    let teamBSynergySum = 0;
+    let teamASuitSum = 0;
+    let teamBSuitSum = 0;
+    let teamAPairSum = 0;
+    let teamBPairSum = 0;
+    let teamAStraightSum = 0;
+    let teamBStraightSum = 0;
+    let teamATrioSum = 0;
+    let teamBTrioSum = 0;
     let teamAFrontWins = 0;
     let teamBFrontWins = 0;
+    let teamANominalTieWins = 0;
+    let teamBNominalTieWins = 0;
+    let teamAShadowsSpent = 0;
+    let teamBShadowsSpent = 0;
+    const frontBreakdowns = {};
 
     FRONTS.forEach(front => {
       const teamACards = activeFronts[front.id].teamA;
@@ -935,23 +1045,65 @@ export default function App() {
 
       teamARoundScoreSum += teamAScore.total;
       teamBRoundScoreSum += teamBScore.total;
+      teamABaseSum += teamAScore.baseTotal;
+      teamBBaseSum += teamBScore.baseTotal;
+      teamASynergySum += teamAScore.synergyTotal;
+      teamBSynergySum += teamBScore.synergyTotal;
+      teamASuitSum += teamAScore.suitSynergyTotal;
+      teamBSuitSum += teamBScore.suitSynergyTotal;
+      teamAPairSum += teamAScore.pairTotal;
+      teamBPairSum += teamBScore.pairTotal;
+      teamAStraightSum += teamAScore.straightTotal;
+      teamBStraightSum += teamBScore.straightTotal;
+      teamATrioSum += teamAScore.trioTotal;
+      teamBTrioSum += teamBScore.trioTotal;
+      teamAShadowsSpent += teamACards.filter(c => c && c.isShadow).length;
+      teamBShadowsSpent += teamBCards.filter(c => c && c.isShadow).length;
 
       const resolution = resolveFrontWinner(teamACards, teamBCards, language, activeGameMode);
-      if (resolution.winner === 'teamA') teamAFrontWins++;
-      if (resolution.winner === 'teamB') teamBFrontWins++;
+      if (resolution.winner === 'teamA') {
+        teamAFrontWins++;
+        if (resolution.wonByTiebreaker) teamANominalTieWins++;
+      }
+      if (resolution.winner === 'teamB') {
+        teamBFrontWins++;
+        if (resolution.wonByTiebreaker) teamBNominalTieWins++;
+      }
+
+      frontBreakdowns[front.id] = {
+        teamATotal: teamAScore.total,
+        teamABase: teamAScore.baseTotal,
+        teamASynergy: teamAScore.synergyTotal,
+        teamASuit: teamAScore.suitSynergyTotal,
+        teamAPair: teamAScore.pairTotal,
+        teamAStraight: teamAScore.straightTotal,
+        teamATrio: teamAScore.trioTotal,
+        teamAHighestRank: teamAScore.highestRankLabel,
+        teamBTotal: teamBScore.total,
+        teamBBase: teamBScore.baseTotal,
+        teamBSynergy: teamBScore.synergyTotal,
+        teamBSuit: teamBScore.suitSynergyTotal,
+        teamBPair: teamBScore.pairTotal,
+        teamBStraight: teamBScore.straightTotal,
+        teamBTrio: teamBScore.trioTotal,
+        teamBHighestRank: teamBScore.highestRankLabel,
+        winner: resolution.winner,
+        wonByTiebreaker: Boolean(resolution.wonByTiebreaker),
+        tiebreakerWinnerRank: resolution.tiebreakerWinnerRank || null,
+        tiebreakerLoserRank: resolution.tiebreakerLoserRank || null,
+      };
     });
 
-    const prevTeamACumulative = stateRef.current.teamACumulativePoints ?? teamACumulativePoints;
-    const prevTeamBCumulative = stateRef.current.teamBCumulativePoints ?? teamBCumulativePoints;
     let prevTeamARoundPts = stateRef.current.teamARoundPoints ?? teamARoundPoints;
     let prevTeamBRoundPts = stateRef.current.teamBRoundPoints ?? teamBRoundPoints;
 
-    const newTeamACumulative = prevTeamACumulative + teamARoundScoreSum;
-    const newTeamBCumulative = prevTeamBCumulative + teamBRoundScoreSum;
+    // En v2.1 ya NO se guardan sumas de puntos de frentes para desempates finales
+    const newTeamACumulative = 0;
+    const newTeamBCumulative = 0;
 
-    // 2. El equipo infractor pierde la ronda automáticamente y el equipo rival suma +2 Puntos de Ronda
+    // El equipo infractor pierde la ronda automáticamente y el equipo rival suma +2 Puntos de Ronda
     // (victoria estándar) de forma directa, salvo que en ese instante ya tuviera mayor puntuación en los 3 frentes
-    // y se hubieran jugado todas las cartas del bando rival/ganador, en cuyo caso sumaría +3 Puntos de Ronda.
+    // y el rival hubiera jugado todas sus cartas, en cuyo caso sumaría +3 Puntos de Ronda.
     const activePlayersList = stateRef.current.players || players || [];
     const winnerTeamPlayers = activePlayersList.filter(p => p.team === winnerTeam);
     const infringingTeamPlayers = activePlayersList.filter(p => p.team === infringingTeam);
@@ -971,10 +1123,16 @@ export default function App() {
     const currentBStreak = stateRef.current.teamBLossStreak ?? teamBLossStreak;
     const econResult = calculateRoundEconomy(activeModeId, winnerTeam, currentAStreak, currentBStreak);
 
+    const currentRoundNum = stateRef.current.round ?? round ?? 1;
+    const currentTotalRounds = stateRef.current.totalMatchRounds ?? totalMatchRounds ?? 4;
+    const isFinalMatchRound = currentRoundNum >= currentTotalRounds;
+
     const prevTeamAShadows = stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft;
     const prevTeamBShadows = stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft;
-    const updatedTeamAShadows = prevTeamAShadows + econResult.teamAEarned;
-    const updatedTeamBShadows = prevTeamBShadows + econResult.teamBEarned;
+    const effectiveAEarnedNow = isFinalMatchRound ? 0 : econResult.teamAEarned;
+    const effectiveBEarnedNow = isFinalMatchRound ? 0 : econResult.teamBEarned;
+    const updatedTeamAShadows = prevTeamAShadows + effectiveAEarnedNow;
+    const updatedTeamBShadows = prevTeamBShadows + effectiveBEarnedNow;
 
     const roundEconomyData = {
       modeId: activeModeId,
@@ -984,17 +1142,18 @@ export default function App() {
       teamBPointsEarned: roundPtsResult.teamBPoints,
       teamAEarned: econResult.teamAEarned,
       teamBEarned: econResult.teamBEarned,
+      pendingOvertimeAEarned: isFinalMatchRound ? econResult.teamAEarned : 0,
+      pendingOvertimeBEarned: isFinalMatchRound ? econResult.teamBEarned : 0,
       teamAReason: econResult.teamAReason,
       teamBReason: econResult.teamBReason,
       teamAPrevBank: prevTeamAShadows,
       teamBPrevBank: prevTeamBShadows,
-      teamATotalBank: updatedTeamAShadows,
-      teamBTotalBank: updatedTeamBShadows,
+      teamATotalBank: isFinalMatchRound ? (prevTeamAShadows + econResult.teamAEarned) : updatedTeamAShadows,
+      teamBTotalBank: isFinalMatchRound ? (prevTeamBShadows + econResult.teamBEarned) : updatedTeamBShadows,
       teamANewStreak: econResult.teamANewStreak,
       teamBNewStreak: econResult.teamBNewStreak,
     };
 
-    const currentRoundNum = stateRef.current.round ?? round ?? 1;
     const prevHistory = stateRef.current.roundHistory ?? roundHistory ?? [];
     const roundEntry = {
       round: currentRoundNum,
@@ -1004,6 +1163,29 @@ export default function App() {
       teamBPoints: roundPtsResult.teamBPoints,
       teamAScoreSum: teamARoundScoreSum,
       teamBScoreSum: teamBRoundScoreSum,
+      teamABasePts: teamABaseSum,
+      teamBBasePts: teamBBaseSum,
+      teamASynergyPts: teamASynergySum,
+      teamBSynergyPts: teamBSynergySum,
+      teamASuitPts: teamASuitSum,
+      teamBSuitPts: teamBSuitSum,
+      teamAPairPts: teamAPairSum,
+      teamBPairPts: teamBPairSum,
+      teamAStraightPts: teamAStraightSum,
+      teamBStraightPts: teamBStraightSum,
+      teamATrioPts: teamATrioSum,
+      teamBTrioPts: teamBTrioSum,
+      teamANominalTieWins,
+      teamBNominalTieWins,
+      teamAShadowsSpent,
+      teamBShadowsSpent,
+      teamAShadowsEarned: effectiveAEarnedNow,
+      teamBShadowsEarned: effectiveBEarnedNow,
+      pendingOvertimeAEarned: isFinalMatchRound ? econResult.teamAEarned : 0,
+      pendingOvertimeBEarned: isFinalMatchRound ? econResult.teamBEarned : 0,
+      teamAShadowsBank: updatedTeamAShadows,
+      teamBShadowsBank: updatedTeamBShadows,
+      frontBreakdowns,
       roundWinner: roundPtsResult.roundWinner,
       winType: roundPtsResult.winType,
       flagFallTeam: infringingTeam,
@@ -1372,6 +1554,7 @@ export default function App() {
     setTeamBLossStreak(0);
     setLastRoundEconomy(null);
     setRoundHistory([]);
+    setIsOvertimeMatch(false);
     setTotalMatchRounds(durationConfig.rounds);
     setRoundOverTimer(60);
     setRoundOverReadyPlayers([]);
@@ -1408,6 +1591,7 @@ export default function App() {
     stateRef.current.selectedMode = lobbyData.modeId;
     stateRef.current.selectedTimeSpeed = activeSpeed;
     stateRef.current.selectedGameMode = activeRuleMode;
+    stateRef.current.isOvertimeMatch = false;
 
     const activeConfig = GAME_MODES[lobbyData.modeId] || GAME_MODES['2v2'];
     setTotalMatchRounds(lobbyData.rhythmRounds);
@@ -1421,6 +1605,7 @@ export default function App() {
     setTeamBLossStreak(0);
     setLastRoundEconomy(null);
     setRoundHistory([]);
+    setIsOvertimeMatch(false);
 
     if (isHostUser) {
       const initialDeck = createDeck(activeConfig.decks);
@@ -1502,10 +1687,45 @@ export default function App() {
 
   // Disputar Prórroga oficial de 2 rondas por empate exacto (Capítulo 7 / Anexo Casual)
   function handlePlayOvertime() {
+    const activeGameMode = stateRef.current.selectedGameMode || selectedGameMode || 'competitive';
+    const isCasualMode = activeGameMode === 'casual';
+    const lastEcon = stateRef.current.lastRoundEconomy ?? lastRoundEconomy;
+    const pendingA = (!isCasualMode && lastEcon?.pendingOvertimeAEarned) ? Number(lastEcon.pendingOvertimeAEarned) : 0;
+    const pendingB = (!isCasualMode && lastEcon?.pendingOvertimeBEarned) ? Number(lastEcon.pendingOvertimeBEarned) : 0;
+
+    const nextAShadows = isCasualMode ? 0 : ((stateRef.current.teamAShadowsLeft ?? teamAShadowsLeft) + pendingA);
+    const nextBShadows = isCasualMode ? 0 : ((stateRef.current.teamBShadowsLeft ?? teamBShadowsLeft) + pendingB);
+
+    const prevHistory = stateRef.current.roundHistory ?? roundHistory ?? [];
+    const currentRoundNum = stateRef.current.round ?? round;
+    const updatedHistory = prevHistory.map(entry => {
+      if (entry.round === currentRoundNum && (pendingA > 0 || pendingB > 0)) {
+        return {
+          ...entry,
+          teamAShadowsEarned: (entry.teamAShadowsEarned || 0) + pendingA,
+          teamBShadowsEarned: (entry.teamBShadowsEarned || 0) + pendingB,
+          pendingOvertimeAEarned: 0,
+          pendingOvertimeBEarned: 0,
+          teamAShadowsBank: nextAShadows,
+          teamBShadowsBank: nextBShadows,
+        };
+      }
+      return entry;
+    });
+
+    setTeamAShadowsLeft(nextAShadows);
+    setTeamBShadowsLeft(nextBShadows);
+    setRoundHistory(updatedHistory);
+    setIsOvertimeMatch(true);
     setTotalMatchRounds(prev => prev + 2);
     setPhase('roundOver');
+
     stateRef.current = {
       ...stateRef.current,
+      teamAShadowsLeft: nextAShadows,
+      teamBShadowsLeft: nextBShadows,
+      roundHistory: updatedHistory,
+      isOvertimeMatch: true,
       totalMatchRounds: (stateRef.current.totalMatchRounds || totalMatchRounds) + 2,
       phase: 'roundOver',
     };
@@ -1524,6 +1744,7 @@ export default function App() {
     setTeamBLossStreak(0);
     setLastRoundEconomy(null);
     setRoundHistory([]);
+    setIsOvertimeMatch(false);
     setTotalMatchRounds(durationConfig.rounds);
 
     const newDeck = createDeck(modeConfig.decks);
@@ -2230,13 +2451,14 @@ export default function App() {
         teamBShadowsLeft={teamBShadowsLeft}
       />
 
-      {/* MODAL DE FIN DE PARTIDA CON PRÓRROGA REGLAMENTARIA */}
+      {/* MODAL DE FIN DE PARTIDA CON DESEMPATE POR EFICIENCIA DE SOMBRAS Y PRÓRROGA */}
       <GameOverModal
         isOpen={phase === 'gameOver'}
         teamARoundPoints={teamARoundPoints}
         teamBRoundPoints={teamBRoundPoints}
-        teamACumulativePoints={teamACumulativePoints}
-        teamBCumulativePoints={teamBCumulativePoints}
+        teamAShadowsLeft={teamAShadowsLeft}
+        teamBShadowsLeft={teamBShadowsLeft}
+        isOvertimeMatch={isOvertimeMatch}
         roundHistory={roundHistory}
         modeId={selectedMode}
         gameMode={selectedGameMode}
